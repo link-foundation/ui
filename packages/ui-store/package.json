@@ -1,0 +1,44 @@
+{
+  "name": "@link-foundation/ui-store",
+  "version": "0.0.0",
+  "description": "Mutable links network store of the associative UI framework: stable IDs, change events, transactions, undo/redo and an operation log in Links Notation",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
+  "types": "./src/index.d.ts",
+  "files": [
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "ui",
+    "links-notation",
+    "associative",
+    "store",
+    "undo"
+  ],
+  "license": "Unlicense",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/link-foundation/ui.git",
+    "directory": "packages/ui-store"
+  },
+  "homepage": "https://github.com/link-foundation/ui/tree/main/packages/ui-store#readme",
+  "bugs": {
+    "url": "https://github.com/link-foundation/ui/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@link-foundation/ui-core": "^0.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
