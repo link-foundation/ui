@@ -97,9 +97,10 @@ except for the primitive names and these differences:
 | `(ok: Button (label OK))` in `elements/positional-values`                   | `(ok: Button (label OK) (variant outlined))`             | Material 3 draws `variant outlined` as an `OutlinedButton`                           |
 | `(ok: Button (label OK) (disabled true))` in `properties/declared-property` | `(ok: Button (label OK) (variant text) (disabled true))` | `variant text` is a `TextButton`                                                     |
 
-`experiments/compare-kotlin-swift-snapshots.sh <swift-git-ref>` applies the
-renames above to the Swift snapshots and prints every line that still
-differs (only the two `variant` lines).
+`bash experiments/compare-kotlin-swift-snapshots.sh` applies the renames
+above to the Swift snapshots of the current commit (or of a git ref given as
+its argument) and prints every line that still differs (only the two
+`variant` lines).
 
 ## Actions
 

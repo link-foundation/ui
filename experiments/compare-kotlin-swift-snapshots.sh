@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-# Compares the ui-kotlin render-tree snapshots with the ui-swift ones (#30,
-# PR #105) after the primitive renames listed in packages/ui-kotlin/README.md.
-# Usage: experiments/compare-kotlin-swift-snapshots.sh [swift-git-ref]
+# Compares the ui-kotlin render-tree snapshots with the ui-swift ones (#30)
+# after the primitive renames listed in packages/ui-kotlin/README.md.
+# Usage: bash experiments/compare-kotlin-swift-snapshots.sh [swift-git-ref]
+# (default HEAD: the ui-swift snapshots of the current commit)
 # Prints every line that still differs; exits 1 when any does.
 set -euo pipefail
-ref="${1:-pr105}"
+ref="${1:-HEAD}"
 kotlin=packages/ui-kotlin/src/commonTest/resources/snapshots
 swift=packages/ui-swift/Tests/Snapshots
 status=0

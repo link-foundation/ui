@@ -105,6 +105,18 @@ UiView(document: UiDocumentModel(lino: text)) { action in
 }
 ```
 
+### Jetpack Compose
+
+[`ui-kotlin`](packages/ui-kotlin/README.md) draws a LiNo document with Material 3
+Compose views (Compose Multiplatform desktop, optional Android). It is a
+Gradle Kotlin Multiplatform project; `examples/kotlin` is a desktop window:
+
+```kotlin
+UiView(rememberUiDocumentState(text), onAction = { action ->
+    // UiAction("ok", "press", listOf("navigate", "home"))
+})
+```
+
 ### Style rules
 
 [`@link-foundation/ui-style`](packages/ui-style/README.md) reads style rules
@@ -159,6 +171,7 @@ npm run example:desktop:package
 ├── .github/workflows/    # GitHub Actions CI/CD
 ├── .husky/               # Git hooks (pre-commit)
 ├── examples/             # Usage examples
+│   ├── kotlin/           # Compose Desktop window for ui-kotlin (Gradle build)
 │   └── universal-app/    # React + GitHub Pages + Electron + Capacitor app
 ├── scripts/              # Build and release scripts
 ├── packages/             # npm workspaces (see docs/monorepo.md)
@@ -166,6 +179,7 @@ npm run example:desktop:package
 │   ├── ui-convert/       # @link-foundation/ui-convert (HTML/DOM, A2UI, Adaptive Cards, JSON Forms, Lottie <-> LiNo)
 │   ├── ui-core/          # @link-foundation/ui-core
 │   ├── ui-i18n/          # @link-foundation/ui-i18n (localisation with lino-i18n, (t KEY) messages)
+│   ├── ui-kotlin/        # Jetpack Compose renderer (Gradle Kotlin Multiplatform, see build.gradle.kts)
 │   ├── ui-settings/      # @link-foundation/ui-settings (settings schemas, presets, share links)
 │   ├── ui-store/         # @link-foundation/ui-store
 │   ├── ui-style/         # @link-foundation/ui-style (style rules, states, media and container conditions)
