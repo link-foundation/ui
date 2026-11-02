@@ -15,7 +15,8 @@ describe('tag prefix logic', () => {
   });
 
   it('defaults to "<package>@" in the npm workspaces root', () => {
-    expect(buildReleaseTag('1.0.0', { jsRoot: '.' })).toBe(
+    const env = { RELEASE_PACKAGE: '@link-foundation/ui-core' };
+    expect(buildReleaseTag('1.0.0', { jsRoot: '.', env })).toBe(
       '@link-foundation/ui-core@1.0.0'
     );
   });
