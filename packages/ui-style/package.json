@@ -1,0 +1,51 @@
+{
+  "name": "@link-foundation/ui-style",
+  "version": "0.0.0",
+  "description": "Style rules of the associative UI framework written in Links Notation: selectors, states, media and container conditions, resolved against ui-tokens into a CSS stylesheet or a resolved style per element",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
+  "types": "./src/index.d.ts",
+  "files": [
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "ui",
+    "links-notation",
+    "styles",
+    "css",
+    "design-tokens",
+    "media-queries",
+    "container-queries"
+  ],
+  "license": "Unlicense",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/link-foundation/ui.git",
+    "directory": "packages/ui-style"
+  },
+  "homepage": "https://github.com/link-foundation/ui/tree/main/packages/ui-style#readme",
+  "bugs": {
+    "url": "https://github.com/link-foundation/ui/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@link-foundation/ui-core": "^0.0.0",
+    "@link-foundation/ui-tokens": "^0.0.0"
+  },
+  "devDependencies": {
+    "postcss": "^8.5.6",
+    "test-anywhere": "^0.8.48"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
