@@ -1,0 +1,5 @@
+# Gradle and Kotlin build outputs of the Compose renderer.
+.gradle/
+.kotlin/
+build/
+local.properties

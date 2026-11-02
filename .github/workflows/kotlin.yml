@@ -3,6 +3,11 @@ name: Kotlin
 # The Kotlin Multiplatform Links Notation parser (native/kotlin/links-notation,
 # issue #31). Its tests read the upstream parity corpus (native/parity) and the
 # ui-dialect/0 parser vectors (docs/spec), so a change to either runs them too.
+#
+# The Compose renderer (packages/ui-kotlin, issue #32) and its desktop example
+# (examples/kotlin) build on that parser; their tests read the shared fixtures
+# (docs/spec), the issue #1 sample document and the ui-tokens golden Kotlin
+# output, so a change to any of those runs them too.
 on:
   push:
     branches:
@@ -11,6 +16,10 @@ on:
       - 'native/kotlin/**'
       - 'native/parity/**'
       - 'docs/spec/**'
+      - 'packages/ui-kotlin/**'
+      - 'examples/kotlin/**'
+      - 'packages/ui-tokens/tests/golden/**'
+      - 'docs/case-studies/issue-1/samples/**'
       - '.github/workflows/kotlin.yml'
   pull_request:
     types: [opened, synchronize, reopened]
@@ -18,6 +27,10 @@ on:
       - 'native/kotlin/**'
       - 'native/parity/**'
       - 'docs/spec/**'
+      - 'packages/ui-kotlin/**'
+      - 'examples/kotlin/**'
+      - 'packages/ui-tokens/tests/golden/**'
+      - 'docs/case-studies/issue-1/samples/**'
       - '.github/workflows/kotlin.yml'
   workflow_dispatch:
 
@@ -139,6 +152,90 @@ jobs:
         if: ${{ !cancelled() }}
         run: sh test-summary.sh
 
+  ui-kotlin:
+    name: ui-kotlin desktop tests and example
+    runs-on: ubuntu-24.04
+    # Typical run: about 6min (Gradle, Compose Multiplatform, the desktop
+    # tests and the example build). 25min stops a hung download from
+    # blocking the run; a hung Compose test fails after 10min (Test.timeout).
+    timeout-minutes: 25
+    concurrency:
+      group: check-${{ github.workflow }}-${{ github.ref }}-ui-kotlin
+      cancel-in-progress: true
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: packages/ui-kotlin
+    # The Android target is configured only where an Android SDK is found;
+    # this job leaves it out (the ui-kotlin-android job below builds it).
+    env:
+      ANDROID_HOME: ''
+      ANDROID_SDK_ROOT: ''
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Validate the Gradle wrapper
+        uses: gradle/actions/wrapper-validation@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+
+      - name: Setup Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+
+      # Every test: render-tree snapshots of the shared fixtures, themes,
+      # actions and UiView in a headless Compose window.
+      - name: Run ./gradlew check
+        run: ./gradlew --no-daemon --console=plain check
+
+      - name: Show how many tests ran
+        if: ${{ !cancelled() }}
+        run: sh ../../native/kotlin/links-notation/test-summary.sh
+
+      # examples/kotlin is its own build (it includes this one); building it
+      # compiles Main.kt against the library.
+      - name: Build the desktop example
+        working-directory: examples/kotlin
+        run: ../../packages/ui-kotlin/gradlew --no-daemon --console=plain build
+
+  ui-kotlin-android:
+    name: ui-kotlin Android build
+    runs-on: ubuntu-24.04
+    # Typical run: about 5min (Gradle, Android Gradle plugin, one build).
+    timeout-minutes: 25
+    concurrency:
+      group: check-${{ github.workflow }}-${{ github.ref }}-ui-kotlin-android
+      cancel-in-progress: true
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: packages/ui-kotlin
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+
+      # The hosted image ships an Android SDK and sets ANDROID_HOME; the
+      # build applies the Android library target only when it finds one.
+      - name: Build the Android library
+        run: ./gradlew --no-daemon --console=plain assemble
+
   # Terminal status gate: runs even when the jobs above fail or are
   # cancelled, and turns a `timeout-minutes` kill (reported as cancelled)
   # into a red run. needs is derived and checked by the status-gate-coverage
@@ -159,6 +256,8 @@ jobs:
       - jvm-js
       - android
       - ios
+      - ui-kotlin
+      - ui-kotlin-android
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
