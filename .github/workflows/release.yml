@@ -32,6 +32,15 @@ on:
         description: 'Manual release description (optional)'
         required: false
         type: string
+      package:
+        description: 'Workspace package to release manually'
+        required: true
+        type: choice
+        default: '@link-foundation/ui-core'
+        options:
+          - '@link-foundation/ui-core'
+          - '@link-foundation/ui-convert'
+          - '@link-foundation/ui-store'
 
 # Least-privilege default for the highest-value token in the repository.
 # Every job starts read-only; the publishing jobs escalate individually.
@@ -704,6 +713,9 @@ jobs:
       !contains(needs.*.result, 'failure') &&
       !contains(needs.*.result, 'cancelled')
     runs-on: ubuntu-24.04
+    # A manual release bumps one workspace package.
+    env:
+      RELEASE_PACKAGE: ${{ github.event.inputs.package }}
     # Same publish envelope as the automated release path.
     timeout-minutes: 65
     concurrency:
@@ -823,6 +835,8 @@ jobs:
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
       DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
       RELEASE_VERSION: ${{ needs.release.outputs.published_version || needs.instant-release.outputs.published_version }}
+      # The package the Docker image follows (the manual release package).
+      RELEASE_PACKAGE: ${{ github.event.inputs.package || '@link-foundation/ui-core' }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -979,6 +993,9 @@ jobs:
       github.event.inputs.release_mode == 'changeset-pr' &&
       needs.lint.result == 'success'
     runs-on: ubuntu-24.04
+    # The changeset names one workspace package.
+    env:
+      RELEASE_PACKAGE: ${{ github.event.inputs.package }}
     # PR creation only: install, create a changeset, format, and open a PR.
     timeout-minutes: 10
     concurrency:

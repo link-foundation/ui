@@ -326,7 +326,7 @@ describe('CI timeout policy', () => {
 
   it('caps individual Node.js and Bun tests at 30 seconds', () => {
     expect(packageJson.scripts.test).toBe(
-      'node --test --test-timeout=30000 tests/*.test.js packages/*/tests/*.test.js'
+      'node --test --test-timeout=30000 tests/*.test.js packages/*/tests/*.test.js packages/*/tests/*/*.test.js'
     );
     expect(releaseWorkflow).toContain('bun test --timeout 30000');
   });

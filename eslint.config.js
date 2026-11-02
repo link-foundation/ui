@@ -118,6 +118,32 @@ export default [
     },
   },
   {
+    // The HTML importer reads HTML only with parse5 or the DOM and writes
+    // Links Notation only through links-notation `Link` objects: no regular
+    // expressions, so no hand-written HTML or LiNo parser.
+    files: ['packages/ui-convert/src/html/**/*.js'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'Literal[regex]',
+          message:
+            'No regular expressions in src/html/: read HTML with parse5 or the DOM.',
+        },
+        {
+          selector: "NewExpression[callee.name='RegExp']",
+          message:
+            'No regular expressions in src/html/: read HTML with parse5 or the DOM.',
+        },
+        {
+          selector: "CallExpression[callee.name='RegExp']",
+          message:
+            'No regular expressions in src/html/: read HTML with parse5 or the DOM.',
+        },
+      ],
+    },
+  },
+  {
     // Test files have different requirements
     files: ['tests/**/*.js', 'packages/*/tests/**/*.js', '**/*.test.js'],
     rules: {

@@ -133,6 +133,9 @@ jobs:
           #   licence field; transitive deps of the artifact-transport action.
           # - truncate-utf8-bytes: WTFPL (permissive), transitive dependency
           #   of examples/universal-app (via sanitize-filename).
+          # - @csstools/color-helpers, @csstools/css-syntax-patches-for-csstree:
+          #   MIT-0 (MIT without the attribution clause), transitive dev-only
+          #   dependencies of jsdom, used by the ui-convert DOM import tests.
           allow-dependencies-licenses: >-
             pkg:npm/%40axe-core/playwright,
             pkg:npm/axe-core,
@@ -151,7 +154,9 @@ jobs:
             pkg:npm/%40resvg/resvg-js-win32-x64-msvc,
             pkg:npm/buffers,
             pkg:npm/chainsaw,
-            pkg:npm/truncate-utf8-bytes
+            pkg:npm/truncate-utf8-bytes,
+            pkg:npm/%40csstools/color-helpers,
+            pkg:npm/%40csstools/css-syntax-patches-for-csstree
 
   npm-audit:
     name: Audit npm lock (${{ matrix.directory }})

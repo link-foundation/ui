@@ -16,7 +16,7 @@ is either decided in a spec document or listed below.
 | 5.1 Typed values                          | Decided: schema-driven typing, [values.md](values.md); `quoted` flag below                              |
 | 5.2 Units and colours                     | Decided: [values.md](values.md)                                                                         |
 | 5.3 `:` in values (and `#`)               | Decided: structured links and quoting, [values.md](values.md)                                           |
-| 5.4 Comments on round trip                | Open, below (#22)                                                                                       |
+| 5.4 Comments on round trip                | Decided: source-preserving edits and `note`, below (#22)                                                |
 | 5.5 Ordering                              | Decided: [ordering-and-ids.md](ordering-and-ids.md)                                                     |
 | 5.6 Ids and scoping                       | Decided for one document, [ordering-and-ids.md](ordering-and-ids.md); cross-document and doublets below |
 | 5.7 Reference sigils                      | Decided: structured references, `@` / `$` reserved, [values.md](values.md)                              |
@@ -37,8 +37,24 @@ document back loses them.
 - (b) Comments as first-class links, for example `(note 'text')`.
 - (c) Patch-in-place edits using parser positions.
 
-Owner: #22. v0 rule: comments carry no meaning and MAY be lost by tools that
-rewrite documents.
+Decided by #22, all three:
+
+- (c) `@link-foundation/ui-core/source` edits the text in place: it maps every
+  element, property and value to its span, changes only those bytes, and
+  checks after each edit that the new text parses to the expected tree.
+  Comments, blank lines and layout around the edit are kept, and a comment on
+  the lines directly above a node moves or is removed with it.
+- (b) `note` is a property of every kind (`common-property` in
+  [vocabulary.lino](vocabulary.lino)): `(note 'Why this is red')` is part of
+  the tree, so it survives `parse` and `format` and any tool that rewrites a
+  document. A `#` comment carries no meaning.
+- (a) The spans in (c) are found by a small delimiter scanner that every span
+  is checked against. It is a stopgap: when `links-notation` reports source
+  positions, the spans come from the parser and the scanner goes. The
+  proposal for upstream is in the pull request of #22.
+
+Tools that rewrite documents without the source edits MAY still lose `#`
+comments; they MUST keep `note` properties.
 
 ## A `quoted` flag on parsed references
 

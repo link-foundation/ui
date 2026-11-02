@@ -1,0 +1,8 @@
+# References that look like delimiters.
+(quotes: stack
+  (a: text 'it''s # not a comment')
+  (b: text "say ""hi"" (twice)")
+  (c: text `back: tick`)
+  (d: text 'line one
+line two')
+  (e: button (label '') (on press (navigate 'https://example.com/a(b)')))) # end

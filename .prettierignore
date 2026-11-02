@@ -17,3 +17,5 @@ native/**/.gradle/
 docs/spec/parser-vectors.json
 # Interop fixtures keep their upstream bytes (see the SOURCES.md next to them)
 packages/ui-convert/tests/fixtures/interop/**/*.json
+# Importer fixtures are compared byte for byte (packages/ui-convert/tests/html)
+packages/ui-convert/tests/html/fixtures/

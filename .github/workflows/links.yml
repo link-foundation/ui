@@ -83,6 +83,8 @@ jobs:
           # URLs are only valid when served by Vite.
           # Exclude tests/fixtures - the captured lychee reports there contain
           # deliberately broken links used as parser test input.
+          # Exclude the ui-convert HTML fixtures - they are importer test input
+          # with deliberately unsafe and relative links (unsafe.html).
           args: >-
             --verbose
             --no-progress
@@ -97,6 +99,7 @@ jobs:
             --exclude-path dev/log
             --exclude-path examples/universal-app/index.html
             --exclude-path tests/fixtures
+            --exclude-path packages/ui-convert/tests/html/fixtures
             .
           # Don't fail the workflow immediately - we want to check web archive first
           fail: false
