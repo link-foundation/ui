@@ -146,3 +146,8 @@ reports/
 playwright-report/
 test-results/
 blob-report/
+
+# SwiftPM build output (native/swift)
+.build/
+.swiftpm/
+Package.resolved
