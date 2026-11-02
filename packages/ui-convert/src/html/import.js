@@ -116,7 +116,13 @@ class Importer {
     const styles = node.tag === 'style' ? [node] : inner.filter(isPlainStyle);
     const children =
       node.tag === 'style' ? [] : inner.filter((c) => !isPlainStyle(c));
-    const mapped = this.mapped(node, children, attrs) ?? {
+    const mapped = mapHtmlElement(
+      node,
+      children,
+      attrs,
+      this.vocabulary,
+      this.table
+    ) ?? {
       head: [atom(HTML_FALLBACK_KIND), property('tag', node.tag)],
       attrs,
       children,
@@ -141,28 +147,6 @@ class Importer {
         .map((css) => property('raw-css', css)),
       ...mapped.children.map((child) => this.link(child)),
     ]);
-  }
-
-  /**
-   * The head, remaining attributes and children of an element that a rule
-   * of the mapping table maps to a dialect kind, or `null` (fallback).
-   */
-  mapped(node, children, attrs) {
-    const rule = findRule(node, this.vocabulary, this.table);
-    if (!rule) {
-      return null;
-    }
-    const spec = this.vocabulary.kinds.get(rule.kind);
-    const text = rule.text ? textContent(children) : null;
-    if (spec.children === 'none' && children.length > 0 && text === null) {
-      return null;
-    }
-    const { head, consumed } = ruleHead(rule, spec, node, text, attrs);
-    return {
-      head,
-      attrs: attrs.filter(([name]) => !consumed.has(name)),
-      children: text === null ? children : [],
-    };
   }
 
   /** Convert the top-level nodes and format the result. */
@@ -191,6 +175,41 @@ class Importer {
     }
     return result;
   }
+}
+
+/**
+ * The head, remaining attributes and children of an element that a rule of
+ * the mapping table maps to a dialect kind, or `null` (fallback).
+ * @param {import('./tree.js').HtmlNode} node
+ * @param {import('./tree.js').HtmlNode[]} children the children that stay
+ * @param {[string, string][]} attrs the attributes that stay
+ * @param {import('@link-foundation/ui-core').Vocabulary} vocabulary
+ * @param {readonly import('./mapping.js').MappingRule[]} [table]
+ * @returns {{ head: Link[], attrs: [string, string][],
+ *   children: import('./tree.js').HtmlNode[] } | null}
+ */
+export function mapHtmlElement(
+  node,
+  children,
+  attrs,
+  vocabulary,
+  table = HTML_MAPPING
+) {
+  const rule = findRule(node, vocabulary, table);
+  if (!rule) {
+    return null;
+  }
+  const spec = vocabulary.kinds.get(rule.kind);
+  const text = rule.text ? textContent(children) : null;
+  if (spec.children === 'none' && children.length > 0 && text === null) {
+    return null;
+  }
+  const { head, consumed } = ruleHead(rule, spec, node, text, attrs);
+  return {
+    head,
+    attrs: attrs.filter(([name]) => !consumed.has(name)),
+    children: text === null ? children : [],
+  };
 }
 
 /**

@@ -94,6 +94,17 @@ npx link-ui-tokens build tokens.lino --set material3 \
   --css tokens.css --dtcg tokens.json --swift Tokens.swift --kotlin Tokens.kt
 ```
 
+### SwiftUI
+
+[`ui-swift`](packages/ui-swift/README.md) draws a LiNo document with native
+SwiftUI views. Add this repository to SwiftPM and use the `UiSwiftUI` product:
+
+```swift
+UiView(document: UiDocumentModel(lino: text)) { action in
+    // UiAction(source: "ok", event: "press", action: ["navigate", "home"])
+}
+```
+
 ### Style rules
 
 [`@link-foundation/ui-style`](packages/ui-style/README.md) reads style rules
@@ -155,8 +166,10 @@ npm run example:desktop:package
 │   ├── ui-convert/       # @link-foundation/ui-convert (HTML/DOM, A2UI, Adaptive Cards, JSON Forms, Lottie <-> LiNo)
 │   ├── ui-core/          # @link-foundation/ui-core
 │   ├── ui-i18n/          # @link-foundation/ui-i18n (localisation with lino-i18n, (t KEY) messages)
+│   ├── ui-settings/      # @link-foundation/ui-settings (settings schemas, presets, share links)
 │   ├── ui-store/         # @link-foundation/ui-store
 │   ├── ui-style/         # @link-foundation/ui-style (style rules, states, media and container conditions)
+│   ├── ui-swift/         # SwiftUI renderer (Swift package, see Package.swift)
 │   └── ui-tokens/        # @link-foundation/ui-tokens (design tokens)
 ├── tests/                # Repository and release-script tests
 ├── .eslintrc.js          # ESLint configuration

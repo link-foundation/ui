@@ -7,7 +7,9 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { format, parse } from '@link-foundation/ui-core';
+import { Parser } from 'links-notation';
 import { interopVocabulary } from '../src/interop/index.js';
+import { componentVocabulary } from '../src/mappings/index.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 
@@ -48,3 +50,41 @@ export const codes = (diagnostics) => diagnostics.map((d) => d.code);
 /** The diagnostics of a list with severity `error`. */
 export const errors = (diagnostics) =>
   diagnostics.filter((d) => d.severity === 'error');
+
+/**
+ * The JSX or Vue fixtures: `{ file, source, lino }`, where `lino` is the
+ * expected output stored next to the source file.
+ * @param {'jsx' | 'vue'} dir
+ */
+export const componentFixtures = (dir) => {
+  const fixtures = join(here, dir, 'fixtures');
+  return readdirSync(fixtures)
+    .filter((file) => /\.(jsx|tsx|vue)$/.test(file))
+    .sort()
+    .map((file) => ({
+      file,
+      source: readFileSync(join(fixtures, file), 'utf8'),
+      lino: readFileSync(
+        join(fixtures, `${file.slice(0, file.lastIndexOf('.'))}.lino`),
+        'utf8'
+      ),
+    }));
+};
+
+/**
+ * Check that a component import parses with links-notation and with the
+ * ui-core parser (component vocabulary) without errors.
+ * @param {string} text
+ */
+export function expectParses(text) {
+  const links = new Parser().parse(text);
+  if (text.trim() !== '' && links.length === 0) {
+    throw new Error(`links-notation read no links from:\n${text}`);
+  }
+  const tree = parse(text, { vocabulary: componentVocabulary() });
+  const failed = tree.diagnostics.filter((d) => d.severity === 'error');
+  if (failed.length > 0) {
+    throw new Error(`ui-core errors: ${JSON.stringify(failed)}`);
+  }
+  return tree;
+}

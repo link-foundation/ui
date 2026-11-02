@@ -1,22 +1,36 @@
 name: Swift
 
-# The Swift Links Notation parser (native/swift/LinksNotation, issue #29):
+# The Swift Links Notation parser (native/swift/LinksNotation, issue #29) and
+# the SwiftUI renderer (packages/ui-swift, issue #30, the root Package.swift):
 # `swift test` on Linux, in the official Swift image, and on macOS. The tests
-# read docs/spec/parser-vectors.json, so the spec fixtures trigger them too.
+# read docs/spec (parser vectors, fixtures, vocabulary), so the spec triggers
+# them too. On Linux the root package is the parser and UiSwiftCore; on macOS
+# it also builds UiSwiftUI and the UiDemo app, whose light and dark
+# screenshots are uploaded as the `ui-swift-screenshots` artifact.
 on:
   push:
     branches:
       - main
     paths:
       - 'native/swift/**'
+      - 'packages/ui-swift/**'
+      - 'examples/swift/**'
+      - 'Package.swift'
       - 'docs/spec/**'
+      - 'docs/case-studies/issue-1/samples/**'
       - '.github/workflows/swift.yml'
+      - '.github/actions/artifact-transport/**'
   pull_request:
     types: [opened, synchronize, reopened]
     paths:
       - 'native/swift/**'
+      - 'packages/ui-swift/**'
+      - 'examples/swift/**'
+      - 'Package.swift'
       - 'docs/spec/**'
+      - 'docs/case-studies/issue-1/samples/**'
       - '.github/workflows/swift.yml'
+      - '.github/actions/artifact-transport/**'
   workflow_dispatch:
 
 # Least-privilege default; these jobs only need to read the checked-out tree.
@@ -88,6 +102,86 @@ jobs:
         working-directory: native/swift/LinksNotation
         run: swift test
 
+  ui-swift-linux:
+    name: ui-swift core (Linux)
+    runs-on: ubuntu-24.04
+    container:
+      image: swift@sha256:bca121f6eb59fd80340d1296887b2698ed8f3eb9eca7d80c181f8af769dc7ee0 # 6.4-noble
+    # Typical run: ~3min (image pull, debug build of the parser and
+    # UiSwiftCore, tests). 15min stops a hung build from blocking the run.
+    timeout-minutes: 15
+    concurrency:
+      group: check-${{ github.workflow }}-${{ github.ref }}-ui-swift-linux
+      cancel-in-progress: true
+    permissions:
+      contents: read
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Trust the checkout
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: swift build
+        run: swift build
+
+      - name: swift test
+        run: swift test
+
+  ui-swift-macos:
+    name: ui-swift (macOS)
+    runs-on: macos-15
+    # Typical run: ~6min (debug build of UiSwiftUI and UiDemo, tests, two
+    # screenshots). 30min stops a hung build or app from blocking the run.
+    timeout-minutes: 30
+    concurrency:
+      group: check-${{ github.workflow }}-${{ github.ref }}-ui-swift-macos
+      cancel-in-progress: true
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Show the toolchain
+        run: swift --version
+
+      - name: swift build
+        run: swift build
+
+      - name: swift test
+        run: swift test
+
+      - name: Render tree of the issue-1 sample
+        run: swift run UiDemo --dump
+
+      # The app quits by itself once the window is captured; the alarm (perl
+      # ships with macOS, GNU timeout does not) stops it if it never draws.
+      - name: Screenshots of UiDemo (light and dark)
+        run: |
+          mkdir -p ui-swift-screenshots
+          for appearance in light dark; do
+            perl -e 'alarm 120; exec @ARGV' .build/debug/UiDemo --appearance "$appearance" \
+              --screenshot "ui-swift-screenshots/uidemo-$appearance.png"
+          done
+          file ui-swift-screenshots/*.png
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24.x'
+
+      - uses: ./.github/actions/artifact-transport
+        with:
+          name: ui-swift-screenshots
+          path: ui-swift-screenshots/
+          if-no-files-found: error
+
   # Terminal status gate: runs even when the jobs above fail or are
   # cancelled, and turns a `timeout-minutes` kill (reported as cancelled)
   # into a red run. needs is derived and checked by the status-gate-coverage
@@ -107,6 +201,8 @@ jobs:
     needs:
       - swift-linux
       - swift-macos
+      - ui-swift-linux
+      - ui-swift-macos
     steps:
       - uses: actions/checkout@v7
         with:

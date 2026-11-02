@@ -70,6 +70,7 @@ flowchart TB
 | Core                  | `@link-foundation/ui-core`                     | Parse LiNo (via `links-notation`), project links into an element tree, validate against the dialect, format back, diff and patch.  |
 | Store                 | `@link-foundation/ui-store`                    | Mutable links network with stable IDs, change events, transactions, undo/redo, persistence (IndexedDB; `doublets-web` compatible). |
 | Configuration         | `@link-foundation/ui-config`                   | Layered configuration and overrides; export of overrides as LiNo patches.                                                          |
+| Settings              | `@link-foundation/ui-settings`                 | Settings schemas in LiNo: validation, presets, migrations, diff-only values documents and share links, before-paint application.   |
 | Tokens and themes     | `@link-foundation/ui-tokens`                   | Design tokens in LiNo; export to CSS custom properties, DTCG 2025.10 JSON, Swift and Kotlin.                                       |
 | Styles                | `@link-foundation/ui-style`                    | Style rules as links (selectors, states, responsive conditions) resolved against tokens.                                           |
 | DOM renderer          | `@link-foundation/ui-dom`                      | Reference renderer with custom elements and incremental updates.                                                                   |

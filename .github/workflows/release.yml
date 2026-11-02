@@ -42,6 +42,7 @@ on:
           - '@link-foundation/ui-config'
           - '@link-foundation/ui-convert'
           - '@link-foundation/ui-i18n'
+          - '@link-foundation/ui-settings'
           - '@link-foundation/ui-store'
           - '@link-foundation/ui-style'
           - '@link-foundation/ui-tokens'

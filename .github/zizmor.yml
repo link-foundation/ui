@@ -28,6 +28,7 @@ rules:
       - example-app.yml
       - action.yml
       - javascript-first-example.yml
+      - swift.yml
       - links.yml
       - security.yml
       - ui-tests.yml
