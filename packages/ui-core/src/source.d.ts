@@ -13,7 +13,7 @@ import type {
   UiDocument,
   UiNode,
   Vocabulary,
-} from './index.js';
+} from '@link-foundation/ui-core';
 
 export type {
   SourceEdit,
@@ -21,7 +21,7 @@ export type {
   SourceOp,
   SourceSpan,
   SpanNode,
-} from './index.js';
+} from '@link-foundation/ui-core';
 
 export interface SourceOptions {
   vocabulary?: Vocabulary;
