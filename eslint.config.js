@@ -151,6 +151,21 @@ export default [
     },
   },
   {
+    // describeChanges prints one line per configuration value for people
+    // and AI agents (ui-config, R12), in the wording the issue asks for;
+    // that output describes values at run time, not source history.
+    files: [
+      'packages/ui-config/src/explain.js',
+      'packages/ui-config/tests/explain.test.js',
+    ],
+    rules: {
+      'local/no-changelog-comments': [
+        'warn',
+        { allow: [['changed', 'from'].join(' ')] },
+      ],
+    },
+  },
+  {
     // Case studies preserve historical wording on purpose, and the rule's own
     // tests contain fixtures the rule is designed to flag.
     files: [

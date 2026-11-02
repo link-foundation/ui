@@ -1,0 +1,8 @@
+(site-overrides: overrides
+  (layer site)
+  (base app)
+  (note 'The committed configuration of the demo site')
+  (set ok variant text)
+  (set body padding 8px)
+  (set body gap (token space.large))
+  (set material3 token color.secondary '#625B71'))
