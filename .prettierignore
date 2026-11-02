@@ -19,5 +19,6 @@ docs/spec/parser-vectors.json
 packages/ui-convert/tests/fixtures/interop/**/*.json
 # Importer fixtures are compared byte for byte (packages/ui-convert/tests/html)
 packages/ui-convert/tests/html/fixtures/
-# Golden files are compared byte for byte (packages/ui-tokens/tests)
+# Golden files are compared byte for byte (packages/ui-tokens/tests, packages/ui-style/tests)
 packages/ui-tokens/tests/golden/
+packages/ui-style/tests/golden/

@@ -1,0 +1,11 @@
+ui-button[variant='filled'] {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  border-radius: var(--shape-corner-medium);
+}
+ui-button[variant='filled']:hover {
+  box-shadow: var(--elevation-2);
+}
+ui-button[variant='filled']:active {
+  transform: scale(0.98);
+}
