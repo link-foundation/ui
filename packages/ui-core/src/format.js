@@ -56,13 +56,27 @@ export function elementLink(node) {
 }
 
 /**
- * A top-level unknown value as a line. An atom on its own line would be read
+ * A top-level raw value as a line. An atom on its own line would be read
  * back as a link, so it is written as an empty link `(name:)`.
+ * @param {import('./types.js').RawValue} value
  */
-const rootUnknownLine = (value) =>
+const rootValueLine = (value) =>
   typeof value === 'string'
     ? `(${escapeReference(value)}:)`
     : valueLink(value).format();
+
+/**
+ * Write raw values (docs/spec/values.md) as Links Notation text, one
+ * top-level link per line, with `links-notation` doing all quoting. The
+ * inverse of `parseLinks`: `parseLinks(formatLinks(values))` deep-equals
+ * `values` for every value that has no empty link `()` and no link with an id
+ * but no values (`(name:)`, read back as the atom `name`) nested inside.
+ * @param {import('./types.js').RawValue[]} values
+ * @returns {string}
+ */
+export function formatLinks(values) {
+  return values.map((value) => `${rootValueLine(value)}\n`).join('');
+}
 
 function multilineLines(node, pad, indent) {
   const head = new Link(node.id, headValues(node));
@@ -116,7 +130,7 @@ export function format(doc, options = {}) {
   }
   const lines = [
     ...doc.roots.flatMap((node) => write(node, indent)),
-    ...doc.unknown.map(rootUnknownLine),
+    ...doc.unknown.map(rootValueLine),
   ];
   return lines.length > 0 ? `${lines.join('\n')}\n` : '';
 }

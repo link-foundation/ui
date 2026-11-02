@@ -24,7 +24,7 @@ import {
   needsCd,
   parseJsRootConfig,
 } from './js-paths.mjs';
-import { readPackageInfo } from './package-info.mjs';
+import { readPackageInfo, readReleasePackages } from './package-info.mjs';
 import { bootstrapDependencies } from './bootstrap-dependencies.mjs';
 import { loadCommandStream, loadLinoArguments } from './use-module.mjs';
 import { printUntrusted } from './github-actions-log.mjs';
@@ -160,13 +160,28 @@ function countChangesets() {
 }
 
 /**
- * Get package version
+ * The version of the release: the version of the release package, or, when
+ * several workspace packages are publishable and RELEASE_PACKAGE names none,
+ * `name@version` of each of them (for the log and the commit message).
  * @param {string} source - 'local' or 'remote'
  */
 async function getVersion(source = 'local') {
-  // In an npm workspaces root this is the release package's manifest.
-  const packageJsonPath = readPackageInfo({ jsRoot })
-    .packageJsonPath.replaceAll('\\', '/')
+  const packages = process.env.RELEASE_PACKAGE
+    ? [readPackageInfo({ jsRoot })]
+    : readReleasePackages({ jsRoot });
+  const versions = [];
+  for (const pkg of packages) {
+    versions.push(await readVersion(pkg.packageJsonPath, source));
+  }
+  if (versions.length === 1) {
+    return versions[0];
+  }
+  return packages.map((pkg, i) => `${pkg.name}@${versions[i]}`).join(' ');
+}
+
+async function readVersion(manifestPath, source) {
+  const packageJsonPath = manifestPath
+    .replaceAll('\\', '/')
     .replace(/^\.\//, '');
   if (source === 'remote') {
     const result = await $`git show origin/main:${packageJsonPath}`.run({

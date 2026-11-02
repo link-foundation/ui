@@ -1250,6 +1250,23 @@
         "npm:test-anywhere@~0.8.48",
         "npm:yaml@^2.9.1"
       ]
+    },
+    "members": {
+      "packages/ui-core": {
+        "packageJson": {
+          "dependencies": [
+            "npm:links-notation@~0.27.1"
+          ]
+        }
+      },
+      "packages/ui-store": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@link-foundation/ui-core@^0.0.0",
+            "npm:test-anywhere@~0.8.48"
+          ]
+        }
+      }
     }
   }
 }

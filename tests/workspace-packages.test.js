@@ -136,8 +136,8 @@ describe('workspace-packages', () => {
 });
 
 describe('repository workspace', () => {
-  it('publishes @link-foundation/ui-core from packages/ui-core', async () => {
+  it('publishes ui-core and ui-store from packages/', async () => {
     const names = (await listPublishablePackages('.')).map((p) => p.dir);
-    expect(names).toEqual(['packages/ui-core']);
+    expect(names).toEqual(['packages/ui-core', 'packages/ui-store']);
   });
 });

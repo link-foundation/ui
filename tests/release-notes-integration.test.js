@@ -36,6 +36,7 @@ esac
         encoding: 'utf8',
         env: {
           ...process.env,
+          RELEASE_PACKAGE: '@link-foundation/ui-core',
           PATH: `${dir}:${process.env.PATH}`,
           FIXTURE: dir,
         },
