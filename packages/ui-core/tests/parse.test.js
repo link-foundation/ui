@@ -190,7 +190,9 @@ describe('projectLink', () => {
 
 describe('vocabulary', () => {
   it('embeds docs/spec/vocabulary.lino byte for byte', () => {
-    expect(VOCABULARY_TEXT).toBe(read(join(REPO, 'docs/spec/vocabulary.lino')));
+    // A Windows checkout may turn the file's LF line ends into CRLF.
+    const file = read(join(REPO, 'docs/spec/vocabulary.lino'));
+    expect(VOCABULARY_TEXT).toBe(file.replaceAll('\r\n', '\n'));
   });
 
   it('reads kinds, properties, actions and multi-valued names', () => {
