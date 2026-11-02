@@ -52,7 +52,8 @@ export async function buildWithStyleDictionary(
     const source = join(dir, 'tokens.json');
     // Style Dictionary has no modes and reads a root $extensions as a
     // group of tokens; build a mode from tokens resolved with `{ mode }`.
-    const { $extensions, ...tokens } = toDtcg(resolved, { keepAliases });
+    const tokens = toDtcg(resolved, { keepAliases });
+    delete tokens.$extensions;
     await writeFile(source, `${JSON.stringify(tokens, null, 2)}\n`);
     const sd = new SD({ ...config, source: [source] });
     await sd.buildAllPlatforms();

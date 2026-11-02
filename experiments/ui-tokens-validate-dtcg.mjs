@@ -6,11 +6,11 @@
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { URL, pathToFileURL } from 'node:url';
 
 const [tools] = process.argv.slice(2);
 const require = createRequire(join(tools, 'package.json'));
-const load = async (name) => import(pathToFileURL(require.resolve(name)).href);
+const load = (name) => import(pathToFileURL(require.resolve(name)).href);
 const version = (name) =>
   JSON.parse(
     readFileSync(join(tools, 'node_modules', name, 'package.json'), 'utf8')
