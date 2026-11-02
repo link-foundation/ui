@@ -13,7 +13,13 @@ import { VOCABULARY_TEXT } from './vocabulary-text.js';
 const BOOTSTRAP = {
   kind: ['description', 'positional', 'property*', 'children'],
   action: ['description', 'argument*'],
-  dialect: ['version', 'multi-valued', 'reserved-sigil', 'reserved-property*'],
+  dialect: [
+    'version',
+    'multi-valued',
+    'reserved-sigil',
+    'reserved-property*',
+    'common-property*',
+  ],
 };
 
 const kindSpec = (names) => ({
@@ -40,11 +46,15 @@ const bootstrap = {
 const valuesOf = (element, name) =>
   element.properties.filter((p) => p.name === name).map((p) => p.values);
 
+/** `(property name type flags...)` values as `[name, { type, multi }]`. */
+const propertyEntries = (element, property) =>
+  valuesOf(element, property).map(([name, type, ...flags]) => [
+    name,
+    { type, multi: flags.includes('multi') },
+  ]);
+
 function readKind(element) {
-  const properties = new Map();
-  for (const [name, type, ...flags] of valuesOf(element, 'property')) {
-    properties.set(name, { type, multi: flags.includes('multi') });
-  }
+  const properties = new Map(propertyEntries(element, 'property'));
   const [children = ['any']] = valuesOf(element, 'children');
   return {
     positional: valuesOf(element, 'positional').flat(),
@@ -75,6 +85,7 @@ export function loadVocabulary(text) {
     actions: new Map(),
     multiValued: new Set(),
   };
+  const common = [];
   for (const element of roots) {
     if (element.kind === 'kind') {
       vocabulary.kinds.set(element.id, readKind(element));
@@ -85,6 +96,15 @@ export function loadVocabulary(text) {
       vocabulary.version = version;
       for (const name of valuesOf(element, 'multi-valued').flat()) {
         vocabulary.multiValued.add(name);
+      }
+      common.push(...propertyEntries(element, 'common-property'));
+    }
+  }
+  // A common property (such as `note`) is declared on every kind.
+  for (const kind of vocabulary.kinds.values()) {
+    for (const [name, spec] of common) {
+      if (!kind.properties.has(name)) {
+        kind.properties.set(name, spec);
       }
     }
   }
