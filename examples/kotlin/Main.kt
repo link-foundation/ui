@@ -1,10 +1,11 @@
 // The ui-kotlin example (issue #32): renders a ui-dialect/0 document with
 // UiView in a Compose Desktop window, or into a PNG with --screenshot.
 //
-//     cd packages/ui-kotlin && ./gradlew run
-//     ./gradlew run --args="--dark"
-//     ./gradlew run --args="--screenshot out.png --dark"
-//     ./gradlew run --args="--document path/to/other.lino"
+//     cd examples/kotlin
+//     ../../packages/ui-kotlin/gradlew run
+//     ../../packages/ui-kotlin/gradlew run --args="--dark"
+//     ../../packages/ui-kotlin/gradlew run --args="--screenshot out.png --dark"
+//     ../../packages/ui-kotlin/gradlew run --args="--document path/to/other.lino"
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize

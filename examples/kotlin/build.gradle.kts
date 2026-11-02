@@ -1,19 +1,16 @@
 // The ui-kotlin example (issue #32): a Compose Desktop window that renders
-// docs/case-studies/issue-1/samples/document.lino with UiView. It is the
-// `example` project of packages/ui-kotlin; run it from there:
+// docs/case-studies/issue-1/samples/document.lino with UiView.
 //
-//     cd packages/ui-kotlin && ./gradlew run
-//     ./gradlew run --args="--dark"
-//     ./gradlew run --args="--screenshot ../../docs/screenshots/ui-kotlin-light.png"
+//     cd examples/kotlin
+//     ../../packages/ui-kotlin/gradlew run
+//     ../../packages/ui-kotlin/gradlew run --args="--dark"
+//     ../../packages/ui-kotlin/gradlew run --args="--screenshot ../../docs/screenshots/ui-kotlin-light.png"
 
 plugins {
-    kotlin("jvm")
-    id("org.jetbrains.kotlin.plugin.compose")
-    id("org.jetbrains.compose")
+    kotlin("jvm") version "2.4.21"
+    id("org.jetbrains.kotlin.plugin.compose") version "2.4.21"
+    id("org.jetbrains.compose") version "1.12.2"
 }
-
-// Build outputs go under packages/ui-kotlin/build, not next to Main.kt.
-layout.buildDirectory.set(rootProject.layout.buildDirectory.dir("example"))
 
 kotlin {
     // Any JDK 17 or newer that runs Gradle; the bytecode targets 17.
@@ -26,6 +23,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
+// Main.kt sits at the top of examples/kotlin, next to this file.
 sourceSets {
     main {
         kotlin {
@@ -39,16 +37,18 @@ sourceSets {
 }
 
 dependencies {
-    implementation(project(":"))
+    implementation("foundation.link.ui:ui-kotlin:0.1.0")
     implementation(compose.desktop.currentOs)
 }
 
-val repository = rootProject.projectDir.resolve("../..").canonicalFile
+val repository = projectDir.resolve("../..").canonicalFile
 
 compose.desktop {
     application {
         mainClass = "MainKt"
         jvmArgs += listOf(
+            // Skiko loads its native library; JDK 22+ warns without this.
+            "--enable-native-access=ALL-UNNAMED",
             "-Dui.kotlin.document=${repository.resolve("docs/case-studies/issue-1/samples/document.lino")}",
             "-Dui.kotlin.theme=${projectDir.resolve("theme.lino")}",
         )

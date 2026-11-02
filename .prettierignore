@@ -13,6 +13,11 @@ dev/log/
 # Gradle build outputs of the native ports
 native/**/build/
 native/**/.gradle/
+# Gradle build outputs of ui-kotlin and its example
+packages/ui-kotlin/build/
+packages/ui-kotlin/.gradle/
+examples/kotlin/build/
+examples/kotlin/.gradle/
 # Generated, one parser vector per line (scripts/generate-parser-vectors.mjs)
 docs/spec/parser-vectors.json
 # Interop fixtures keep their upstream bytes (see the SOURCES.md next to them)

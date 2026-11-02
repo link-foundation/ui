@@ -24,7 +24,3 @@ rootProject.name = "ui-kotlin"
 // io.github.link-foundation:links-notation-kotlin coordinates with this build.
 includeBuild("../../native/kotlin/links-notation")
 
-// examples/kotlin: `./gradlew run` opens the example window (see its README
-// section in packages/ui-kotlin/README.md).
-include(":example")
-project(":example").projectDir = file("../../examples/kotlin")
