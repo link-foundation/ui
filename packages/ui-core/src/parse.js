@@ -152,25 +152,25 @@ export function parseLinks(text, options = {}) {
     maxDepth = DEFAULT_MAX_DEPTH,
     maxInputSize = DEFAULT_MAX_INPUT_SIZE,
   } = options;
-  let error = null;
   if (typeof text !== 'string') {
-    error = diagnostic(
-      'syntax-error',
-      'error',
-      {},
-      'The input is not a string'
+    throw linksError(
+      diagnostic('syntax-error', 'error', {}, 'The input is not a string')
     );
-  } else if (text.length > maxInputSize) {
-    error = diagnostic('input-too-large', 'error', {});
-  } else {
-    try {
-      const parser = new Parser({ maxDepth, maxInputSize: maxInputSize + 1 });
-      return parser.parse(text).map(valueJson);
-    } catch (thrown) {
-      error = parserDiagnostic(thrown);
-    }
   }
-  throw new UiParseError([error], emptyDocument([error]));
+  if (text.length > maxInputSize) {
+    throw linksError(diagnostic('input-too-large', 'error', {}));
+  }
+  try {
+    const parser = new Parser({ maxDepth, maxInputSize: maxInputSize + 1 });
+    return parser.parse(text).map(valueJson);
+  } catch (thrown) {
+    throw linksError(parserDiagnostic(thrown));
+  }
+}
+
+/** The error of `parseLinks`: one error diagnostic and an empty document. */
+function linksError(error) {
+  return new UiParseError([error], emptyDocument([error]));
 }
 
 /**
