@@ -12,6 +12,8 @@ publishable artefact is a workspace package under `packages/`.
 │   ├── ui-config/          # @link-foundation/ui-config (configuration layers)
 │   ├── ui-convert/         # @link-foundation/ui-convert (HTML/DOM import)
 │   ├── ui-tokens/          # @link-foundation/ui-tokens (design tokens)
+│   ├── ui-swift/           # SwiftUI renderer: a Swift package built from the
+│   │                       # root Package.swift, not an npm workspace (no package.json)
 │   └── ui-core/            # @link-foundation/ui-core
 │       ├── package.json
 │       ├── README.md
