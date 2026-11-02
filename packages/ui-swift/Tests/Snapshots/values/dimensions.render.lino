@@ -1,0 +1,2 @@
+(box: VStack (spacing 16) (padding 24))
+(hero: AsyncImage (url hero.png) (alt Hero))

@@ -1,0 +1,2 @@
+(card: VStack)
+(name: Text $draft.text)

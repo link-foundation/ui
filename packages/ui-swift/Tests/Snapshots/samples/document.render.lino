@@ -1,0 +1,4 @@
+(app: ScrollView
+  (body: VStack (spacing 16)
+    (greeting: Text 'Hello, links')
+    (ok: Button (label OK))))

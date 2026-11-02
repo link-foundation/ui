@@ -32,9 +32,12 @@ targets point at `swift/Sources/LinksNotation`, or a separate repository.
 
 Until then, the port is **vendored here** in `native/swift/LinksNotation`. Its
 layout (`Package.swift`, `Sources/LinksNotation`, `Tests/LinksNotationTests`)
-lets it move upstream unchanged, as `swift/`. When it moves, the SwiftUI
-renderer ([#30](https://github.com/link-foundation/ui/issues/30)) should depend on the upstream package and this copy should be
-deleted.
+lets it move upstream unchanged, as `swift/`. The SwiftUI renderer
+([#30](https://github.com/link-foundation/ui/issues/30), [`packages/ui-swift`](../packages/ui-swift/README.md))
+uses it through the `LinksNotation` target of the root `Package.swift`, which
+points at `native/swift/LinksNotation/Sources/LinksNotation`. When the parser
+moves upstream, that target should become a package dependency and this copy
+should be deleted.
 
 ### The package
 
@@ -126,7 +129,9 @@ cd native/swift/LinksNotation && swift test
 
 The [Swift workflow](../.github/workflows/swift.yml) runs `swift test` on
 Linux, in the official `swift` image pinned by digest, and on macOS. It runs
-whenever `native/swift/**` or `docs/spec/**` changes. The issue asked for
+whenever `native/swift/**` or `docs/spec/**` changes. The same workflow
+builds and tests the root `Package.swift` (the renderer of #30) on Linux and
+macOS. The issue asked for
 `ubuntu-latest` and `macos-latest`, but the repository's CI policy
 (`scripts/check-ci-workflows.mjs`) requires pinned runner images, so the
 workflow uses `ubuntu-24.04` and `macos-15`.

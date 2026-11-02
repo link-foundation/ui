@@ -1,0 +1,4 @@
+(page: ScrollView
+  (main: VStack
+    (intro: Text One)
+    (outro: Text Two)))
