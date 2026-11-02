@@ -111,13 +111,39 @@ function parseTokenDimension(raw) {
     : null;
 }
 
+/** Heads of the function-like values; a list with one is no font family. */
+const VALUE_HEADS = new Set([
+  'token',
+  'cubic-bezier',
+  'shadow',
+  'typography',
+  'oklch',
+  'rgb',
+  'rgba',
+  'hsl',
+  'hsla',
+]);
+
 function parseFontFamily(raw) {
   if (isAtom(raw)) {
     return { type: 'fontFamily', value: raw };
   }
-  return isLink(raw) && raw.length > 0 && raw.every(isAtom)
+  return isLink(raw) &&
+    raw.length > 0 &&
+    raw.every(isAtom) &&
+    !VALUE_HEADS.has(raw[0])
     ? { type: 'fontFamily', value: [...raw] }
     : null;
+}
+
+/**
+ * An undeclared font family: no name may look like a quantity (`12em`,
+ * `50%`), which is a mistyped dimension rather than a family name.
+ */
+function inferFontFamily(raw) {
+  const value = parseFontFamily(raw);
+  const names = value === null ? [] : [value.value].flat();
+  return names.some((name) => parseDimension(name) !== null) ? null : value;
 }
 
 function parseFontWeight(raw) {
@@ -274,7 +300,8 @@ export function typeTokenValue(raw, declared) {
     return Object.hasOwn(READERS, declared) ? READERS[declared](raw) : null;
   }
   for (const type of INFER_ORDER) {
-    const value = READERS[type](raw);
+    const value =
+      type === 'fontFamily' ? inferFontFamily(raw) : READERS[type](raw);
     if (value !== null) {
       return value;
     }

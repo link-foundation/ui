@@ -50,20 +50,48 @@ export function rgba(color) {
 export const layers = (shadow) => [shadow.value].flat();
 
 /**
- * The resolved tokens and, per mode, the tokens the mode changes.
+ * The tokens in their order, except that an alias comes after the token of
+ * the same section it refers to: a Kotlin `object` initialises its
+ * properties in order, so `val A = Tokens.B` before `val B` would read an
+ * uninitialised `B`. (Aliases have no cycles once resolved.)
+ * @param {Map<string, ResolvedToken>} tokens
+ * @returns {Map<string, ResolvedToken>}
+ */
+export function targetsFirst(tokens) {
+  const out = new Map();
+  const add = (token) => {
+    if (out.has(token.path)) {
+      return;
+    }
+    const target =
+      token.alias === undefined ? undefined : tokens.get(token.alias);
+    if (target !== undefined) {
+      add(target);
+    }
+    out.set(token.path, token);
+  };
+  for (const token of tokens.values()) {
+    add(token);
+  }
+  return out;
+}
+
+/**
+ * The resolved tokens and, per mode, the tokens the mode changes, each with
+ * the alias targets first ({@link targetsFirst}).
  * @param {ResolvedTokens} resolved
  * @param {string} name  the name of the outer namespace
  * @returns {Section[]}
  */
 export function sections(resolved, name) {
   return [
-    { mode: null, scope: [name], tokens: resolved },
+    { mode: null, scope: [name], tokens: targetsFirst(resolved) },
     ...[...(resolved.modes ?? [])]
       .filter(([, tokens]) => tokens.size > 0)
       .map(([mode, tokens]) => ({
         mode,
         scope: [name, upperCamel(mode)],
-        tokens,
+        tokens: targetsFirst(tokens),
       })),
   ];
 }
