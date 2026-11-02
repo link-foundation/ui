@@ -1,0 +1,2 @@
+(greeting: Text 'Hello, links')
+(ok: Button (label OK) (variant outlined))

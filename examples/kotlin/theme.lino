@@ -1,0 +1,9 @@
+(material3: theme
+  (token color.primary '#6750A4')
+  (token color.on-primary '#FFFFFF')
+  (token space.medium 16px)
+  (token shape.corner.medium 12px)
+  (token motion.duration.short 150ms)
+  (mode dark
+    (token color.primary '#D0BCFF')
+    (token color.on-primary '#381E72')))

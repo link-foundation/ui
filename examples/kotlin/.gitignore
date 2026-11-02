@@ -1,0 +1,4 @@
+# Gradle and Kotlin build outputs of the example.
+.gradle/
+.kotlin/
+build/

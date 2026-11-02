@@ -198,6 +198,11 @@ export default [
       // Gradle build outputs of the native ports (Kotlin/JS and Kotlin/Wasm bundles)
       'native/**/build/**',
       'native/**/.gradle/**',
+      // Gradle build outputs (test reports) of ui-kotlin and its example
+      'packages/ui-kotlin/build/**',
+      'packages/ui-kotlin/.gradle/**',
+      'examples/kotlin/build/**',
+      'examples/kotlin/.gradle/**',
     ],
   },
 ];

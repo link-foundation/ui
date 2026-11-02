@@ -1,0 +1,4 @@
+(list: Column
+  (Text First)
+  (Text Second)
+  (separator: Text -))
