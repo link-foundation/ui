@@ -58,6 +58,7 @@ const ENCODE = {
   move: (op) => ['move', op.id, ...position(op.parentId, op.index)],
   setProp: (op) => ['setProp', ...at(op), op.id, op.name, ...op.values],
   removeProp: (op) => ['removeProp', ...at(op), op.id, op.name],
+  setPositional: (op) => ['setPositional', op.id, ...op.values],
   rename: (op) =>
     op.to === null
       ? ['rename', op.id, ['anonymous', op.as]]
@@ -222,6 +223,14 @@ const DECODE = {
     const { values, ...op } = propertyOp('removeProp', parts);
     check(values.length === 0, 'bad-log', 'removeProp takes no values');
     return op;
+  },
+  setPositional(parts) {
+    check(parts.length >= 1, 'bad-log', 'setPositional needs an id');
+    return {
+      op: 'setPositional',
+      id: atom(parts[0], 'setPositional id'),
+      values: parts.slice(1),
+    };
   },
   rename(parts) {
     check(parts.length === 2, 'bad-log', 'rename takes an id and a target');

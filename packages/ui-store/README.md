@@ -73,18 +73,19 @@ changed afterwards: a view taken before a change still shows the old state.
 
 ### Changing
 
-Every change is one of six operations. Outside a transaction each call is a
+Every change is one of seven operations. Outside a transaction each call is a
 transaction of its own.
 
-| Method                          | Operation                                                                                                                                                                                                     |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `insert(parentId, index, node)` | Insert a subtree (`{ id?, kind, positional?, properties?, children?, unknown? }`, the ui-core node shape) under `parentId` (`null`: a root) at `index` (`undefined`: at the end). Returns the ID of its root. |
-| `remove(id)`                    | Remove an element with its subtree.                                                                                                                                                                           |
-| `move(id, parentId, index?)`    | Move an element (with its subtree) to another position. Moving an element into itself or its descendants throws `cycle`.                                                                                      |
-| `setProp(id, name, values)`     | Set the values of a property (`label` → `['OK']`). The last property with this name is replaced (last wins, as in `docs/spec/ordering-and-ids.md`); without one it is appended.                               |
-| `removeProp(id, name)`          | Remove the last property with this name.                                                                                                                                                                      |
-| `rename(id, to)`                | Give an element a new ID (`to: null`: make it anonymous, with a new generated ID). Returns the new ID.                                                                                                        |
-| `apply(op)`                     | Apply an operation given as data (the forms below); returns it as applied.                                                                                                                                    |
+| Method                          | Operation                                                                                                                                                                                                      |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `insert(parentId, index, node)` | Insert a subtree (`{ id?, kind, positional?, properties?, children?, unknown? }`, the ui-core node shape) under `parentId` (`null`: a root) at `index` (`undefined`: at the end). Returns the ID of its root.  |
+| `remove(id)`                    | Remove an element with its subtree.                                                                                                                                                                            |
+| `move(id, parentId, index?)`    | Move an element (with its subtree) to another position. Moving an element into itself or its descendants throws `cycle`.                                                                                       |
+| `setProp(id, name, values)`     | Set the values of a property (`label` → `['OK']`). The last property with this name is replaced (last wins, as in `docs/spec/ordering-and-ids.md`); without one it is appended.                                |
+| `removeProp(id, name)`          | Remove the last property with this name.                                                                                                                                                                       |
+| `setPositional(id, values)`     | Set the positional values of an element (`'Hello'` of `(greeting: text 'Hello')` → `['Hi']`). They are atoms (`docs/spec/elements.md`): any other value throws `bad-value`. IDs, properties and children stay. |
+| `rename(id, to)`                | Give an element a new ID (`to: null`: make it anonymous, with a new generated ID). Returns the new ID.                                                                                                         |
+| `apply(op)`                     | Apply an operation given as data (the forms below); returns it as applied.                                                                                                                                     |
 
 Operations as data:
 
@@ -94,6 +95,7 @@ Operations as data:
 { op: 'move', id, parentId, index? }
 { op: 'setProp', id, name, values, index? }   // index: insert a new property there
 { op: 'removeProp', id, name, index? }        // index: remove the property there
+{ op: 'setPositional', id, values }           // values: atoms (strings)
 { op: 'rename', id, to, as? }                 // as: the generated ID for to: null
 ```
 
@@ -149,19 +151,20 @@ order, and `entry` is the log entry of the transaction.
   parentId: string | null;
   index: number;        // the position among its siblings
   props: readonly UiProperty[] | null; // the properties after the change (remove: null)
-  prop?: string;        // update only: the changed property
+  prop?: string;        // update only: the changed property (left out: positional values)
   before: unknown;
   after: unknown;
 }
 ```
 
-| `type`   | `before`                  | `after`                   |
-| -------- | ------------------------- | ------------------------- |
-| `insert` | `null`                    | the view of the element   |
-| `remove` | the view of the element   | `null`                    |
-| `update` | the old values, or `null` | the new values, or `null` |
-| `move`   | `{ parentId, index }`     | `{ parentId, index }`     |
-| `rename` | the old ID                | the new ID                |
+| `type`               | `before`                  | `after`                   |
+| -------------------- | ------------------------- | ------------------------- |
+| `insert`             | `null`                    | the view of the element   |
+| `remove`             | the view of the element   | `null`                    |
+| `update`             | the old values, or `null` | the new values, or `null` |
+| `update` (no `prop`) | the old positional values | the new positional values |
+| `move`               | `{ parentId, index }`     | `{ parentId, index }`     |
+| `rename`             | the old ID                | the new ID                |
 
 Inserting a subtree gives one `insert` event per element, parents first;
 removing one gives one `remove` event per element, children first, so each
@@ -194,14 +197,15 @@ line, and `logFromLino(text)` reads it back (both through ui-core
 (tx 5 (origin undo) (undoes 4) (setProp ok label 'OK'))
 ```
 
-| Operation    | Links Notation                                                                                                                             |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `insert`     | `(insert (parent p) (at i) (ids id…) (node (id x) (kind k) (positional …) (properties (name values…)…) (unknown …) (children (node …)…)))` |
-| `remove`     | `(remove id)`                                                                                                                              |
-| `move`       | `(move id (parent p) (at i))`                                                                                                              |
-| `setProp`    | `(setProp id name values…)`, `(setProp (at i) id name values…)`                                                                            |
-| `removeProp` | `(removeProp id name)`, `(removeProp (at i) id name)`                                                                                      |
-| `rename`     | `(rename id to)`, `(rename id (anonymous as))`                                                                                             |
+| Operation       | Links Notation                                                                                                                             |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `insert`        | `(insert (parent p) (at i) (ids id…) (node (id x) (kind k) (positional …) (properties (name values…)…) (unknown …) (children (node …)…)))` |
+| `remove`        | `(remove id)`                                                                                                                              |
+| `move`          | `(move id (parent p) (at i))`                                                                                                              |
+| `setProp`       | `(setProp id name values…)`, `(setProp (at i) id name values…)`                                                                            |
+| `removeProp`    | `(removeProp id name)`, `(removeProp (at i) id name)`                                                                                      |
+| `setPositional` | `(setPositional id values…)` (`(setPositional id)`: no positional values)                                                                  |
+| `rename`        | `(rename id to)`, `(rename id (anonymous as))`                                                                                             |
 
 A root position has no `(parent …)`; empty sections of a node are left out.
 Text that is not in this format throws a `StoreError` with the code

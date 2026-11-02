@@ -67,6 +67,26 @@ describe('bindStore', () => {
     expect(store.get('greeting').parentId).toBe('body');
   });
 
+  it('changes positional values with one setPositional operation', () => {
+    const { config, store, entries } = bound();
+    const before = store.get('greeting').positional;
+    config.set('user', 'greeting', 'text', ['Hi']);
+    expect(entries.length).toBe(1);
+    const [{ entry, events }] = entries;
+    expect(entry.origin).toBe('config');
+    expect(entry.ops).toEqual([
+      { op: 'setPositional', id: 'greeting', values: ['Hi'] },
+    ]);
+    expect(
+      events.map((e) => [e.type, e.id, e.prop, e.before, e.after])
+    ).toEqual([['update', 'greeting', undefined, before, ['Hi']]]);
+    expect(events.some((e) => e.type === 'remove' || e.type === 'insert')).toBe(
+      false
+    );
+    expect(store.undo()).toBe(true);
+    expect(store.get('greeting').positional).toEqual(before);
+  });
+
   it('falls back to the lower layers when overrides go away', () => {
     const { config, store, entries } = bound();
     config.set('user', 'greeting', 'text', ['Hello, agents']);

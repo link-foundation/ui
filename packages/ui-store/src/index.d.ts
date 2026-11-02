@@ -42,6 +42,8 @@ export type Op =
       index?: number;
     }
   | { op: 'removeProp'; id: string; name: string; index?: number }
+  /** Replace the positional values (atoms) of an element. */
+  | { op: 'setPositional'; id: string; values: string[] }
   | {
       op: 'rename';
       id: string;
@@ -79,16 +81,19 @@ export interface StoreEvent {
   index: number;
   /** The properties after the change; `null` for `remove`. */
   props: readonly UiProperty[] | null;
-  /** `update` only: the name of the changed property. */
+  /**
+   * `update` only: the name of the changed property. Left out when the
+   * positional values changed (`setPositional`).
+   */
   prop?: string;
   /**
    * insert: `null`; remove: the element view; update: the old values (or
-   * `null`); move: `{ parentId, index }`; rename: the old ID.
+   * `null`; the old positional values without `prop`); move: `{ parentId, index }`; rename: the old ID.
    */
   before: unknown;
   /**
    * insert: the element view; remove: `null`; update: the new values (or
-   * `null`); move: `{ parentId, index }`; rename: the new ID.
+   * `null`; the new positional values without `prop`); move: `{ parentId, index }`; rename: the new ID.
    */
   after: unknown;
 }
@@ -144,6 +149,8 @@ export interface Store {
   move(id: string, parentId: string | null, index?: number): void;
   setProp(id: string, name: string, values: RawValue[]): void;
   removeProp(id: string, name: string): void;
+  /** Replace the positional values of an element. */
+  setPositional(id: string, values: string[]): void;
   /** Returns the new ID; `to: null` makes the element anonymous. */
   rename(id: string, to: string | null): string;
   /** Apply an operation given as data; returns it as applied. */

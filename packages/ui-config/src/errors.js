@@ -5,7 +5,8 @@
  * - `read-only-layer`: only `user` and `session` can be edited;
  * - `unknown-id`: the base document has no element with this id;
  * - `missing-key`: a keyed prop (`token`, `state`) needs a key;
- * - `bad-value`: the values are not an array of Links Notation values;
+ * - `bad-value`: the values are not an array of Links Notation values (or,
+ *   for the positional values of an element, not atoms);
  * - `bad-patch`: a patch given to `createConfig({ layers })` has an error
  *   (the error has the `diagnostics`).
  */

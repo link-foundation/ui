@@ -65,6 +65,7 @@ const OPS = [
   'setProp',
   'setProp',
   'removeProp',
+  'setPositional',
   'rename',
 ];
 
@@ -92,6 +93,8 @@ export function randomOp(store, rand, n) {
     store.setProp(id, pick(rand, ['label', 'variant', 'gap']), [`s${n}`]);
   } else if (kind === 'removeProp' && store.get(id).properties.length > 0) {
     store.removeProp(id, pick(rand, store.get(id).properties).name);
+  } else if (kind === 'setPositional') {
+    store.setPositional(id, rand() < 0.2 ? [] : [`p${n}`, `q ${n}`]);
   } else if (kind === 'rename') {
     store.rename(id, rand() < 0.5 ? `r${n}` : null);
   }

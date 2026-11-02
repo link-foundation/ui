@@ -67,6 +67,11 @@ export function createConfig(options) {
         'bad-value',
         'set needs a non-empty array of Links Notation values'
       );
+      check(
+        t.mode !== 'positional' || values.every((v) => typeof v === 'string'),
+        'bad-value',
+        `The positional values of "${id}" are atoms (no links)`
+      );
       batch(() => write(layer, t, values));
     },
 

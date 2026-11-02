@@ -71,10 +71,19 @@ export function preparePatch(state, text, layer) {
       );
       return;
     }
-    ops.push({
-      t,
-      values: positional && values ? [op.key, ...values] : values,
-    });
+    const all = positional && values ? [op.key, ...values] : values;
+    if (t.mode === 'positional' && all?.some((v) => typeof v !== 'string')) {
+      diagnostics.push(
+        diagnostic(
+          'bad-value',
+          'error',
+          `The positional values of "${op.id}" are atoms (no links)`,
+          { op: index, element: op.id }
+        )
+      );
+      return;
+    }
+    ops.push({ t, values: all });
   });
   return { patch, ops, diagnostics, ok: !hasError(diagnostics) };
 }

@@ -21,6 +21,7 @@
  *   | { op: 'move', id: string, parentId: string|null, index: number }
  *   | { op: 'setProp', id: string, name: string, values: RawValue[], index?: number }
  *   | { op: 'removeProp', id: string, name: string, index?: number }
+ *   | { op: 'setPositional', id: string, values: RawValue[] }
  *   | { op: 'rename', id: string, to: string|null, as?: string }} Op
  *
  * `index`, `ids` and `as` are optional on input. `setProp` without `index`
@@ -30,6 +31,9 @@
  * `index` removes the last property with that name; with `index` it removes
  * the property at that position (which must have that name). `rename` with
  * `to: null` makes the element anonymous under the generated ID `as`.
+ * `setPositional` replaces the positional values of an element (`'Hello'` in
+ * `(greeting: text 'Hello')`, atoms only); its event is an `update` without
+ * `prop`.
  */
 
 import { check } from './errors.js';
@@ -49,7 +53,15 @@ import {
 
 /** @typedef {import('./model.js').Model} Model */
 
-const OPS = ['insert', 'remove', 'move', 'setProp', 'removeProp', 'rename'];
+const OPS = [
+  'insert',
+  'remove',
+  'move',
+  'setProp',
+  'removeProp',
+  'setPositional',
+  'rename',
+];
 
 /**
  * @param {unknown} index
@@ -271,6 +283,26 @@ function removeProp(model, op) {
   };
 }
 
+function setPositional(model, op) {
+  const { id } = op;
+  const node = record(model, id);
+  const values = freezeValues(op.values);
+  // An element's positional values are atoms (docs/spec/elements.md).
+  check(
+    values.every((value) => typeof value === 'string'),
+    'bad-value',
+    'setPositional: positional values are atoms (strings)'
+  );
+  const before = node.positional;
+  node.positional = values;
+  return {
+    op: { op: 'setPositional', id, values },
+    // An `update` without `prop`: the positional values changed.
+    events: [{ type: 'update', ...place(model, id), before, after: values }],
+    inverse: { op: 'setPositional', id, values: before },
+  };
+}
+
 /** Give a record a new ID everywhere it is referenced. */
 function rekey(model, node, to) {
   const from = node.id;
@@ -326,7 +358,15 @@ function rename(model, op) {
   };
 }
 
-const APPLY = { insert, remove, move, setProp, removeProp, rename };
+const APPLY = {
+  insert,
+  remove,
+  move,
+  setProp,
+  removeProp,
+  setPositional,
+  rename,
+};
 
 /**
  * Apply one operation to a model.
