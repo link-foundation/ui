@@ -92,6 +92,8 @@ final class UiViewAccessibilityTests: XCTestCase {
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 400, height: 300), styleMask: [.titled], backing: .buffered,
             defer: false)
+        // Owned by ARC here; the default (true) frees it a second time on close.
+        window.isReleasedWhenClosed = false
         window.contentView = hosting
         window.orderFront(nil)
         hosting.layoutSubtreeIfNeeded()
