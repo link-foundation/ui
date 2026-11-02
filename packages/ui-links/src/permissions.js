@@ -91,17 +91,22 @@ export function createPolicy({ rules, markers, types }) {
  * The storage as `subject` sees it: `each` and `count` skip what it may not
  * read; a write it may not do throws `forbidden`, the storage unchanged.
  * An update needs the right to write the link before and after it. A link
- * the subject created is its own until an update gives it a type (a source
- * other than 0).
+ * the subject created through this view is its own while it has no type
+ * (its source is 0), so undoing the update that typed it makes it its own
+ * again. `forget(id)` drops that claim when the link is gone (deleted or its
+ * creation undone), so a later link at the same address is not the
+ * subject's.
  * @param {any} links
  * @param {ReturnType<typeof createPolicy>} policy
  * @param {number | null | (() => number | null)} subject
  */
 export function withPermissions(links, policy, subject) {
   const who = typeof subject === 'function' ? subject : () => subject;
-  const fresh = new Set();
-  const readable = (link) => fresh.has(link.id) || policy.canRead(who(), link);
-  const writable = (link) => fresh.has(link.id) || policy.canWrite(who(), link);
+  /** The addresses of the links created through this view. */
+  const created = new Set();
+  const own = (link) => link.from_id === NULL && created.has(link.id);
+  const readable = (link) => own(link) || policy.canRead(who(), link);
+  const writable = (link) => own(link) || policy.canWrite(who(), link);
   /** The stored link; a hidden one is as missing as a deleted one. */
   const visible = (id) => {
     const link = getLink(links, id);
@@ -127,7 +132,7 @@ export function withPermissions(links, policy, subject) {
         throw forbidden('create');
       }
       const id = links.create();
-      fresh.add(id);
+      created.add(id);
       return id;
     },
     update(id, source, target) {
@@ -135,7 +140,7 @@ export function withPermissions(links, policy, subject) {
       if (before === null) {
         return links.update(id, source, target);
       }
-      if (fresh.has(id) && source === NULL) {
+      if (own(before) && source === NULL) {
         // Still without a type: still its creator's own.
         return links.update(id, source, target);
       }
@@ -143,7 +148,6 @@ export function withPermissions(links, policy, subject) {
       if (!writable(before) || !policy.canWrite(who(), after)) {
         throw forbidden(`update ${id}`);
       }
-      fresh.delete(id);
       return links.update(id, source, target);
     },
     delete(id) {
@@ -151,8 +155,12 @@ export function withPermissions(links, policy, subject) {
       if (before !== null && !writable(before)) {
         throw forbidden(`delete ${id}`);
       }
-      fresh.delete(id);
+      created.delete(id);
       return links.delete(id);
+    },
+    /** The link at `id` is gone: a new one there is not the subject's own. */
+    forget(id) {
+      created.delete(id);
     },
   };
   if (typeof links.createAt === 'function') {
@@ -161,7 +169,7 @@ export function withPermissions(links, policy, subject) {
         throw forbidden('create');
       }
       const result = links.createAt(id);
-      fresh.add(id);
+      created.add(id);
       return result;
     };
   }

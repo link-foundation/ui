@@ -117,6 +117,7 @@ describe('synced client', () => {
     const mine = a.create();
     a.update(mine, t.Note, mine);
     await a.flush();
+    expect(errors).toEqual([['remote', 'update']]);
     expect(allLinks(links, [a.resolve(mine)])[0].from_id).toBe(t.Note);
   });
 

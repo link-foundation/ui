@@ -100,25 +100,23 @@ const isLeaf = (p) => p.source === null;
  * addresses `fn` gave a name. On success the result is the net change of
  * every link (no link refers to a missing address; the names of deleted
  * links are removed); on failure every write and new name is undone.
+ *
+ * When `context.links` is a restricted view (`withPermissions`),
+ * `context.base` is the storage under it: references are checked and writes
+ * undone there, since a link the subject may not read still exists, and
+ * undoing the subject's own writes needs no permission.
  * @returns {Change[]}
  */
 export function transact(context, fn) {
   const recorded = [];
   const named = [];
   const raw = context.links;
+  const base = context.base ?? raw;
   const links = observe(raw, (change) => recorded.push(change));
   try {
     fn(links, recorded, named);
     const changes = netChanges(recorded);
-    for (const { after } of changes) {
-      if (after !== null) {
-        for (const part of [after.from_id, after.to_id]) {
-          if (part !== NULL && part !== after.id && !exists(raw, part)) {
-            throw notFound(part);
-          }
-        }
-      }
-    }
+    changes.forEach(({ after }) => checkReferences(base, after));
     for (const { before, after } of changes) {
       if (after === null && before !== null) {
         context.names?.removeName(before.id);
@@ -126,11 +124,33 @@ export function transact(context, fn) {
     }
     return changes;
   } catch (error) {
-    rollback(raw, recorded);
-    for (const id of named) {
-      context.names?.removeName(id);
-    }
+    undo(context, base, recorded, named);
     throw error;
+  }
+}
+
+/** A `not-found` error when `link` refers to a missing link of `base`. */
+function checkReferences(base, link) {
+  if (link === null) {
+    return;
+  }
+  for (const part of [link.from_id, link.to_id]) {
+    if (part !== NULL && part !== link.id && !exists(base, part)) {
+      throw notFound(part);
+    }
+  }
+}
+
+/** Undo a failed `transact`: its writes (on `base`) and its new names. */
+function undo(context, base, recorded, named) {
+  rollback(base, recorded);
+  for (const { before, after } of recorded) {
+    if (before === null && after !== null) {
+      context.links.forget?.(after.id);
+    }
+  }
+  for (const id of named) {
+    context.names?.removeName(id);
   }
 }
 
@@ -138,6 +158,8 @@ export function transact(context, fn) {
  * Run a query on `links`.
  * @param {object} context
  * @param {any} context.links  a storage
+ * @param {any} [context.base]  the storage under `links` when it is a
+ *   restricted view (see `transact`)
  * @param {any} [context.names]  a names store
  * @param {boolean} [context.autoCreate]  create missing references as
  *   points `(x: x x)` (link-cli's `--auto-create-missing-references`)

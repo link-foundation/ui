@@ -201,6 +201,11 @@ export function namesFromLino(names: NamesStore, text: string): NamesStore;
 
 export interface QueryContext {
   links: LinksStorage;
+  /**
+   * The storage under `links` when it is a restricted view: references are
+   * checked and failed writes undone there.
+   */
+  base?: LinksStorage;
   names?: NamesStore;
   /** Create missing references as points `(x: x x)`. */
   autoCreate?: boolean;
@@ -273,11 +278,16 @@ export function createPolicy(options: {
   markers: PermissionMarkers;
   types: TypeSystem;
 }): Policy;
+/**
+ * The storage as `subject` sees it. A link created through the view is the
+ * subject's own while its source is 0; `forget(id)` drops that claim when
+ * the link is gone.
+ */
 export function withPermissions<T extends LinksStorage>(
   links: T,
   policy: Policy,
   subject: number | null | (() => number | null)
-): T;
+): T & { forget(id: number): void };
 export function permissionMarkers(
   links: LinksStorage,
   names: NamesStore

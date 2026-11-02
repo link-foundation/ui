@@ -163,3 +163,54 @@ describe('links server', () => {
     );
   });
 });
+
+describe('links server and the links a subject creates', () => {
+  it('lets a subject type the links it creates, as types it may not read', () => {
+    const { links, names, policy, t, v } = world();
+    const server = createLinksServer({ links, names, policy });
+    const alice = server.session({ subject: v.alice });
+    // alice may write notes, but may not read the link of the type Note.
+    expect(alice.request(`(each: (${t.Note}))`)).toBe('');
+    const n = links.count([]) + 1;
+    expect(alice.request('(create: (0 0))')).toBe(`() ((${n}: 0 0))`);
+    expect(alice.request(`(update: (${n} ${t.Note} ${n}))`)).toBe(
+      `((${n}: 0 0)) ((${n}: ${t.Note} ${n}))`
+    );
+    expect(alice.request(`(create: (${t.Note} ${n}))`)).toBe(
+      `() ((${n + 1}: ${t.Note} ${n}))`
+    );
+  });
+
+  it('undoes a failed request and reports its own error', () => {
+    const { links, names, policy, t, v } = world();
+    const server = createLinksServer({ links, names, policy });
+    const alice = server.session({ subject: v.alice });
+    const n = links.count([]) + 1;
+    alice.request('(create: (0 0))');
+    // The update is allowed, then refused for its missing target: undoing it
+    // needs no permission, and the error is the one of the request.
+    expect(alice.request(`(update: (${n} ${t.Note} 9999))`)).toBe(
+      "(error: 'Link not found: 9999')"
+    );
+    expect(alice.request(`(each: (${n}))`)).toBe(`(${n}: 0 0)`);
+    expect(alice.request(`(update: (${n} ${t.Note} ${n}))`)).toBe(
+      `((${n}: 0 0)) ((${n}: ${t.Note} ${n}))`
+    );
+  });
+
+  it('does not give a subject a link made where its own was deleted', () => {
+    const { links, names, policy, v } = world();
+    const server = createLinksServer({ links, names, policy });
+    const alice = server.session({ subject: v.alice });
+    const boss = server.session({ subject: v.boss });
+    const n = links.count([]) + 1;
+    alice.request('(create: (0 0))');
+    expect(alice.request(`(each: (${n}))`)).toBe(`(${n}: 0 0)`);
+    boss.request(`(delete: ${n})`);
+    expect(boss.request('(create: (0 0))')).toBe(`() ((${n}: 0 0))`);
+    expect(alice.request(`(each: (${n}))`)).toBe('');
+    expect(alice.request(`(update: (${n} 0 0))`)).toBe(
+      `(error: 'Link not found: ${n}')`
+    );
+  });
+});

@@ -305,14 +305,15 @@ function openSession(server, { subject = null, onPush = null } = {}) {
   const view = policy
     ? withPermissions(links, policy, () => state.subject)
     : links;
-  const context = { links: view, names, autoCreate };
+  const context = { links: view, base: links, names, autoCreate };
   const readable = (link) => !policy || policy.canRead(state.subject, link);
   const nameRef = (id) => names.getName(id) ?? String(id);
-  const write = (fn, ref = String) => {
-    const changes = transact(context, fn);
+  /** Tell the other sessions about `changes`; them as LiNo for the reply. */
+  const report = (changes, ref = String) => {
     server.publish(changes, api);
     return changes.map((change) => changeToLino(change, ref));
   };
+  const write = (fn, ref = String) => report(transact(context, fn), ref);
   const operations = createOperations(server, state, {
     view,
     reader: createReader(view, names),
@@ -336,10 +337,7 @@ function openSession(server, { subject = null, onPush = null } = {}) {
       ) {
         return operations[first.id](first.values[0]);
       }
-      return write(
-        (store) => runQuery({ ...context, links: store }, document),
-        nameRef
-      );
+      return report(runQuery(context, document), nameRef);
     } catch (error) {
       if (!(error instanceof LinksError)) {
         throw error;
@@ -386,6 +384,11 @@ function openSession(server, { subject = null, onPush = null } = {}) {
     },
     /** Push the changes the subscriptions of this session ask for. */
     deliver(changes) {
+      for (const { before, after } of changes) {
+        if (after === null && before !== null) {
+          view.forget?.(before.id);
+        }
+      }
       if (!onPush) {
         return;
       }
