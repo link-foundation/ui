@@ -1,0 +1,153 @@
+(ui-convert: dialect
+  (version 'ui-dialect/0'))
+
+(common: kind
+  (description 'Properties every kind accepts in interop documents.')
+  (property extra any multi)
+  (property spacing any)
+  (property separator any)
+  (property visible any)
+  (property block-height any)
+  (property alignment any)
+  (property fallback any)
+  (property requires any))
+
+(document: kind
+  (property source any)
+  (property fallback-text any)
+  (property speak any)
+  (property rtl any)
+  (property metadata any)
+  (property refresh any)
+  (property authentication any)
+  (property container-style any)
+  (property bleed any)
+  (property min-height any)
+  (property vertical-alignment any)
+  (property background-image any)
+  (property select-action any))
+
+(stack: kind
+  (property role string)
+  (property width any)
+  (property rtl any)
+  (property container-style any)
+  (property bleed any)
+  (property min-height any)
+  (property vertical-alignment any)
+  (property background-image any)
+  (property select-action any))
+
+(text: kind
+  (property size any)
+  (property weight any)
+  (property color any)
+  (property subtle any)
+  (property wrap any)
+  (property max-lines any)
+  (property font-type any)
+  (property text-style any))
+
+(image: kind
+  (property image-size any)
+  (property image-style any)
+  (property background any)
+  (property select-action any))
+
+(button: kind
+  (property icon any)
+  (property action-style any)
+  (property tooltip any)
+  (property enabled any)
+  (property mode any)
+  (property data any)
+  (property associated-inputs any)
+  (property verb any))
+
+(facts: kind
+  (description 'A list of title and value pairs.')
+  (property fact any multi)
+  (children none))
+
+(opaque: kind
+  (description 'An element outside the supported subset, kept whole in extra.')
+  (property source any)
+  (children none))
+
+(field: kind
+  (description 'Properties every form field kind accepts (see FIELD_KINDS in vocabulary.js).')
+  (property bind any)
+  (property label string)
+  (property title any)
+  (property description any)
+  (property placeholder any)
+  (property value any)
+  (property default any)
+  (property required any)
+  (property disabled any)
+  (property error-message any)
+  (property label-position any)
+  (property label-width any)
+  (property input-style any)
+  (property min any)
+  (property max any)
+  (property min-length any)
+  (property max-length any)
+  (property pattern any)
+  (property format any)
+  (property type any)
+  (property option any multi)
+  (property rule any multi)
+  (property options any)
+  (children none))
+
+(text-field: kind
+  (description 'A single or multi line text input.')
+  (property multiline any)
+  (property text-input-style any)
+  (property inline-action any))
+
+(number-field: kind
+  (description 'A number input.'))
+
+(date-field: kind
+  (description 'A date input.'))
+
+(time-field: kind
+  (description 'A time input.'))
+
+(checkbox: kind
+  (description 'A boolean input.')
+  (property value-on any)
+  (property value-off any)
+  (property wrap any))
+
+(select: kind
+  (description 'A choice from options: (option <value> <title>).')
+  (property multiple any)
+  (property choice-style any)
+  (property wrap any))
+
+(submit: action
+  (description 'Submit the inputs of a card or form.')
+  (argument card element-ref))
+
+(execute: action
+  (description 'Submit the inputs with a verb (Adaptive Cards Action.Execute).')
+  (argument card element-ref))
+
+(open-url: action
+  (description 'Open a URL; unsafe schemes are dropped on import.')
+  (argument url url))
+
+(show-card: action
+  (description 'Show the card with the given id.')
+  (argument card element-ref))
+
+(toggle-visibility: action
+  (description 'Toggle elements, or set them with (<id> true|false).')
+  (argument target any))
+
+(theme: kind
+  (property source any)
+  (property unmapped any))

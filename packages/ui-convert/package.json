@@ -1,0 +1,51 @@
+{
+  "name": "@link-foundation/ui-convert",
+  "version": "0.0.0",
+  "description": "Converters between the UI dialect of Links Notation and other UI formats: A2UI, Adaptive Cards, JSON Forms and Lottie",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js",
+    "./interop": "./src/interop/index.js"
+  },
+  "bin": {
+    "ui-convert": "./src/cli.js"
+  },
+  "files": [
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "ui",
+    "links-notation",
+    "a2ui",
+    "adaptive-cards",
+    "json-forms",
+    "lottie"
+  ],
+  "license": "Unlicense",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/link-foundation/ui.git",
+    "directory": "packages/ui-convert"
+  },
+  "homepage": "https://github.com/link-foundation/ui/tree/main/packages/ui-convert#readme",
+  "bugs": {
+    "url": "https://github.com/link-foundation/ui/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@link-foundation/ui-core": "^0.0.0",
+    "links-notation": "^0.27.1"
+  },
+  "devDependencies": {
+    "@lottie-animation-community/lottie-specs": "^0.3.2",
+    "ajv": "^8.17.1",
+    "lottie-web": "^5.13.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
