@@ -34,7 +34,8 @@
     "changeset:version": "node scripts/changeset-version.mjs",
     "changeset:publish": "changeset publish",
     "changeset:status": "changeset status --since=origin/main",
-    "check:spec": "node scripts/check-spec-fixtures.mjs"
+    "check:spec": "node scripts/check-spec-fixtures.mjs",
+    "check:i18n": "node packages/ui-i18n/scripts/check-i18n.mjs"
   },
   "keywords": [
     "ui",
