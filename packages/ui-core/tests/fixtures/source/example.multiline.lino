@@ -1,0 +1,4 @@
+# primary action
+(ok: button
+  (label 'OK')   # shown on the button
+  (variant filled))
