@@ -1,0 +1,7 @@
+:root {
+  --color-primary: #6750a4;
+  --color-on-primary: #ffffff;
+  --space-medium: 16px;
+  --shape-corner-medium: 12px;
+  --motion-duration-short: 150ms;
+}

@@ -83,6 +83,17 @@ See the
 [capability matrix](packages/ui-convert/README.md#capability-matrix) for
 what each format supports.
 
+### Design tokens
+
+[`@link-foundation/ui-tokens`](packages/ui-tokens/README.md) reads design
+tokens written in Links Notation, with inheritance, aliases and modes, and
+writes them as CSS custom properties, DTCG 2025.10 JSON, Swift and Kotlin:
+
+```sh
+npx link-ui-tokens build tokens.lino --set material3 \
+  --css tokens.css --dtcg tokens.json --swift Tokens.swift --kotlin Tokens.kt
+```
+
 ### Development
 
 ```bash
@@ -125,7 +136,8 @@ npm run example:desktop:package
 │   ├── ui-config/        # @link-foundation/ui-config (layered configuration, overrides patches)
 │   ├── ui-convert/       # @link-foundation/ui-convert (HTML/DOM, A2UI, Adaptive Cards, JSON Forms, Lottie <-> LiNo)
 │   ├── ui-core/          # @link-foundation/ui-core
-│   └── ui-store/         # @link-foundation/ui-store
+│   ├── ui-store/         # @link-foundation/ui-store
+│   └── ui-tokens/        # @link-foundation/ui-tokens (design tokens)
 ├── tests/                # Repository and release-script tests
 ├── .eslintrc.js          # ESLint configuration
 ├── .prettierrc           # Prettier configuration
