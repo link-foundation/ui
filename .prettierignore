@@ -10,3 +10,5 @@ CLAUDE.md
 docs/case-studies/*/data/
 docs/template-history/case-studies/*/data/
 dev/log/
+# Generated, one parser vector per line (scripts/generate-parser-vectors.mjs)
+docs/spec/parser-vectors.json
