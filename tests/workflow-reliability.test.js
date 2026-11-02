@@ -346,6 +346,7 @@ describe('workflow reliability policy', () => {
       '--exclude-path dev/log',
       `--exclude-path ${viteSourceHtmlPath}`,
       '--exclude-path tests/fixtures',
+      '--exclude-path packages/ui-convert/tests/html/fixtures',
       '\n            .',
     ]);
   });
