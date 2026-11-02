@@ -250,6 +250,26 @@ storage under the view for the reference check and the rollback; the tests
 "lets a subject type the links it creates, as types it may not read" and
 "undoes a failed request and reports its own error" failed before it.
 
+## CI fixes
+
+- **One changeset.** The changeset check allows exactly one changeset per
+  pull request, so the three changesets became `.changeset/ui-links-package.md`
+  (`ui-links: minor`, `ui-store: minor`, `ui-config: patch`).
+- **CRLF on Windows.** On the Windows runners (Node.js, Deno and Bun), the
+  checkout converted two kinds of input to CRLF.
+  - The roadmap issue files are read by the front-matter parser of
+    `experiments/issue-1/create-roadmap-issues.mjs`, which expects `---\n`.
+    The roadmap test failed with "missing front matter".
+  - `server.test.js` replays link-cli's protocol conversation line by line, and
+    a blank line read as `"\r"` came before any request, giving "Cannot read
+    properties of undefined (reading 'reply')".
+
+  `.gitattributes` now keeps `docs/case-studies/issue-101/roadmap/**` and
+  `packages/ui-links/tests/fixtures/**` in LF, as it already did for the other
+  byte-exact inputs. `experiments/issue-101/crlf-checkout-probe.mjs`
+  reproduces both errors with CRLF text. A clone with `core.autocrlf=true`
+  gave CRLF files before the fix and LF files after it.
+
 ## Known limits
 
 - **Pushes after rule changes**

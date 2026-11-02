@@ -60,4 +60,6 @@ Experiments are in [`experiments/issue-101/`](../../../experiments/issue-101/):
 - `create-issues.mjs` creates and updates the roadmap issues;
 - `fresh-note-probe.mjs` and `fresh-note-server-probe.mjs` reproduced the bug
   fixed in commit `5aaf3f3` (a subject could not type the links it created);
+- `crlf-checkout-probe.mjs` reproduces the Windows CI failures that
+  `.gitattributes` fixed (CRLF in the roadmap sources and the protocol fixture);
 - `readme-snippet.mjs` runs the example of the ui-links README.
