@@ -1,0 +1,53 @@
+{
+  "name": "@link-foundation/ui-i18n",
+  "version": "0.0.0",
+  "description": "Localisation of the associative UI framework: (t KEY) message references in Links Notation documents, locale from the configuration layers, text direction, framework catalogs and CI checks, built on lino-i18n",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./locales/ui.lino": "./locales/ui.lino"
+  },
+  "types": "./src/index.d.ts",
+  "files": [
+    "src/",
+    "locales/",
+    "scripts/",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "ui",
+    "links-notation",
+    "associative",
+    "i18n",
+    "localization",
+    "rtl"
+  ],
+  "license": "Unlicense",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/link-foundation/ui.git",
+    "directory": "packages/ui-i18n"
+  },
+  "homepage": "https://github.com/link-foundation/ui/tree/main/packages/ui-i18n#readme",
+  "bugs": {
+    "url": "https://github.com/link-foundation/ui/issues"
+  },
+  "engines": {
+    "node": ">=22.11.0"
+  },
+  "dependencies": {
+    "@link-foundation/ui-core": "^0.0.0",
+    "lino-i18n": "0.5.0"
+  },
+  "devDependencies": {
+    "@link-foundation/ui-config": "^0.0.0",
+    "test-anywhere": "^0.8.48"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

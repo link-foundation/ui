@@ -41,6 +41,7 @@ on:
           - '@link-foundation/ui-core'
           - '@link-foundation/ui-config'
           - '@link-foundation/ui-convert'
+          - '@link-foundation/ui-i18n'
           - '@link-foundation/ui-store'
           - '@link-foundation/ui-tokens'
 
@@ -285,6 +286,9 @@ jobs:
 
       - name: Check code duplication
         run: npm run check:duplication
+
+      - name: Check translations (key parity and hard-coded text)
+        run: npm run check:i18n
 
   # Test matrix: 3 runtimes (Node.js, Bun, Deno) x 3 OS (Ubuntu, macOS, Windows)
   # IMPORTANT: Tests must validate the ACTUAL merge result, not a stale merge preview.

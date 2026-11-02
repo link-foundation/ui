@@ -1,0 +1,6 @@
+(app: document
+  (i18n required)
+  (ok: button (label (t ok.label)))
+  (close: button (label (t ui.dialog.close)))
+  (greeting: text (t greeting (name 'Ada')))
+  (count: text (t files (count 3))))
