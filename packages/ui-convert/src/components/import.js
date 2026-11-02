@@ -124,6 +124,20 @@ class ComponentImporter {
     if (node.tag === RAW) {
       return { tag: node.stem, attrs: [], children: [], node, notes: [] };
     }
+    if (node.tag === UNSUPPORTED) {
+      // A top-level construct (a Vue interpolation outside elements).
+      return {
+        tag: 'unsupported',
+        attrs: [],
+        children: [],
+        node,
+        notes: [],
+        mapped: { head: [atom(HTML_FALLBACK_KIND)], attrs: [], children: [] },
+        styles: [],
+        links: [],
+        unsupported: [node],
+      };
+    }
     if (DROPPED_TAGS.includes(node.tag)) {
       notes.push(this.dropped(`the <${node.tag}> element`, node.span));
       return null;
@@ -211,7 +225,9 @@ class ComponentImporter {
         };
       }
     }
-    if (isHtmlTag(node.tag)) {
+    const htmlTag =
+      node.component === undefined ? isHtmlTag(node.tag) : !node.component;
+    if (htmlTag) {
       const html = mapHtmlElement(
         { tag: node.tag, attrs: literals, children: nodes },
         nodes,
@@ -229,11 +245,11 @@ class ComponentImporter {
       }
     }
     return {
-      stem: isHtmlTag(node.tag) ? node.tag : kebabCase(node.tag),
+      stem: htmlTag ? node.tag : kebabCase(node.tag),
       head: [atom(HTML_FALLBACK_KIND), property('tag', node.tag)],
       attrs: literals,
       children,
-      notes: isHtmlTag(node.tag)
+      notes: htmlTag
         ? []
         : [
             {

@@ -109,6 +109,11 @@
   (description 'A row of controls (MUI Toolbar).')
   (children any))
 
+(vue-block: kind
+  (description 'A <script>, <style> or custom block of a Vue single-file component, kept as raw text: one content value per line.')
+  (property content any)
+  (children none))
+
 (action: action
   (description 'Call a handler of the imported component by name; the host binds it.')
   (argument name string))

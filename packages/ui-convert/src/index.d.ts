@@ -141,6 +141,165 @@ export function extendVocabulary(base: Vocabulary, text: string): Vocabulary;
 export function readHtml(text: string, options?: ImportHtmlOptions): HtmlNode[];
 export function readDom(root: unknown, options?: ImportDomOptions): HtmlNode[];
 
+export function mapHtmlElement(
+  node: HtmlNode,
+  children: HtmlNode[],
+  attrs: [string, string][],
+  vocabulary: Vocabulary,
+  table?: readonly MappingRule[]
+): { head: Link[]; attrs: [string, string][]; children: HtmlNode[] } | null;
+
+// ---------------------------------------------------------------------------
+// Components: JSX / TSX and Vue single-file components, mapped to dialect
+// kinds by LiNo match / replace rules (src/mappings/mui.lino).
+// ---------------------------------------------------------------------------
+
+/** A term of the rule engine: an atom or a link of terms. */
+export type Term = string | Term[];
+
+/** A match / replace rule read from Links Notation. */
+export interface Rule {
+  name: string;
+  match: Term[];
+  replace: Term[];
+}
+
+export function readRules(text: string): Rule[];
+export function matchTerm(
+  pattern: Term,
+  term: Term,
+  bindings?: Map<string, Term>
+): Map<string, Term> | null;
+export function matchElement(
+  pattern: Term[],
+  element: Term[]
+): { bindings: Map<string, Term>; consumed: Term[]; rest: Term[] } | null;
+export function substitute(
+  term: Term,
+  bindings: Map<string, Term>
+): Term | undefined;
+export function applyRules(
+  element: Term[],
+  rules: Rule[]
+): { node: Term[]; applied: string[]; consumed: Term[]; rest: Term[] };
+
+/** The built-in mappings: `['mui']`. */
+export const MAPPINGS: readonly string[];
+export const COMPONENT_VOCABULARY_TEXT: string;
+/** The vocabulary of documents imported from JSX and Vue. */
+export function componentVocabulary(): Vocabulary;
+export function mappingRules(name: string): Rule[];
+/** Built-in mapping names or rule file texts, first match wins. */
+export function loadMappings(mappings: string[]): Rule[];
+
+export interface ComponentDiagnostic {
+  code: string;
+  severity: 'error' | 'warning' | 'info';
+  message: string;
+  /** The source text range of the construct. */
+  span?: Span;
+  /** The id of the link that carries it (`null`: the document). */
+  id: string | null;
+}
+
+export interface ImportComponentOptions {
+  /** Mapping names (`'mui'`) or rule file texts; default `['mui']`. */
+  mappings?: string[];
+  /** Default: `componentVocabulary()`. */
+  vocabulary?: Vocabulary;
+  /** Output style of `text` (default `multiline`). */
+  style?: 'inline' | 'multiline' | 'indented';
+  indent?: string;
+}
+
+export interface ImportComponentResult {
+  text: string;
+  tree: UiDocument;
+  links: Link[];
+  /** Link id -> source span. */
+  spans: Map<string, Span>;
+  /** Link id -> the name of the mapping rule that produced it. */
+  applied: Map<string, string>;
+  diagnostics: (ComponentDiagnostic | Diagnostic)[];
+}
+
+export interface JsxProp {
+  name: string | null;
+  kind: 'literal' | 'identifier' | 'expression' | 'spread';
+  value?: string;
+  source: string;
+  span: Span;
+  expression?: unknown;
+}
+
+export interface JsxNode extends HtmlNode {
+  props?: JsxProp[];
+}
+
+export function parseJsx(
+  text: string,
+  options?: { typescript?: boolean }
+): JsxNode & { errors: { message: string; span: Span }[] };
+export function cleanJsxText(text: string): string;
+export function importJsx(
+  text: string,
+  options?: ImportComponentOptions & { typescript?: boolean }
+): ImportComponentResult;
+
+export interface VueProp {
+  kind: 'attribute' | 'directive';
+  name: string;
+  rawName: string;
+  value?: string;
+  arg?: string;
+  dynamicArg?: boolean;
+  exp?: string;
+  modifiers?: string[];
+  alias?: string[];
+  iterable?: string;
+  source: string;
+  span: Span;
+}
+
+export interface VueNode extends HtmlNode {
+  props?: VueProp[];
+  component?: boolean;
+}
+
+export interface VueBlock {
+  tag: string;
+  attrs: [string, string][];
+  content: string;
+  span: Span;
+}
+
+export function parseVue(text: string): {
+  template: VueNode;
+  script: VueBlock[];
+  styles: VueBlock[];
+  blocks: VueBlock[];
+  errors: { message: string; span: Span }[];
+};
+export function importVue(
+  text: string,
+  options?: ImportComponentOptions
+): ImportComponentResult;
+
+export function importComponents(
+  roots: unknown[],
+  options?: ImportComponentOptions
+): ImportComponentResult;
+
+export function literalText(expression: unknown): string | undefined;
+export function pathText(expression: unknown): string | undefined;
+export function styleDeclarations(
+  expression: unknown,
+  options?: { px?: boolean }
+): [string, string][] | null;
+export function cssName(key: string): string;
+export function eventName(name: string): string;
+export function jsxEvent(prop: string): string | null;
+
 // ---------------------------------------------------------------------------
 // Interop: A2UI, Adaptive Cards, JSON Forms and Lottie.
 //
