@@ -5,7 +5,10 @@
 import type { Link } from 'links-notation';
 import type {
   Diagnostic,
+  DiagnosticLocation,
+  RawValue,
   UiDocument,
+  UiNode,
   Vocabulary,
 } from '@link-foundation/ui-core';
 
@@ -137,3 +140,217 @@ export function extendVocabulary(base: Vocabulary, text: string): Vocabulary;
 
 export function readHtml(text: string, options?: ImportHtmlOptions): HtmlNode[];
 export function readDom(root: unknown, options?: ImportDomOptions): HtmlNode[];
+
+// ---------------------------------------------------------------------------
+// Interop: A2UI, Adaptive Cards, JSON Forms and Lottie.
+//
+// Every converter reports the same diagnostic type as the HTML importer and
+// `@link-foundation/ui-core`: `{ code, severity, message, at }`. `at` also
+// names the format and the JSON path (or the element id) it is about.
+// ---------------------------------------------------------------------------
+
+export type InteropFormat = 'a2ui' | 'adaptive-cards' | 'json-forms' | 'lottie';
+
+export interface InteropDiagnosticLocation extends DiagnosticLocation {
+  format?: string;
+  /** JSON Pointer into the input (or the output, on export). */
+  path?: string;
+  [key: string]: unknown;
+}
+
+export interface InteropDiagnostic extends Diagnostic {
+  at: InteropDiagnosticLocation;
+}
+
+/** Collects the diagnostics of one conversion. */
+export class Diagnostics {
+  constructor(format: string);
+  format: string;
+  list: InteropDiagnostic[];
+  add(
+    code: string,
+    severity: 'error' | 'warning' | 'info',
+    message: string,
+    at?: Omit<InteropDiagnosticLocation, 'format'>
+  ): void;
+  error(code: string, message: string, at?: object): void;
+  warning(code: string, message: string, at?: object): void;
+  info(code: string, message: string, at?: object): void;
+}
+
+export interface InteropImportOptions {
+  /** Output style of `lino` (default `multiline`). */
+  style?: 'inline' | 'multiline' | 'indented';
+}
+
+export interface InteropImportResult {
+  /** Links Notation text in the UI dialect. */
+  lino: string;
+  /** The ui-core element tree of `lino`. */
+  roots: UiNode[];
+  diagnostics: InteropDiagnostic[];
+}
+
+export interface InteropExportResult<T> {
+  /** `null` when nothing could be exported (see the diagnostics). */
+  json: T | null;
+  diagnostics: InteropDiagnostic[];
+}
+
+/** LiNo text or a parsed document. */
+export type InteropSource = string | { roots: UiNode[] };
+
+export interface InteropExportOptions {
+  /** The element to export (by default the first document). */
+  id?: string;
+  /** Adaptive Cards only: the card version to write. */
+  targetVersion?: string;
+}
+
+export const FORMATS: InteropFormat[];
+export function detectFormat(json: unknown): InteropFormat | null;
+export const CONVERTERS: Record<
+  InteropFormat,
+  {
+    import(json: unknown, options?: InteropImportOptions): InteropImportResult;
+    export(
+      doc: InteropSource,
+      options?: InteropExportOptions
+    ): InteropExportResult<unknown>;
+  }
+>;
+
+/** The vocabulary of the UI dialect with the interop kinds and properties. */
+export function interopVocabulary(): Vocabulary;
+
+/** `(extra <format> '<json>')`: input keys a format has no mapping for. */
+export function encodeAny(value: unknown): string;
+export function decodeAny(raw: RawValue): unknown;
+export function extraProperty(
+  format: string,
+  rest: Record<string, unknown>
+): unknown;
+export function readExtra(
+  node: { properties: { name: string; values: unknown[] }[] },
+  format: string
+): Record<string, unknown>;
+
+// A2UI
+
+/** A2UI messages: an array, a `{ messages }` sample or JSON Lines text. */
+export type A2uiMessages = object[] | { messages: object[] } | string;
+
+export interface A2uiDiffProps {
+  positional: string[];
+  properties: object[];
+}
+
+export interface A2uiDiff {
+  op: 'insert' | 'set' | 'remove';
+  id: string;
+  parent?: string;
+  index?: number;
+  kind?: string;
+  props?: A2uiDiffProps;
+}
+
+export interface A2uiDiffResult {
+  diffs: A2uiDiff[];
+  diagnostics: InteropDiagnostic[];
+}
+
+export const A2UI_VERSION: string;
+export const SUPPORTED_VERSIONS: string[];
+export function importA2ui(
+  messages: A2uiMessages,
+  options?: InteropImportOptions
+): InteropImportResult;
+export function exportA2ui(
+  doc: InteropSource,
+  options?: { id?: string }
+): InteropExportResult<object[]>;
+export function normalizeA2ui(messages: A2uiMessages): object[];
+export function a2uiMessagesToDiffs(messages: A2uiMessages): A2uiDiffResult;
+export function applyA2uiDiffs(roots: UiNode[], diffs: A2uiDiff[]): UiNode[];
+export function diffTrees(before: UiNode[], after: UiNode[]): A2uiDiff[];
+
+/** Push A2UI messages one at a time and get the diffs each one makes. */
+export class A2uiStream {
+  tree: UiNode[];
+  push(message: unknown): A2uiDiffResult;
+  allDiagnostics(): InteropDiagnostic[];
+}
+
+// Adaptive Cards
+
+export const ADAPTIVE_CARDS_VERSION: string;
+export function importAdaptiveCard(
+  json: unknown,
+  options?: InteropImportOptions
+): InteropImportResult;
+export function exportAdaptiveCard(
+  doc: InteropSource,
+  options?: { id?: string; targetVersion?: string }
+): InteropExportResult<object>;
+/** A host config colour (`#RGB`, `#RRGGBB`, `#AARRGGBB`) or `null`. */
+export function hostColour(text: unknown): string | null;
+/** An Adaptive Cards host config as a `theme` element (LiNo text). */
+export function hostConfigToTheme(
+  hostConfig: unknown,
+  options?: { id?: string }
+): string;
+export function hostConfigToThemeDetails(
+  hostConfig: unknown,
+  options?: { id?: string }
+): {
+  lino: string;
+  tokens: Map<string, string>;
+  unmapped: string[];
+  diagnostics: InteropDiagnostic[];
+};
+
+// JSON Forms
+
+export interface JsonForm {
+  schema?: object;
+  uischema?: object;
+  [key: string]: unknown;
+}
+
+export const JSON_FORMS_VERSION: string;
+export function importJsonForms(
+  form: JsonForm,
+  options?: InteropImportOptions
+): InteropImportResult;
+export function exportJsonForms(
+  doc: InteropSource,
+  options?: { id?: string }
+): InteropExportResult<{ schema?: object; uischema: object }>;
+export function normalizeJsonForms<T>(form: T): T;
+/** `#/properties/a/properties/b` -> `a.b` (other scopes are kept). */
+export function scopeToBind(scope: string): string;
+export function bindToScope(bind: string): string;
+
+// Lottie
+
+export interface LottieBezier {
+  c: boolean;
+  v: number[][];
+  i: number[][];
+  o: number[][];
+}
+
+export const LOTTIE_VERSION: string;
+export function importLottie(
+  json: unknown,
+  options?: InteropImportOptions
+): InteropImportResult;
+export function normalizeLottie<T>(json: T): T;
+/** Exports a document, an animation or a shape (by default the first). */
+export function exportLottie(
+  doc: InteropSource,
+  id?: string
+): InteropExportResult<object>;
+export function svgToBezier(text: string): LottieBezier | null;
+export function encodePath(bezier: unknown): string;
+export function decodePath(text: unknown): LottieBezier | null;

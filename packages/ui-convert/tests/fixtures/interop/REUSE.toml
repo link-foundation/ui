@@ -1,0 +1,53 @@
+# Licences of the interop fixtures copied from other projects (see
+# SOURCES.md). The fixtures written for ui-convert (A2UI coverage.json,
+# Adaptive Cards hello.json, JSON Forms categorization.json, Lottie
+# dot-pulse.* and rejected.json) fall under the repository licence in the
+# root REUSE.toml.
+version = 1
+
+[[annotations]]
+path = [
+  "a2ui/child-list-template.json",
+  "a2ui/incremental.json",
+  "a2ui/interactive-button.json",
+  "a2ui/row-layout.json",
+  "a2ui/simple-login-form.json",
+  "a2ui/simple-text.json",
+  "a2ui/task-card.json",
+]
+precedence = "override"
+SPDX-FileCopyrightText = "Google LLC"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = [
+  "adaptive-cards/ActivityUpdate.json",
+  "adaptive-cards/CalendarReminder.json",
+  "adaptive-cards/InputForm.json",
+  "adaptive-cards/ShowCardWizard.json",
+  "adaptive-cards/Table.json",
+  "adaptive-cards/hc-sample.json",
+  "adaptive-cards/hc-teams.json",
+]
+precedence = "override"
+SPDX-FileCopyrightText = "2017 Microsoft"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = ["json-forms/person.json", "json-forms/rule.json"]
+precedence = "override"
+SPDX-FileCopyrightText = "2019 EclipseSource GmbH"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = [
+  "lottie/ellipse.json",
+  "lottie/fill.json",
+  "lottie/path.json",
+  "lottie/rectangle.json",
+  "lottie/stroke.json",
+  "lottie/transform.json",
+]
+precedence = "override"
+SPDX-FileCopyrightText = "Lottie Animation Community"
+SPDX-License-Identifier = "MIT"

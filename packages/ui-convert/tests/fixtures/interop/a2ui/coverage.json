@@ -1,0 +1,52 @@
+{
+  "name": "Coverage",
+  "description": "Written for ui-convert: two surfaces with the same component ids, a deleted surface, every basic catalog component, unknown keys, a shared child, a dangling child and a data model built by path updates.",
+  "messages": [
+    {"version": "v0.9.1", "createSurface": {"surfaceId": "main", "catalogId": "https://a2ui.org/specification/v0_9/catalogs/basic/catalog.json", "theme": {"primaryColor": "#00BFFF"}, "sendDataModel": true}},
+    {"version": "v0.9.1", "createSurface": {"surfaceId": "side", "catalogId": "https://a2ui.org/specification/v0_9/catalogs/basic/catalog.json"}},
+    {"version": "v0.9.1", "createSurface": {"surfaceId": "gone", "catalogId": "https://a2ui.org/specification/v0_9/catalogs/basic/catalog.json"}},
+    {"version": "v0.9.1", "updateComponents": {"surfaceId": "main", "components": [
+      {"id": "root", "component": "Column", "children": ["header", "tabs", "picker", "volume", "when", "agree", "name", "go", "call", "modal", "rule", "clip", "shared-a", "shared-b"], "justify": "spaceBetween", "align": "stretch"},
+      {"id": "header", "component": "Row", "children": ["logo", "title"], "align": "center"},
+      {"id": "logo", "component": "Image", "url": "https://example.com/logo.png", "description": "Logo", "fit": "scaleDown", "variant": "icon"},
+      {"id": "title", "component": "Text", "text": "12", "variant": "h1", "weight": 2, "accessibility": {"label": "Title"}},
+      {"id": "tabs", "component": "Tabs", "tabs": [{"title": "One", "child": "tab-one"}, {"title": {"path": "/tabTitle"}, "child": "tab-two"}]},
+      {"id": "tab-one", "component": "Text", "text": {"path": "/one"}},
+      {"id": "tab-two", "component": "Icon", "name": "star"},
+      {"id": "picker", "component": "ChoicePicker", "label": "Fruit", "variant": "mutuallyExclusive", "options": [{"label": "Apple", "value": "apple"}, {"label": {"path": "/pear"}, "value": "pear"}], "value": {"path": "/fruit"}, "displayStyle": "chips", "filterable": true},
+      {"id": "volume", "component": "Slider", "label": "Volume", "min": 0, "max": 11, "value": 5},
+      {"id": "when", "component": "DateTimeInput", "label": "When", "value": {"path": "/when"}, "enableDate": true, "enableTime": false, "min": "2026-01-01"},
+      {"id": "agree", "component": "CheckBox", "label": "I agree", "value": false},
+      {"id": "name", "component": "TextField", "label": {"path": "/nameLabel"}, "value": {"path": "/name"}, "variant": "shortText", "validationRegexp": "^[a-z]+$", "checks": [{"condition": {"call": "required", "args": {"value": {"path": "/name"}}, "returnType": "boolean"}, "message": "Required"}]},
+      {"id": "go", "component": "Button", "child": "go-label", "variant": "borderless", "action": {"event": {"name": "go", "context": {"name": {"path": "/name"}}}}},
+      {"id": "go-label", "component": "Text", "text": "Go"},
+      {"id": "call", "component": "Button", "child": "call-label", "action": {"functionCall": {"call": "openUrl", "args": {"url": "https://example.com"}}}},
+      {"id": "call-label", "component": "Text", "text": "Open"},
+      {"id": "modal", "component": "Modal", "trigger": "modal-open", "content": "modal-body"},
+      {"id": "modal-open", "component": "Button", "child": "modal-open-label", "action": {"event": {"name": "noop"}}},
+      {"id": "modal-open-label", "component": "Text", "text": "Details"},
+      {"id": "modal-body", "component": "Card", "child": "modal-text"},
+      {"id": "modal-text", "component": "Text", "text": "Hidden details", "variant": "caption"},
+      {"id": "rule", "component": "Divider", "axis": "horizontal"},
+      {"id": "clip", "component": "Video", "url": "https://example.com/clip.mp4"},
+      {"id": "shared-a", "component": "Card", "child": "shared"},
+      {"id": "shared-b", "component": "Card", "child": "shared"},
+      {"id": "shared", "component": "Text", "text": "Shared"}
+    ]}},
+    {"version": "v0.9.1", "updateComponents": {"surfaceId": "side", "components": [
+      {"id": "root", "component": "List", "direction": "horizontal", "children": ["title", "missing"]},
+      {"id": "title", "component": "Text", "text": "Side"}
+    ]}},
+    {"version": "v0.9.1", "updateComponents": {"surfaceId": "gone", "components": [
+      {"id": "root", "component": "Text", "text": "Bye"}
+    ]}},
+    {"version": "v0.9.1", "deleteSurface": {"surfaceId": "gone"}},
+    {"version": "v0.9.1", "updateDataModel": {"surfaceId": "main", "path": "/one", "value": "First"}},
+    {"version": "v0.9.1", "updateDataModel": {"surfaceId": "main", "path": "/list/1", "value": {"a~b": 1}}},
+    {"version": "v0.9.1", "updateDataModel": {"surfaceId": "main", "path": "/list/1/a~0b"}},
+    {"version": "v0.9.1", "updateDataModel": {"surfaceId": "main", "path": "/tabTitle", "value": "Second"}},
+    {"version": "v0.9.1", "updateComponents": {"surfaceId": "main", "components": [
+      {"id": "title", "component": "Text", "text": "Welcome", "variant": "h2", "weight": 2, "accessibility": {"label": "Title"}}
+    ]}}
+  ]
+}

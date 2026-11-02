@@ -131,10 +131,19 @@ describe('Playwright e2e files stay out of unit test runners', () => {
     'utf8'
   );
 
-  it('discovers only *.e2e.mjs files in tests/ui and packages/*/e2e', () => {
-    expect(config).toContain(
-      "testMatch: ['tests/ui/**/*.e2e.mjs', 'packages/*/e2e/**/*.e2e.mjs']"
-    );
+  it('discovers *.e2e.mjs in tests/ui and packages/*/e2e, *.spec.js in tests/e2e', () => {
+    for (const pattern of [
+      "'tests/ui/**/*.e2e.mjs'",
+      "'packages/*/e2e/**/*.e2e.mjs'",
+      "'tests/e2e/**/*.spec.js'",
+    ]) {
+      expect(config).toContain(pattern);
+    }
+  });
+
+  it('keeps tests/e2e specs out of bun test', () => {
+    const bunfig = readFileSync(path.join(repoRoot, 'bunfig.toml'), 'utf8');
+    expect(bunfig).toContain('"tests/e2e/**"');
   });
 
   it('uses a suffix that node, bun and deno default patterns do not match', () => {
