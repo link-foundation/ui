@@ -159,7 +159,7 @@ swift test                         # from the repository root; on Linux, UiSwift
 swift run UiDemo                   # macOS: open the demo window
 swift run UiDemo --dump            # print the render tree of the sample
 swift run UiDemo --appearance dark --screenshot dark.png
-node --test packages/ui-swift/tests/   # the vendored Tokens.swift equals the F11 output
+node --test tests/ui-swift-tokens.test.js  # the vendored Tokens.swift equals the F11 output
 ```
 
 | Suite                    | Checks                                                                                                                                    |
