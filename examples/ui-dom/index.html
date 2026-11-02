@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ui-dom example</title>
+    <!--
+      No bundler: the workspace packages load as ES modules from their src/
+      folders. Serve the repository with `node scripts/serve-static.mjs` and
+      open http://127.0.0.1:4173/examples/ui-dom/
+    -->
+    <script type="importmap">
+      {
+        "imports": {
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "@link-foundation/ui-store": "/packages/ui-store/src/index.js",
+          "@link-foundation/ui-style": "/packages/ui-style/src/index.js",
+          "@link-foundation/ui-tokens": "/packages/ui-tokens/src/index.js",
+          "@link-foundation/ui-dom": "/packages/ui-dom/src/index.js",
+          "links-notation": "/node_modules/links-notation/dist/index.js"
+        }
+      }
+    </script>
+    <style>
+      body {
+        margin: 0;
+        padding: 24px;
+        font-family: system-ui, sans-serif;
+        color: #1d1b20;
+        background: #fffbfe;
+      }
+      .controls {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-top: 24px;
+        padding-top: 16px;
+        border-top: 1px solid #cac4d0;
+      }
+      output {
+        font-family: ui-monospace, monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>ui-dom example</h1>
+      <p>
+        <code>document.lino</code> rendered as plain custom elements, styled
+        with <code>styles.lino</code> and <code>tokens.lino</code>.
+      </p>
+      <div id="app"></div>
+      <div class="controls">
+        <button id="change" type="button">Change greeting</button>
+        <span
+          >Last action:
+          <output id="action" aria-live="polite">none</output></span
+        >
+      </div>
+    </main>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

@@ -12,6 +12,7 @@ import path from 'node:path';
 import { fileURLToPath, URL } from 'node:url';
 
 import { checkPlaywrightVersion } from '../scripts/check-playwright-version.mjs';
+import { defaultMounts } from '../scripts/serve-static.mjs';
 import {
   normaliseMounts,
   resolveRequestPath,
@@ -94,6 +95,32 @@ describe('shared static server', () => {
       status: 200,
       file: path.resolve('/srv/root/a.css'),
     });
+  });
+
+  it('serves the ui-dom example with its import map targets', () => {
+    const served = normaliseMounts(defaultMounts(repoRoot));
+    for (const [url, file] of [
+      ['/examples/ui-dom/', 'examples/ui-dom/index.html'],
+      ['/packages/ui-dom/src/index.js', 'packages/ui-dom/src/index.js'],
+      ['/packages/ui-core/src/index.js', 'packages/ui-core/src/index.js'],
+      [
+        '/node_modules/links-notation/dist/index.js',
+        'node_modules/links-notation/dist/index.js',
+      ],
+      [
+        '/docs/case-studies/issue-1/samples/document.lino',
+        'docs/case-studies/issue-1/samples/document.lino',
+      ],
+    ]) {
+      expect(resolveRequestPath(served, url)).toEqual({
+        status: 200,
+        file: path.resolve(repoRoot, file),
+      });
+    }
+    // Only src/ of a package is served, not its tests or package.json.
+    expect(
+      resolveRequestPath(served, '/packages/ui-dom/package.json').status
+    ).toBe(404);
   });
 
   it('refuses paths that escape a mount', () => {

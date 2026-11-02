@@ -94,6 +94,21 @@ npx link-ui-tokens build tokens.lino --set material3 \
   --css tokens.css --dtcg tokens.json --swift Tokens.swift --kotlin Tokens.kt
 ```
 
+### DOM renderer
+
+[`@link-foundation/ui-dom`](packages/ui-dom/README.md) renders a document as
+plain custom elements in the light DOM (`ui-stack`, `ui-button`, …) with
+stable `data-link-id` attributes, patches only what each store transaction
+changed, and dispatches `(on press ...)` handlers as `ui-action` events
+without running code:
+
+```js
+import { mountDocument } from '@link-foundation/ui-dom';
+
+const { store } = mountDocument(app, text, { tokens, styles, onAction });
+store.setProp('greeting', 'value', ['Hello again']); // one patch
+```
+
 ### SwiftUI
 
 [`ui-swift`](packages/ui-swift/README.md) draws a LiNo document with native
@@ -199,12 +214,14 @@ npm run example:desktop:package
 ├── .husky/               # Git hooks (pre-commit)
 ├── examples/             # Usage examples
 │   ├── kotlin/           # Compose Desktop window for ui-kotlin (Gradle build)
+│   ├── ui-dom/           # ui-dom page served with an import map (scripts/serve-static.mjs)
 │   └── universal-app/    # React + GitHub Pages + Electron + Capacitor app
 ├── scripts/              # Build and release scripts
 ├── packages/             # npm workspaces (see docs/monorepo.md)
 │   ├── ui-config/        # @link-foundation/ui-config (layered configuration, overrides patches)
 │   ├── ui-convert/       # @link-foundation/ui-convert (HTML/DOM, A2UI, Adaptive Cards, JSON Forms, Lottie <-> LiNo)
 │   ├── ui-core/          # @link-foundation/ui-core
+│   ├── ui-dom/           # @link-foundation/ui-dom (DOM renderer, plain custom elements)
 │   ├── ui-i18n/          # @link-foundation/ui-i18n (localisation with lino-i18n, (t KEY) messages)
 │   ├── ui-kotlin/        # Jetpack Compose renderer (Gradle Kotlin Multiplatform, see build.gradle.kts)
 │   ├── ui-links/         # @link-foundation/ui-links (associative links storages, queries, permissions, links server, synced client)

@@ -26,3 +26,7 @@ docs/case-studies/issue-101/roadmap/** text eol=lf
 # The ui-links fixtures are byte copies of link-cli files (links-operations.txt
 # is its protocol conversation); server.test.js replays them line by line.
 packages/ui-links/tests/fixtures/** text eol=lf
+
+# The ui-dom snapshots are the exact HTML the renderer writes (always LF), and
+# the tests compare them byte for byte.
+packages/ui-dom/tests/__snapshots__/** text eol=lf
