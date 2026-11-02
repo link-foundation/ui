@@ -70,6 +70,10 @@ jobs:
       - name: Run the JVM, JS and Wasm tests
         run: ./gradlew --no-daemon --console=plain jvmTest jsTest wasmJsTest
 
+      - name: Show how many tests each target ran
+        if: ${{ !cancelled() }}
+        run: sh test-summary.sh
+
   android:
     name: Android host tests
     runs-on: ubuntu-24.04
@@ -99,6 +103,10 @@ jobs:
       - name: Build the Android library and run its host tests
         run: ./gradlew --no-daemon --console=plain assemble testAndroidHostTest
 
+      - name: Show how many tests each target ran
+        if: ${{ !cancelled() }}
+        run: sh test-summary.sh
+
   ios:
     name: iOS simulator tests
     runs-on: macos-15
@@ -126,6 +134,10 @@ jobs:
 
       - name: Run the iOS simulator tests
         run: ./gradlew --no-daemon --console=plain iosSimulatorArm64Test
+
+      - name: Show how many tests each target ran
+        if: ${{ !cancelled() }}
+        run: sh test-summary.sh
 
   # Terminal status gate: runs even when the jobs above fail or are
   # cancelled, and turns a `timeout-minutes` kill (reported as cancelled)
