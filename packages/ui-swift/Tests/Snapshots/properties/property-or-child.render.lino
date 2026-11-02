@@ -1,0 +1,2 @@
+(row: HStack (spacing 4)
+  (Text 'text is a kind, so this is a child'))
