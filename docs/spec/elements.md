@@ -53,9 +53,11 @@ order by the first matching rule:
 5. Otherwise, a sublink without an id whose head is a registered kind is an
    **anonymous child** element with `"id": null`: `(text 'First')` inside a
    `stack`.
-6. Otherwise the sublink MUST be kept verbatim in the element's `unknown`
-   list and MUST produce the warning `unknown-sublink`, which points at the
-   element id and the head.
+6. Otherwise the sublink MUST be kept as one value (its JSON value) in the
+   element's `unknown` list and MUST produce the warning `unknown-sublink`,
+   which points at the element id and the head. Lines indented under it are
+   folded into that value, so all three forms keep the same `unknown` list
+   ([projection.md](projection.md#unknown-sublinks-with-indented-lines)).
 
 Property lookup (rule 4) wins over kind lookup (rule 5). The `asset` kind
 declares a property named `kind`, so `(kind icon)` inside an `asset` is a

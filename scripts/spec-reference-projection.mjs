@@ -29,6 +29,24 @@ const TOKEN_NAME = /^[a-z0-9-]+(\.[a-z0-9-]+)*$/;
 
 const isAtom = (link) => link.values.length === 0;
 const atomText = (link) => link.id;
+/** A path link: no id, and its first value is a link (projection.md). */
+const isPath = (link) =>
+  !isAtom(link) && link.id === null && !isAtom(link.values[0]);
+
+/**
+ * The anonymous wrapper of a multi-line group, `(H (H a) (H b) ...)`: every
+ * payload value is a path link with the same path H. Its head always
+ * declares a new node (projection.md).
+ */
+function isGroupWrapper(link) {
+  if (!isPath(link) || link.values.length < 2) {
+    return false;
+  }
+  const key = link.values[0].format();
+  return link.values
+    .slice(1)
+    .every((value) => isPath(value) && value.values[0].format() === key);
+}
 
 /** JSON form of a value: atom -> string, anonymous link -> array. */
 export function valueJson(link) {
@@ -114,6 +132,20 @@ export function readVocabulary(text) {
   return vocabulary;
 }
 
+/**
+ * A node that collects values: a property, an unknown sublink or a link
+ * nested in one of them. `local` maps the heads and paths known inside it.
+ */
+function valueNode(values, owner, name, unknown = false) {
+  return {
+    node: 'property',
+    json: { name, values },
+    local: new Map(),
+    owner,
+    unknown,
+  };
+}
+
 class Projector {
   constructor(vocabulary) {
     this.vocabulary = vocabulary;
@@ -121,6 +153,11 @@ class Projector {
     this.ids = new Set();
     this.global = new Map();
     this.root = { elements: [], local: new Map() };
+    this.rootNode = {
+      node: 'element',
+      json: this.rootView(),
+      local: this.root.local,
+    };
   }
 
   warn(code, at) {
@@ -163,6 +200,9 @@ class Projector {
     if (id !== null) {
       this.global.set(head.format(), element);
     }
+    // The head names the element inside itself too, so the path links of a
+    // multi-line group, ((text A) (style x)), fold into it.
+    element.local.set(link.format(), element);
     for (const value of rest) {
       this.append(element, value);
     }
@@ -172,10 +212,9 @@ class Projector {
   /** Append one value of the source to an element or property node. */
   append(node, value) {
     if (node.node === 'property') {
-      this.appendToProperty(node, value);
-      return null;
+      return this.appendToProperty(node, value);
     }
-    if (!isAtom(value) && value.id === null && !isAtom(value.values[0])) {
+    if (isPath(value)) {
       return this.fold(node, value);
     }
     const element = node.json;
@@ -201,19 +240,29 @@ class Projector {
       node.local.set(value.format(), child);
       return child;
     }
-    this.warn('unknown-sublink', { element: element.id, head });
-    element.unknown.push(valueJson(value));
-    return null;
+    return this.keepUnknown(node, value, head);
+  }
+
+  /**
+   * Keep an unknown sublink as one value of `unknown`. It is returned as a
+   * value node, so that its indented lines (path links naming it) fold into
+   * it and the three forms stay equal (projection.md).
+   */
+  keepUnknown(node, link, head) {
+    this.warn('unknown-sublink', { element: node.json.id, head });
+    const json = valueJson(link);
+    node.json.unknown.push(json);
+    const unknown = valueNode(json, node.json, undefined, true);
+    unknown.local.set(link.format(), unknown);
+    node.local.set(link.format(), unknown);
+    return unknown;
   }
 
   addProperty(node, link, name, spec) {
     const element = node.json;
-    const values = [];
-    const property = { node: 'property', json: { name, values } };
+    const property = valueNode([], element, name, false);
     // A multi-line property value folds back onto the property head.
-    property.local = new Map([[link.format(), values]]);
-    property.owner = element;
-    property.spec = spec;
+    property.local.set(link.format(), property);
     if (!spec.multi) {
       const index = element.properties.findIndex((p) => p.name === name);
       if (index !== -1) {
@@ -232,46 +281,93 @@ class Projector {
     return property;
   }
 
+  /**
+   * Append one value to a value node. Returns the value node of a nested
+   * link, so that the lines indented under it fold into it, or null.
+   */
   appendToProperty(property, value) {
-    if (!isAtom(value) && value.id === null && !isAtom(value.values[0])) {
-      const key = value.values[0].format();
-      if (property.local?.has(key)) {
-        // A path inside a multi-line property value, e.g. ((track a) (key 0 1)).
-        for (const rest of value.values.slice(1)) {
-          property.local.get(key).push(valueJson(rest));
+    if (isPath(value)) {
+      // A path inside a multi-line value, e.g. ((track a) (key 0 1)).
+      const [first, ...rest] = value.values;
+      const wrapper = isGroupWrapper(value);
+      let target = wrapper ? null : property.local.get(first.format());
+      if (wrapper) {
+        target = this.appendToProperty(property, first);
+      }
+      if (target) {
+        for (const item of rest) {
+          const created = this.appendToProperty(target, item);
+          if (created) {
+            property.local.set(new Link(null, [first, item]).format(), created);
+          }
         }
-        return;
+        return target;
       }
     }
     const json = valueJson(value);
-    this.walkSigils(json, property.owner.id, property.json.name);
-    property.json.values.push(json);
-    if (Array.isArray(json)) {
-      property.local ??= new Map();
-      property.local.set(value.format(), json);
+    if (!property.unknown) {
+      this.walkSigils(json, property.owner.id, property.json.name);
     }
+    property.json.values.push(json);
+    if (isAtom(value)) {
+      return null;
+    }
+    const values = Array.isArray(json) ? json : json.values;
+    const node = valueNode(values, property.owner, property.json.name);
+    node.unknown = property.unknown;
+    // Known in its parent and in itself, as an element head is.
+    property.local.set(value.format(), node);
+    node.local.set(value.format(), node);
+    return node;
+  }
+
+  /**
+   * Whether an unknown path may be declared in an element (projection.md):
+   * an element head, a property head of its kind, or a path made of them.
+   */
+  declarable(context, path) {
+    if (path.id !== null) {
+      return true;
+    }
+    if (isPath(path)) {
+      const key = path.values[0].format();
+      return (
+        context.local.has(key) ||
+        this.global.has(key) ||
+        this.declarable(context, path.values[0])
+      );
+    }
+    const head = atomText(path.values[0]);
+    const spec = this.vocabulary.kinds.get(context.json.kind);
+    return (
+      this.vocabulary.kinds.has(head) || Boolean(spec?.properties.has(head))
+    );
   }
 
   /** Path folding: (P v1 v2 ...) where P is a head or a known path. */
   fold(context, link) {
     const [first, ...rest] = link.values;
     const key = first.format();
-    let target = context.local?.get(key) ?? this.global.get(key);
+    const wrapper = isGroupWrapper(link);
+    let target = wrapper
+      ? null
+      : (context.local.get(key) ?? this.global.get(key));
     if (!target) {
+      if (!wrapper && !this.declarable(context, first)) {
+        // Not foldable: keep the whole link verbatim, once.
+        this.warn('unknown-sublink', { element: context.json.id, head: null });
+        context.json.unknown.push(valueJson(link));
+        return null;
+      }
       target = this.append(context, first);
     }
     if (!target) {
-      // Not foldable: keep it verbatim on the context element.
-      this.warn('unknown-sublink', { element: context.json.id, head: null });
-      context.json.unknown?.push(valueJson(link));
       return null;
     }
     for (const value of rest) {
       const created = this.append(target, value);
       if (created) {
         this.global.set(new Link(null, [first, value]).format(), created);
-      } else if (target.node === 'property' && !isAtom(value)) {
-        this.global.set(new Link(null, [first, value]).format(), target);
       }
     }
     return target;
@@ -296,27 +392,15 @@ class Projector {
     }
   }
 
+  /** The root accepts only elements: an atom there is an unknown sublink. */
   top(link) {
-    if (!isAtom(link) && link.id === null && !isAtom(link.values[0])) {
-      this.fold(
-        { node: 'element', json: this.rootView(), local: this.root.local },
-        link
-      );
+    if (isAtom(link)) {
+      this.warn('unknown-sublink', { element: null, head: atomText(link) });
+      this.root.unknown ??= [];
+      this.root.unknown.push(atomText(link));
       return;
     }
-    if (link.id !== null) {
-      const element = this.makeElement(link, link.id);
-      this.root.elements.push(element.json);
-      return;
-    }
-    const head = isAtom(link) ? atomText(link) : atomText(link.values[0]);
-    if (!isAtom(link) && this.vocabulary.kinds.has(head)) {
-      this.root.elements.push(this.makeElement(link, null).json);
-      return;
-    }
-    this.warn('unknown-sublink', { element: null, head });
-    this.root.unknown ??= [];
-    this.root.unknown.push(valueJson(link));
+    this.append(this.rootNode, link);
   }
 
   /** The document root behaves as an element whose children are elements. */

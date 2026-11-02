@@ -1,0 +1,28 @@
+{
+  "spec": "ui-dialect/0",
+  "elements": [
+    {
+      "id": "ok",
+      "kind": "button",
+      "positional": [],
+      "properties": [
+        {
+          "name": "label",
+          "values": ["OK"]
+        }
+      ],
+      "children": [],
+      "unknown": [["colour", "red", ["shade", "dark", ["tone", "deep"]]]]
+    }
+  ],
+  "diagnostics": [
+    {
+      "code": "unknown-sublink",
+      "severity": "warning",
+      "at": {
+        "element": "ok",
+        "head": "colour"
+      }
+    }
+  ]
+}

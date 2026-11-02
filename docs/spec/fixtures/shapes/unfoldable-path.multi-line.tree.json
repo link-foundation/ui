@@ -1,0 +1,28 @@
+{
+  "spec": "ui-dialect/0",
+  "elements": [
+    {
+      "id": "b",
+      "kind": "button",
+      "positional": [],
+      "properties": [
+        {
+          "name": "label",
+          "values": ["OK"]
+        }
+      ],
+      "children": [],
+      "unknown": [[["x", "y"], "z"]]
+    }
+  ],
+  "diagnostics": [
+    {
+      "code": "unknown-sublink",
+      "severity": "warning",
+      "at": {
+        "element": "b",
+        "head": null
+      }
+    }
+  ]
+}

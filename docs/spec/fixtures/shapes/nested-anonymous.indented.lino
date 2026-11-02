@@ -1,0 +1,4 @@
+s: stack
+  text 'First'
+    style x
+    value y

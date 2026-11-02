@@ -1,0 +1,32 @@
+{
+  "spec": "ui-dialect/0",
+  "elements": [
+    {
+      "id": "s",
+      "kind": "stack",
+      "positional": [],
+      "properties": [],
+      "children": [
+        {
+          "id": null,
+          "kind": "text",
+          "positional": ["First"],
+          "properties": [
+            {
+              "name": "style",
+              "values": ["x"]
+            },
+            {
+              "name": "value",
+              "values": ["y"]
+            }
+          ],
+          "children": [],
+          "unknown": []
+        }
+      ],
+      "unknown": []
+    }
+  ],
+  "diagnostics": []
+}

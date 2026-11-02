@@ -73,6 +73,36 @@ describe('docs/spec (ui-dialect/0)', () => {
     expect(forms[2]).toBe(forms[0]);
   });
 
+  it('folds repeated groups and top-level heads the same in every form', () => {
+    const vocabulary = loadVocabulary();
+    const groups = [
+      [
+        '(ok: button (on press (navigate home)) (on press (navigate back)))',
+        '(ok: button\n  (on press\n    (navigate home))\n  (on press\n    (navigate back)))',
+        'ok: button\n  on press\n    navigate home\n  on press\n    navigate back',
+      ],
+      [
+        "(s: stack (text 'A' (style x)) (text 'A' (style y)))",
+        "(s: stack\n  (text 'A'\n    (style x))\n  (text 'A'\n    (style y)))",
+        "s: stack\n  text 'A'\n    style x\n  text 'A'\n    style y",
+      ],
+      [
+        "(text 'A' (style x))",
+        "(text 'A'\n  (style x))",
+        "text 'A'\n  style x",
+      ],
+      ['(foo bar (baz qux))', '(foo bar\n  (baz qux))', 'foo bar\n  baz qux'],
+    ];
+    for (const group of groups) {
+      const [first, ...rest] = group.map((text) =>
+        JSON.stringify(projectText(text, vocabulary).tree)
+      );
+      for (const tree of rest) {
+        expect(tree).toBe(first);
+      }
+    }
+  });
+
   it('covers every case-study sample', () => {
     const samples = readdirSync('docs/case-studies/issue-1/samples');
     const copies = readdirSync(path.join(SPEC_DIR, 'fixtures', 'samples'));
