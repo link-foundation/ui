@@ -86,6 +86,7 @@ describe('permissions', () => {
     view.update(v.shared, t.Shared, v.shared);
     expect(allLinks(links)).toEqual(before);
     const id = view.create();
+    view.update(id, 0, id);
     view.update(id, t.Note, id);
     expect(errorCode(() => view.update(id, t.Secret, id))).toBe('forbidden');
     view.delete(id);

@@ -18,7 +18,7 @@
  * writes to administrators only, or keep the rules in a storage of their own.
  */
 
-import { CONTINUE } from './constants.js';
+import { CONTINUE, NULL } from './constants.js';
 import { point } from './types.js';
 import {
   decorate,
@@ -91,7 +91,8 @@ export function createPolicy({ rules, markers, types }) {
  * The storage as `subject` sees it: `each` and `count` skip what it may not
  * read; a write it may not do throws `forbidden`, the storage unchanged.
  * An update needs the right to write the link before and after it. A link
- * the subject created is its own until its first update gives it a type.
+ * the subject created is its own until an update gives it a type (a source
+ * other than 0).
  * @param {any} links
  * @param {ReturnType<typeof createPolicy>} policy
  * @param {number | null | (() => number | null)} subject
@@ -132,6 +133,10 @@ export function withPermissions(links, policy, subject) {
     update(id, source, target) {
       const before = visible(id);
       if (before === null) {
+        return links.update(id, source, target);
+      }
+      if (fresh.has(id) && source === NULL) {
+        // Still without a type: still its creator's own.
         return links.update(id, source, target);
       }
       const after = linkOf(id, source, target);

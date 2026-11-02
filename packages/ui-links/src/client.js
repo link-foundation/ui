@@ -311,33 +311,42 @@ function createOutbox({ writer, request, connected, disconnect, report }) {
     }
   };
 
-  const run = async () => {
-    while (queue.length > 0 && connected()) {
-      const entry = queue[0];
-      entry.sent = true;
-      try {
-        await send(entry);
-      } catch (error) {
-        if (!(error instanceof LinksError) || error.code === 'offline') {
-          // The transport failed: keep the write for the next connection.
-          entry.sent = false;
-          disconnect();
-          report(error, null);
-          return;
-        }
-        writer.undo(entry.changes);
-        report(error, entry);
+  /** Send one write; `false` when the transport failed. */
+  const sendFirst = async () => {
+    const entry = queue[0];
+    entry.sent = true;
+    try {
+      await send(entry);
+    } catch (error) {
+      if (!(error instanceof LinksError) || error.code === 'offline') {
+        // The transport failed: keep the write for the next connection.
+        entry.sent = false;
+        disconnect();
+        report(error, null);
+        return false;
       }
-      queue.shift();
+      writer.undo(entry.changes);
+      report(error, entry);
+    }
+    queue.shift();
+    return true;
+  };
+
+  const run = async () => {
+    // `flush` stores the promise before the loop can end.
+    await null;
+    try {
+      while (queue.length > 0 && connected() && (await sendFirst())) {
+        // Every write is sent by the condition.
+      }
+    } finally {
+      // Cleared in the step that saw the queue empty: a write queued later
+      // starts a new run.
+      flushing = null;
     }
   };
 
-  const flush = () => {
-    flushing ??= run().finally(() => {
-      flushing = null;
-    });
-    return flushing;
-  };
+  const flush = () => (flushing ??= run());
 
   return {
     flush,
