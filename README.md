@@ -94,6 +94,24 @@ npx link-ui-tokens build tokens.lino --set material3 \
   --css tokens.css --dtcg tokens.json --swift Tokens.swift --kotlin Tokens.kt
 ```
 
+### Style rules
+
+[`@link-foundation/ui-style`](packages/ui-style/README.md) reads style rules
+written in Links Notation, with states such as `(state hover)` and conditions
+such as `(media (max-width 640px))`. It writes them as a CSS stylesheet, or
+resolves the style of one element against the design tokens for renderers
+without CSS:
+
+```js
+import { compileCss, readStyles } from '@link-foundation/ui-style';
+
+const { rules } = readStyles(`(button-style: style
+  (selector (type button) (variant filled))
+  (background (token color.primary))
+  (state hover (elevation 2)))`);
+compileCss(rules); // ui-button[variant='filled'] { ... } and ui-button[variant='filled']:hover { ... }
+```
+
 ### Development
 
 ```bash
@@ -137,6 +155,7 @@ npm run example:desktop:package
 │   ├── ui-convert/       # @link-foundation/ui-convert (HTML/DOM, A2UI, Adaptive Cards, JSON Forms, Lottie <-> LiNo)
 │   ├── ui-core/          # @link-foundation/ui-core
 │   ├── ui-store/         # @link-foundation/ui-store
+│   ├── ui-style/         # @link-foundation/ui-style (style rules, states, media and container conditions)
 │   └── ui-tokens/        # @link-foundation/ui-tokens (design tokens)
 ├── tests/                # Repository and release-script tests
 ├── .eslintrc.js          # ESLint configuration
