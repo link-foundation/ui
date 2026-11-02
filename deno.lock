@@ -7,9 +7,11 @@
     "npm:@playwright/test@1.59.1": "1.59.1",
     "npm:axe-core@4.14.0": "4.14.0",
     "npm:command-stream@2.4.0": "2.4.0",
+    "npm:doublets-web@~0.1.3": "0.1.3",
     "npm:eslint-config-prettier@^10.1.8": "10.1.8_eslint@10.13.0",
     "npm:eslint-plugin-prettier@^5.5.4": "5.5.6_eslint@10.13.0_eslint-config-prettier@10.1.8_prettier@3.8.4",
     "npm:eslint@^10.13.0": "10.13.0",
+    "npm:fake-indexeddb@^6.2.7": "6.2.7",
     "npm:husky@^9.1.7": "9.1.7",
     "npm:jscpd@^5.4.0": "5.4.0",
     "npm:jsdom@^30.1.3": "30.1.3",
@@ -609,6 +611,9 @@
     "deep-is@0.1.4": {
       "integrity": "sha512-oIPzksmTg4/MriiaYGO+okXDT7ztn/w3Eptv/+gSIdMdKsJo0u4CfYNFJPy+4SKMuCqGw2wxnA+URMg3t8a/bQ=="
     },
+    "doublets-web@0.1.3": {
+      "integrity": "sha512-8HVF+X/qSzacm947mKi5gw3aa2V0GOpbwMZXxFDROc4k1PVPOVwMR7b3PfiZND2E2k6lxXUk5BlIWHxLbsx/+A=="
+    },
     "emoji-regex@10.6.0": {
       "integrity": "sha512-toUI84YS5YmxW219erniWD0CIVOo46xGKColeNQRgOzDorgBi1v4D71/OFzgD9GO2UGKIv1C3Sp8DAn0+j5w7A=="
     },
@@ -740,6 +745,9 @@
         "which-command",
         "yoctocolors"
       ]
+    },
+    "fake-indexeddb@6.2.7": {
+      "integrity": "sha512-g0ghQ+BmU3CSZaHup5FigEAAtCmtNyxkrmID7OAeK2qONHghw1aQ2l2T1RxmfhP1H1tEXVRWArUTGVCk5832ww=="
     },
     "fast-deep-equal@3.1.3": {
       "integrity": "sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q=="
@@ -1478,6 +1486,8 @@
         "packageJson": {
           "dependencies": [
             "npm:@link-foundation/ui-core@^0.0.0",
+            "npm:doublets-web@~0.1.3",
+            "npm:fake-indexeddb@^6.2.7",
             "npm:test-anywhere@~0.8.48"
           ]
         }

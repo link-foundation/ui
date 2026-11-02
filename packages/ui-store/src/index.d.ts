@@ -259,17 +259,33 @@ export const DATABASE_PREFIX: 'link-ui-';
 /** `link-ui-<name>` */
 export function databaseName(name: string): string;
 
+/**
+ * The part of an `IDBFactory` that is used (`globalThis.indexedDB` in a
+ * browser, `new IDBFactory()` of fake-indexeddb in Node.js).
+ */
+export interface IndexedDBFactory {
+  open(name: string, version?: number): unknown;
+  deleteDatabase(name: string): unknown;
+}
+
+/** The part of a `BroadcastChannel` that is used. */
+export interface BroadcastChannelLike {
+  postMessage(message: { tx: number }): void;
+  close(): void;
+  onmessage: ((event: { data: { tx: number } }) => void) | null;
+}
+
 export interface PersistentStoreOptions {
   /** The database is `link-ui-<name>`. */
   name: string;
   /** Default: `globalThis.indexedDB`. */
-  indexedDB?: IDBFactory;
+  indexedDB?: IndexedDBFactory;
   /** LiNo of the document when the database has no data yet. */
   initialText?: string;
   /** Tell other tabs to reload through a BroadcastChannel (default `true`). */
   channel?: boolean;
   /** Default: `globalThis.BroadcastChannel`. */
-  BroadcastChannel?: typeof BroadcastChannel;
+  BroadcastChannel?: new (name: string) => BroadcastChannelLike;
   /** More options of `createStore` (`historyLimit`, `onListenerError`, ...). */
   storeOptions?: Omit<StoreOptions, 'document' | 'text' | 'ids'>;
   /** The default limits of `importBundle`. */

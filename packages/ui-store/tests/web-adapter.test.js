@@ -1,11 +1,13 @@
 /**
  * copyToDoubletsWeb: the doublets of a document in a doublets-web
  * `UnitedLinks` store. The real store runs when `doublets-web` (a
- * WebAssembly module built for bundlers) can be loaded in this Node.js;
- * otherwise that test is skipped with the reason.
+ * WebAssembly module built for bundlers) can be loaded by this runtime;
+ * otherwise that test is skipped with the reason in its name (`it.skip` is
+ * the only skip that Node.js, Bun and Deno all report, and none prints a
+ * reason; see tests/helpers/skip.js of the repository).
  */
 
-import { describe, it } from 'node:test';
+import { describe, it } from 'test-anywhere';
 import { deepStrictEqual, strictEqual, throws } from 'node:assert';
 import {
   copyToDoubletsWeb,
@@ -36,8 +38,12 @@ let reason;
 try {
   loaded = await openDoubletsWeb();
 } catch (error) {
-  reason = `doublets-web cannot be loaded in Node.js ${process.version}: ${error.message}`;
+  reason = `doublets-web cannot be loaded here: ${error.message}`;
 }
+/** `it`, or `it.skip` with the reason in the name. */
+const itWithDoubletsWeb = reason
+  ? (name, fn) => it.skip(`${name} (skipped: ${reason})`, fn)
+  : it;
 
 describe('copyToDoubletsWeb', () => {
   it('creates every triple in index order (stand-in store)', () => {
@@ -69,9 +75,8 @@ describe('copyToDoubletsWeb', () => {
     throws(() => copyToDoubletsWeb(forward, fakeUnitedLinks()), RangeError);
   });
 
-  it(
+  itWithDoubletsWeb(
     'fills a doublets-web UnitedLinks: count() is the number of triples',
-    { skip: reason },
     () => {
       const map = copyToDoubletsWeb(encoded, loaded.links);
       strictEqual(Number(loaded.links.count()), encoded.links.length);
