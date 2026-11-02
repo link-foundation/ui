@@ -160,3 +160,59 @@ export function valueMatches(
   type: RawValue | undefined,
   value: RawValue
 ): boolean;
+
+/*
+ * Source-preserving edits: the types of the `@link-foundation/ui-core/source`
+ * subpath (declared in src/source.d.ts).
+ */
+
+/** Offsets `[start, end)` of a piece of the source text. */
+export interface SourceSpan {
+  start: number;
+  end: number;
+}
+
+/** One node of the span tree of `indexSource`. */
+export interface SpanNode extends SourceSpan {
+  kind: 'document' | 'element' | 'prop' | 'value';
+  /** Elements: the id (`null` when anonymous). */
+  id?: string | null;
+  /** Props: the property name. */
+  name?: string;
+  /** Values: a positional value, a property value, or an unknown link. */
+  role?: 'positional' | 'value' | 'unknown';
+  /** In source order. */
+  children: SpanNode[];
+  /** The blanks that start the node's line. */
+  indent?: string;
+  /** Whether only blanks come before the node on its line. */
+  startsLine?: boolean;
+  /** Elements: how the element is written. */
+  form?: 'inline' | 'multiline' | 'indented';
+  idSpan?: SourceSpan;
+  kindSpan?: SourceSpan;
+  nameSpan?: SourceSpan;
+  /** Props: an earlier duplicate that a later one overrides. */
+  shadowed?: boolean;
+  /** Atoms: the reference text. */
+  text?: string;
+}
+
+/** One text replacement, in offsets of the input. */
+export interface SourceEdit extends SourceSpan {
+  insert: string;
+}
+
+export type SourceEditResult =
+  | { ok: true; text: string; edits: SourceEdit[]; references?: SourceSpan[] }
+  | { ok: false; error: string; text: string };
+
+/** The edit ops of issue #16. */
+export type SourceOp =
+  | { op: 'insert'; parentId: string | null; index: number; node: UiNode }
+  | { op: 'remove'; id: string }
+  | { op: 'move'; id: string; parentId: string | null; index: number }
+  | { op: 'setProp'; id: string; name: string; values: RawValue[] }
+  | { op: 'removeProp'; id: string; name: string }
+  | { op: 'rename'; id: string; to: string }
+  | { op: 'setPositional'; id: string; values: string[] };
