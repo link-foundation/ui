@@ -68,6 +68,21 @@ Scripts, `on*` attributes and `javascript:` URLs are dropped with a
 `dropped-script` diagnostic; see the package README for the mapping table,
 ids, spans and `importDom`.
 
+### Interop with A2UI, Adaptive Cards, JSON Forms and Lottie
+
+The same package converts both ways between the UI dialect and
+[A2UI](https://a2ui.org), [Adaptive Cards](https://adaptivecards.io),
+[JSON Forms](https://jsonforms.io) and [Lottie](https://lottie.github.io):
+
+```bash
+npx ui-convert import card.json > card.lino
+npx ui-convert export card.lino --format adaptive-cards > card.json
+```
+
+See the
+[capability matrix](packages/ui-convert/README.md#capability-matrix) for
+what each format supports.
+
 ### Development
 
 ```bash
@@ -107,7 +122,7 @@ npm run example:desktop:package
 │   └── universal-app/    # React + GitHub Pages + Electron + Capacitor app
 ├── scripts/              # Build and release scripts
 ├── packages/             # npm workspaces (see docs/monorepo.md)
-│   ├── ui-convert/       # @link-foundation/ui-convert (HTML/DOM -> LiNo)
+│   ├── ui-convert/       # @link-foundation/ui-convert (HTML/DOM, A2UI, Adaptive Cards, JSON Forms, Lottie <-> LiNo)
 │   ├── ui-core/          # @link-foundation/ui-core
 │   └── ui-store/         # @link-foundation/ui-store
 ├── tests/                # Repository and release-script tests

@@ -1,0 +1,2 @@
+(dot: shape (path 'M0 0 L10 0 L10 10 Z') (fill '#FF5500'))
+(dot-pulse: animation (source lottie '1.0') (target dot) (duration 1000ms) (track opacity (key 0 0) (key 0.5 1) (key 1 0)) (track translate (key 0 '0px 0px') (key 1 '100px 0px')))

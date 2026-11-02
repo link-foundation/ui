@@ -7,6 +7,9 @@
 
 import { describe, it, expect } from 'test-anywhere';
 import * as convert from '@link-foundation/ui-convert';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { PACKAGE_DIR } from './helpers.js';
 
 describe('@link-foundation/ui-convert', () => {
   it('exports the public API', () => {
@@ -32,7 +35,62 @@ describe('@link-foundation/ui-convert', () => {
         'readHtml',
         'ruleMatches',
         'styleLink',
+        // Interop: A2UI, Adaptive Cards, JSON Forms and Lottie.
+        'A2UI_VERSION',
+        'A2uiStream',
+        'ADAPTIVE_CARDS_VERSION',
+        'CONVERTERS',
+        'Diagnostics',
+        'FORMATS',
+        'JSON_FORMS_VERSION',
+        'LOTTIE_VERSION',
+        'SUPPORTED_VERSIONS',
+        'a2uiMessagesToDiffs',
+        'applyA2uiDiffs',
+        'bindToScope',
+        'decodeAny',
+        'decodePath',
+        'detectFormat',
+        'diffTrees',
+        'encodeAny',
+        'encodePath',
+        'exportA2ui',
+        'exportAdaptiveCard',
+        'exportJsonForms',
+        'exportLottie',
+        'extraProperty',
+        'hostColour',
+        'hostConfigToTheme',
+        'hostConfigToThemeDetails',
+        'importA2ui',
+        'importAdaptiveCard',
+        'importJsonForms',
+        'importLottie',
+        'interopVocabulary',
+        'normalizeA2ui',
+        'normalizeJsonForms',
+        'normalizeLottie',
+        'readExtra',
+        'scopeToBind',
+        'svgToBezier',
       ].sort()
+    );
+  });
+
+  it('declares every export in src/index.d.ts', () => {
+    const declarations = readFileSync(
+      join(PACKAGE_DIR, 'src', 'index.d.ts'),
+      'utf8'
+    );
+    const declared = new Set(
+      [
+        ...declarations.matchAll(
+          /^export (?:declare )?(?:const|function|class) (\w+)/gm
+        ),
+      ].map((match) => match[1])
+    );
+    expect(Object.keys(convert).filter((name) => !declared.has(name))).toEqual(
+      []
     );
   });
 

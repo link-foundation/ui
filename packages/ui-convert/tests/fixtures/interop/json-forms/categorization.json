@@ -1,0 +1,80 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "firstName": { "type": "string", "title": "First name", "minLength": 1 },
+      "vegetarian": { "type": "boolean" },
+      "diet": {
+        "type": "string",
+        "enum": ["vegan", "vegetarian", "pescatarian"]
+      },
+      "address": {
+        "type": "object",
+        "properties": {
+          "street": { "type": "string" },
+          "zip": { "type": "string", "pattern": "^[0-9]{5}$" }
+        },
+        "required": ["street"]
+      },
+      "meeting": { "type": "string", "format": "time" },
+      "notes": { "type": "string", "x-internal": true }
+    },
+    "required": ["firstName"]
+  },
+  "uischema": {
+    "type": "Categorization",
+    "elements": [
+      {
+        "type": "Category",
+        "label": "Person",
+        "elements": [
+          { "type": "Control", "scope": "#/properties/firstName" },
+          { "type": "Control", "scope": "#/properties/vegetarian" },
+          {
+            "type": "Control",
+            "scope": "#/properties/diet",
+            "rule": {
+              "effect": "HIDE",
+              "condition": {
+                "scope": "#/properties/vegetarian",
+                "schema": { "const": false }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "type": "Category",
+        "label": "Address",
+        "rule": {
+          "effect": "DISABLE",
+          "condition": {
+            "scope": "#/properties/diet",
+            "schema": { "enum": ["vegan", "pescatarian"] }
+          }
+        },
+        "elements": [
+          {
+            "type": "Group",
+            "label": "Street",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/address/properties/street",
+                "options": { "trim": true }
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/address/properties/zip",
+                "label": false
+              }
+            ]
+          },
+          { "type": "Control", "scope": "#/properties/meeting" },
+          { "type": "ListWithDetail", "scope": "#/properties/notes" }
+        ]
+      }
+    ],
+    "options": { "variant": "stepper" }
+  }
+}

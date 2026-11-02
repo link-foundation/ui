@@ -12,4 +12,6 @@ pathIgnorePatterns = [
   "docs/**",
   "examples/**",
   "experiments/**",
+  # Playwright specs: `npm run test:ui` runs them.
+  "tests/e2e/**",
 ]
