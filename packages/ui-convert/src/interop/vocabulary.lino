@@ -12,7 +12,10 @@
   (property fallback any)
   (property requires any)
   (property rule any)
-  (property options any))
+  (property options any)
+  (property ref any)
+  (property flex any)
+  (property repeat any))
 
 (document: kind
   (property source any)
@@ -33,9 +36,13 @@
   (property in-frame any)
   (property out-frame any)
   (property width any)
-  (property height any))
+  (property height any)
+  (property catalog any)
+  (property send-data-model any)
+  (property model any))
 
 (stack: kind
+  (property justify any)
   (property role string)
   (property width any)
   (property rtl any)
@@ -54,9 +61,12 @@
   (property wrap any)
   (property max-lines any)
   (property font-type any)
-  (property text-style any))
+  (property text-style any)
+  (property variant any))
 
 (image: kind
+  (property fit any)
+  (property variant any)
   (property image-size any)
   (property image-style any)
   (property background any)
@@ -78,8 +88,9 @@
   (property direction any))
 
 (tabs: kind
-  (description 'Tabs; every child is a tab (JSON Forms Categorization).')
-  (property title any))
+  (description 'Tabs; every child is a tab (JSON Forms Categorization), or the content of the matching (tab <title>) (A2UI Tabs).')
+  (property title any)
+  (property tab any multi))
 
 (tab: kind
   (description 'One tab of tabs (JSON Forms Category).')
@@ -118,6 +129,7 @@
   (property format any)
   (property type any)
   (property option any multi)
+  (property variant any)
   (children none))
 
 (text-field: kind
@@ -130,7 +142,9 @@
   (description 'A number input.'))
 
 (date-field: kind
-  (description 'A date input.'))
+  (description 'A date input; A2UI DateTimeInput sets (enable-date) and (enable-time).')
+  (property enable-date any)
+  (property enable-time any))
 
 (time-field: kind
   (description 'A time input.'))
@@ -145,7 +159,21 @@
   (description 'A choice from options: (option <value> <title>).')
   (property multiple any)
   (property choice-style any)
+  (property filterable any)
   (property wrap any))
+
+(slider: kind
+  (description 'A number input on a track between (min) and (max).'))
+
+(icon: kind
+  (description 'A named icon.')
+  (property name any)
+  (children none))
+
+(divider: kind
+  (description 'A separating line; (axis horizontal|vertical).')
+  (property axis any)
+  (children none))
 
 (submit: action
   (description 'Submit the inputs of a card or form.')
@@ -166,6 +194,10 @@
 (toggle-visibility: action
   (description 'Toggle elements, or set them with (<id> true|false).')
   (argument target any))
+
+(call: action
+  (description 'A client function call, kept as its JSON text. It is data: no converter evaluates it.')
+  (argument call any))
 
 (theme: kind
   (property source any)
