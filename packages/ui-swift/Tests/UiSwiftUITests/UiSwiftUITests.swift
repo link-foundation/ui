@@ -143,7 +143,8 @@ final class UiViewAccessibilityTests: XCTestCase {
         let all = elements(hosting)
         let ok = try XCTUnwrap(all.first { $0.identifier == "ok" }, "\(all.map(\.description))")
         XCTAssertEqual(ok.label, "OK")
-        XCTAssertEqual(all.first { $0.identifier == "greeting" }?.label, "Hello, links")
+        let greeting = try XCTUnwrap(all.first { $0.identifier == "greeting" })
+        XCTAssertEqual(greeting.spoken, "Hello, links", greeting.description)
         ok.press()
         RunLoop.main.run(until: Date().addingTimeInterval(0.2))
         XCTAssertEqual(actions, [UiAction(source: "ok", event: "press", action: ["navigate", "home"])])
@@ -167,11 +168,20 @@ private struct AXElement {
     private func string(_ selector: String) -> String? {
         let name = NSSelectorFromString(selector)
         guard object.responds(to: name) else { return nil }
-        return object.perform(name)?.takeUnretainedValue() as? String
+        switch object.perform(name)?.takeUnretainedValue() {
+        case let text as String: return text
+        case let text as NSAttributedString: return text.string
+        default: return nil
+        }
     }
 
     var identifier: String? { string("accessibilityIdentifier") }
     var label: String? { string("accessibilityLabel") }
+    var value: String? { string("accessibilityValue") }
+    var role: String? { string("accessibilityRole") }
+    /// What VoiceOver reads: the label, or for a static text (whose text
+    /// AppKit exposes as its AXValue) the value.
+    var spoken: String? { label.flatMap { $0.isEmpty ? nil : $0 } ?? value }
 
     var children: [NSObject] {
         let name = NSSelectorFromString("accessibilityChildren")
@@ -187,6 +197,8 @@ private struct AXElement {
         if object.responds(to: name) { _ = object.perform(name) }
     }
 
-    var description: String { "\(type(of: object)) id=\(identifier ?? "-") label=\(label ?? "-")" }
+    var description: String {
+        "\(type(of: object)) role=\(role ?? "-") id=\(identifier ?? "-") label=\(label ?? "-") value=\(value ?? "-")"
+    }
 }
 #endif
