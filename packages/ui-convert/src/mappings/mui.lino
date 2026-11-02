@@ -39,22 +39,22 @@
 
 (mui-typography-h1: rule
   (match (Typography (variant h1) (children $text)))
-  (replace (text $text (tag h1) (level 1))))
+  (replace (text $text (level 1))))
 (mui-typography-h2: rule
   (match (Typography (variant h2) (children $text)))
-  (replace (text $text (tag h2) (level 2))))
+  (replace (text $text (level 2))))
 (mui-typography-h3: rule
   (match (Typography (variant h3) (children $text)))
-  (replace (text $text (tag h3) (level 3))))
+  (replace (text $text (level 3))))
 (mui-typography-h4: rule
   (match (Typography (variant h4) (children $text)))
-  (replace (text $text (tag h4) (level 4))))
+  (replace (text $text (level 4))))
 (mui-typography-h5: rule
   (match (Typography (variant h5) (children $text)))
-  (replace (text $text (tag h5) (level 5))))
+  (replace (text $text (level 5))))
 (mui-typography-h6: rule
   (match (Typography (variant h6) (children $text)))
-  (replace (text $text (tag h6) (level 6))))
+  (replace (text $text (level 6))))
 (mui-typography-body1: rule
   (match (Typography (variant body1) (children $text)))
   (replace (text $text (variant body-large))))
