@@ -1,3 +1,10 @@
 # Shell scripts and Git hooks require LF on every platform.
 *.sh text eol=lf
 .husky/** text eol=lf
+
+# LiNo documents are parser inputs: docs/spec/parser-vectors.json records their
+# exact bytes (inputs, lines and columns), and the spec samples must equal the
+# case-study samples byte for byte, so none may gain CRLF on a Windows checkout.
+*.lino text eol=lf
+docs/spec/fixtures/** text eol=lf
+docs/spec/parser-vectors.json text eol=lf

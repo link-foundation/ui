@@ -107,6 +107,7 @@ jobs:
           .github/workflows/example-app.yml
           .github/workflows/licensing.yml
           .github/workflows/kotlin.yml
+          .github/workflows/swift.yml
 
   zizmor:
     name: zizmor

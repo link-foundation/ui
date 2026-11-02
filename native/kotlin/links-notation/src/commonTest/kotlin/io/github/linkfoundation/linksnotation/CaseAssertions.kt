@@ -25,6 +25,9 @@ internal fun assertCase(case: Case, options: ParserOptions = ParserOptions()) {
             else -> fail("${case.id}: unknown diagnostic code ${case.code}")
         }
         assertEquals(case.line to case.column, error.line to error.column, "${case.id}: ${error.message}")
+        case.message?.let { reason ->
+            assertTrue(error.message.orEmpty().contains(reason), "${case.id}: \"${error.message}\" lacks \"$reason\"")
+        }
         return
     }
     val expected = assertNotNull(case.expected, case.id)

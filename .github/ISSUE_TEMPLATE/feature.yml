@@ -1,0 +1,107 @@
+name: Feature
+description: Propose a feature with the sections an AI coding agent needs to deliver it.
+title: '<package>: <what the feature does>'
+labels: [enhancement]
+type: Feature
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Most issues here are solved by AI coding agents. Please write an issue that a less capable agent can deliver without asking a question: concrete names, numbered steps, objectively verifiable acceptance criteria and exact commands.
+        Read [`docs/agents/writing-issues.md`](https://github.com/link-foundation/ui/blob/main/docs/agents/writing-issues.md) first. The sections below follow the roadmap issue template; every change also follows [`docs/agents/conventions.md`](https://github.com/link-foundation/ui/blob/main/docs/agents/conventions.md).
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Why is this needed? Describe the current state with links to files, issues and documents.
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: One or two sentences on the outcome.
+    validations:
+      required: true
+  - type: textarea
+    id: in-scope
+    attributes:
+      label: In scope
+      description: The exact deliverables, with package names (`@link-foundation/ui-*`), file paths and function names.
+      placeholder: |
+        - `packages/ui-core/src/parse.js`: `parseUi(source)` ...
+    validations:
+      required: true
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: What must not be done here, with the issue that owns it.
+    validations:
+      required: false
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: Blocking issues (`#N`) and what each provides; related issues. Write "None" if there are none.
+    validations:
+      required: false
+  - type: textarea
+    id: plan
+    attributes:
+      label: Step-by-step plan
+      description: Numbered steps an agent can follow in order.
+      placeholder: |
+        1. Write a failing test in `packages/<name>/tests/<file>.test.js`.
+        2. ...
+    validations:
+      required: false
+  - type: textarea
+    id: files
+    attributes:
+      label: Files to create or change
+      description: Every path the pull request is expected to touch.
+    validations:
+      required: false
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: One checkbox per criterion. Each must be checkable with a command, a test or a screenshot.
+      value: '- [ ] '
+    validations:
+      required: true
+  - type: textarea
+    id: verify
+    attributes:
+      label: How to verify
+      description: The exact commands, from a clean checkout, and the expected result. This is rendered as a shell code block.
+      placeholder: |
+        npm ci
+        node --test packages/<name>/tests/<file>.test.js
+        npm test && npm run lint && npm run format:check
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: prior-art
+    attributes:
+      label: Prior art and libraries
+      description: Upstream code, specifications and permissively licensed libraries (MIT, ISC, BSD, Apache-2.0, CC0) to reuse.
+    validations:
+      required: false
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Links to documents, specifications and issues.
+    validations:
+      required: false
+  - type: input
+    id: requirements
+    attributes:
+      label: Requirements
+      description: Optional requirement IDs from `docs/case-studies/issue-1/requirements.md`.
+      placeholder: R2, R6
+    validations:
+      required: false

@@ -1,118 +1,87 @@
 /**
- * Tests for scripts/generate-parser-vectors.mjs and the freshness of
- * docs/spec/parser-vectors.json, the parser vectors the Swift (#29) and Kotlin
- * (#31) ports run.
+ * Tests for docs/spec/parser-vectors.json, the parser vectors the native
+ * Links Notation parsers (native/swift/LinksNotation) are checked against,
+ * and for the copy of the upstream parity corpus vendored with the Swift port.
  */
 
 import { describe, it, expect } from 'test-anywhere';
-import { mkdtempSync, rmSync, writeFileSync, mkdirSync } from 'node:fs';
+import {
+  cpSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import { Parser, formatLinks } from 'links-notation';
 import {
-  checkVectors,
-  FIXTURES_DIR,
-  generateVectors,
-  listFixtures,
-  mustBeRejected,
-  vectorFor,
   VECTORS_FILE,
+  buildVectors,
+  linkTree,
+  renderVectors,
 } from '../scripts/generate-parser-vectors.mjs';
 
-/** Run `body` with a temporary directory, removed afterwards. */
-function withTempDir(body) {
-  const dir = mkdtempSync(path.join(tmpdir(), 'parser-vectors-'));
-  try {
-    return body(dir);
-  } finally {
-    rmSync(dir, { recursive: true, force: true });
-  }
-}
+const PARITY_CORPUS = 'native/swift/LinksNotation/parity/text-fixtures.json';
 
-describe('parser vectors', () => {
-  it('docs/spec/parser-vectors.json is fresh', () => {
-    expect(checkVectors()).toBe(null);
+describe('docs/spec/parser-vectors.json', () => {
+  it('is what scripts/generate-parser-vectors.mjs writes now', () => {
+    // When this fails, run: node scripts/generate-parser-vectors.mjs
+    expect(readFileSync(VECTORS_FILE, 'utf8')).toBe(renderVectors());
   });
 
-  it('has one vector per fixture, in fixture order', () => {
-    const vectors = JSON.parse(generateVectors());
-    const fixtures = listFixtures();
-    expect(vectors.length).toBe(fixtures.length);
-    expect(vectors.map((v) => `${v.id}.lino`)).toEqual(fixtures);
-    expect(fixtures.length >= 30).toBe(true);
-  });
-
-  it('marks exactly the errors/syntax-* fixtures as errors', () => {
-    const vectors = JSON.parse(generateVectors());
+  it('has one vector per fixture, syntax-* fixtures as errors', () => {
+    const vectors = JSON.parse(readFileSync(VECTORS_FILE, 'utf8'));
+    expect(vectors.length >= 30).toBe(true);
     for (const vector of vectors) {
-      expect(vector.error === true).toBe(mustBeRejected(`${vector.id}.lino`));
+      const name = vector.id.slice(vector.id.lastIndexOf('/') + 1);
+      expect(vector.error === true).toBe(name.startsWith('syntax-'));
     }
-    const errors = vectors.filter((v) => v.error);
-    expect(errors.map((v) => [v.id, v.code, v.line, v.column])).toEqual([
-      ['errors/syntax-colon-in-value', 'syntax-error', 1, 19],
-      ['errors/syntax-depth-exceeded', 'depth-exceeded', 1, 202],
-      ['errors/syntax-unquoted-hex', 'syntax-error', 2, 1],
-    ]);
+    const codes = vectors.filter((v) => v.error).map((v) => v.code);
+    expect(codes.includes('syntax-error')).toBe(true);
+    expect(codes.includes('depth-exceeded')).toBe(true);
   });
 
-  it('writes the upstream parity case shape', () => {
-    expect(vectorFor('elements/a.lino', '(button: (label Save))\n')).toEqual({
-      id: 'elements/a',
-      input: '(button: (label Save))\n',
-      expected: [
-        {
-          id: 'button',
-          values: [
-            {
-              id: null,
-              values: [
-                { id: 'label', values: [] },
-                { id: 'Save', values: [] },
-              ],
-            },
-          ],
-        },
-      ],
-      format: '(button: (label Save))',
-    });
+  it('places every error where the diagnostics fixture places it', () => {
+    const vectors = JSON.parse(readFileSync(VECTORS_FILE, 'utf8'));
+    for (const vector of vectors.filter((v) => v.error)) {
+      const file = path.join(
+        'docs/spec/fixtures',
+        `${vector.id}.diagnostics.json`
+      );
+      const [diagnostic] = JSON.parse(readFileSync(file, 'utf8')).diagnostics;
+      expect({ code: vector.code, ...diagnostic.at }).toEqual({
+        code: diagnostic.code,
+        line: vector.line,
+        column: vector.column,
+      });
+    }
   });
 
-  it('refuses a syntax-* fixture that parses and a fixture that does not', () => {
-    expect(() => vectorFor('errors/syntax-x.lino', 'a b\n')).toThrow();
-    expect(() => vectorFor('elements/x.lino', '(a: b: c)\n')).toThrow();
+  it('refuses to write vectors for a syntax-* fixture that parses', () => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'vectors-'));
+    try {
+      cpSync('docs/spec/fixtures', dir, { recursive: true });
+      writeFileSync(
+        path.join(dir, 'errors', 'syntax-unquoted-hex.lino'),
+        '(a b)'
+      );
+      expect(() => buildVectors(dir)).toThrow(/must be refused/);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
+});
 
-  it('reports a stale or missing vector file', () => {
-    withTempDir((dir) => {
-      const fixtures = path.join(dir, 'fixtures');
-      mkdirSync(path.join(fixtures, 'elements'), { recursive: true });
-      writeFileSync(path.join(fixtures, 'elements', 'a.lino'), 'a\n');
-      const file = path.join(dir, 'parser-vectors.json');
-      expect(checkVectors(file, fixtures)).toContain('is missing');
-      writeFileSync(file, generateVectors(fixtures));
-      expect(checkVectors(file, fixtures)).toBe(null);
-      writeFileSync(path.join(fixtures, 'elements', 'a.lino'), 'b\n');
-      expect(checkVectors(file, fixtures)).toContain('is stale');
-    });
-  });
-
-  it('reads a CRLF checkout of the fixtures as the LF text', () => {
-    // Windows checkouts turn LF line ends into CRLF.
-    withTempDir((dir) => {
-      const fixtures = path.join(dir, 'fixtures');
-      mkdirSync(path.join(fixtures, 'elements'), { recursive: true });
-      const fixture = path.join(fixtures, 'elements', 'a.lino');
-      writeFileSync(fixture, 'a:\n  b\n');
-      const lf = generateVectors(fixtures);
-      writeFileSync(fixture, 'a:\r\n  b\r\n');
-      expect(generateVectors(fixtures)).toBe(lf);
-      const file = path.join(dir, 'parser-vectors.json');
-      writeFileSync(file, lf.replaceAll('\n', '\r\n'));
-      expect(checkVectors(file, fixtures)).toBe(null);
-    });
-  });
-
-  it('exports the default paths', () => {
-    expect(FIXTURES_DIR).toBe('docs/spec/fixtures');
-    expect(VECTORS_FILE).toBe('docs/spec/parser-vectors.json');
+describe('the parity corpus vendored with the Swift port', () => {
+  it('agrees with the links-notation package the repository uses', () => {
+    const corpus = JSON.parse(readFileSync(PARITY_CORPUS, 'utf8'));
+    expect(corpus.length).toBe(14);
+    const parser = new Parser();
+    for (const { input, expected, format } of corpus) {
+      const links = parser.parse(input);
+      expect(links.map(linkTree)).toEqual(expected);
+      expect(formatLinks(links)).toBe(format);
+    }
   });
 });

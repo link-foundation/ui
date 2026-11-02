@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Roadmap and issue template
+    url: https://github.com/link-foundation/ui/tree/main/docs/case-studies/issue-1/roadmap
+    about: The roadmap case study (tracking issue #75) with the issue template every Feature and Bug issue follows.
+  - name: Agent guide
+    url: https://github.com/link-foundation/ui/blob/main/docs/agents/README.md
+    about: How to pick, plan, implement, verify and hand off work in this repository.

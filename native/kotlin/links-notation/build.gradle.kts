@@ -75,6 +75,8 @@ abstract class GenerateParityCases : DefaultTask() {
             out.append("        code = ").append(if (code == null) "null" else literal(code)).append(",\n")
             out.append("        line = ").append((case["line"] as Number?)?.toInt() ?: 0).append(",\n")
             out.append("        column = ").append((case["column"] as Number?)?.toInt() ?: 0).append(",\n")
+            val message = case["message"] as String?
+            out.append("        message = ").append(if (message == null) "null" else literal(message)).append(",\n")
             out.append("    ),\n")
         }
     }

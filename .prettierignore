@@ -13,3 +13,5 @@ dev/log/
 # Gradle build outputs of the native ports
 native/**/build/
 native/**/.gradle/
+# Generated, one parser vector per line (scripts/generate-parser-vectors.mjs)
+docs/spec/parser-vectors.json
