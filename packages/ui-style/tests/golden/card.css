@@ -1,0 +1,42 @@
+ui-dialog ui-card {
+  padding: var(--space-medium);
+}
+@media (max-width: 640px) {
+  ui-dialog ui-card {
+    padding: var(--space-small);
+  }
+}
+@media (max-width: 640px) {
+  ui-dialog ui-card:hover {
+    opacity: 0.92;
+  }
+}
+@container (min-width: 400px) {
+  ui-dialog ui-card {
+    flex-direction: row;
+  }
+}
+@media (prefers-color-scheme: dark) and (prefers-reduced-motion: reduce) {
+  ui-dialog ui-card {
+    border-color: var(--color-outline);
+  }
+}
+ui-dialog ui-card:is(:disabled, [disabled], [aria-disabled='true']) {
+  opacity: 0.38;
+}
+ui-list ui-chip#chip\ 1[label='it\'s']:is(ui-dialog *) {
+  border-radius: 8px 8px 0 0;
+  gap: 4px 0.5rem;
+  font-size: 14px;
+  font-weight: 500;
+  border-width: 1px;
+}
+ui-list ui-chip#chip\ 1[label='it\'s']:is(ui-dialog *)[aria-selected='true'] {
+  background-color: var(--color-selected, #E8DEF8);
+}
+ui-list ui-chip#chip\ 1[label='it\'s']:is(ui-dialog *)[aria-checked='true'] {
+  color: oklch(0.5 0.1 300);
+}
+ui-list ui-chip#chip\ 1[label='it\'s']:is(ui-dialog *):focus-visible {
+  transform: scale(var(--motion-scale-focus));
+}
