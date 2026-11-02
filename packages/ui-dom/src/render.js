@@ -28,6 +28,7 @@ import { atom, elementOf } from './model.js';
  *   `{ sets }` of `readTokens`, or resolved tokens
  * @property {string} [theme]  the token set (default: the document's
  *   `theme`, else the first set)
+ * @property {string|object[]} [styles]  ui-style LiNo text or read rules
  * @property {string} [css]  extra CSS appended to the sheet
  * @property {string} [prefix]  the CSS custom property prefix
  * @property {boolean} [baseCss]  `false` leaves out the base rules
