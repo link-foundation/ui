@@ -29,3 +29,9 @@ export { walk } from './walk.js';
 export { projectLink, projectLinks } from './project.js';
 export { loadVocabulary, defaultVocabulary } from './vocabulary.js';
 export { valueMatches } from './check.js';
+
+/**
+ * The value layer: schema-driven typing of values, units, colours and
+ * references (docs/spec/values.md), canonical LiNo and CSS output.
+ */
+export * as values from './values/index.js';
