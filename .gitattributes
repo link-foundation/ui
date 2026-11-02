@@ -17,3 +17,12 @@ packages/ui-style/tests/golden/** text eol=lf
 # UiSwiftUI vendors the ui-tokens Swift output, and tests/ui-swift-tokens.test.js
 # compares it byte for byte with what ui-tokens writes (always LF).
 packages/ui-swift/Sources/UiSwiftUI/Tokens.swift text eol=lf
+
+# The issue-101 roadmap sources are read by the front-matter parser of
+# experiments/issue-1/create-roadmap-issues.mjs, which expects LF, and
+# tests/issue-101-roadmap.test.js compares the bodies built from them.
+docs/case-studies/issue-101/roadmap/** text eol=lf
+
+# The ui-links fixtures are byte copies of link-cli files (links-operations.txt
+# is its protocol conversation); server.test.js replays them line by line.
+packages/ui-links/tests/fixtures/** text eol=lf
