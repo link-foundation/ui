@@ -8,7 +8,8 @@ export const VOCABULARY_TEXT = `(ui-dialect: dialect
   (multi-valued on token track key event set state media)
   (reserved-sigil at-sign dollar-sign)
   (reserved-property bind)
-  (reserved-property when))
+  (reserved-property when)
+  (common-property note string multi))
 
 (document: kind
   (description 'Root of a UI document.')

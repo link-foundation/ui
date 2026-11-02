@@ -1,0 +1,3 @@
+# A whole document on one line.
+(app: document (title 'One line') (body: stack (direction vertical) (greeting: text 'Hello, links') (ok: button (label 'OK') (variant filled)) (cancel: button (label Cancel)))) # trailing comment
+# A comment after the document.

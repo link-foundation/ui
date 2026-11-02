@@ -87,6 +87,86 @@ parse('(a: button').diagnostics;
 `UiParseError` (with `diagnostics` and `document`) when there are. Warnings
 alone do not make it throw.
 
+## Editing the source text
+
+`format` writes a document from its tree, so `#` comments and layout are not
+kept. To change a document a person wrote, edit its text in place with
+`@link-foundation/ui-core/source`. Each edit changes only the bytes it must,
+and is checked: the new text must parse to the tree the same change gives on
+`parse(text)`, otherwise nothing is changed and `{ ok: false, error }` is
+returned.
+
+```js
+import { setProp, applyOpsToSource } from '@link-foundation/ui-core/source';
+
+const text = `# primary action
+(ok: button
+  (label 'OK')   # shown on the button
+  (variant filled))
+`;
+
+setProp(text, 'ok', 'label', ['Cancel']);
+// { ok: true,
+//   text: "# primary action\n(ok: button\n  (label 'Cancel')   # shown on the button\n  (variant filled))\n",
+//   edits: [{ start: 38, end: 42, insert: "'Cancel'" }] }
+
+applyOpsToSource(text, [
+  { op: 'setProp', id: 'ok', name: 'note', values: ['Why this is red'] },
+  { op: 'rename', id: 'ok', to: 'confirm' },
+]).text;
+// # primary action
+// (confirm: button
+//   (label 'OK')   # shown on the button
+//   (variant filled)
+//   (note 'Why this is red'))
+```
+
+| Export                                              | Purpose                                                                                                                                    |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `indexSource(text)`                                 | `{ root, form, document, unit }`: the span tree (`{ start, end, kind, children, … }` for every element, property and value) and the form.  |
+| `setProp(text, id, name, values)`                   | Replace the values of a property (the last one, if it is repeated), or append it.                                                          |
+| `removeProp(text, id, name)`                        | Remove a property.                                                                                                                         |
+| `setPositional(text, id, values)`                   | Replace the positional values of an element.                                                                                               |
+| `insertChild(text, parentId, index, lino)`          | Insert a child element (`parentId` `null`: a root) at `index` among the child elements.                                                    |
+| `removeNode(text, id)`                              | Remove an element, the line it leaves empty and the comment lines directly above it.                                                       |
+| `moveNode(text, id, parentId, index)`               | Move an element, with the comment lines directly above it.                                                                                 |
+| `renameId(text, from, to)`                          | Rename the definition only; `references` lists the other references to the old id for the caller.                                          |
+| `applyOpsToSource(text, ops)`                       | Apply the ops `insert`, `remove`, `move`, `setProp`, `removeProp`, `rename`, `setPositional` in order, checked after each, all or nothing. |
+| `applyOpToTree(doc, op)`, `checkEdit`, `applyEdits` | The tree reference the edits are checked against, the check itself, and applying `{ start, end, insert }` edits.                           |
+| `scanDelimiters`, `quotedEnd`, `SourceIndexError`   | The delimiter scanner (no regular expressions) and the error thrown when a span does not match the parser.                                 |
+
+Each edit returns `{ ok: true, text, edits }` (`edits` are `{ start, end,
+insert }` in offsets of the old text) or `{ ok: false, error }`. The edits
+keep the layout of the document: a new node takes the indentation of its
+nearest sibling, a one-line document gets the node inline after one space,
+new values are quoted with `escapeReference` when they need it, and line
+breaks stay CRLF in a CRLF text.
+
+**Stopgap.** `links-notation` does not report where a link was read from, so
+`scan.js` finds the delimiters itself and `index.js` checks every span by
+parsing it again with the official parser; any mismatch throws a
+`SourceIndexError` with the path of the link. When `links-notation` reports
+source positions, `index.js` takes the spans from the parser and `scan.js` is
+deleted.
+
+### Notes that survive
+
+A `#` comment carries no meaning, so a tool that writes the document from its
+tree drops it. Write what must survive as a `note`, a property of every kind:
+
+```lino
+(ok: button
+  (label OK)
+  (note 'Why this is red'))
+```
+
+`parse` keeps it in `properties` and `format` writes it back in all three
+forms. The links store of
+[link-foundation/ui#16](https://github.com/link-foundation/ui/issues/16)
+(`@link-foundation/ui-store`) keeps it too: text → store → text, its
+operation log written as Links Notation and replayed, and undo/redo
+(`packages/ui-store/tests/note.test.js`).
+
 ## Typed values
 
 `parse` keeps values as the raw strings and arrays of the tree. The `values`
@@ -168,7 +248,8 @@ there and back changes no channel by more than 0.001.
 | `values`                                 | The value layer: see [Typed values](#typed-values).                                                                                                                        |
 | `UI_DIALECT_VERSION`, `SPEC_VERSION`     | `'ui-dialect/0'`.                                                                                                                                                          |
 
-Type declarations are in [`src/index.d.ts`](src/index.d.ts).
+Type declarations are in [`src/index.d.ts`](src/index.d.ts) and, for
+`@link-foundation/ui-core/source`, [`src/source.d.ts`](src/source.d.ts).
 
 The wider design is described in
 [`docs/ARCHITECTURE.md`](https://github.com/link-foundation/ui/blob/main/docs/ARCHITECTURE.md).

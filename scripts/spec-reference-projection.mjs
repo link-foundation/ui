@@ -96,6 +96,7 @@ export function readVocabulary(text) {
             ['multi-valued', { type: 'any' }],
             ['reserved-sigil', { type: 'any' }],
             ['reserved-property', { type: 'any', multi: true }],
+            ['common-property', { type: 'any', multi: true }],
           ]),
         },
       ],
@@ -109,13 +110,18 @@ export function readVocabulary(text) {
   const vocabulary = { kinds: new Map(), actions: new Map() };
   const prop = (element, name) =>
     element.properties.filter((p) => p.name === name);
+  const entries = (element, name) =>
+    prop(element, name).map(({ values: [property, type, ...flags] }) => [
+      property,
+      { type, multi: flags.includes('multi') },
+    ]);
+  const common = tree.elements
+    .filter((element) => element.kind === 'dialect')
+    .flatMap((element) => entries(element, 'common-property'));
   for (const element of tree.elements) {
     if (element.kind === 'kind') {
-      const properties = new Map();
-      for (const { values } of prop(element, 'property')) {
-        const [name, type, ...flags] = values;
-        properties.set(name, { type, multi: flags.includes('multi') });
-      }
+      // A common property (such as `note`) is declared on every kind.
+      const properties = new Map([...common, ...entries(element, 'property')]);
       const [children] = prop(element, 'children').map((p) => p.values[0]);
       vocabulary.kinds.set(element.id, {
         positional: prop(element, 'positional').flatMap((p) => p.values),

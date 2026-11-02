@@ -263,6 +263,7 @@ describe('source rules', () => {
     const files = readdirSync(dir, { recursive: true }).filter((file) =>
       file.endsWith('.js')
     );
+    expect(files).toContain(join('source', 'scan.js'));
     expect(files.some((file) => file.startsWith('values'))).toBe(true);
     for (const file of files) {
       const text = read(join(dir, file));

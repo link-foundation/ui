@@ -1,0 +1,16 @@
+
+
+# Blank lines before, between and after.
+
+(list: stack
+
+
+  (one: text One)
+
+  # Two is commented.
+
+  (two: text Two)
+  (three: text Three))
+
+
+

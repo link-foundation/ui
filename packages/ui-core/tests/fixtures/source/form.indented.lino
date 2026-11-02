@@ -1,0 +1,18 @@
+# The demo, written in the indented form.
+app: document
+  title 'Links UI demo'   # the window title
+
+  # The page body.
+  body: stack
+    direction vertical
+    gap (token space.medium)
+    # A greeting first.
+    greeting: text 'Hello, links'
+    ok: button
+      label 'OK'   # shown on the button
+      variant filled
+      note 'Why this is red'
+
+    cancel: button
+      label Cancel
+      variant outlined
