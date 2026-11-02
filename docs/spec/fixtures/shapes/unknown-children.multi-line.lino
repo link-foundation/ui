@@ -1,0 +1,5 @@
+(ok: button
+  (label OK)
+  (colour red
+    (shade dark
+      (tone deep))))
