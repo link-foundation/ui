@@ -46,6 +46,9 @@ Full commits: `fe15495477905d2f83b27cb5a4acc8295da5fdc0`,
 `72a8ae86c637dd5dba17869a2b9b672ad97b1718`,
 `8ec3d2925d7af4747764faa413abaa2f983dd3b4`.
 
+`hello.json` was written for ui-convert (Unlicense): the card of the issue
+#61 example, with one `TextBlock`, one `Input.Text` and one `Action.Submit`.
+
 ## JSON Forms (`json-forms/`)
 
 Source: [eclipsesource/jsonforms](https://github.com/eclipsesource/jsonforms)

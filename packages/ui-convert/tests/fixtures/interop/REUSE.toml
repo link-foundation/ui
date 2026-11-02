@@ -1,7 +1,8 @@
 # Licences of the interop fixtures copied from other projects (see
 # SOURCES.md). The fixtures written for ui-convert (A2UI coverage.json,
-# JSON Forms categorization.json, Lottie dot-pulse.* and rejected.json)
-# fall under the repository licence in the root REUSE.toml.
+# Adaptive Cards hello.json, JSON Forms categorization.json, Lottie
+# dot-pulse.* and rejected.json) fall under the repository licence in the
+# root REUSE.toml.
 version = 1
 
 [[annotations]]
@@ -19,7 +20,15 @@ SPDX-FileCopyrightText = "Google LLC"
 SPDX-License-Identifier = "Apache-2.0"
 
 [[annotations]]
-path = "adaptive-cards/*.json"
+path = [
+  "adaptive-cards/ActivityUpdate.json",
+  "adaptive-cards/CalendarReminder.json",
+  "adaptive-cards/InputForm.json",
+  "adaptive-cards/ShowCardWizard.json",
+  "adaptive-cards/Table.json",
+  "adaptive-cards/hc-sample.json",
+  "adaptive-cards/hc-teams.json",
+]
 precedence = "override"
 SPDX-FileCopyrightText = "2017 Microsoft"
 SPDX-License-Identifier = "MIT"
