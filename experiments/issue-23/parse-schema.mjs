@@ -1,0 +1,16 @@
+import { parse, parseLinks } from '@link-foundation/ui-core';
+const text = `(settings-schema: schema (version 2))
+(appearance: section (label 'Appearance'))
+(liquid.blur: (type range) (default 18) (min 0) (max 40) (step 1) (unit px)
+  (section appearance) (label 'Blur') (apply (css-var --liquid-blur)))
+(theme.mode: (type choice) (default auto) (options auto light dark)
+  (section appearance) (apply (data-attr theme-mode)))
+(motion.reduce: (type toggle) (default false) (section appearance) (comfort))
+(accent: (type color) (default '#3390EC') (apply (css-var --accent)))
+(preset calm (label 'Calm') (set liquid.blur 24) (set theme.mode dark))
+(migration (from 1) (to 2) (rename blur liquid.blur) (old-default liquid.blur 12))`;
+const d = parse(text);
+console.log(JSON.stringify(d.roots, null, 1).slice(0, 3000));
+console.log(d.diagnostics);
+const l = parseLinks(text);
+console.log(JSON.stringify(l, null, 0).slice(0, 3000));
