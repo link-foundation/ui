@@ -88,6 +88,7 @@ final class UiViewAccessibilityTests: XCTestCase {
     /// Show `view` in a window until the test ends.
     private func host(_ view: some View) -> NSView {
         _ = NSApplication.shared
+        enableAccessibility()
         let hosting = NSHostingView(rootView: view.frame(width: 400, height: 300))
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 400, height: 300), styleMask: [.titled], backing: .buffered,
@@ -102,15 +103,27 @@ final class UiViewAccessibilityTests: XCTestCase {
         return hosting
     }
 
-    /// Every accessibility element below `root`, depth first.
-    private func elements(_ root: Any) -> [NSAccessibilityProtocol] {
-        var found: [NSAccessibilityProtocol] = []
-        var queue: [Any] = [root]
+    /// SwiftUI builds its accessibility tree only once an assistive client
+    /// asks for it; these are the attributes such a client (VoiceOver,
+    /// Accessibility Inspector) sets on the app. Without them the hosting view
+    /// has no children at all.
+    private func enableAccessibility() {
+        for attribute in ["AXEnhancedUserInterface", "AXManualAccessibility"] {
+            NSApp.accessibilitySetValue(true, forAttribute: NSAccessibility.Attribute(rawValue: attribute))
+        }
+    }
+
+    /// Every accessibility element below `root`, breadth first. SwiftUI's
+    /// elements (`AccessibilityNode`) answer the NSAccessibility selectors
+    /// without conforming to `NSAccessibilityProtocol` in Swift, so they are
+    /// asked by selector.
+    private func elements(_ root: NSObject) -> [AXElement] {
+        var found: [AXElement] = []
+        var queue = [root]
         while !queue.isEmpty {
-            let next = queue.removeFirst()
-            guard let element = next as? NSAccessibilityProtocol else { continue }
+            let element = AXElement(object: queue.removeFirst())
             found.append(element)
-            queue += element.accessibilityChildren() ?? []
+            queue += element.children
         }
         return found
     }
@@ -118,7 +131,7 @@ final class UiViewAccessibilityTests: XCTestCase {
     func testEveryViewIsIdentifiedByItsLinkId() {
         let model = UiDocumentModel(lino: sample)
         let hosting = host(UiView(document: model))
-        let identifiers = Set(elements(hosting).compactMap { $0.accessibilityIdentifier() }.filter { !$0.isEmpty })
+        let identifiers = Set(elements(hosting).compactMap(\.identifier).filter { !$0.isEmpty })
         let expected = Set(RenderTree(document: model.document).allNodes.compactMap(\.accessibilityIdentifier))
         XCTAssertEqual(expected, ["app", "body", "greeting", "ok"])
         XCTAssertTrue(expected.isSubset(of: identifiers), "accessibility identifiers: \(identifiers.sorted())")
@@ -128,10 +141,10 @@ final class UiViewAccessibilityTests: XCTestCase {
         var actions: [UiAction] = []
         let hosting = host(UiView(document: UiDocumentModel(lino: sample)) { actions.append($0) })
         let all = elements(hosting)
-        let ok = try XCTUnwrap(all.first { $0.accessibilityIdentifier() == "ok" })
-        XCTAssertEqual(ok.accessibilityLabel(), "OK")
-        XCTAssertEqual(all.first { $0.accessibilityIdentifier() == "greeting" }?.accessibilityLabel(), "Hello, links")
-        XCTAssertTrue(ok.accessibilityPerformPress())
+        let ok = try XCTUnwrap(all.first { $0.identifier == "ok" }, "\(all.map(\.description))")
+        XCTAssertEqual(ok.label, "OK")
+        XCTAssertEqual(all.first { $0.identifier == "greeting" }?.label, "Hello, links")
+        ok.press()
         RunLoop.main.run(until: Date().addingTimeInterval(0.2))
         XCTAssertEqual(actions, [UiAction(source: "ok", event: "press", action: ["navigate", "home"])])
     }
@@ -144,5 +157,36 @@ final class UiViewAccessibilityTests: XCTestCase {
                 $0.code == "unsupported-kind" && $0.at["element"] == "strange" && $0.at["kind"] == "marquee"
             }, "\(UiDiagnosticLog.shared.diagnostics)")
     }
+}
+
+/// One accessibility element, read through the NSAccessibility selectors.
+@MainActor
+private struct AXElement {
+    let object: NSObject
+
+    private func string(_ selector: String) -> String? {
+        let name = NSSelectorFromString(selector)
+        guard object.responds(to: name) else { return nil }
+        return object.perform(name)?.takeUnretainedValue() as? String
+    }
+
+    var identifier: String? { string("accessibilityIdentifier") }
+    var label: String? { string("accessibilityLabel") }
+
+    var children: [NSObject] {
+        let name = NSSelectorFromString("accessibilityChildren")
+        guard object.responds(to: name) else { return [] }
+        return object.perform(name)?.takeUnretainedValue() as? [NSObject] ?? []
+    }
+
+    /// `accessibilityPerformPress`, as VoiceOver's "press" does. Its BOOL
+    /// result is not read (`perform` returns objects); the test checks the
+    /// `UiAction` it sends instead.
+    func press() {
+        let name = NSSelectorFromString("accessibilityPerformPress")
+        if object.responds(to: name) { _ = object.perform(name) }
+    }
+
+    var description: String { "\(type(of: object)) id=\(identifier ?? "-") label=\(label ?? "-")" }
 }
 #endif
