@@ -194,6 +194,10 @@ jobs:
       - name: Run ./gradlew check
         run: ./gradlew --no-daemon --console=plain check
 
+      - name: Show how many tests ran
+        if: ${{ !cancelled() }}
+        run: sh ../../native/kotlin/links-notation/test-summary.sh
+
       # examples/kotlin is its own build (it includes this one); building it
       # compiles Main.kt against the library.
       - name: Build the desktop example
