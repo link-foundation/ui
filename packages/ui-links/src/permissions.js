@@ -3,19 +3,23 @@
  *
  * A rule is a pair `(g: Subject Object)` marked as `(r: AllowRead g)` or
  * `(r: AllowWrite g)`: the subjects that are `Subject` (the subject itself,
- * or a link of that type) may read, or read and write, the links that are
- * `Object`. The `Anything` marker in either place matches every subject or
- * every link. "Is" is `isA` of the type system: through sub-types and
- * multiple inheritance.
+ * or a link of that type) may read, or read and write, the links of type
+ * `Object` (its values and sub-types, not the link of `Object` itself: a
+ * type is changed by who may change its parent). The `Anything` marker in
+ * either place matches every subject or every link. Types follow the type
+ * system: through sub-types and multiple inheritance; the links that wire
+ * the hierarchy are of type `Extends`.
  *
- * The rules live in the same storage as the data or in another one (a
- * separate links file): only the addresses they hold refer to the data.
- * Rules in the same storage are links like any other: a subject that may
- * write them may change the rules, so give `Anything` writes to
- * administrators only, or keep the rules in a storage of their own.
+ * The markers are points of the data (`permissionMarkers`), so every
+ * address a rule holds is an address of the data. The rules (the pairs and
+ * the marks) live in the same storage as the data or in another one (a
+ * separate links file). Rules in the same storage are links like any other:
+ * a subject that may write them may change the rules, so give `Anything`
+ * writes to administrators only, or keep the rules in a storage of their own.
  */
 
 import { CONTINUE } from './constants.js';
+import { point } from './types.js';
 import {
   decorate,
   getLink,
@@ -56,13 +60,15 @@ export function createPolicy({ rules, markers, types }) {
     );
     return out;
   };
-  const fits = (value, type) =>
-    type === markers.anything || (value !== null && types.isA(value, type));
+  const isSubject = (subject, type) =>
+    type === markers.anything || (subject !== null && types.isA(subject, type));
+  const isObject = (link, type) =>
+    type === markers.anything || types.isOf(link, type);
 
   /** Whether `subject` (an address or `null`) may do what `marker` allows to `link`. */
   const allows = (marker, subject, link) =>
     granted(marker).some(
-      (rule) => fits(subject, rule.from_id) && fits(link, rule.to_id)
+      (rule) => isSubject(subject, rule.from_id) && isObject(link, rule.to_id)
     );
 
   return {
@@ -75,7 +81,9 @@ export function createPolicy({ rules, markers, types }) {
     canWrite: (subject, link) => allows(markers.allowWrite, subject, link),
     /** Whether `subject` may write anything at all: it may create links. */
     canCreate: (subject) =>
-      granted(markers.allowWrite).some((rule) => fits(subject, rule.from_id)),
+      granted(markers.allowWrite).some((rule) =>
+        isSubject(subject, rule.from_id)
+      ),
   };
 }
 
@@ -156,12 +164,34 @@ export function withPermissions(links, policy, subject) {
 }
 
 /**
+ * The markers of the permission rules by name: `AllowRead`, `AllowWrite` and
+ * `Anything`, points of the data created when missing.
+ * @param {any} links  the storage of the data
+ * @param {any} names  its names store
+ * @returns {PermissionMarkers}
+ */
+export function permissionMarkers(links, names) {
+  return {
+    allowRead: point(links, names, 'AllowRead'),
+    allowWrite: point(links, names, 'AllowWrite'),
+    anything: point(links, names, 'Anything'),
+  };
+}
+
+/**
  * Write a rule: `subject` may `access` (`'read'` or `'write'`) links of
  * `object`. Returns the address of the rule pair.
  * @param {any} rules
  * @param {PermissionMarkers} markers
  */
 export function allow(rules, markers, access, subject, object) {
+  if (access !== 'read' && access !== 'write') {
+    throw new LinksError('bad-request', `Unknown access: ${access}`);
+  }
+  if (subject === markers.allowRead || subject === markers.allowWrite) {
+    // A pair from a marker would read as a mark.
+    throw new LinksError('bad-request', 'A marker cannot be a subject');
+  }
   const marker = access === 'write' ? markers.allowWrite : markers.allowRead;
   const rule = rules.create();
   rules.update(rule, subject, object);

@@ -11,6 +11,8 @@
  *
  * So `Type -> SubType -> SubType -> Value` is a chain of sources, of any
  * depth, and `isA` follows sources and `Extends` links, cycles included.
+ * The links that wire the hierarchy, the marked pairs and their marks, are
+ * of type `Extends`: what may change them may change the hierarchy.
  */
 
 import { CONTINUE, NULL } from './constants.js';
@@ -63,20 +65,22 @@ export function typeSystem(links, { root, extends: extendsMarker = null }) {
     return out.filter((parent) => parent !== NULL);
   };
 
+  /** Whether `id` is a pair that gives a type one more parent. */
+  const isExtension = (id) =>
+    extendsMarker !== null && search(links, extendsMarker, id) !== null;
+
   /**
-   * Whether `value` (an address, or a link that is not stored yet) is
-   * `type` or of `type`, through any number of sub-types and parents.
+   * Whether `value` (an address, or a link that is not stored yet) is of
+   * `type`, through any number of sub-types and parents. A type is not of
+   * itself; `isA` is.
    */
-  const isA = (value, type) => {
+  const isOf = (value, type) => {
     const link = linkOf(value);
     if (link === null) {
       return false;
     }
-    if (link.id === type) {
-      return true;
-    }
     const seen = new Set();
-    const stack = [link.from_id];
+    const stack = [isExtension(link.id) ? extendsMarker : link.from_id];
     while (stack.length > 0) {
       const at = stack.pop();
       if (at === type) {
@@ -90,6 +94,9 @@ export function typeSystem(links, { root, extends: extendsMarker = null }) {
     }
     return false;
   };
+
+  /** Whether `value` is `type` or of `type`. */
+  const isA = (value, type) => linkOf(value)?.id === type || isOf(value, type);
 
   /** Every type `type` is, itself first (breadth first, no repeats). */
   const ancestorsOf = (type) => {
@@ -139,6 +146,8 @@ export function typeSystem(links, { root, extends: extendsMarker = null }) {
     isType,
     parentsOf,
     ancestorsOf,
+    isExtension,
+    isOf,
     isA,
     define,
     instance,

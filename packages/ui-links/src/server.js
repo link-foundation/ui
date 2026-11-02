@@ -87,6 +87,13 @@ export function changeToLino({ before, after }, ref = String) {
   return group([side(before), side(after)]);
 }
 
+/** Whether `document` is `()`, the request for every link. */
+const isEmptyGroup = ([only, ...rest]) =>
+  rest.length === 0 &&
+  typeof only !== 'string' &&
+  only.id === null &&
+  only.values.length === 0;
+
 /** `(i: s t)` with numbers. */
 const linkLine = (link) =>
   named(String(link.id), [String(link.from_id), String(link.to_id)]);
@@ -315,12 +322,12 @@ function openSession(server, { subject = null, onPush = null } = {}) {
   /** Answer one request document. */
   const handle = (document) => {
     try {
-      if (document.length === 0) {
+      const [first] = document;
+      if (document.length === 0 || isEmptyGroup(document)) {
         return allLinks(view).map((link) =>
           named(nameRef(link.id), [nameRef(link.from_id), nameRef(link.to_id)])
         );
       }
-      const [first] = document;
       if (
         document.length === 1 &&
         typeof first !== 'string' &&
@@ -366,7 +373,12 @@ function openSession(server, { subject = null, onPush = null } = {}) {
     },
     /** Answer a binary packet with a packet of the same options. */
     requestBinary(bytes) {
-      const decoded = decodeBinary(bytes);
+      let decoded;
+      try {
+        decoded = decodeBinary(bytes);
+      } catch (error) {
+        return encodeBinary([named('error', [error.message])]);
+      }
       if (decoded === null) {
         return encodeBinary([named('error', ['Incomplete binary packet'])]);
       }
