@@ -119,6 +119,33 @@ describe('DTCG round trip', () => {
       }));
     expect(values(again)).toEqual(values(full()));
   });
+
+  it('keeps __proto__ and constructor names as plain names', () => {
+    const resolved = resolveText(
+      `(t: theme
+  (token __proto__.polluted '#FFFFFF')
+  (token constructor.polluted 1px)
+  (mode __proto__ (token constructor.polluted 2px)))`,
+      't'
+    );
+    expect(resolved.diagnostics).toEqual([]);
+    const dtcg = JSON.parse(JSON.stringify(toDtcg(resolved)));
+    expect(Object.keys(dtcg)).toEqual([
+      '__proto__',
+      'constructor',
+      '$extensions',
+    ]);
+    expect(Object.keys(dtcg.$extensions[DTCG_EXTENSION].modes)).toEqual([
+      '__proto__',
+    ]);
+    expect({}.polluted).toBeUndefined();
+    expect(Object.polluted).toBeUndefined();
+    const { again } = roundTrip(resolved, 't');
+    expect(comparable(again)).toEqual(comparable(resolved));
+    expect(
+      again.modes.get('__proto__').get('constructor.polluted').value
+    ).toEqual({ type: 'dimension', value: 2, unit: 'px' });
+  });
 });
 
 describe('fromDtcg', () => {

@@ -157,7 +157,13 @@ function readMode(set, values, diagnostics) {
 
 function readSet(node, diagnostics) {
   /** @type {TokenSet} */
-  const set = { id: node.id, extends: [], tokens: [], modes: {} };
+  // `modes` has no prototype, so that a mode named `__proto__` is a mode.
+  const set = {
+    id: node.id,
+    extends: [],
+    tokens: [],
+    modes: Object.create(null),
+  };
   for (const property of node.properties) {
     if (property.name === 'extends') {
       set.extends.push(...property.values.filter((v) => typeof v === 'string'));

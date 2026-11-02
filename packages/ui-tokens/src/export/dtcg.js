@@ -146,6 +146,20 @@ function groupPaths(maps) {
 }
 
 /**
+ * Set an own property: a token path is input, and `parent[name] = value`
+ * with the name `__proto__` would replace the prototype (or, through
+ * `constructor`, reach `Object`); `JSON.parse` reads such a name back as an
+ * own property too.
+ */
+const own = (object, name, value) =>
+  Object.defineProperty(object, name, {
+    value,
+    enumerable: true,
+    writable: true,
+    configurable: true,
+  });
+
+/**
  * The nested group of some tokens.
  * @param {Map<string, ResolvedToken>} tokens
  */
@@ -165,10 +179,12 @@ function group(tokens, groups, keepAliases) {
     }
     let parent = root;
     for (const part of parts.slice(0, -1)) {
-      parent[part] ??= {};
+      if (!Object.hasOwn(parent, part)) {
+        own(parent, part, {});
+      }
       parent = parent[part];
     }
-    parent[parts.at(-1)] = node;
+    own(parent, parts.at(-1), node);
   }
   return root;
 }
