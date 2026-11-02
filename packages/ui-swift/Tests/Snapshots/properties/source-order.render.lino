@@ -1,0 +1,1 @@
+(card: VStack (spacing 12) (padding 16) (alignment center))

@@ -1,0 +1,31 @@
+(stack-0: stack
+  (direction vertical)
+  (gap (token space.2))
+  (text-0-0: text Todo
+    (level 1))
+  (list-0-1: list
+    (when (param todo.items))
+    (list-item-0-1-0: list-item
+      (each item (param todo.items) (index i))
+      (bind key (param item.id))
+      (checkbox-0-1-0-0: checkbox
+        (attr label Done)
+        (bind checked (param item.done)))))
+  (text-0-2: text 'Nothing to do'
+    (variant body-medium)
+    (when (not (param todo.items))))
+  (text-field-0-3: text-field
+    (label 'New item')
+    (bind value (param draft.text)))
+  (button-0-4: button
+    (label Add)
+    (variant filled)
+    (on press (action addItem))))
+(script-1: vue-block
+  (tag script)
+  (attr setup)
+  (content "import { ref } from 'vue';" ~1{} "const draft = ref({ text: '' });" 'function addItem() {}'))
+(style-2: vue-block
+  (tag style)
+  (attr scoped)
+  (content '.todo { padding: 8px; }'))

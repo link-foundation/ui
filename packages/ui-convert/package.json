@@ -1,7 +1,7 @@
 {
   "name": "@link-foundation/ui-convert",
   "version": "0.0.0",
-  "description": "Converters between the UI dialect of Links Notation and other UI formats: HTML/DOM import, A2UI, Adaptive Cards, JSON Forms and Lottie",
+  "description": "Converters between the UI dialect of Links Notation and other UI formats: HTML/DOM, JSX/TSX (MUI) and Vue SFC import, A2UI, Adaptive Cards, JSON Forms and Lottie",
   "type": "module",
   "exports": {
     ".": {
@@ -25,6 +25,10 @@
     "html",
     "dom",
     "importer",
+    "jsx",
+    "tsx",
+    "mui",
+    "vue",
     "a2ui",
     "adaptive-cards",
     "json-forms",
@@ -44,7 +48,9 @@
     "node": ">=20"
   },
   "dependencies": {
+    "@babel/parser": "^7.29.12",
     "@link-foundation/ui-core": "^0.0.0",
+    "@vue/compiler-dom": "^3.5.44",
     "links-notation": "^0.27.1",
     "parse5": "^8.0.1"
   },

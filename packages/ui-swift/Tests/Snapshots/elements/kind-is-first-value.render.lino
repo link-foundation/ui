@@ -1,0 +1,2 @@
+(button.save: Button (label Save))
+(save: Text 'button is the kind of the first link, text of this one')

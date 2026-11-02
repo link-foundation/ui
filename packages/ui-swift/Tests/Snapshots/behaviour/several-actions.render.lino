@@ -1,0 +1,2 @@
+(save: Button (label Save))
+(status: Text)
