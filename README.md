@@ -50,6 +50,24 @@ import { version } from '@link-foundation/ui';
 console.log(version);
 ```
 
+### Importing HTML
+
+[`@link-foundation/ui-convert`](packages/ui-convert/README.md) turns an HTML
+string or a live DOM subtree into a UI dialect document:
+
+```js
+import { importHtml } from '@link-foundation/ui-convert';
+
+console.log(importHtml('<button id="ok" class="primary">OK</button>').text);
+// (ok: button
+//   (label OK)
+//   (attr class primary))
+```
+
+Scripts, `on*` attributes and `javascript:` URLs are dropped with a
+`dropped-script` diagnostic; see the package README for the mapping table,
+ids, spans and `importDom`.
+
 ### Development
 
 ```bash
@@ -89,6 +107,7 @@ npm run example:desktop:package
 │   └── universal-app/    # React + GitHub Pages + Electron + Capacitor app
 ├── scripts/              # Build and release scripts
 ├── packages/             # npm workspaces (see docs/monorepo.md)
+│   ├── ui-convert/       # @link-foundation/ui-convert (HTML/DOM -> LiNo)
 │   └── ui-core/          # @link-foundation/ui-core
 ├── tests/                # Repository and release-script tests
 ├── .eslintrc.js          # ESLint configuration

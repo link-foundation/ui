@@ -9,6 +9,7 @@ publishable artefact is a workspace package under `packages/`.
 ├── package.json            # "private": true, "workspaces": ["packages/*"]
 ├── package-lock.json       # one lock file for the whole workspace
 ├── packages/
+│   ├── ui-convert/         # @link-foundation/ui-convert (HTML/DOM import)
 │   └── ui-core/            # @link-foundation/ui-core
 │       ├── package.json
 │       ├── README.md
@@ -37,7 +38,9 @@ exactly as a consumer would.
 3. Run `npm install` to update `package-lock.json` and the workspace link.
 4. Add a changeset for the new package (see below).
 
-The root test script (`tests/*.test.js packages/*/tests/*.test.js`),
+The root test script (`tests/*.test.js packages/*/tests/*.test.js
+packages/*/tests/*/*.test.js`, so tests may be grouped one folder deep as in
+`packages/ui-convert/tests/html/`),
 `bunfig.toml`, `deno.json` and the ESLint test overrides already cover every
 `packages/*` directory, so a new package needs no configuration changes.
 
