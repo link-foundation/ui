@@ -3,6 +3,7 @@
 // with the element's link id, and the native label of its kind: the text of
 // a `Text`, the label of a `Button`, `alt` of an image and `title` of a document.
 
+import Foundation
 import SwiftUI
 import UiSwiftCore
 import os
@@ -81,16 +82,21 @@ struct UiPrimitiveView<Children: View>: View {
 
 extension View {
     /// The element's link id as the accessibility identifier, and its native label.
-    /// A container keeps its children as separate accessibility elements.
+    /// A container keeps its children as separate accessibility elements; an
+    /// anonymous element has no identifier.
     @ViewBuilder
     func identified(_ node: RenderNode, container: Bool = false) -> some View {
         let labelled = self.modifier(UiAccessibilityLabel(label: node.accessibilityLabel))
-        if container {
-            labelled
-                .accessibilityElement(children: .contain)
-                .accessibilityIdentifier(node.accessibilityIdentifier ?? "")
+        if let id = node.accessibilityIdentifier {
+            if container {
+                labelled.accessibilityElement(children: .contain).accessibilityIdentifier(id)
+            } else {
+                labelled.accessibilityIdentifier(id)
+            }
+        } else if container {
+            labelled.accessibilityElement(children: .contain)
         } else {
-            labelled.accessibilityIdentifier(node.accessibilityIdentifier ?? "")
+            labelled
         }
     }
 }
@@ -98,6 +104,7 @@ extension View {
 private struct UiAccessibilityLabel: ViewModifier {
     let label: String?
 
+    @ViewBuilder
     func body(content: Content) -> some View {
         if let label {
             content.accessibilityLabel(Text(verbatim: label))

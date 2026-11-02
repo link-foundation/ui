@@ -52,7 +52,7 @@ final class UiDocumentModelTests: XCTestCase {
 
     private func watch(_ read: @escaping () -> Void) -> Flag {
         let flag = Flag()
-        withObservationTracking(read) { flag.changed = true }
+        withObservationTracking(read, onChange: { flag.changed = true })
         return flag
     }
 
@@ -85,16 +85,9 @@ final class UiDocumentModelTests: XCTestCase {
 /// The accessibility tree SwiftUI builds for a hosted `UiView`.
 @MainActor
 final class UiViewAccessibilityTests: XCTestCase {
-    private var window: NSWindow?
-
-    override func tearDown() async throws {
-        await MainActor.run {
-            window?.close()
-            window = nil
-        }
-    }
-
+    /// Show `view` in a window until the test ends.
     private func host(_ view: some View) -> NSView {
+        _ = NSApplication.shared
         let hosting = NSHostingView(rootView: view.frame(width: 400, height: 300))
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 400, height: 300), styleMask: [.titled], backing: .buffered,
@@ -103,7 +96,7 @@ final class UiViewAccessibilityTests: XCTestCase {
         window.orderFront(nil)
         hosting.layoutSubtreeIfNeeded()
         RunLoop.main.run(until: Date().addingTimeInterval(0.5))
-        self.window = window
+        addTeardownBlock { @MainActor in window.close() }
         return hosting
     }
 

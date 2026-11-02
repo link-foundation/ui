@@ -1,4 +1,4 @@
-// Every row of the render mapping (README.md, "Render mapping") and the
+// Every row of the render mapping (README.md, "Mapping") and the
 // unsupported-kind diagnostic.
 
 import XCTest
