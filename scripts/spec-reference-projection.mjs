@@ -121,10 +121,7 @@ export function readVocabulary(text) {
   for (const element of tree.elements) {
     if (element.kind === 'kind') {
       // A common property (such as `note`) is declared on every kind.
-      const properties = new Map([
-        ...common,
-        ...entries(element, 'property'),
-      ]);
+      const properties = new Map([...common, ...entries(element, 'property')]);
       const [children] = prop(element, 'children').map((p) => p.values[0]);
       vocabulary.kinds.set(element.id, {
         positional: prop(element, 'positional').flatMap((p) => p.values),
