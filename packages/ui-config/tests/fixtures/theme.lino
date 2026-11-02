@@ -1,0 +1,6 @@
+(theme-overrides: overrides
+  (layer theme)
+  (base app)
+  (set material3 token color.primary '#6750A4')
+  (set ok variant outlined)
+  (set body padding 4px))
