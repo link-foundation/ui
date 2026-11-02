@@ -12,6 +12,7 @@ publishable artefact is a workspace package under `packages/`.
 │   ├── ui-config/          # @link-foundation/ui-config (configuration layers)
 │   ├── ui-convert/         # @link-foundation/ui-convert (HTML/DOM import)
 │   ├── ui-i18n/            # @link-foundation/ui-i18n (localisation, lino-i18n)
+│   ├── ui-settings/        # @link-foundation/ui-settings (settings schemas)
 │   ├── ui-style/           # @link-foundation/ui-style (style rules)
 │   ├── ui-tokens/          # @link-foundation/ui-tokens (design tokens)
 │   └── ui-core/            # @link-foundation/ui-core
