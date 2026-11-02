@@ -114,3 +114,20 @@ export const sourceFixtures = () =>
       name: file,
       text: read(join(LOCAL_FIXTURES_DIR, 'source', file)),
     }));
+
+/**
+ * Type `raw` with `spec`, check the result equals `expected` and that it
+ * survives the round trip `typeValue(parseValue(formatValue(v)))` (#15).
+ * @param {object} values the `values` namespace of ui-core
+ * @param {import('../src/types.js').RawValue} raw
+ * @param {{ type: unknown }} spec
+ * @param {object} expected
+ * @param {(actual: unknown, expected: unknown) => void} equal
+ */
+export function checkTyped(values, raw, spec, expected, equal) {
+  const { value, diagnostics } = values.typeValue(raw, spec);
+  equal({ raw, value, diagnostics }, { raw, value: expected, diagnostics: [] });
+  const text = values.formatValue(value);
+  const again = values.typeValue(values.parseValue(text), spec).value;
+  equal({ text, value: again }, { text, value: expected });
+}

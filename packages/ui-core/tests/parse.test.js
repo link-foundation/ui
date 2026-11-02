@@ -264,6 +264,7 @@ describe('source rules', () => {
       file.endsWith('.js')
     );
     expect(files).toContain(join('source', 'scan.js'));
+    expect(files.some((file) => file.startsWith('values'))).toBe(true);
     for (const file of files) {
       const text = read(join(dir, file));
       for (const pattern of ['new RegExp', '.match(', '.replace(/', '.test(']) {

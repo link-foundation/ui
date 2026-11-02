@@ -32,6 +32,7 @@ describe('@link-foundation/ui-core', () => {
         'projectLinks',
         'toTree',
         'valueMatches',
+        'values',
         'walk',
       ].sort()
     );
