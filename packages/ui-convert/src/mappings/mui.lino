@@ -1,0 +1,116 @@
+(mui: mapping
+  (description 'MUI (Material UI) components -> ui-dialect kinds. Rules are tried in order; the first match wins. Properties a rule does not match stay as (attr name value).')
+  (source 'https://mui.com/material-ui/all-components/')
+  (catalogue 'docs/guidelines/catalogue.lino (mui column)'))
+
+(mui-button-contained: rule
+  (match (Button (variant contained) (children $label) (optional (disabled $disabled))))
+  (replace (button (label $label) (variant filled) (disabled $disabled))))
+(mui-button-outlined: rule
+  (match (Button (variant outlined) (children $label) (optional (disabled $disabled))))
+  (replace (button (label $label) (variant outlined) (disabled $disabled))))
+(mui-button-text: rule
+  (match (Button (variant text) (children $label) (optional (disabled $disabled))))
+  (replace (button (label $label) (variant text) (disabled $disabled))))
+(mui-button-default: rule
+  (match (Button (absent variant) (children $label) (optional (disabled $disabled))))
+  (replace (button (label $label) (variant text) (disabled $disabled))))
+(mui-button: rule
+  (match (Button (children $label) (optional (disabled $disabled))))
+  (replace (button (label $label) (disabled $disabled))))
+
+(mui-icon-button: rule
+  (match (IconButton (optional (aria-label $label)) (optional (disabled $disabled))))
+  (replace (icon-button (label $label) (disabled $disabled))))
+
+(mui-text-area: rule
+  (match (TextField (multiline true) (optional (label $label)) (optional (placeholder $placeholder)) (optional (value $value)) (optional (rows $rows)) (optional (required $required)) (optional (disabled $disabled))))
+  (replace (text-area (label $label) (placeholder $placeholder) (value $value) (rows $rows) (required $required) (disabled $disabled))))
+(mui-text-field: rule
+  (match (TextField (optional (label $label)) (optional (placeholder $placeholder)) (optional (value $value)) (optional (type $type)) (optional (required $required)) (optional (disabled $disabled))))
+  (replace (text-field (label $label) (placeholder $placeholder) (value $value) (type $type) (required $required) (disabled $disabled))))
+
+(mui-checkbox: rule
+  (match (Checkbox (optional (checked $checked)) (optional (disabled $disabled))))
+  (replace (checkbox (checked $checked) (disabled $disabled))))
+(mui-switch: rule
+  (match (Switch (optional (checked $checked)) (optional (disabled $disabled))))
+  (replace (switch (checked $checked) (disabled $disabled))))
+
+(mui-typography-h1: rule
+  (match (Typography (variant h1) (children $text)))
+  (replace (text $text (tag h1) (level 1))))
+(mui-typography-h2: rule
+  (match (Typography (variant h2) (children $text)))
+  (replace (text $text (tag h2) (level 2))))
+(mui-typography-h3: rule
+  (match (Typography (variant h3) (children $text)))
+  (replace (text $text (tag h3) (level 3))))
+(mui-typography-h4: rule
+  (match (Typography (variant h4) (children $text)))
+  (replace (text $text (tag h4) (level 4))))
+(mui-typography-h5: rule
+  (match (Typography (variant h5) (children $text)))
+  (replace (text $text (tag h5) (level 5))))
+(mui-typography-h6: rule
+  (match (Typography (variant h6) (children $text)))
+  (replace (text $text (tag h6) (level 6))))
+(mui-typography-body1: rule
+  (match (Typography (variant body1) (children $text)))
+  (replace (text $text (variant body-large))))
+(mui-typography-body2: rule
+  (match (Typography (variant body2) (children $text)))
+  (replace (text $text (variant body-medium))))
+(mui-typography-default: rule
+  (match (Typography (absent variant) (children $text)))
+  (replace (text $text (variant body-large))))
+(mui-typography: rule
+  (match (Typography (children $text)))
+  (replace (text $text)))
+
+(mui-stack-column: rule
+  (match (Stack (direction column) (optional (spacing $n))))
+  (replace (stack (direction vertical) (gap (token space.$n)))))
+(mui-stack-row: rule
+  (match (Stack (direction row) (optional (spacing $n))))
+  (replace (stack (direction horizontal) (gap (token space.$n)))))
+(mui-stack-default: rule
+  (match (Stack (absent direction) (optional (spacing $n))))
+  (replace (stack (direction vertical) (gap (token space.$n)))))
+(mui-stack: rule
+  (match (Stack (optional (spacing $n))))
+  (replace (stack (gap (token space.$n)))))
+
+(mui-box: rule
+  (match (Box))
+  (replace (box)))
+(mui-card-outlined: rule
+  (match (Card (variant outlined)))
+  (replace (card (variant outlined))))
+(mui-card: rule
+  (match (Card (absent variant)))
+  (replace (card (variant elevated))))
+(mui-card-content: rule
+  (match (CardContent))
+  (replace (card-content)))
+(mui-dialog: rule
+  (match (Dialog (optional (open $open))))
+  (replace (dialog (open $open))))
+(mui-tabs: rule
+  (match (Tabs (optional (value $value))))
+  (replace (tabs (value $value))))
+(mui-tab: rule
+  (match (Tab (optional (label $label)) (optional (value $value))))
+  (replace (tab (label $label) (value $value))))
+(mui-list: rule
+  (match (List))
+  (replace (list)))
+(mui-list-item: rule
+  (match (ListItem))
+  (replace (list-item)))
+(mui-app-bar: rule
+  (match (AppBar (optional (position $position))))
+  (replace (app-bar (position $position))))
+(mui-toolbar: rule
+  (match (Toolbar))
+  (replace (toolbar)))
