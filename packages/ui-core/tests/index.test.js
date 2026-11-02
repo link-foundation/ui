@@ -25,13 +25,16 @@ describe('@link-foundation/ui-core', () => {
         'defaultVocabulary',
         'elementLink',
         'format',
+        'formatLinks',
         'loadVocabulary',
         'parse',
+        'parseLinks',
         'parseOrThrow',
         'projectLink',
         'projectLinks',
         'toTree',
         'valueMatches',
+        'values',
         'walk',
       ].sort()
     );

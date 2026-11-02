@@ -260,7 +260,11 @@ describe('source rules', () => {
   // package uses none at all.
   it('uses no regular expressions in src/', () => {
     const dir = join(REPO, 'packages/ui-core/src');
-    for (const file of readdirSync(dir)) {
+    const files = readdirSync(dir, { recursive: true }).filter((file) =>
+      file.endsWith('.js')
+    );
+    expect(files.some((file) => file.startsWith('values'))).toBe(true);
+    for (const file of files) {
       const text = read(join(dir, file));
       for (const pattern of ['new RegExp', '.match(', '.replace(/', '.test(']) {
         expect([file, pattern, text.includes(pattern)]).toEqual([

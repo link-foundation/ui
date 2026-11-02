@@ -87,19 +87,86 @@ parse('(a: button').diagnostics;
 `UiParseError` (with `diagnostics` and `document`) when there are. Warnings
 alone do not make it throw.
 
+## Typed values
+
+`parse` keeps values as the raw strings and arrays of the tree. The `values`
+namespace types them with the property types of the vocabulary
+([`values.md`](https://github.com/link-foundation/ui/blob/main/docs/spec/values.md)):
+
+```js
+import { parse, values } from '@link-foundation/ui-core';
+
+values.typeValue('16px', { type: 'dimension' }).value;
+// { type: 'dimension', value: 16, unit: 'px' }
+values.typeValue(['token', 'color.primary'], { type: 'color' }).value;
+// { type: 'token-ref', path: 'color.primary' }
+values.toCss({ type: 'token-ref', path: 'color.primary' }); // 'var(--color-primary)'
+
+const { roots, diagnostics } = values.typeDocument(
+  parse('(box: stack (gap abc))')
+);
+roots[0].properties[0].typed; // [null]
+diagnostics;
+// [{ code: 'invalid-value', severity: 'error', at: { element: 'box', property: 'gap' },
+//    expected: 'dimension', message: … }]
+```
+
+Typing is driven by the declared type: `links-notation` does not tell whether
+an atom was quoted, so `'16px'` and `16px` are the same value. Where no type is
+declared (`any`), `inferValue` guesses: number, dimension, duration, hex
+colour, then string.
+
+| Type          | Text                                             | Typed value                                                                            |
+| ------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------- |
+| `dimension`   | `16px`, `1.5rem`, `-1em`, `50%`, `100vw`, `0`    | `{ type, value, unit }` (`unit` is `''` for `0`)                                       |
+| `duration`    | `150ms`, `0.2s`                                  | `{ type, value, unit }`                                                                |
+| `number`      | `-1`, `0.5`, `1.5e3`                             | `{ type, value }`                                                                      |
+| `color`       | `'#6750A4'`, `(rgb 103 80 164)`, `(oklch l c h)` | `{ type, space: 'srgb', r, g, b, a }` (0..1) or `{ type, space: 'oklch', l, c, h, a }` |
+| `string`      | `Hello`, `'Links UI demo'`                       | `{ type, value }`                                                                      |
+| `(enum a b)`  | `a`                                              | `{ type: 'enum', value }`                                                              |
+| `url`         | `'https://example.com/a.svg'`, `hero.png`        | `{ type, value }`                                                                      |
+| `element-ref` | `hello`                                          | `{ type, id }`                                                                         |
+| `action`      | `(navigate hello)`                               | `{ type, name, args }`                                                                 |
+| `boolean`     | `true`, `false`                                  | `{ type, value }` (no spec property uses it yet)                                       |
+| any type      | `(token a.b)`, `(param a.b)`, `(or x y z)`       | `token-ref`, `param`, `fallback` (options typed)                                       |
+
+| Export                                                  | Purpose                                                                                            |
+| ------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `typeValue(raw, spec?, { at, vocabulary })`             | `{ value, diagnostics }`; `value` is `null` for an invalid value. Never throws.                    |
+| `typeNode(node)`, `typeDocument(doc)`                   | Adds `typed` to each property and `typedPositional` to each element.                               |
+| `inferValue(raw)`                                       | The type of a value without a declared type.                                                       |
+| `formatValue(v)`, `parseValue(text)`                    | Canonical Links Notation and back: `typeValue(parseValue(formatValue(v)), spec).value` equals `v`. |
+| `toCss(v, { refToVar }?)`                               | CSS text; references become `var(--color-primary)`, `(or …)` nested `var()` fallbacks.             |
+| `parseColor`, `toHex`, `oklchToSrgb`, `srgbToOklch`     | Colours; `toHex` gives upper-case `#RRGGBB[AA]` and clamps out-of-gamut colours.                   |
+| `parseDimension`, `parseDuration`, `parseNumber`, `is*` | The scalar scanners (no regular expressions).                                                      |
+
+Diagnostics use the shape of the parser: the element id and property of the
+spec are `at.element` and `at.property`. `invalid-value` (error) also gives the
+`expected` type as text; `reserved-sigil` (warning) is given for `@x` and `$x`
+values, which are typed as strings.
+
+The oklch <-> sRGB conversion uses the OKLab matrices published by
+[Björn Ottosson](https://bottosson.github.io/posts/oklab/) and the sRGB
+transfer function of CSS Color 4, in about fifty lines, so the package does
+not depend on a colour library such as `culori`. Converting an in-gamut colour
+there and back changes no channel by more than 0.001.
+
 ## API
 
-| Export                                   | Purpose                                                                                                                                                         |
-| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `parse(text, options?)`                  | Text to `{ roots, diagnostics }`. Options: `maxDepth` (64), `maxInputSize` (1 MiB), `mode` (`'auto'`, `'groups'` or `'fold'`), `checks` (`true`), `vocabulary`. |
-| `parseOrThrow(text, options?)`           | Same as `parse`, but throws `UiParseError` on an error diagnostic.                                                                                              |
-| `toTree(doc)`                            | The tree JSON of the specification: `{ spec, elements, unknown?, diagnostics }`.                                                                                |
-| `format(doc, { style, indent }?)`        | Tree back to text, in the `'inline'`, `'multiline'` (default) or `'indented'` style. `parse(format(doc))` gives the same tree.                                  |
-| `walk(docOrNode, visitor)`               | Depth-first, pre-order visit `visitor(node, parent, depth)`; returning `false` skips the children.                                                              |
-| `projectLink(link)`, `projectLinks(...)` | Project `links-notation` `Link` objects you already have.                                                                                                       |
-| `defaultVocabulary()`, `loadVocabulary`  | The `ui-dialect/0` vocabulary of kinds, properties and actions, or your own one written in the same LiNo form.                                                  |
-| `valueMatches(type, value)`              | Checks a value against a property type of the vocabulary.                                                                                                       |
-| `UI_DIALECT_VERSION`, `SPEC_VERSION`     | `'ui-dialect/0'`.                                                                                                                                               |
+| Export                                   | Purpose                                                                                                                                                                    |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `parse(text, options?)`                  | Text to `{ roots, diagnostics }`. Options: `maxDepth` (64), `maxInputSize` (1 MiB), `mode` (`'auto'`, `'groups'` or `'fold'`), `checks` (`true`), `vocabulary`.            |
+| `parseOrThrow(text, options?)`           | Same as `parse`, but throws `UiParseError` on an error diagnostic.                                                                                                         |
+| `toTree(doc)`                            | The tree JSON of the specification: `{ spec, elements, unknown?, diagnostics }`.                                                                                           |
+| `format(doc, { style, indent }?)`        | Tree back to text, in the `'inline'`, `'multiline'` (default) or `'indented'` style. `parse(format(doc))` gives the same tree.                                             |
+| `parseLinks(text, options?)`             | Text to raw values (atoms as strings, links as arrays or `{ id, values }`), without the element projection, for formats such as the `ui-store` log. Throws `UiParseError`. |
+| `formatLinks(values)`                    | Raw values back to text, one link per line. `parseLinks(formatLinks(v))` gives `v` back.                                                                                   |
+| `walk(docOrNode, visitor)`               | Depth-first, pre-order visit `visitor(node, parent, depth)`; returning `false` skips the children.                                                                         |
+| `projectLink(link)`, `projectLinks(...)` | Project `links-notation` `Link` objects you already have.                                                                                                                  |
+| `defaultVocabulary()`, `loadVocabulary`  | The `ui-dialect/0` vocabulary of kinds, properties and actions, or your own one written in the same LiNo form.                                                             |
+| `valueMatches(type, value)`              | Checks a value against a property type of the vocabulary.                                                                                                                  |
+| `values`                                 | The value layer: see [Typed values](#typed-values).                                                                                                                        |
+| `UI_DIALECT_VERSION`, `SPEC_VERSION`     | `'ui-dialect/0'`.                                                                                                                                                          |
 
 Type declarations are in [`src/index.d.ts`](src/index.d.ts).
 

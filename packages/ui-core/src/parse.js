@@ -9,6 +9,7 @@
 import { Link, Parser } from 'links-notation';
 import { checkTree } from './check.js';
 import { diagnostic, diagnosticJson } from './diagnostics.js';
+import { valueJson } from './links.js';
 import { projectLinks } from './project.js';
 import { defaultVocabulary } from './vocabulary.js';
 
@@ -131,6 +132,45 @@ export function parseOrThrow(text, options) {
     throw new UiParseError(errors, document);
   }
   return document;
+}
+
+/**
+ * Read Links Notation text into raw values (docs/spec/values.md) without the
+ * element projection: an atom is a string, a link without an id is an array,
+ * a link with an id is `{ id, values }`. Text is read only by the official
+ * `links-notation` parser. Formats other than UI documents (such as the
+ * `ui-store` operation log) use it; see {@link formatLinks} for the inverse.
+ *
+ * Throws a {@link UiParseError} (with one `syntax-error`, `depth-exceeded`
+ * or `input-too-large` diagnostic) when the text cannot be read.
+ * @param {string} text
+ * @param {{ maxDepth?: number, maxInputSize?: number }} [options]
+ * @returns {import('./types.js').RawValue[]}
+ */
+export function parseLinks(text, options = {}) {
+  const {
+    maxDepth = DEFAULT_MAX_DEPTH,
+    maxInputSize = DEFAULT_MAX_INPUT_SIZE,
+  } = options;
+  if (typeof text !== 'string') {
+    throw linksError(
+      diagnostic('syntax-error', 'error', {}, 'The input is not a string')
+    );
+  }
+  if (text.length > maxInputSize) {
+    throw linksError(diagnostic('input-too-large', 'error', {}));
+  }
+  try {
+    const parser = new Parser({ maxDepth, maxInputSize: maxInputSize + 1 });
+    return parser.parse(text).map(valueJson);
+  } catch (thrown) {
+    throw linksError(parserDiagnostic(thrown));
+  }
+}
+
+/** The error of `parseLinks`: one error diagnostic and an empty document. */
+function linksError(error) {
+  return new UiParseError([error], emptyDocument([error]));
 }
 
 /**

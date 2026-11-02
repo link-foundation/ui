@@ -36,6 +36,7 @@ async function rehearse(script, overrides = {}) {
           timeout: HANG_GUARD_MS,
           env: {
             ...process.env,
+            RELEASE_PACKAGE: '@link-foundation/ui-core',
             RELEASE_FIXTURE: file,
             NODE_OPTIONS: `--import=${pathToFileURL(resolve('experiments/issue-273-release-fixture.mjs')).href}`,
             VERSION: '1.2.3',

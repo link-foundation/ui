@@ -19,13 +19,20 @@ export {
   parse,
   parseOrThrow,
   toTree,
+  parseLinks,
   UiParseError,
   SPEC_VERSION,
   DEFAULT_MAX_DEPTH,
   DEFAULT_MAX_INPUT_SIZE,
 } from './parse.js';
-export { format, elementLink } from './format.js';
+export { format, formatLinks, elementLink } from './format.js';
 export { walk } from './walk.js';
 export { projectLink, projectLinks } from './project.js';
 export { loadVocabulary, defaultVocabulary } from './vocabulary.js';
 export { valueMatches } from './check.js';
+
+/**
+ * The value layer: schema-driven typing of values, units, colours and
+ * references (docs/spec/values.md), canonical LiNo and CSS output.
+ */
+export * as values from './values/index.js';
