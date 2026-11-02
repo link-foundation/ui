@@ -161,9 +161,11 @@ tree drops it. Write what must survive as a `note`, a property of every kind:
 ```
 
 `parse` keeps it in `properties` and `format` writes it back in all three
-forms. Keeping notes through the links store of
-[link-foundation/ui#16](https://github.com/link-foundation/ui/issues/16) is
-not covered yet: that store is not merged.
+forms. The links store of
+[link-foundation/ui#16](https://github.com/link-foundation/ui/issues/16)
+(`@link-foundation/ui-store`) keeps it too: text → store → text, its
+operation log written as Links Notation and replayed, and undo/redo
+(`packages/ui-store/tests/note.test.js`).
 
 ## Typed values
 
