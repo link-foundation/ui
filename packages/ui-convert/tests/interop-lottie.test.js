@@ -109,6 +109,48 @@ describe('Lottie export of the issue example', () => {
   });
 });
 
+describe('Lottie unknown properties', () => {
+  const still = (k) => ({ a: 0, k });
+  const animation = {
+    v: '5.7.0',
+    fr: 30,
+    ip: 0,
+    op: 30,
+    w: 100,
+    h: 100,
+    future: { x: 1 },
+    layers: [
+      {
+        ty: 4,
+        ind: 1,
+        nm: 'box',
+        ip: 0,
+        op: 30,
+        st: 0,
+        ks: {},
+        layerFuture: 'y',
+        shapes: [
+          {
+            ty: 'rc',
+            p: still([0, 0]),
+            s: still([10, 10]),
+            r: still(0),
+            glow: true,
+          },
+        ],
+      },
+    ],
+  };
+
+  it('keeps them in extra and writes them back', () => {
+    const imported = importLottie(animation);
+    expect(imported.diagnostics).toEqual([]);
+    expect(imported.lino).toContain(`(extra lottie '{"glow":true}')`);
+    expect(imported.lino).toContain(`(extra lottie '{"layerFuture":"y"}')`);
+    expect(exportLottie(imported.lino).json).toEqual(animation);
+  });
+});
+
 describe('Lottie rejected input', () => {
   const { lino, diagnostics } = importLottie(
     fixture('lottie', 'rejected.json')
