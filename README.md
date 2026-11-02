@@ -105,6 +105,24 @@ UiView(document: UiDocumentModel(lino: text)) { action in
 }
 ```
 
+### Style rules
+
+[`@link-foundation/ui-style`](packages/ui-style/README.md) reads style rules
+written in Links Notation, with states such as `(state hover)` and conditions
+such as `(media (max-width 640px))`. It writes them as a CSS stylesheet, or
+resolves the style of one element against the design tokens for renderers
+without CSS:
+
+```js
+import { compileCss, readStyles } from '@link-foundation/ui-style';
+
+const { rules } = readStyles(`(button-style: style
+  (selector (type button) (variant filled))
+  (background (token color.primary))
+  (state hover (elevation 2)))`);
+compileCss(rules); // ui-button[variant='filled'] { ... } and ui-button[variant='filled']:hover { ... }
+```
+
 ### Development
 
 ```bash
@@ -149,6 +167,7 @@ npm run example:desktop:package
 │   ├── ui-core/          # @link-foundation/ui-core
 │   ├── ui-i18n/          # @link-foundation/ui-i18n (localisation with lino-i18n, (t KEY) messages)
 │   ├── ui-store/         # @link-foundation/ui-store
+│   ├── ui-style/         # @link-foundation/ui-style (style rules, states, media and container conditions)
 │   ├── ui-swift/         # SwiftUI renderer (Swift package, see Package.swift)
 │   └── ui-tokens/        # @link-foundation/ui-tokens (design tokens)
 ├── tests/                # Repository and release-script tests

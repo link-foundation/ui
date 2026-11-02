@@ -1,0 +1,5 @@
+---
+'@link-foundation/ui-style': minor
+---
+
+Add `@link-foundation/ui-style`: style rules written in Links Notation (`(NAME: style (selector (type KIND) (id ID) (PROP VALUE) (within ...)) (PROPERTY VALUE) (state hover ...) (media (max-width 640px) ...) (container (min-width 400px) ...))`) with nested blocks, the states hover, focus, pressed, disabled, selected and checked, and the conditions min-width, max-width, prefers-color-scheme and prefers-reduced-motion. `readStyles` reports CSS syntax in bare values (`(state :hover)`, `(media (max-width: 640px))`) as a `css-syntax` diagnostic and types every declaration with ui-core typed values. `compileCss` writes the stylesheet of the DOM renderer (`ui-button[variant='filled']:hover`, token references as `var(--color-primary)`, escaped identifiers and quoted attribute values, never `url(`). `resolveStyle` gives the resolved style of one element in a state and environment, with the id of the winning rule per property, using the CSS cascade (specificity, then source order).
