@@ -151,3 +151,6 @@ blob-report/
 .build/
 .swiftpm/
 Package.resolved
+
+# Locally downloaded CI logs used while investigating failures
+ci-logs/
