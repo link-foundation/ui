@@ -1,0 +1,1 @@
+(card: Column (spacing 12) (padding 16) (alignment CenterHorizontally))

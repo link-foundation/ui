@@ -1,0 +1,2 @@
+(card: Column)
+(name: Text $draft.text)

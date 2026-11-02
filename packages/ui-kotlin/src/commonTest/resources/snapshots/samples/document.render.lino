@@ -1,0 +1,4 @@
+(app: Column (scroll vertical)
+  (body: Column (spacing 16)
+    (greeting: Text 'Hello, links')
+    (ok: Button (label OK))))
