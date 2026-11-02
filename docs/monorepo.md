@@ -9,6 +9,7 @@ publishable artefact is a workspace package under `packages/`.
 ├── package.json            # "private": true, "workspaces": ["packages/*"]
 ├── package-lock.json       # one lock file for the whole workspace
 ├── packages/
+│   ├── ui-convert/         # @link-foundation/ui-convert (HTML/DOM import)
 │   └── ui-core/            # @link-foundation/ui-core
 │       ├── package.json
 │       ├── README.md
@@ -37,7 +38,9 @@ exactly as a consumer would.
 3. Run `npm install` to update `package-lock.json` and the workspace link.
 4. Add a changeset for the new package (see below).
 
-The root test script (`tests/*.test.js packages/*/tests/*.test.js`),
+The root test script (`tests/*.test.js packages/*/tests/*.test.js
+packages/*/tests/*/*.test.js`, so tests may be grouped one folder deep as in
+`packages/ui-convert/tests/html/`),
 `bunfig.toml`, `deno.json` and the ESLint test overrides already cover every
 `packages/*` directory, so a new package needs no configuration changes.
 
@@ -62,11 +65,14 @@ The release scripts discover packages through `scripts/workspace-packages.mjs`:
 
 A root `package.json` without `workspaces` keeps the single-package behaviour
 (the root itself is the release package). When several packages are
-publishable, the changeset release handles all of them: `changeset publish`
-publishes every package npm does not have yet, the smoke test covers each of
-them, and the release job creates one GitHub release `<name>@<version>` per
-package that has none yet. The instant version bump changes one package, so
-it needs `RELEASE_PACKAGE=<package-name>`.
+publishable, the changeset release handles all of them: the release check
+looks at every package, merged changesets keep the bump of each package,
+`changeset publish` publishes every package npm does not have yet, the smoke
+test covers each of them, and the release job creates one GitHub release
+`<name>@<version>` per package that has none yet. The manual release steps
+(instant version bump, changeset PR) change one package, so they need
+`RELEASE_PACKAGE=<package-name>`; the release workflow sets it from its
+`package` input.
 
 ## Changesets
 
