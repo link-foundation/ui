@@ -112,6 +112,12 @@ export interface StoreOptions {
   /** Links Notation, read with ui-core `parseOrThrow`. */
   text?: string;
   parseOptions?: ParseOptions;
+  /**
+   * The store IDs of every element of `document` (or `text`) in pre-order;
+   * by default an anonymous element gets a generated ID. A named element's
+   * ID must be its name.
+   */
+  ids?: readonly string[];
   /** How many transactions can be undone (default 500). */
   historyLimit?: number;
   /** Called when a listener throws (default: `console.error`). */
@@ -182,10 +188,131 @@ export class StoreError extends Error {
     | 'bad-value'
     | 'bad-log'
     | 'in-transaction'
-    | 'async-transaction';
+    | 'async-transaction'
+    | 'bad-doublets'
+    | 'bad-bundle'
+    | 'closed';
 }
 
 export function logToLino(entries: readonly LogEntry[]): string;
 export function logFromLino(text: string): LogEntry[];
+
+/** One doublets link: a point when `index === source === target`. */
+export interface Doublet {
+  index: number;
+  source: number;
+  target: number;
+}
+
+/** A document as doublets (see README.md, "The doublets encoding"). */
+export interface EncodedDocument {
+  /** Ordered by index, starting at 1. */
+  links: Doublet[];
+  /** Reference string → the index of its point. */
+  names: Map<string, number>;
+  /** [the root elements, the top-level links that are not elements] */
+  roots: number[];
+}
+
+/** The strings of the two points of the empty list: `['list', 'end']`. */
+export const NIL_POINTS: readonly ['list', 'end'];
+export function encodeDocument(
+  document: Partial<Pick<UiDocument, 'roots' | 'unknown'>>
+): EncodedDocument;
+/** Throws a `StoreError` (`bad-doublets`) for doublets of another form. */
+export function decodeDocument(encoded: {
+  links: Iterable<Doublet>;
+  names: Map<string, number> | Iterable<[string, number]>;
+  roots: number[];
+}): UiDocument;
+
+/** The part of a doublets-web `UnitedLinks` that the adapter uses. */
+export interface UnitedLinksLike {
+  create(): number;
+  update(index: number, source: number, target: number): number;
+}
+/**
+ * Create every link of `encoded` in `unitedLinks` in index order; returns
+ * the index of each link → its index in `unitedLinks`.
+ */
+export function copyToDoubletsWeb(
+  encoded: { links: Iterable<Doublet> },
+  unitedLinks: UnitedLinksLike
+): Map<number, number>;
+/** Load the optional peer `doublets-web` and create an empty `UnitedLinks`. */
+export function openDoubletsWeb(
+  load?: () => Promise<unknown>
+): Promise<{ module: any; links: any }>;
+
+export interface BundleLimits {
+  /** Default: ui-core `DEFAULT_MAX_DEPTH`. */
+  maxDepth?: number;
+  /** In characters. Default: ui-core `DEFAULT_MAX_INPUT_SIZE`. */
+  maxInputSize?: number;
+}
+export const DEFAULT_BUNDLE_LIMITS: Readonly<Required<BundleLimits>>;
+/** The head of the first link of a bundle: `'ui_store_bundle'`. */
+export const BUNDLE_HEAD: 'ui_store_bundle';
+/** The IndexedDB version of the database and the bundle `schema`. */
+export const SCHEMA_VERSION: 1;
+export const DATABASE_PREFIX: 'link-ui-';
+/** `link-ui-<name>` */
+export function databaseName(name: string): string;
+
+export interface PersistentStoreOptions {
+  /** The database is `link-ui-<name>`. */
+  name: string;
+  /** Default: `globalThis.indexedDB`. */
+  indexedDB?: IDBFactory;
+  /** LiNo of the document when the database has no data yet. */
+  initialText?: string;
+  /** Tell other tabs to reload through a BroadcastChannel (default `true`). */
+  channel?: boolean;
+  /** Default: `globalThis.BroadcastChannel`. */
+  BroadcastChannel?: typeof BroadcastChannel;
+  /** More options of `createStore` (`historyLimit`, `onListenerError`, ...). */
+  storeOptions?: Omit<StoreOptions, 'document' | 'text' | 'ids'>;
+  /** The default limits of `importBundle`. */
+  bundleLimits?: BundleLimits;
+  /** A write failed (default: `console.error`); `flush()` rejects too. */
+  onError?: (error: unknown) => void;
+}
+
+export interface Persistence {
+  readonly name: string;
+  /** `link-ui-<name>` */
+  readonly databaseName: string;
+  /** Resolves when every queued write is done; rejects if one failed. */
+  flush(): Promise<void>;
+  /** Rewrite the snapshot from the current document and empty the log. */
+  compact(): Promise<void>;
+  /** The `.lino` bundle of the database: snapshot and log. */
+  exportBundle(): Promise<string>;
+  /**
+   * Replace everything with a bundle in one IndexedDB transaction. Throws
+   * (and changes nothing) for a bundle over the limits (ui-core
+   * `UiParseError`), a bad bundle (`bad-bundle`, `bad-log`) or a log that
+   * cannot be replayed. Ask the user before calling it.
+   */
+  importBundle(text: string, limits?: BundleLimits): Promise<void>;
+  /** Read the database again (another tab wrote to it). */
+  reload(): Promise<void>;
+  /** Called after `reload()` or `importBundle()` replaced the document. */
+  onReload(listener: () => void): () => boolean;
+  /** The doublets of the snapshot as stored. */
+  readDoublets(): Promise<EncodedDocument>;
+  /** Wait for the writes and close; later edits stay in memory only. */
+  close(): Promise<void>;
+  /** Close and delete the database. Ask the user before calling it. */
+  destroy(): Promise<void>;
+}
+
+/**
+ * A store saved to IndexedDB. `store` stays valid when `reload()` or
+ * `importBundle()` replaces the document; its listeners are kept.
+ */
+export function openPersistentStore(
+  options: PersistentStoreOptions
+): Promise<{ store: Store; persistence: Persistence }>;
 
 export type { RawValue, UiDocument, UiNode, UiProperty };
