@@ -1,4 +1,4 @@
-import type { ResolvedTokens } from './index.js';
+import type { ResolvedTokens } from '@link-foundation/ui-tokens';
 
 /**
  * Build the tokens with Style Dictionary: they are written as a DTCG

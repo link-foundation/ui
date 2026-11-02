@@ -34,7 +34,9 @@ describe('toCss: every type and the options', () => {
 
   it('writes the modes with a selector by default', () => {
     const css = toCss(full());
-    expect(css).toContain('\n\n[data-mode="dark"] {\n  --color-primary: #d0bcff;\n');
+    expect(css).toContain(
+      '\n\n[data-mode="dark"] {\n  --color-primary: #d0bcff;\n'
+    );
   });
 
   it('applies the prefix, the selector and the mode selector to names and aliases', () => {

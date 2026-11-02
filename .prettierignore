@@ -17,3 +17,5 @@ native/**/.gradle/
 docs/spec/parser-vectors.json
 # Importer fixtures are compared byte for byte (packages/ui-convert/tests/html)
 packages/ui-convert/tests/html/fixtures/
+# Golden files are compared byte for byte (packages/ui-tokens/tests)
+packages/ui-tokens/tests/golden/

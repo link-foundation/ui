@@ -8,7 +8,10 @@ import { full, resolveText, sample, codes } from './helpers.js';
 
 const dims = (resolved) =>
   Object.fromEntries(
-    [...resolved.values()].map((t) => [t.path, `${t.value.value}${t.value.unit ?? ''}`])
+    [...resolved.values()].map((t) => [
+      t.path,
+      `${t.value.value}${t.value.unit ?? ''}`,
+    ])
   );
 
 const SETS = `(base: theme
@@ -44,7 +47,10 @@ describe('resolveTokens: extends', () => {
 (b: theme (extends a) (token y 2px))`,
       'a'
     );
-    expect(codes(resolved.diagnostics)).toEqual(['extends-cycle', 'unknown-set']);
+    expect(codes(resolved.diagnostics)).toEqual([
+      'extends-cycle',
+      'unknown-set',
+    ]);
     expect(resolved.diagnostics[0].at.cycle).toEqual(['a', 'b', 'a']);
     expect(resolved.diagnostics[1].severity).toBe('warning');
     expect(dims(resolved)).toEqual({ y: '2px', x: '1px' });
@@ -61,8 +67,14 @@ describe('resolveTokens: extends', () => {
   it('warns about the missing base of the issue-1 sample', () => {
     const resolved = sample();
     expect(resolved.size).toBe(5);
-    expect(resolved.diagnostics.map((d) => [d.code, d.severity, d.message])).toEqual([
-      ['unknown-set', 'warning', 'The token set "material3" extends "base", which does not exist'],
+    expect(
+      resolved.diagnostics.map((d) => [d.code, d.severity, d.message])
+    ).toEqual([
+      [
+        'unknown-set',
+        'warning',
+        'The token set "material3" extends "base", which does not exist',
+      ],
     ]);
   });
 });
@@ -140,7 +152,10 @@ describe('resolveTokens: aliases', () => {
     expect(body.fontWeight).toEqual({ type: 'fontWeight', value: 'bold' });
     const low = resolved.get('elevation.low');
     expect(low.value.value.color.a).toBe(0x80 / 255);
-    expect(low.raw.value.color).toEqual({ type: 'token-ref', path: 'color.scrim' });
+    expect(low.raw.value.color).toEqual({
+      type: 'token-ref',
+      path: 'color.scrim',
+    });
     const high = resolved.get('elevation.high').value.value;
     expect(high.length).toBe(2);
     expect(high[0]).toEqual(low.value.value);
@@ -148,9 +163,13 @@ describe('resolveTokens: aliases', () => {
   });
 
   it('reports the cycle a -> b -> a without throwing', () => {
-    const resolved = resolveText('(t: theme (token a (token b)) (token b (token a)) (token c 1px))', 't');
+    const resolved = resolveText(
+      '(t: theme (token a (token b)) (token b (token a)) (token c 1px))',
+      't'
+    );
     expect(codes(resolved.diagnostics)).toEqual(['alias-cycle']);
-    expect(resolved.diagnostics[0].at.cycle).toEqual(['a', 'b', 'a']);
+    expect(resolved.diagnostics[0].at.cycle).toEqual(['b', 'a', 'b']);
+    expect(resolved.diagnostics[0].at.token).toBe('b');
     expect([...resolved.keys()]).toEqual(['c']);
   });
 
@@ -180,7 +199,9 @@ describe('resolveTokens: aliases', () => {
   (token t (typography (font-family Roboto) (font-size (token gap)) (font-weight (token gap)) (letter-spacing 0px) (line-height 1.2))))`,
       't'
     );
-    expect(resolved.diagnostics.map((d) => [d.code, d.at.token, d.at.target])).toEqual([
+    expect(
+      resolved.diagnostics.map((d) => [d.code, d.at.token, d.at.target])
+    ).toEqual([
       ['unknown-alias', 'a', 'nowhere'],
       ['type-mismatch', 'b', 'gap'],
       ['type-mismatch', 't', 'gap'],

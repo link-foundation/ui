@@ -98,7 +98,11 @@ function resolveAll(defs, diagnostics) {
       return null;
     }
     if (stack.includes(ref.path)) {
-      const cycle = [...stack.slice(stack.indexOf(ref.path)), ref.path];
+      // The ring of tokens, written from the token reported: b -> a -> b.
+      const ring = stack.slice(stack.indexOf(ref.path));
+      const start = Math.max(0, ring.indexOf(def.token.path));
+      const from = [...ring.slice(start), ...ring.slice(0, start)];
+      const cycle = [...from, from[0]];
       diagnostics.push(
         tokenDiagnostic('alias-cycle', 'error', { ...where(def), cycle })
       );

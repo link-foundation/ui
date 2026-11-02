@@ -138,7 +138,7 @@ function parseFontFamily(raw) {
 
 /**
  * An undeclared font family: no name may look like a quantity (`12em`,
- * `50%`), which is a mistyped dimension rather than a family name.
+ * `50%`): such a name is a mistyped dimension, not a family.
  */
 function inferFontFamily(raw) {
   const value = parseFontFamily(raw);

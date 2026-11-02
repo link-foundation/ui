@@ -67,7 +67,10 @@ describe('toDtcg', () => {
 
   it('writes $root for a path that is also a group', () => {
     const dtcg = toDtcg(
-      resolveText('(t: theme (token a 1px) (token a.b 2px) (token c (token a)))', 't')
+      resolveText(
+        '(t: theme (token a 1px) (token a.b 2px) (token c (token a)))',
+        't'
+      )
     );
     expect(dtcg.a.$root.$value).toEqual({ value: 1, unit: 'px' });
     expect(dtcg.a.b.$value).toEqual({ value: 2, unit: 'px' });
@@ -101,13 +104,19 @@ describe('DTCG round trip', () => {
     expect(comparable(again.modes.get('dark'))).toEqual(
       comparable(full().modes.get('dark'))
     );
-    expect(again.get('elevation.high').raw).toEqual(full().get('elevation.high').raw);
+    expect(again.get('elevation.high').raw).toEqual(
+      full().get('elevation.high').raw
+    );
   });
 
   it('is lossless with the aliases resolved', () => {
     const { again } = roundTrip(full(), 'brand', { keepAliases: false });
     const values = (tokens) =>
-      comparable(tokens).map(({ path, type, value }) => ({ path, type, value }));
+      comparable(tokens).map(({ path, type, value }) => ({
+        path,
+        type,
+        value,
+      }));
     expect(values(again)).toEqual(values(full()));
   });
 });
@@ -119,7 +128,11 @@ describe('fromDtcg', () => {
         color: {
           $type: 'color',
           base: {
-            $value: { colorSpace: 'display-p3', components: [1, 0, 0], hex: '#ff0000' },
+            $value: {
+              colorSpace: 'display-p3',
+              components: [1, 0, 0],
+              hex: '#ff0000',
+            },
             $description: "It's red",
           },
           link: { $value: '{color.base}' },
@@ -141,9 +154,11 @@ describe('fromDtcg', () => {
   });
 
   it('accepts a JSON string and names the set tokens by default', () => {
-    expect(fromDtcg('{"a": {"$type": "duration", "$value": {"value": 0.2, "unit": "s"}}}')).toBe(
-      '(tokens: theme\n  (token a 0.2s))\n'
-    );
+    expect(
+      fromDtcg(
+        '{"a": {"$type": "duration", "$value": {"value": 0.2, "unit": "s"}}}'
+      )
+    ).toBe('(tokens: theme\n  (token a 0.2s))\n');
   });
 
   it('spells the type out when the value would read as another', () => {
@@ -159,10 +174,17 @@ describe('fromDtcg', () => {
 
   it('throws on what it cannot represent', () => {
     expect(() => fromDtcg({ a: { $value: 1 } })).toThrow(/no \$type/);
-    expect(() => fromDtcg({ a: { $type: 'gradient', $value: [] } })).toThrow(/gradient/);
+    expect(() => fromDtcg({ a: { $type: 'gradient', $value: [] } })).toThrow(
+      /gradient/
+    );
     expect(() => fromDtcg({ g: { $extends: '{x}' } })).toThrow(/\$extends/);
     expect(() =>
-      fromDtcg({ c: { $type: 'color', $value: { colorSpace: 'lab', components: [1, 2, 3] } } })
+      fromDtcg({
+        c: {
+          $type: 'color',
+          $value: { colorSpace: 'lab', components: [1, 2, 3] },
+        },
+      })
     ).toThrow(/hex fallback/);
     expect(() => fromDtcg('[]')).toThrow(TypeError);
   });

@@ -18,7 +18,14 @@ export const REPO = join(here, '..', '..', '..');
 export const PACKAGE = join(here, '..');
 export const GOLDEN = join(here, 'golden');
 /** The token sample of the issue-1 case study (one set, `material3`). */
-export const SAMPLE = join(REPO, 'docs', 'case-studies', 'issue-1', 'samples', 'tokens.lino');
+export const SAMPLE = join(
+  REPO,
+  'docs',
+  'case-studies',
+  'issue-1',
+  'samples',
+  'tokens.lino'
+);
 /** Two sets with aliases, modes, a shadow and a typography (`brand`). */
 export const FULL = join(here, 'fixtures', 'full.lino');
 
