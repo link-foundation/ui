@@ -296,6 +296,14 @@ const PHASES = {
   10: 'Phase 10 — Migration of existing projects',
 };
 
+// docs/ROADMAP.md continues with sections other plans generate (issue 101's
+// begins with this marker); rewriting the issue-1 part keeps them.
+export const ROADMAP_TAIL_MARKER = '<!-- roadmap section of issue 101 -->';
+export const roadmapTail = (text) => {
+  const at = text.indexOf(ROADMAP_TAIL_MARKER);
+  return at < 0 ? '' : `\n${text.slice(at)}`;
+};
+
 const issueLink = (key, state) =>
   state[key] ? `[#${state[key].number}](${state[key].url})` : key;
 
@@ -377,7 +385,10 @@ const main = () => {
   if (tracking) {
     linkSubIssues(tracking.key, issues, state);
   }
-  writeFileSync(ROADMAP_FILE, renderRoadmap(issues, state));
+  const tail = existsSync(ROADMAP_FILE)
+    ? roadmapTail(readFileSync(ROADMAP_FILE, 'utf8'))
+    : '';
+  writeFileSync(ROADMAP_FILE, renderRoadmap(issues, state) + tail);
   console.log(`wrote ${ROADMAP_FILE}`);
 };
 

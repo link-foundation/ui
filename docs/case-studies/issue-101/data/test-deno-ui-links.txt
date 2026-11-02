@@ -1,0 +1,89 @@
+Check packages/ui-store/tests/links-adapter.test.js
+Check packages/ui-store/tests/set-positional.test.js
+Check packages/ui-links/tests/client.test.js
+Check packages/ui-links/tests/core.test.js
+Check packages/ui-links/tests/permissions.test.js
+Check packages/ui-links/tests/persist.test.js
+Check packages/ui-links/tests/query.test.js
+Check packages/ui-links/tests/server.test.js
+Check packages/ui-links/tests/storages.test.js
+running 6 tests from ./packages/ui-store/tests/links-adapter.test.js
+round-trips a document through a memory storage ... ok (5ms)
+keeps the document apart from other data, names in a names store ... ok (2ms)
+round-trips through SQLite and IndexedDB ... ok (32ms)
+round-trips through doublets-web ... ok (3ms)
+shares a document through a links server ... ok (32ms)
+rejects a root that is missing ... ok (1ms)
+running 8 tests from ./packages/ui-store/tests/set-positional.test.js
+changes the positional values with one update event ... ok (49ms)
+keeps the ID, the place, the properties and the children ... ok (2ms)
+sets the values of an anonymous element and clears them ... ok (17ms)
+is undone and redone exactly ... ok (4ms)
+rolls back inside a failed transaction ... ok (3ms)
+checks its input before changing anything ... ok (3ms)
+round-trips through the log as Links Notation and replays ... ok (4ms)
+rejects a setPositional link without an id ... ok (1ms)
+running 8 tests from ./packages/ui-links/tests/client.test.js
+writes optimistically and moves temporary addresses ... ok (12ms)
+receives what other clients change in a subscription ... ok (10ms)
+queues writes offline and sends them on connect ... ok (1ms)
+keeps writes when the transport fails ... ok (1ms)
+rolls back what the server refuses ... ok (10ms)
+runs queries on the server and reads names in the reply ... ok (6ms)
+works through createWasmClient ... ok (5ms)
+works over TCP, with pushes to a synced client ... ok (40ms)
+running 8 tests from ./packages/ui-links/tests/core.test.js
+observe reports create, update and delete ... ok (2ms)
+deletes the links that use a deleted link ... ok (1ms)
+netChanges folds the changes of each link ... ok (575µs)
+keeps one name per link and one link per name ... ok (848µs)
+refuses what reads as something else in a query ... ok (2ms)
+exports and imports links with names ... ok (8ms)
+refuses lines that are not links ... ok (1ms)
+round-trips the binary form ... ok (7ms)
+running 9 tests from ./packages/ui-links/tests/permissions.test.js
+follows sub-types and multiple inheritance ... ok (4ms)
+checks a link that is not stored yet ... ok (529µs)
+needs an Extends marker for more parents ... ok (757µs)
+answers by type (rules with the data) ... ok (1ms)
+answers by type (rules apart) ... ok (1ms)
+shows a subject only what it may read ... ok (10ms)
+refuses writes, the storage unchanged ... ok (4ms)
+keeps the hierarchy from who may write its values ... ok (2ms)
+refuses a marker as a subject ... ok (1ms)
+running 4 tests from ./packages/ui-links/tests/persist.test.js
+keeps links in localStorage, one key per link ... ok (9ms)
+keeps links in IndexedDB ... ok (13ms)
+keeps links as Links Notation text ... ok (2ms)
+keeps links in a SQLite file ... ok (52ms)
+running 4 tests from ./packages/ui-links/tests/query.test.js
+creates, reads, updates and deletes by address ... ok (20ms)
+swaps with variables and deletes with wildcards ... ok (6ms)
+creates nested links and names with autoCreate ... ok (6ms)
+changes nothing when a query fails ... ok (3ms)
+running 8 tests from ./packages/ui-links/tests/server.test.js
+replays link-cli's protocol conversation ... ok (23ms)
+answers a binary request in binary ... ok (15ms)
+runs substitution queries and answers with names ... ok (14ms)
+authenticates and pushes changes to subscribers ... ok (2ms)
+serves each subject what its permissions allow ... ok (13ms)
+lets a subject type the links it creates, as types it may not read ... ok (1ms)
+undoes a failed request and reports its own error ... ok (1ms)
+does not give a subject a link made where its own was deleted ... ok (3ms)
+running 13 tests from ./packages/ui-links/tests/storages.test.js
+creates, updates, reads and deletes links ... ok (3ms)
+stops each() at BREAK ... ok (505µs)
+throws not-found and bad-reference with a code ... ok (1ms)
+ensureCreated makes the link at an address ... ok (649µs)
+creates, updates, reads and deletes links ... ok (3ms)
+stops each() at BREAK ... ok (1ms)
+throws not-found and bad-reference with a code ... ok (1ms)
+ensureCreated makes the link at an address ... ok (727µs)
+creates, updates, reads and deletes links ... ok (82ms)
+stops each() at BREAK ... ok (64ms)
+throws not-found and bad-reference with a code ... ok (76ms)
+ensureCreated makes the link at an address ... ok (79ms)
+reuses freed addresses and takes far ones with createAt ... ok (1ms)
+
+ok | 68 passed | 0 failed (2s)
+

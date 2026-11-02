@@ -1,0 +1,10 @@
+$ node examples/ui-links-permissions.mjs
+news is a Doc: true
+news is Public: true
+(subject: 16)
+(subject: 15)
+alice sees: [ 'Shared', 'memo', 'news' ]
+refused update: Forbidden: update 18
+memo is still a Note: true
+the boss sees the new note: { id: 26, from_id: 11, to_id: 26 }
+exit 0
