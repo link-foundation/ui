@@ -396,7 +396,7 @@ jobs:
       - name: Run tests (Deno)
         if: matrix.runtime == 'deno'
         shell: bash
-        run: bash scripts/run-with-budget-warning.sh 100 "Deno test suite" deno test -A --parallel
+        run: bash scripts/run-with-budget-warning.sh 200 "Deno test suite" deno test -A --parallel
 
   # === DOCKER IMAGE BUILD CHECK (pull requests) ===
   # Builds the Dockerfile without pushing so a broken image fails the pull
