@@ -89,6 +89,7 @@ npm run example:desktop:package
 │   └── universal-app/    # React + GitHub Pages + Electron + Capacitor app
 ├── scripts/              # Build and release scripts
 ├── packages/             # npm workspaces (see docs/monorepo.md)
+│   ├── ui-convert/       # @link-foundation/ui-convert
 │   ├── ui-core/          # @link-foundation/ui-core
 │   └── ui-store/         # @link-foundation/ui-store
 ├── tests/                # Repository and release-script tests
