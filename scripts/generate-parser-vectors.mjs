@@ -105,8 +105,13 @@ export function vectorFor(name, input) {
 
 /** The whole vector file, as the text written to disk. */
 export function generateVectors(dir = FIXTURES_DIR) {
+  // A Windows checkout may turn the fixtures' LF line ends into CRLF; the
+  // vectors are always generated from the LF text the repository stores.
   const vectors = listFixtures(dir).map((name) =>
-    vectorFor(name, readFileSync(join(dir, name), 'utf8'))
+    vectorFor(
+      name,
+      readFileSync(join(dir, name), 'utf8').replace(/\r\n/g, '\n')
+    )
   );
   return `${JSON.stringify(vectors, null, 2)}\n`;
 }

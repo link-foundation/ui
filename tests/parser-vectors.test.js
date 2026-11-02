@@ -95,6 +95,22 @@ describe('parser vectors', () => {
     });
   });
 
+  it('reads a CRLF checkout of the fixtures as the LF text', () => {
+    // Windows checkouts turn LF line ends into CRLF.
+    withTempDir((dir) => {
+      const fixtures = path.join(dir, 'fixtures');
+      mkdirSync(path.join(fixtures, 'elements'), { recursive: true });
+      const fixture = path.join(fixtures, 'elements', 'a.lino');
+      writeFileSync(fixture, 'a:\n  b\n');
+      const lf = generateVectors(fixtures);
+      writeFileSync(fixture, 'a:\r\n  b\r\n');
+      expect(generateVectors(fixtures)).toBe(lf);
+      const file = path.join(dir, 'parser-vectors.json');
+      writeFileSync(file, lf.replaceAll('\n', '\r\n'));
+      expect(checkVectors(file, fixtures)).toBe(null);
+    });
+  });
+
   it('exports the default paths', () => {
     expect(FIXTURES_DIR).toBe('docs/spec/fixtures');
     expect(VECTORS_FILE).toBe('docs/spec/parser-vectors.json');
