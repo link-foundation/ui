@@ -20,6 +20,9 @@
  *   `expression`, `spread`), source text, span and Babel expression node;
  * - `span`: `{ start, end }` source offsets.
  *
+ * TypeScript assertions around a value (`save as () => void`, `value!`,
+ * `x satisfies T`) are read as the value.
+ *
  * Fragments (`<>...</>`, `<React.Fragment>`) are flattened into their
  * parent. Text follows the JSX whitespace rules (React and Babel).
  */
@@ -58,6 +61,18 @@ const SKIPPED_KEYS = new Set([
   'comments',
   'tokens',
 ]);
+
+/** TypeScript wrappers that do not change the value of an expression. */
+const TYPE_WRAPPERS = new Set([
+  'TSAsExpression',
+  'TSSatisfiesExpression',
+  'TSNonNullExpression',
+  'TSTypeAssertion',
+]);
+
+/** An expression without its type assertions: `save as () => void` -> `save`. */
+const withoutTypes = (node) =>
+  TYPE_WRAPPERS.has(node?.type) ? withoutTypes(node.expression) : node;
 
 const isJsx = (node) =>
   node?.type === 'JSXElement' || node?.type === 'JSXFragment';
@@ -158,8 +173,9 @@ class JsxReader {
     if (value.type === 'StringLiteral') {
       return { name, kind: 'literal', value: value.value, source: name, span };
     }
-    const expression =
-      value.type === 'JSXExpressionContainer' ? value.expression : value;
+    const expression = withoutTypes(
+      value.type === 'JSXExpressionContainer' ? value.expression : value
+    );
     const literal = literalText(expression);
     if (literal !== undefined) {
       return { name, kind: 'literal', value: literal, source: name, span };

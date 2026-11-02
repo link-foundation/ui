@@ -3,7 +3,7 @@
  * The ui-convert command line:
  *
  *   ui-convert import <file.json> [--format <name>] [--style <style>]
- *   ui-convert import --from jsx|vue|html <file> [--mapping <name>]
+ *   ui-convert import --from jsx|vue|html <file> [--mapping <name|file.lino>]
  *                     [--style <style>]
  *   ui-convert export <file.lino> --format <name> [--id <id>]
  *                     [--target-version <version>]
@@ -23,6 +23,7 @@ import { CONVERTERS, FORMATS, detectFormat } from './interop/index.js';
 import { importHtml } from './html/import.js';
 import { importJsx } from './jsx/import.js';
 import { importVue } from './vue/import.js';
+import { MAPPINGS } from './mappings/index.js';
 
 /** The component importers of `import --from`. */
 export const SOURCES = {
@@ -47,13 +48,14 @@ const sourceOf = (file) =>
 
 export const USAGE = `Usage:
   ui-convert import <file.json> [--format <name>] [--style <style>]
-  ui-convert import --from jsx|vue|html <file> [--mapping <name>] [--style <style>]
+  ui-convert import --from jsx|vue|html <file> [--mapping <name|file.lino>] [--style <style>]
   ui-convert export <file.lino> --format <name> [--id <id>] [--target-version <version>]
 
 Formats: ${FORMATS.join(', ')}. A file named - is read from stdin.
 import detects the format when --format is missing.
 --from reads component markup (.jsx, .tsx, .vue, .html files need no --from);
---mapping names the component mapping rules (default mui; repeat for more).
+--mapping is a built-in mapping (mui, the default) or a .lino rule file;
+  repeat it to try several, the first match wins.
 --style is one of indented (default), multiline, inline.`;
 
 const OPTIONS = {
@@ -206,6 +208,10 @@ export function main(argv, io) {
   const readFile = io.readFile ?? ((file) => readFileSync(file, 'utf8'));
   try {
     const args = parseArgs(argv);
+    // A mapping is a built-in name (mui) or a rule file.
+    args.mappings = args.mappings?.map((mapping) =>
+      MAPPINGS.includes(mapping) ? mapping : readFile(mapping)
+    );
     const text = readFile(args.file === '-' ? 0 : args.file);
     const { output, diagnostics } = convert(args, text);
     io.stdout.write(output);

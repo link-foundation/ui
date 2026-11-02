@@ -11,7 +11,13 @@ import {
   parseArgs,
   readJson,
 } from '../src/cli.js';
-import { importA2ui, importLottie, importJsonForms } from '../src/index.js';
+import {
+  importA2ui,
+  importJsonForms,
+  importJsx,
+  importLottie,
+  importVue,
+} from '../src/index.js';
 import { FIXTURES_DIR, fixture, fixtureText } from './helpers.js';
 
 /** Run the CLI with `files` (name -> text; `0` is stdin). */
@@ -66,6 +72,58 @@ describe('ui-convert import', () => {
     expect(out.code).toBe(1);
     expect(out.stdout).toContain('rejected: document');
     expect(out.stderr).toContain('error expression (lottie /layers/1/ks/o/x)');
+  });
+});
+
+describe('ui-convert import --from jsx|vue', () => {
+  const login =
+    '<Stack direction="column"><Button onClick={go}>Go</Button></Stack>';
+
+  it('imports JSX with --from jsx', () => {
+    const out = run(['import', '--from', 'jsx', 'login.txt'], {
+      'login.txt': login,
+    });
+    expect(out.code).toBe(0);
+    expect(out.stdout).toBe(importJsx(login).text);
+    expect(out.stderr).toBe('');
+  });
+
+  it('detects .jsx, .tsx and .vue by the extension', () => {
+    const vue = '<template><Switch :checked="dark" /></template>';
+    expect(run(['import', 'a.tsx'], { 'a.tsx': login }).stdout).toBe(
+      importJsx(login).text
+    );
+    expect(run(['import', 'a.vue'], { 'a.vue': vue }).stdout).toBe(
+      importVue(vue).text
+    );
+  });
+
+  it('passes --mapping and writes diagnostics with id and span', () => {
+    const out = run(['import', 'a.jsx', '--mapping', 'mui'], {
+      'a.jsx': '<Box {...props} />',
+    });
+    expect(out.code).toBe(0);
+    expect(out.stderr).toBe(
+      'warning unsupported-jsx-expression (box-0 5-15): Unsupported JSX expression {...props}: spread props need the code to run\n'
+    );
+  });
+
+  it('reads --mapping rule files, tried before the next mapping', () => {
+    const rules =
+      '(go: rule (match (Button (children $l))) (replace (button (label $l) (variant tonal))))';
+    const out = run(
+      ['import', 'a.jsx', '--mapping', 'own.lino', '--mapping', 'mui'],
+      { 'a.jsx': login, 'own.lino': rules }
+    );
+    expect(out.code).toBe(0);
+    expect(out.stdout).toContain('(variant tonal)');
+    expect(out.stdout).toContain('(direction vertical)');
+  });
+
+  it('rejects an unknown --from', () => {
+    const out = run(['import', '--from', 'svelte', 'a.svelte'], {});
+    expect(out.code).toBe(2);
+    expect(out.stderr).toContain('Unknown --from "svelte"');
   });
 });
 
