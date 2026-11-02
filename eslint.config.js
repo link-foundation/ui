@@ -154,6 +154,9 @@ export default [
       'docs/case-studies/*/data/**',
       'docs/template-history/case-studies/*/data/**',
       'dev/log/**',
+      // Gradle build outputs of the native ports (Kotlin/JS and Kotlin/Wasm bundles)
+      'native/**/build/**',
+      'native/**/.gradle/**',
     ],
   },
 ];

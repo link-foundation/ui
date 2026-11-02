@@ -1,0 +1,5 @@
+# Gradle and Kotlin build outputs of the Kotlin Links Notation port.
+.gradle/
+.kotlin/
+build/
+local.properties
