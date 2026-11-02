@@ -9,7 +9,10 @@
  * - `bad-op`, `bad-node`, `bad-value`: a malformed operation, node or value;
  * - `bad-log`: operation log text that is not in the log format;
  * - `in-transaction`: undo or redo called inside a transaction;
- * - `async-transaction`: a transaction function returned a promise.
+ * - `async-transaction`: a transaction function returned a promise;
+ * - `bad-doublets`: doublets that `decodeDocument` cannot read;
+ * - `bad-bundle`: a bundle that `importBundle` cannot read;
+ * - `closed`: a persistent store used after `close()` or `destroy()`.
  */
 export class StoreError extends Error {
   /**
