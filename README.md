@@ -9,6 +9,8 @@ The framework is at the planning stage: the package currently exports only its
 
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — the target design.
 - [docs/ROADMAP.md](docs/ROADMAP.md) — the roadmap issues in dependency order.
+- [docs/native-parsers.md](docs/native-parsers.md) — the native Links Notation
+  parsers (Swift) and the parser vectors they are checked against.
 - [docs/case-studies/issue-1](docs/case-studies/issue-1/README.md) — the case
   study, requirements, solutions and research behind the plan.
 
