@@ -23,6 +23,7 @@ import { Diagnostics } from '../../diagnostics.js';
 import { encodeAny, extraProperty } from '../extra.js';
 import { IdAllocator, element, prop, writeLino } from '../lino.js';
 import { isObject } from '../safety.js';
+import { EASING_KEYS, collapseEasing, readEasing } from './easing.js';
 import { encodePath } from './path.js';
 import {
   FORMAT,
@@ -52,18 +53,6 @@ const PROPERTY_KEYS = ['a', 'k', 'ix'];
 
 /** Keyframe keys turned into a `(key ...)` link. */
 const KEY_KEYS = ['t', 's', 'i', 'o', 'h'];
-const EASING_KEYS = ['i', 'o', 'h'];
-
-/** One number of an easing handle component, or `undefined`. */
-function handle(component) {
-  if (isNumber(component)) {
-    return component;
-  }
-  if (isVector(component) && component.every((n) => n === component[0])) {
-    return component[0];
-  }
-  return undefined;
-}
 
 class LottieImporter {
   constructor(json) {
@@ -292,7 +281,7 @@ class LottieImporter {
       num(offset),
       encodeTransform(spec, spec.vector ? value : value[0]),
     ];
-    const easing = this.easing(frame);
+    const easing = readEasing(frame);
     const kept = easing
       ? KEY_KEYS
       : KEY_KEYS.filter((k) => !EASING_KEYS.includes(k));
@@ -306,27 +295,6 @@ class LottieImporter {
       link.push(['extra', FORMAT, JSON.stringify(rest)]);
     }
     return link;
-  }
-
-  /** `(cubic-bezier ox oy ix iy)`, `hold`, or `null`. */
-  easing(frame) {
-    if (frame.h === 1 && !('i' in frame) && !('o' in frame)) {
-      return 'hold';
-    }
-    if ('h' in frame && frame.h !== 0) {
-      return null;
-    }
-    const { i, o } = frame;
-    if (!isObject(i) || !isObject(o)) {
-      return null;
-    }
-    const values = [handle(o.x), handle(o.y), handle(i.x), handle(i.y)];
-    const plain =
-      values.every((v) => v !== undefined) &&
-      Object.keys(i).length === 2 &&
-      Object.keys(o).length === 2 &&
-      !('h' in frame);
-    return plain ? ['cubic-bezier', ...values.map(num)] : null;
   }
 
   animation(target, tracks) {
@@ -609,21 +577,4 @@ export function normalizeLottie(json) {
     }
   });
   return out;
-}
-
-/** Easing handles whose components are all equal, as numbers. */
-function collapseEasing(frame) {
-  const { i, o } = frame;
-  const plain =
-    isObject(i) &&
-    isObject(o) &&
-    Object.keys(i).length === 2 &&
-    Object.keys(o).length === 2 &&
-    [o.x, o.y, i.x, i.y].every((c) => handle(c) !== undefined);
-  if (plain) {
-    for (const h of [i, o]) {
-      h.x = handle(h.x);
-      h.y = handle(h.y);
-    }
-  }
 }

@@ -12,10 +12,10 @@ import { Diagnostics } from '../../diagnostics.js';
 import { readExtra } from '../extra.js';
 import { readLino, value, values } from '../lino.js';
 import { isObject } from '../safety.js';
+import { NAMED_EASINGS, bezierHandles, writeEasing } from './easing.js';
 import { decodePath } from './path.js';
 import {
   FORMAT,
-  NAMED_EASINGS,
   TRANSFORM,
   decodeColour,
   decodeTransform,
@@ -74,19 +74,11 @@ function* nodes(roots) {
   }
 }
 
-/** Lottie `o`/`i` handles of a cubic-bezier. */
-const bezier = ([ox, oy, ix, iy]) => ({
-  o: { x: ox, y: oy },
-  i: { x: ix, y: iy },
-});
-
 /** The Lottie keys of one part of a `(key ...)` link after its value. */
 function keyPart(part) {
-  if (part === 'hold') {
-    return { h: 1 };
-  }
-  if (Array.isArray(part) && part[0] === 'cubic-bezier') {
-    return bezier(part.slice(1).map(number));
+  const easing = writeEasing(part, number);
+  if (easing) {
+    return easing;
   }
   if (Array.isArray(part) && part[0] === 'extra' && part[1] === FORMAT) {
     return JSON.parse(String(part[2]));
@@ -373,7 +365,7 @@ class LottieExporter {
     const json = { t: frame(start + offset * span), s };
     rest.forEach((part) => Object.assign(json, keyPart(part)));
     if (!last && !('h' in json) && !('i' in json) && !('o' in json)) {
-      Object.assign(json, bezier(easing ?? NAMED_EASINGS.linear));
+      Object.assign(json, bezierHandles(easing ?? NAMED_EASINGS.linear));
     }
     return json;
   }

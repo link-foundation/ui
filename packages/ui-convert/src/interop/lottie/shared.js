@@ -1,6 +1,6 @@
 /**
  * What the Lottie importer and exporter share: the mapping table, the
- * transform properties and their units, numbers, colours and easings.
+ * transform properties and their units, numbers and colours.
  */
 
 import { loadMapping } from '../mapping.js';
@@ -171,18 +171,6 @@ export function staticValue(property) {
 /** Whether an animatable property is animated: `{ a: 1, k: [...] }`. */
 export const isAnimated = (property) =>
   isObject(property) && property.a === 1 && Array.isArray(property.k);
-
-/**
- * The cubic-bezier of the ui-core easing names, for keys without their own
- * easing.
- */
-export const NAMED_EASINGS = {
-  linear: [0, 0, 1, 1],
-  standard: [0.2, 0, 0, 1],
-  emphasized: [0.2, 0, 0, 1],
-  decelerate: [0, 0, 0, 1],
-  accelerate: [0.3, 0, 1, 1],
-};
 
 /**
  * Walk a JSON value and call `visit(object, path)` for every object.
