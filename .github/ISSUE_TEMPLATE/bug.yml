@@ -1,0 +1,82 @@
+name: Bug
+description: Report a defect with exact reproduction steps and a verifiable fix.
+title: '<area>: <what is wrong>'
+labels: [bug]
+type: Bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please write a report that an AI coding agent can reproduce and fix without asking a question: exact commands, exact output and objectively verifiable acceptance criteria.
+        Read [`docs/agents/writing-issues.md`](https://github.com/link-foundation/ui/blob/main/docs/agents/writing-issues.md) first.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: One or two sentences on what is wrong and where (package, file, workflow).
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Numbered steps with the exact commands, starting from a clean checkout.
+      placeholder: |
+        1. `npm ci`
+        2. `node --test packages/ui-core/tests/parse.test.js`
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: The relevant output, and the CI run URL if the failure happened in CI. This is rendered as a code block.
+      render: text
+    validations:
+      required: false
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Node.js, Bun or Deno version, browser and operating system.
+      placeholder: |
+        - Node.js 24.x / Bun 1.x / Deno 2.x
+        - Browser: Chromium 1xx
+        - OS: Ubuntu 24.04
+    validations:
+      required: false
+  - type: textarea
+    id: suspected-cause
+    attributes:
+      label: Suspected cause
+      description: Optional. The file, line or commit you suspect, and why.
+    validations:
+      required: false
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: One checkbox per criterion, including a regression test that fails before the fix.
+      value: '- [ ] '
+    validations:
+      required: true
+  - type: textarea
+    id: verify
+    attributes:
+      label: How to verify
+      description: The exact commands that show the fix, and the expected result. This is rendered as a shell code block.
+      render: shell
+    validations:
+      required: false

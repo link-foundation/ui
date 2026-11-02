@@ -14,6 +14,26 @@ Changesets 3 requires a supported Node.js 22.11, 24, or 26+ runtime.
 7. **Commit and push** (pre-commit hooks will run automatically)
 8. **Create a Pull Request**
 
+### For AI agents
+
+Most issues in this repository are solved by AI coding agents. Agents (and
+people working the same way) start here:
+
+- [`AGENTS.md`](../AGENTS.md): the entry point, with the repository map and
+  the commands that must pass. [`CLAUDE.md`](../CLAUDE.md) points to it.
+- [`docs/agents/README.md`](agents/README.md): how to pick, plan, implement,
+  verify and hand off an issue.
+- [`docs/agents/conventions.md`](agents/conventions.md): the conventions every
+  change follows (Links Notation first, tests, quality gates, licensing,
+  accessibility, scope, "done means").
+- [`docs/agents/writing-issues.md`](agents/writing-issues.md): how to write an
+  issue that a less capable agent can solve.
+- New issues use the Feature and Bug
+  [issue forms](https://github.com/link-foundation/ui/issues/new/choose)
+  (`.github/ISSUE_TEMPLATE/`), and pull requests use
+  `.github/pull_request_template.md`. `tests/issue-templates.test.js` keeps the
+  Feature form in the same section order as the roadmap issue template.
+
 ### Case study folders
 
 `docs/case-studies/issue-N/` is only for issue `N` of

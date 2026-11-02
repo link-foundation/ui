@@ -77,7 +77,8 @@
     "lino-arguments": "0.4.0",
     "lint-staged": "^16.4.0",
     "prettier": "^3.6.2",
-    "test-anywhere": "^0.8.48"
+    "test-anywhere": "^0.8.48",
+    "yaml": "^2.9.1"
   },
   "lint-staged": {
     "*.{js,mjs,cjs}": [
