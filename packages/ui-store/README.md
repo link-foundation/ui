@@ -8,7 +8,8 @@ as Links Notation and replayed.
 
 The store is the editing layer of the framework: renderers subscribe to its
 events, and the dev-mode editor changes the document only through its
-operations. It has no runtime dependency but `@link-foundation/ui-core`.
+operations. It has no runtime dependency but `@link-foundation/ui-core`;
+`openPersistentStore` saves it to IndexedDB (see "Persistence").
 
 ```js
 import { createStore, logToLino } from '@link-foundation/ui-store';
@@ -49,6 +50,7 @@ The complete example is `examples/ui-store-basics.mjs` in the repository.
 | `historyLimit`    | How many transactions can be undone; the oldest are dropped first. Default `500` (`DEFAULT_HISTORY_LIMIT`).    |
 | `onListenerError` | `(error, { listener, events, entry })`, called when a listener throws. Default: `console.error`.               |
 | `parseOptions`    | Options of `parseOrThrow` for `text`.                                                                          |
+| `ids`             | The store IDs of every element in pre-order (see "ID rules"); by default anonymous elements get generated IDs. |
 
 Without `document` and `text` the store starts empty.
 
@@ -205,6 +207,147 @@ A root position has no `(parent …)`; empty sections of a node are left out.
 Text that is not in this format throws a `StoreError` with the code
 `bad-log`.
 
+## Persistence
+
+`openPersistentStore(options)` opens (or creates) the IndexedDB database
+`link-ui-<name>` and returns `{ store, persistence }`. Every committed
+transaction of `store` is written to the database (write-through), so the
+document, with its store IDs, comes back when the page is opened again.
+
+```js
+import { openPersistentStore } from '@link-foundation/ui-store';
+
+const { store, persistence } = await openPersistentStore({
+  name: 'demo',
+  initialText: "(ok: button (label 'OK'))",
+});
+store.setProp('ok', 'label', ['Cancel']); // queued to IndexedDB
+await persistence.flush(); // all writes are done
+```
+
+The complete example is `examples/ui-store-persistence.mjs` in the
+repository.
+
+| Option             | Meaning                                                                                               |
+| ------------------ | ----------------------------------------------------------------------------------------------------- |
+| `name`             | The database is `link-ui-<name>` (`databaseName(name)`).                                              |
+| `indexedDB`        | The `IDBFactory` to use; default `globalThis.indexedDB` (tests pass `fake-indexeddb`).                |
+| `initialText`      | Links Notation of the document when the database has no data yet.                                     |
+| `channel`          | Tell other tabs about writes through a `BroadcastChannel` (default `true`).                           |
+| `BroadcastChannel` | The constructor to use; default `globalThis.BroadcastChannel`.                                        |
+| `storeOptions`     | More options of `createStore` (`historyLimit`, `onListenerError`).                                    |
+| `bundleLimits`     | The default limits of `importBundle` (`{ maxDepth, maxInputSize }`, `DEFAULT_BUNDLE_LIMITS`).         |
+| `onError`          | `(error)` when a write fails; default `console.error`. `flush()` also rejects with the first failure. |
+
+`store` has the methods of `createStore`, and stays valid when `reload()` or
+`importBundle()` replaces the document: its `subscribe` listeners are kept.
+Undo and redo work for the transactions made since the store was loaded.
+
+| `persistence.`                | Does                                                                                                                          |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `flush()`                     | Resolves when every queued write is done; rejects with the first write that failed since the last `flush()`.                  |
+| `compact()`                   | Writes the current document as the snapshot and deletes the log rows it contains (all of them unless edits are still queued). |
+| `exportBundle()`              | The `.lino` bundle of the database (below).                                                                                   |
+| `importBundle(text, limits?)` | Replaces everything with a bundle in one IndexedDB transaction.                                                               |
+| `reload()`                    | Reads the database again; `onReload(listener)` is called after it (and after `importBundle`).                                 |
+| `readDoublets()`              | The doublets of the snapshot as stored: `{ links, names, roots }`.                                                            |
+| `close()`                     | Waits for the queued writes and closes the database and the channel; later edits stay in memory only.                         |
+| `destroy()`                   | Closes and deletes the database.                                                                                              |
+
+`importBundle` and `destroy` replace or delete the user's data: the UI asks
+for confirmation before calling them; this package only exposes the calls.
+
+### The database
+
+The database version is `SCHEMA_VERSION` (1):
+
+| Object store | Key          | Indexes                             | Rows                                                                 |
+| ------------ | ------------ | ----------------------------------- | -------------------------------------------------------------------- |
+| `links`      | `index`      | `source`, `target`, `source+target` | `{ index, source, target }`: the doublets of the snapshot            |
+| `names`      | `name`       | `index` (unique)                    | `{ name, index }`: the point of each reference string                |
+| `log`        | `seq` (auto) | `tx`                                | `{ seq, tx, lino }`: one committed transaction, as `logToLino` text  |
+| `meta`       | `key`        |                                     | `schemaVersion`, `roots`, `ids` (store IDs, pre-order), `snapshotTx` |
+
+Loading decodes the snapshot (`links`, `names`, `meta.roots`) and replays the
+`log` rows with `tx > snapshotTx`. Each write appends one `log` row in one
+`readwrite` transaction; its `tx` follows the largest `tx` in the database,
+so transaction numbers keep increasing across sessions and tabs (`undoes` and
+`redoes` refer to these numbers).
+
+### The doublets encoding
+
+`encodeDocument(document)` gives `{ links, names, roots }`; `decodeDocument`
+reads it back (a `StoreError` `bad-doublets` for any other form). Every link
+is a doublet `(index, source, target)` of integers from 1, as in
+[doublets-web](https://github.com/linksplatform/doublets-web):
+
+- Each distinct string (`ok`, `button`, `label`, `OK`) is a **point**
+  `(i, i, i)`; `names` maps it to `i`. Every other link is a pair, and equal
+  pairs are created once.
+- A sequence `(a b c)` is a left fold from the empty list `nil = (list,
+end)`: `((nil, a), b), c)`. Its left side is never a point, so no pair of a
+  point with itself (which would be that point) is needed.
+- An element is `(point id, body)`, or the body alone when it is anonymous;
+  the body is the sequence of five sequences `(kind positional properties
+children unknown)`. A property is `(point name, values)`.
+- A raw value is a point (a string), `(nil, items)` (a link) or
+  `(point id, values)` (a link with an id).
+- `roots` is `[root elements, top-level links that are not elements]`.
+
+### Bundles
+
+`exportBundle()` gives one Links Notation document: the header, the snapshot
+as Links Notation, and the transactions after it as `logToLino` lines:
+
+```lino
+(ui_store_bundle (schema 1) (name demo) (snapshot_tx 12))
+(document (ok: button (label OK)))
+(tx 13 (origin devmode) (setProp ok label Cancel))
+```
+
+Two more links follow `document` when they are needed:
+
+- `(document_tree …)`: when the document text would read back as a different
+  document. A store accepts any property name, while ui-core reads a property
+  that its vocabulary does not know as an unknown sublink (or, named like a
+  kind, as a child element). The tree tags every part, e.g. `(e (id ok) (kind
+button) (pos) (props (p label (s OK))) (children) (unknown))`, and is used
+  instead of the text.
+- `(ids …)`: the store IDs in pre-order, when anonymous elements have IDs that
+  a new store would not generate.
+
+`importBundle(text, limits?)` reads the bundle with ui-core `parseLinks`
+within `maxDepth` and `maxInputSize` (a `UiParseError` above them), checks the
+header (`bad-bundle`), the transactions (`bad-log`, increasing `tx` after
+`snapshot_tx`) and replays them on a new store. Only then is the database
+replaced, in one transaction; on any error nothing changes.
+
+Values that `formatLinks` cannot write (an empty link `()` or a link with an
+id but no values, see ui-core) lose that form in the `log` and in bundles,
+as in `logToLino`.
+
+### doublets-web
+
+`copyToDoubletsWeb(encoded, unitedLinks)` creates the doublets in a
+`doublets-web` `UnitedLinks` instance in index order (`create()` then
+`update(index, source, target)`) and returns the map from each index to the
+index in `unitedLinks` (the same numbers when it was empty). `doublets-web`
+is an optional peer dependency: `openDoubletsWeb()` loads it with a dynamic
+`import()` only when called and returns `{ module, links }`.
+
+```js
+const { links } = await openDoubletsWeb();
+copyToDoubletsWeb(await persistence.readDoublets(), links);
+links.count(); // the number of doublets
+```
+
+### Several tabs
+
+After each write, the store posts `{ tx }` on the
+`BroadcastChannel('link-ui-<name>')`; the other tabs call `reload()`. There is
+no conflict resolution: the last writer wins, and a reload drops the undo
+history of that tab.
+
 ## ID rules
 
 - An element with an id in the document (`(ok: button …)`) has that id as its
@@ -224,6 +367,11 @@ Text that is not in this format throws a `StoreError` with the code
   elements stay anonymous, so reading the output again can number them
   differently. Reading a document and writing it back without changes gives
   the same text as ui-core `format`.
+
+- `createStore({ ids })` gives the elements the store IDs listed in
+  pre-order instead (a named element's ID must be its name), so a store read
+  back from a snapshot keeps the generated IDs that its operation log refers
+  to.
 
 `createIdGenerator(usedIds?)` is the generator the store uses, exported for
 tools that need the same IDs.

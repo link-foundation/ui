@@ -24,15 +24,17 @@ export { DEFAULT_ORIGIN };
  * @param {{ roots?: object[], unknown?: unknown[] }} [options.document]
  * @param {string} [options.text]           LiNo, read with ui-core `parseOrThrow`
  * @param {object} [options.parseOptions]   options of `parseOrThrow`
+ * @param {string[]} [options.ids]  the store IDs of every element in
+ *   pre-order (default: an anonymous element gets a generated ID)
  * @param {number} [options.historyLimit]   default 500
  * @param {(error: unknown, info: object) => void} [options.onListenerError]
  */
 export function createStore(options = {}) {
-  const { document, text, historyLimit, onListenerError, parseOptions } =
+  const { document, text, ids, historyLimit, onListenerError, parseOptions } =
     options;
   const source =
     document ?? (text === undefined ? {} : parseOrThrow(text, parseOptions));
-  const model = createModel(source);
+  const model = createModel(source, ids);
   const emitter = createEmitter(onListenerError);
   const history = createHistory(historyLimit);
   const txs = createTransactions(model, history, emitter.emit);
