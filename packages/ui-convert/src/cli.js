@@ -3,10 +3,14 @@
  * The ui-convert command line:
  *
  *   ui-convert import <file.json> [--format <name>] [--style <style>]
+ *   ui-convert import --from jsx|vue|html <file> [--mapping <name|file.lino>]
+ *                     [--style <style>]
  *   ui-convert export <file.lino> --format <name> [--id <id>]
  *                     [--target-version <version>]
  *
- * `import` writes LiNo to stdout, `export` writes JSON (A2UI: one message
+ * `import` writes LiNo to stdout (`--from` reads component markup: JSX or
+ * TSX, a Vue single-file component or HTML; a `.jsx`, `.tsx`, `.vue`,
+ * `.html` or `.htm` file needs no `--from`), `export` writes JSON (A2UI: one message
  * per line, the JSON Lines wire format). A file named `-` is stdin.
  * Diagnostics go to stderr, one per line; the exit code is 1 when one of
  * them is an error (the output is still written when there is one), 2 for a
@@ -16,13 +20,42 @@
 import { readFileSync, realpathSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { CONVERTERS, FORMATS, detectFormat } from './interop/index.js';
+import { importHtml } from './html/import.js';
+import { importJsx } from './jsx/import.js';
+import { importVue } from './vue/import.js';
+import { MAPPINGS } from './mappings/index.js';
+
+/** The component importers of `import --from`. */
+export const SOURCES = {
+  jsx: importJsx,
+  vue: importVue,
+  html: importHtml,
+};
+
+/** `--from` of a file by its extension. */
+const EXTENSIONS = {
+  '.jsx': 'jsx',
+  '.tsx': 'jsx',
+  '.vue': 'vue',
+  '.html': 'html',
+  '.htm': 'html',
+};
+
+const sourceOf = (file) =>
+  Object.entries(EXTENSIONS).find(([extension]) =>
+    file.toLowerCase().endsWith(extension)
+  )?.[1];
 
 export const USAGE = `Usage:
   ui-convert import <file.json> [--format <name>] [--style <style>]
+  ui-convert import --from jsx|vue|html <file> [--mapping <name|file.lino>] [--style <style>]
   ui-convert export <file.lino> --format <name> [--id <id>] [--target-version <version>]
 
 Formats: ${FORMATS.join(', ')}. A file named - is read from stdin.
 import detects the format when --format is missing.
+--from reads component markup (.jsx, .tsx, .vue, .html files need no --from);
+--mapping is a built-in mapping (mui, the default) or a .lino rule file;
+  repeat it to try several, the first match wins.
 --style is one of indented (default), multiline, inline.`;
 
 const OPTIONS = {
@@ -30,6 +63,8 @@ const OPTIONS = {
   '--style': 'style',
   '--id': 'id',
   '--target-version': 'targetVersion',
+  '--from': 'from',
+  '--mapping': 'mapping',
 };
 
 class UsageError extends Error {}
@@ -38,7 +73,8 @@ class UsageError extends Error {}
  * Parse the command line arguments.
  * @param {string[]} argv The arguments after the program name.
  * @returns {{ command: string, file: string, format?: string,
- *   style?: string, id?: string, targetVersion?: string }}
+ *   style?: string, id?: string, targetVersion?: string, from?: string,
+ *   mappings?: string[] }}
  */
 export function parseArgs(argv) {
   const [command, ...rest] = argv;
@@ -55,7 +91,11 @@ export function parseArgs(argv) {
       if (next === undefined) {
         throw new UsageError(`${flag} needs a value.`);
       }
-      args[OPTIONS[flag]] = next;
+      if (flag === '--mapping') {
+        args.mappings = [...(args.mappings ?? []), next];
+      } else {
+        args[OPTIONS[flag]] = next;
+      }
     } else if (rest[i].startsWith('--')) {
       throw new UsageError(`Unknown option "${rest[i]}".`);
     } else if (args.file === undefined) {
@@ -64,11 +104,23 @@ export function parseArgs(argv) {
       throw new UsageError(`Unexpected argument "${rest[i]}".`);
     }
   }
+  return checkArgs(args);
+}
+
+/** Validate parsed arguments and fill in `from` for import. */
+function checkArgs(args) {
+  const { command } = args;
   if (args.file === undefined) {
     throw new UsageError(`${command} needs a file.`);
   }
   if (args.format !== undefined && !FORMATS.includes(args.format)) {
     throw new UsageError(`Unknown format "${args.format}".`);
+  }
+  if (command === 'import' && args.format === undefined) {
+    args.from ??= sourceOf(args.file);
+  }
+  if (args.from !== undefined && !(args.from in SOURCES)) {
+    throw new UsageError(`Unknown --from "${args.from}".`);
   }
   if (command === 'export' && args.format === undefined) {
     throw new UsageError('export needs --format.');
@@ -94,8 +146,12 @@ export function readJson(text) {
 }
 
 /** One diagnostic as a line of text. */
-export const formatDiagnostic = ({ severity, code, message, at }) => {
-  const where = [at?.format, at?.path ?? at?.element]
+export const formatDiagnostic = ({ severity, code, message, at, id, span }) => {
+  const where = [
+    at?.format,
+    at?.path ?? at?.element ?? id ?? undefined,
+    span ? `${span.start}-${span.end}` : undefined,
+  ]
     .filter((part) => part !== undefined && part !== '')
     .join(' ');
   return `${severity} ${code}${where ? ` (${where})` : ''}: ${message}`;
@@ -108,6 +164,13 @@ const writeJson = (format, json) =>
     : `${JSON.stringify(json, null, 2)}\n`;
 
 function convert(args, text) {
+  if (args.command === 'import' && args.from !== undefined) {
+    const { text: lino, diagnostics } = SOURCES[args.from](text, {
+      mappings: args.mappings,
+      style: args.style,
+    });
+    return { output: lino.endsWith('\n') ? lino : `${lino}\n`, diagnostics };
+  }
   if (args.command === 'export') {
     const { json, diagnostics } = CONVERTERS[args.format].export(text, args);
     const output = json === null ? '' : writeJson(args.format, json);
@@ -145,6 +208,10 @@ export function main(argv, io) {
   const readFile = io.readFile ?? ((file) => readFileSync(file, 'utf8'));
   try {
     const args = parseArgs(argv);
+    // A mapping is a built-in name (mui) or a rule file.
+    args.mappings = args.mappings?.map((mapping) =>
+      MAPPINGS.includes(mapping) ? mapping : readFile(mapping)
+    );
     const text = readFile(args.file === '-' ? 0 : args.file);
     const { output, diagnostics } = convert(args, text);
     io.stdout.write(output);

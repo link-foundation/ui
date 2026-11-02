@@ -21,4 +21,6 @@ packages/ui-convert/tests/fixtures/interop/**/*.json
 packages/ui-convert/tests/html/fixtures/
 # Golden files are compared byte for byte (packages/ui-tokens/tests, packages/ui-style/tests)
 packages/ui-tokens/tests/golden/
+packages/ui-convert/tests/jsx/fixtures/
+packages/ui-convert/tests/vue/fixtures/
 packages/ui-style/tests/golden/
