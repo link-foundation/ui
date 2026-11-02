@@ -44,7 +44,10 @@ function readLinks(parser, text, mode) {
  */
 function parserDiagnostic(error) {
   const at = error.line ? { line: error.line, column: error.column } : {};
-  const code = error.maxDepth ? 'depth-exceeded' : 'syntax-error';
+  // The parser reports maxDepth; a host stack overflow (only possible with a
+  // very large maxDepth) is the same problem: the input nests too deep.
+  const tooDeep = error.maxDepth || error.cause instanceof RangeError;
+  const code = tooDeep ? 'depth-exceeded' : 'syntax-error';
   return diagnostic(code, 'error', at, error.message);
 }
 

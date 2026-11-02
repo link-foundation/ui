@@ -7,7 +7,9 @@ const root = 'docs/spec/fixtures';
 const sortD = (ds) => ds.map((d) => JSON.stringify(d)).sort();
 let bad = 0;
 for (const area of readdirSync(root)) {
-  for (const file of readdirSync(join(root, area)).filter((f) => f.endsWith('.lino'))) {
+  for (const file of readdirSync(join(root, area)).filter((f) =>
+    f.endsWith('.lino')
+  )) {
     const base = join(root, area, file.slice(0, -5));
     const text = readFileSync(`${base}.lino`, 'utf8');
     for (const mode of ['auto', 'fold']) {
@@ -19,7 +21,10 @@ for (const area of readdirSync(root)) {
         expected.diagnostics = sortD(expected.diagnostics);
         actual = { ...tree, diagnostics: sortD(tree.diagnostics) };
       } else {
-        expected = sortD(JSON.parse(readFileSync(`${base}.diagnostics.json`, 'utf8')).diagnostics);
+        expected = sortD(
+          JSON.parse(readFileSync(`${base}.diagnostics.json`, 'utf8'))
+            .diagnostics
+        );
         actual = sortD(tree.diagnostics);
       }
       if (JSON.stringify(expected) !== JSON.stringify(actual)) {

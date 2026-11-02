@@ -16,7 +16,7 @@ import { isPathLink, linkKey } from './links.js';
  *
  * Its head `H` always declares a new node, even when an equal head was seen
  * before, so that two multi-line `(on press ...)` handlers or two multi-line
- * `(text 'Item' ...)` children stay two nodes instead of being merged.
+ * `(text 'Item' ...)` children stay two separate nodes.
  * @param {Link} link
  * @returns {boolean}
  */
@@ -51,20 +51,27 @@ function lookup(folder, frame, path) {
 /**
  * Fold a path link `(path payload...)` into `frame`.
  *
- * `folder.place(frame, link)` places one link by the element rules and
- * returns the node (frame) it created, or `null` for an atom.
- * `folder.global` maps document-wide keys to frames.
- * @param {{ place: Function, global: Map<string, object> }} folder
+ * The folder (the projector) provides:
+ * - `place(frame, link)`: place one link by the element rules and return the
+ *   frame of the node it created, or `null` for an atom;
+ * - `canDeclare(frame, path)`: whether an unknown path may be declared here;
+ * - `keepVerbatim(frame, link)`: keep a path link that cannot be folded;
+ * - `global`: document-wide structural keys -> frames.
+ * @param {object} folder
  * @param {object} frame
  * @param {Link} link a path link
- * @returns {object} the frame the payload went to
+ * @returns {object|null} the frame the payload went to
  */
 export function foldPathLink(folder, frame, link) {
   const [path, ...payload] = link.values;
-  let found = isGroupWrapper(link) ? null : lookup(folder, frame, path);
+  const wrapper = isGroupWrapper(link);
+  let found = wrapper ? null : lookup(folder, frame, path);
   if (!found) {
-    // Not known yet: declare the path here (a head of the multi-line form),
-    // then give it the payload.
+    if (!wrapper && !folder.canDeclare(frame, path)) {
+      return folder.keepVerbatim(frame, link);
+    }
+    // Not known yet: declare the path here (the head of a multi-line group,
+    // or an element or property head), then give it the payload.
     found = { target: folder.place(frame, path), scope: frame.keys };
   }
   const { target, scope } = found;

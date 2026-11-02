@@ -94,7 +94,7 @@ export function loadVocabulary(text) {
 let cached = null;
 
 /**
- * The ui-dialect/0 vocabulary, read once on first use.
+ * The ui-dialect/0 vocabulary, built lazily and cached.
  * @returns {import('./types.js').Vocabulary}
  */
 export function defaultVocabulary() {

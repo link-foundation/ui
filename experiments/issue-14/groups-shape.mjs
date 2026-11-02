@@ -4,7 +4,9 @@ import { Parser } from 'links-notation';
 const p = new Parser();
 const src = readFileSync(process.argv[2], 'utf8');
 const show = (g, pad = '') => {
-  console.log(`${pad}${g.element.format()}  [id=${JSON.stringify(g.element.id)} n=${g.element.values.length}]`);
+  console.log(
+    `${pad}${g.element.format()}  [id=${JSON.stringify(g.element.id)} n=${g.element.values.length}]`
+  );
   g.children.forEach((c) => show(c, `${pad}  `));
 };
 console.log('parse():');

@@ -88,7 +88,9 @@ export const isUrl = (text) =>
 export const isTokenName = (text) =>
   text
     .split('.')
-    .every((part) => part.length > 0 && skip(part, 0, isTokenChar) === part.length);
+    .every(
+      (part) => part.length > 0 && skip(part, 0, isTokenChar) === part.length
+    );
 
 const hasReservedSigil = (text) => text.startsWith('@') || text.startsWith('$');
 
@@ -107,7 +109,8 @@ function isFunctionalColour(value) {
     COLOUR_FUNCTIONS.includes(space) &&
     (channels.length === 3 || channels.length === 4) &&
     channels.every(
-      (c) => typeof c === 'string' && isNumber(c.endsWith('%') ? c.slice(0, -1) : c)
+      (c) =>
+        typeof c === 'string' && isNumber(c.endsWith('%') ? c.slice(0, -1) : c)
     )
   );
 }
@@ -142,7 +145,9 @@ export function valueMatches(type, value) {
 }
 
 const isUnsafeTarget = (target) => {
-  const text = String(target ?? '').trim().toLowerCase();
+  const text = String(target ?? '')
+    .trim()
+    .toLowerCase();
   return UNSAFE_SCHEMES.some((scheme) => text.startsWith(scheme));
 };
 

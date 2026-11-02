@@ -4,8 +4,12 @@
   "description": "Core of the associative UI framework: the UI dialect of Links Notation",
   "type": "module",
   "exports": {
-    ".": "./src/index.js"
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    }
   },
+  "types": "./src/index.d.ts",
   "files": [
     "src/",
     "README.md",
@@ -28,6 +32,9 @@
   },
   "engines": {
     "node": ">=20"
+  },
+  "dependencies": {
+    "links-notation": "^0.27.1"
   },
   "publishConfig": {
     "access": "public"

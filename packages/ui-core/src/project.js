@@ -86,6 +86,48 @@ export class Projector {
     return this.keepUnknown(frame, link, head);
   }
 
+  /**
+   * Whether an unknown path may be declared in `frame` (docs/spec/projection.md):
+   * an element head, a property head valid there, or a path made of them.
+   * @param {object} frame
+   * @param {Link} path
+   */
+  canDeclare(frame, path) {
+    if (frame.type !== 'element' && frame.type !== 'root') {
+      return false;
+    }
+    if (path.id !== null) {
+      return true;
+    }
+    if (isPathLink(path)) {
+      const [inner] = path.values;
+      return (
+        frame.keys.has(linkKey(inner)) ||
+        this.global.has(linkKey(inner)) ||
+        this.canDeclare(frame, inner)
+      );
+    }
+    const head = headText(path);
+    return (
+      this.vocabulary.kinds.has(head) ||
+      (frame.type === 'element' &&
+        Boolean(
+          this.vocabulary.kinds.get(frame.node.kind)?.properties.has(head)
+        ))
+    );
+  }
+
+  /**
+   * Keep a path link that cannot be folded: as a plain value inside a
+   * property, otherwise verbatim in `unknown` with `head: null`.
+   */
+  keepVerbatim(frame, link) {
+    if (frame.type === 'property' || frame.type === 'value') {
+      return this.appendValue(frame, link);
+    }
+    return this.keepUnknown(frame, link, null);
+  }
+
   /** Register the frame created from `link` in its parent and itself. */
   remember(parent, link, frame) {
     const key = linkKey(link);
