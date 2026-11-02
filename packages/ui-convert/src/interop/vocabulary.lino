@@ -27,7 +27,13 @@
   (property min-height any)
   (property vertical-alignment any)
   (property background-image any)
-  (property select-action any))
+  (property select-action any)
+  (property spec-version any)
+  (property frame-rate any)
+  (property in-frame any)
+  (property out-frame any)
+  (property width any)
+  (property height any))
 
 (stack: kind
   (property role string)
@@ -164,3 +170,31 @@
 (theme: kind
   (property source any)
   (property unmapped any))
+
+(shape: kind
+  (description 'A vector shape (a Lottie shape layer): its transform and ordered shape items.')
+  (property name any)
+  (property index any)
+  (property parent-index any)
+  (property in-frame any)
+  (property out-frame any)
+  (property start-frame any)
+  (property anchor any)
+  (property translate any)
+  (property scale any)
+  (property rotate any)
+  (property opacity any)
+  (property skew any)
+  (property skew-axis any)
+  (property rect any multi)
+  (property ellipse any multi)
+  (property path any multi)
+  (property fill any multi)
+  (property stroke any multi)
+  (property group any multi)
+  (property transform any multi)
+  (property item any multi)
+  (children none))
+
+(animation: kind
+  (property source any))
