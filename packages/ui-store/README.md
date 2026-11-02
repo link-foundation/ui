@@ -345,6 +345,33 @@ copyToDoubletsWeb(await persistence.readDoublets(), links);
 links.count(); // the number of doublets
 ```
 
+### Any doublets storage
+
+`writeDocumentLinks(encoded, links, names?)` writes the same doublets into any
+storage with `create()` and `update(id, source, target)`: the storages of
+[`@link-foundation/ui-links`](../ui-links/README.md) (memory, SQLite,
+doublets-web, IndexedDB, localStorage and Links Notation text through its
+persistence adapters, or a synced client of a links server). The storage may
+hold other links; the document gets new addresses. It returns
+`{ names, roots }`: each string point and the roots at their addresses. With a
+names store (`setName(id, name)`, like ui-links `createNames()`), the points
+are named there too.
+
+`readDocumentLinks(links, { names, roots })` reads only the links reachable
+from `roots` (with `each(handler, { id, from_id, to_id })`) and decodes them;
+`names` is that map or a names store (`getName(id)`). A missing link is a
+`StoreError` `bad-doublets`. Nothing is imported from ui-links: the storage is
+duck-typed.
+
+```js
+import { createMemoryLinks, createNames } from '@link-foundation/ui-links';
+
+const links = createMemoryLinks();
+const names = createNames();
+const where = writeDocumentLinks(encodeDocument(document), links, names);
+readDocumentLinks(links, { names, roots: where.roots }); // the document
+```
+
 ### Several tabs
 
 After each write, the store posts `{ tx }` on the
