@@ -5,7 +5,9 @@
  *
  * The tokens are written as a DTCG 2025.10 file (`toDtcg`) to a temporary
  * directory, which becomes the `source` of the Style Dictionary config;
- * the directory is removed afterwards. `style-dictionary` is an optional
+ * the directory is removed afterwards. Only the tokens of `resolved` are
+ * written, not the other modes: Style Dictionary has none, so a mode is
+ * built from `resolveTokens(sets, id, { mode })`. `style-dictionary` is an optional
  * peer dependency: it is imported only here, only when called, and only
  * when no `StyleDictionary` class is given.
  */
@@ -48,10 +50,10 @@ export async function buildWithStyleDictionary(
   const dir = await mkdtemp(join(tmpdir(), 'link-ui-tokens-'));
   try {
     const source = join(dir, 'tokens.json');
-    await writeFile(
-      source,
-      `${JSON.stringify(toDtcg(resolved, { keepAliases }), null, 2)}\n`
-    );
+    // Style Dictionary has no modes and reads a root $extensions as a
+    // group of tokens; build a mode from tokens resolved with `{ mode }`.
+    const { $extensions, ...tokens } = toDtcg(resolved, { keepAliases });
+    await writeFile(source, `${JSON.stringify(tokens, null, 2)}\n`);
     const sd = new SD({ ...config, source: [source] });
     await sd.buildAllPlatforms();
     return sd;

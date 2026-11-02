@@ -7,7 +7,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, it, expect } from 'test-anywhere';
 import { buildWithStyleDictionary } from '@link-foundation/ui-tokens/style-dictionary';
-import { PACKAGE, sample } from './helpers.js';
+import { FULL, PACKAGE, full, load, sample } from './helpers.js';
 
 /** A stand-in of the StyleDictionary class that records what it was given. */
 function fakeStyleDictionary() {
@@ -41,6 +41,25 @@ describe('buildWithStyleDictionary', () => {
       $value: { value: 16, unit: 'px' },
     });
     expect(existsSync(seen.config.source[0])).toBe(false);
+  });
+
+  it('writes only the tokens of the resolved mode, without the modes extension', async () => {
+    const light = fakeStyleDictionary();
+    await buildWithStyleDictionary(
+      full(),
+      {},
+      { StyleDictionary: light.FakeStyleDictionary }
+    );
+    expect(light.seen.source.$extensions).toBeUndefined();
+    expect(light.seen.source.color.primary.$value.hex).toBe('#6750a4');
+    const dark = fakeStyleDictionary();
+    await buildWithStyleDictionary(
+      load(FULL, 'brand', { mode: 'dark' }).resolved,
+      {},
+      { StyleDictionary: dark.FakeStyleDictionary, keepAliases: false }
+    );
+    expect(dark.seen.source.color.primary.$value.hex).toBe('#d0bcff');
+    expect(dark.seen.source.color.action.$value.hex).toBe('#d0bcff');
   });
 
   it('names the peer dependency when it is not installed', async () => {
