@@ -195,12 +195,9 @@ describe('.github/ISSUE_TEMPLATE forms', () => {
 
   it('config.yml keeps blank issues and links the roadmap case study', () => {
     assert.equal(config.blank_issues_enabled, true);
-    const urls = config.contact_links.map((link) => link.url);
-    assert.ok(
-      urls.includes(
-        'https://github.com/link-foundation/ui/tree/main/docs/case-studies/issue-1/roadmap'
-      ),
-      urls.join(', ')
+    assert.equal(
+      config.contact_links[0].url,
+      'https://github.com/link-foundation/ui/tree/main/docs/case-studies/issue-1/roadmap'
     );
     for (const link of config.contact_links) {
       assert.ok(link.name && link.url && link.about, JSON.stringify(link));
