@@ -89,7 +89,8 @@ npm run example:desktop:package
 │   └── universal-app/    # React + GitHub Pages + Electron + Capacitor app
 ├── scripts/              # Build and release scripts
 ├── packages/             # npm workspaces (see docs/monorepo.md)
-│   └── ui-core/          # @link-foundation/ui-core
+│   ├── ui-core/          # @link-foundation/ui-core
+│   └── ui-store/         # @link-foundation/ui-store
 ├── tests/                # Repository and release-script tests
 ├── .eslintrc.js          # ESLint configuration
 ├── .prettierrc           # Prettier configuration
