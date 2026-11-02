@@ -1,6 +1,9 @@
 /**
  * Every storage keeps the same doublets interface: memory, SQLite
- * (node:sqlite) and doublets-web run the same cases.
+ * (node:sqlite) and doublets-web run the same cases. A storage this runtime
+ * cannot load (doublets-web is a WebAssembly module built for bundlers; Bun
+ * does not load it) is reported as skipped with the reason in the test
+ * names, as in ui-store's web-adapter tests.
  */
 
 import { describe, it, expect } from 'test-anywhere';
@@ -19,6 +22,16 @@ import {
 } from '@link-foundation/ui-links';
 import { errorCode } from './helpers.js';
 
+/** Why `open` cannot run in this runtime, or `null` when it can. */
+async function unavailable(open) {
+  try {
+    await open();
+    return null;
+  } catch (error) {
+    return `cannot be loaded here: ${error.message}`;
+  }
+}
+
 const storages = [
   ['memory', () => createMemoryLinks()],
   [
@@ -30,10 +43,18 @@ const storages = [
   ],
   ['doublets-web', () => openDoubletsWebLinks()],
 ];
+const reasons = await Promise.all(
+  storages.map(([, open]) => unavailable(open))
+);
 
-for (const [name, open] of storages) {
+storages.forEach(([name, open], index) => {
+  const reason = reasons[index];
+  /** `it`, or `it.skip` with the reason in the name. */
+  const test = reason
+    ? (title, fn) => it.skip(`${title} (skipped: ${name} ${reason})`, fn)
+    : it;
   describe(`storage: ${name}`, () => {
-    it('creates, updates, reads and deletes links', async () => {
+    test('creates, updates, reads and deletes links', async () => {
       const links = await open();
       const a = links.create();
       const b = links.create();
@@ -54,7 +75,7 @@ for (const [name, open] of storages) {
       expect(allLinks(links).map((l) => l.id)).toEqual([1]);
     });
 
-    it('stops each() at BREAK', async () => {
+    test('stops each() at BREAK', async () => {
       const links = await open();
       for (let i = 0; i < 5; i++) {
         links.create();
@@ -68,7 +89,7 @@ for (const [name, open] of storages) {
       expect(seen.length).toBe(2);
     });
 
-    it('throws not-found and bad-reference with a code', async () => {
+    test('throws not-found and bad-reference with a code', async () => {
       const links = await open();
       links.create();
       expect(errorCode(() => links.update(9, 0, 0))).toBe('not-found');
@@ -79,7 +100,7 @@ for (const [name, open] of storages) {
       );
     });
 
-    it('ensureCreated makes the link at an address', async () => {
+    test('ensureCreated makes the link at an address', async () => {
       const links = await open();
       expect(ensureCreated(links, 4)).toBe(true);
       expect(ensureCreated(links, 4)).toBe(false);
@@ -87,7 +108,7 @@ for (const [name, open] of storages) {
       expect(links.count([])).toBe(1);
     });
   });
-}
+});
 
 describe('storage: memory addresses', () => {
   it('reuses freed addresses and takes far ones with createAt', () => {
