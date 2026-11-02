@@ -12,8 +12,8 @@
 // and `link-foundation/link-cli#N` (or `link-foundation/ui#N`) otherwise.
 // Every issue gets a "Dependencies" section listing its blockers and parent,
 // so cross-repository relations are visible even where GitHub's dependency
-// API refuses them, and non-task issues get the footer of their repository
-// (roadmap/issue-footer-<repo>.md).
+// API refuses them, and the issues under a tracking issue get the footer of
+// their repository (roadmap/issue-footer-<repo>.md).
 //
 // Idempotent: numbers and IDs are kept in roadmap/created-issues.json; a
 // re-run creates what is missing, refreshes bodies, and adds missing
@@ -117,7 +117,7 @@ const footerOf = (repo) => {
 
 export const renderBody = (issue, issues, state) => {
   const parts = [issue.body, dependencies(issue)];
-  if (issue.type !== 'Task' && footerOf(issue.repo)) {
+  if (issue.parent !== null && footerOf(issue.repo)) {
     parts.push(footerOf(issue.repo));
   }
   return `${resolve(parts.join('\n\n'), issue, issues, state)}\n`;
@@ -229,11 +229,28 @@ const link = (key, state) =>
     : key;
 
 const tableRows = (issues, state) =>
-  issues.map((issue) => {
-    const blockers = issue.blocked_by.map((key) => link(key, state));
-    const title = issue.title.replace(/\|/g, '\\|');
-    return `| ${link(issue.key, state)} | ${issue.key} | ${issue.type} | ${title} | ${blockers.join(', ') || '—'} | ${issue.requirements.join(', ')} |`;
-  });
+  issues.map((issue) => [
+    link(issue.key, state),
+    issue.key,
+    issue.type,
+    issue.title.replace(/\|/g, '\\|'),
+    issue.blocked_by.map((key) => link(key, state)).join(', ') || '—',
+    issue.requirements.join(', '),
+  ]);
+
+/** A Markdown table padded the way Prettier pads it, so it stays formatted. */
+export const formatTable = (header, rows) => {
+  const widths = header.map((_, column) =>
+    Math.max(3, ...[header, ...rows].map((row) => row[column].length))
+  );
+  const line = (cells) =>
+    `| ${cells.map((cell, column) => cell.padEnd(widths[column])).join(' | ')} |`;
+  return [
+    line(header),
+    line(widths.map((width) => '-'.repeat(width))),
+    ...rows.map(line),
+  ];
+};
 
 /** The section of docs/ROADMAP.md for issue 101, from the marker on. */
 export const renderSection = (issues, state) => {
@@ -253,21 +270,22 @@ export const renderSection = (issues, state) => {
     '`docs/case-studies/issue-101/roadmap/issues/`.',
   ];
   const groups = [
-    ['Tracking issues', (issue) => issue.type === 'Task'],
+    ['Tracking issues', (issue) => issue.parent === null],
     [
       'This repository',
-      (issue) => issue.type !== 'Task' && issue.repo === 'ui',
+      (issue) => issue.parent !== null && issue.repo === 'ui',
     ],
-    ['link-cli', (issue) => issue.type !== 'Task' && issue.repo === 'link-cli'],
+    ['link-cli', (issue) => issue.parent !== null && issue.repo === 'link-cli'],
   ];
   for (const [heading, keep] of groups) {
     lines.push(
       '',
       `### ${heading}`,
       '',
-      '| Issue | Key | Type | Title | Blocked by | Requirements |',
-      '| ----- | --- | ---- | ----- | ---------- | ------------ |',
-      ...tableRows(issues.filter(keep), state)
+      ...formatTable(
+        ['Issue', 'Key', 'Type', 'Title', 'Blocked by', 'Requirements'],
+        tableRows(issues.filter(keep), state)
+      )
     );
   }
   return `${lines.join('\n')}\n`;

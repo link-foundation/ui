@@ -1,0 +1,19 @@
+18 issue files are valid.
+T01	ui	Task	[]	-	Roadmap: associative links beyond the doublets MVP (transports, storages, sync, triplets, Deep)
+T02	link-cli	Task	[]	-	Roadmap: associative architecture in doublets and triplets (permissions, types, subscriptions, Deep Standard)
+U01	ui	Feature	[]	T01	ui-links: WebSocket transport for browsers, text and binary
+U02	ui	Feature	[]	T01	ui-links: SQLite storage in the browser (sqlite-wasm on OPFS)
+U03	ui	Feature	[]	T01	ui-links: names stored as links, synced and permission-checked like links
+U04	ui	Bug	[]	T01	ui-links server: push the links that become readable or hidden when rules or types change
+U05	ui	Feature	[]	T01	ui-links synced client: persist the outbox and resynchronise after a reconnect
+U06	ui	Feature	[U05]	T01	ui-store: a live document over a synced links client
+U07	ui	Task	[L02,L03]	T01	ui-links: run the synced client against clink --serve with permissions and subscriptions
+U08	ui	Feature	[L04,L05]	T01	ui-links: triplets client over the links protocol
+U09	ui	Feature	[U08,L06]	T01	ui-links: a DeepClient and minilinks compatible API over the synced client
+U10	ui	Feature	[]	T01	ui-links permissions: decide whether referencing an unreadable link needs its own rule
+L01	link-cli	Feature	[]	T02	Type hierarchy decorator: Type -> SubType -> … -> Value with multiple inheritance
+L02	link-cli	Feature	[L01]	T02	Optional permission layer with permissions stored in links
+L03	link-cli	Feature	[]	T02	Subscriptions in the LiNo protocol server: subscribe, notify, unsubscribe
+L04	link-cli	Feature	[]	T02	Triplets stored in doublets with an associative API
+L05	link-cli	Feature	[L04]	T02	Serve triplets over the Links Notation text and binary protocol
+L06	link-cli	Feature	[L02,L03,L04]	T02	Hasura-compatible GraphQL server implementing the Deep Standard, so deepcase connects to link-cli
