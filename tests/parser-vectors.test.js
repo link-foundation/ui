@@ -5,7 +5,13 @@
  */
 
 import { describe, it, expect } from 'test-anywhere';
-import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  cpSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { Parser, formatLinks } from 'links-notation';
@@ -39,7 +45,10 @@ describe('docs/spec/parser-vectors.json', () => {
   it('places every error where the diagnostics fixture places it', () => {
     const vectors = JSON.parse(readFileSync(VECTORS_FILE, 'utf8'));
     for (const vector of vectors.filter((v) => v.error)) {
-      const file = path.join('docs/spec/fixtures', `${vector.id}.diagnostics.json`);
+      const file = path.join(
+        'docs/spec/fixtures',
+        `${vector.id}.diagnostics.json`
+      );
       const [diagnostic] = JSON.parse(readFileSync(file, 'utf8')).diagnostics;
       expect({ code: vector.code, ...diagnostic.at }).toEqual({
         code: diagnostic.code,
@@ -53,7 +62,10 @@ describe('docs/spec/parser-vectors.json', () => {
     const dir = mkdtempSync(path.join(tmpdir(), 'vectors-'));
     try {
       cpSync('docs/spec/fixtures', dir, { recursive: true });
-      writeFileSync(path.join(dir, 'errors', 'syntax-unquoted-hex.lino'), '(a b)');
+      writeFileSync(
+        path.join(dir, 'errors', 'syntax-unquoted-hex.lino'),
+        '(a b)'
+      );
       expect(() => buildVectors(dir)).toThrow(/must be refused/);
     } finally {
       rmSync(dir, { recursive: true, force: true });

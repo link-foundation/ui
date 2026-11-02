@@ -67,7 +67,7 @@ export function vectorFor(id, input, mustFail) {
     links = parser.parse(input);
   } catch (error) {
     if (!mustFail || error.name !== 'ParseError') {
-      throw new Error(`${id}: ${error.message}`);
+      throw new Error(`${id}: ${error.message}`, { cause: error });
     }
     return {
       id,
@@ -99,7 +99,11 @@ export function buildVectors(fixturesDir = FIXTURES_DIR) {
       .join('/')
       .replace(/\.lino$/, '');
     const name = id.slice(id.lastIndexOf('/') + 1);
-    return vectorFor(id, readFileSync(file, 'utf8'), name.startsWith('syntax-'));
+    return vectorFor(
+      id,
+      readFileSync(file, 'utf8'),
+      name.startsWith('syntax-')
+    );
   });
 }
 

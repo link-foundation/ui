@@ -11,38 +11,103 @@
 import { Parser, formatLinks } from 'links-notation';
 import { linkTree } from '../scripts/generate-parser-vectors.mjs';
 
-const [count = 2000, seed = 1, maxDepth = 8] = process.argv.slice(2).map(Number);
+const [count = 2000, seed = 1, maxDepth = 8] = process.argv
+  .slice(2)
+  .map(Number);
 let state = seed >>> 0 || 1;
 const random = (n) => {
-  state ^= state << 13; state >>>= 0;
+  state ^= state << 13;
+  state >>>= 0;
   state ^= state >>> 17;
-  state ^= state << 5; state >>>= 0;
+  state ^= state << 5;
+  state >>>= 0;
   return state % n;
 };
 const pieces = [
-  'a', 'b', 'id', ' ', ' ', '  ', '\t', '\n', '\n', '\r\n', '\r', '(', '(', ')', ')',
-  ':', ': ', '"', "'", '`', '""', "''", '#', ' # c', '~1{61}', '~1{zz}', '~2{', '~',
-  'é', '🙂', '́', ' ', '﻿', 'x y', '((', '))', '\n  ', '\n    ', '"a b"',
-  "'it''s'", '```q```', '\u0001',
+  'a',
+  'b',
+  'id',
+  ' ',
+  ' ',
+  '  ',
+  '\t',
+  '\n',
+  '\n',
+  '\r\n',
+  '\r',
+  '(',
+  '(',
+  ')',
+  ')',
+  ':',
+  ': ',
+  '"',
+  "'",
+  '`',
+  '""',
+  "''",
+  '#',
+  ' # c',
+  '~1{61}',
+  '~1{zz}',
+  '~2{',
+  '~',
+  'é',
+  '🙂',
+  '́',
+  ' ',
+  '﻿',
+  'x y',
+  '((',
+  '))',
+  '\n  ',
+  '\n    ',
+  '"a b"',
+  "'it''s'",
+  '```q```',
+  '\u0001',
 ];
 const parser = new Parser({ maxDepth, maxInputSize: 1 << 20 });
 const vectors = [];
 for (let i = 0; i < count; i++) {
   let input = '';
   const length = 1 + random(14);
-  for (let j = 0; j < length; j++) input += pieces[random(pieces.length)];
+  for (let j = 0; j < length; j++) {
+    input += pieces[random(pieces.length)];
+  }
   const id = `fuzz-${i}`;
   try {
     const links = parser.parse(input);
-    vectors.push({ id, input, expected: links.map(linkTree), format: formatLinks(links) });
+    vectors.push({
+      id,
+      input,
+      expected: links.map(linkTree),
+      format: formatLinks(links),
+    });
   } catch (error) {
     if (error.name !== 'ParseError') {
       // An invalid ~1{...} literal: a plain Error without a location.
-      if (!/reference literal/.test(error.message)) throw error;
-      vectors.push({ id, input, error: true, code: 'invalid-literal', message: error.cause.message });
+      if (!/reference literal/.test(error.message)) {
+        throw error;
+      }
+      vectors.push({
+        id,
+        input,
+        error: true,
+        code: 'invalid-literal',
+        message: error.cause.message,
+      });
       continue;
     }
-    vectors.push({ id, input, error: true, code: error.maxDepth === null ? 'syntax-error' : 'depth-exceeded', line: error.line, column: error.column, message: error.cause.message });
+    vectors.push({
+      id,
+      input,
+      error: true,
+      code: error.maxDepth === null ? 'syntax-error' : 'depth-exceeded',
+      line: error.line,
+      column: error.column,
+      message: error.cause.message,
+    });
   }
 }
 process.stdout.write(JSON.stringify(vectors));
