@@ -84,6 +84,11 @@ Every view has `.accessibilityIdentifier` set to its element's link id
 `Text`, the label of a `Button`, `alt` of an image, and `title` of a document.
 Containers keep their children as separate accessibility elements.
 
+`UiViewAccessibilityTests` host a `UiView` in a window and read the tree that
+VoiceOver reads. SwiftUI builds that tree only once an assistive client is
+connected, so the tests first set `AXEnhancedUserInterface` on the app, as
+such a client does.
+
 ## Mapping
 
 | Kind       | SwiftUI view        | Properties                                                                                                                                                |
@@ -173,7 +178,11 @@ node --test tests/ui-swift-tokens.test.js  # the vendored Tokens.swift equals th
 
 The [Swift workflow](../../.github/workflows/swift.yml) runs them on Linux
 and on macOS, and uploads UiDemo screenshots (light and dark) as the
-`ui-swift-screenshots` artifact.
+`ui-swift-screenshots` artifact:
+
+| Light                                                                       | Dark                                                                      |
+| --------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| ![UiDemo, light](../../docs/screenshots/issue-30/ui-swift-uidemo-light.png) | ![UiDemo, dark](../../docs/screenshots/issue-30/ui-swift-uidemo-dark.png) |
 
 ## License
 
