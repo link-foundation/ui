@@ -123,6 +123,23 @@ actions, but not defaults, ranges, documentation or presets.
 Owner: #23 (settings schema engine), which grows `vocabulary.lino` into a
 schema language.
 
+## Boolean and integer types
+
+`values.md` has no `boolean` or `integer` type: `disabled` is
+`(enum true false)` and counts are plain `number` values, so a schema cannot
+say "whole numbers only" and a renderer has to compare the strings `'true'`
+and `'false'`.
+
+- (a) Add `boolean` and `integer` to the property types of `vocabulary.lino`.
+- (b) Keep `(enum true false)` and express ranges and whole numbers in the
+  schema language.
+
+Owner: #23 (settings schema engine), with #15 (typed values). v0 rule:
+`disabled` is `(enum true false)` and types as `{ type: 'enum', value: 'true' }`.
+The ui-core value layer already reads a `boolean` type name
+(`{ type: 'boolean', value: true }`) for vocabularies that declare one; no
+`integer` type is read yet.
+
 ## Asset record fields
 
 The `asset` kind lists the fields used by the samples (`kind`, `source`,

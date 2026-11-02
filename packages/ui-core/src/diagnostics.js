@@ -20,7 +20,7 @@ const MESSAGES = {
   'reserved-sigil': (at) =>
     `${where(at)} uses the reserved prefix @ or $${at.property ? ` in "${at.property}"` : ''}`,
   'invalid-value': (at) =>
-    `${where(at)} has an invalid value of "${at.property}"`,
+    `${where(at)} has an invalid value${at.property ? ` of "${at.property}"` : ''}`,
   'reference-cycle': (at) =>
     `The token "${at.token}" of ${where(at)} refers to itself`,
   'invalid-handler': (at) =>

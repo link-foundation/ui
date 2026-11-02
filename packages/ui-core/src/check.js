@@ -3,146 +3,19 @@
  * docs/spec/behaviour.md, docs/spec/ordering-and-ids.md). They run on the
  * projected tree and only add diagnostics; the tree is never changed.
  *
- * Every value check is a small character scanner: the package uses no
- * regular expressions, so no input can trigger catastrophic backtracking.
+ * Value types are checked by the value layer (src/values/), whose scanners
+ * use no regular expressions, so no input can trigger catastrophic
+ * backtracking.
  */
 
 import { diagnostic } from './diagnostics.js';
+import { sigilDiagnostics } from './values/refs.js';
+import { hasReservedSigil } from './values/scalars.js';
+import { valueMatches } from './values/typed.js';
 
-const isDigit = (c) => c >= '0' && c <= '9';
-const isHexDigit = (c) =>
-  isDigit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
-const isTokenChar = (c) => isDigit(c) || (c >= 'a' && c <= 'z') || c === '-';
+export { valueMatches };
 
-/** Index after a run of characters accepted by `accept`, from `i`. */
-function skip(text, i, accept) {
-  let j = i;
-  while (j < text.length && accept(text[j])) {
-    j++;
-  }
-  return j;
-}
-
-/**
- * Length of the unsigned decimal at the start of `text` (`12`, `1.5`, `.5`),
- * or -1 when there is none.
- */
-function decimalLength(text) {
-  const whole = skip(text, 0, isDigit);
-  if (text[whole] !== '.') {
-    return whole > 0 ? whole : -1;
-  }
-  const fraction = skip(text, whole + 1, isDigit);
-  return fraction > whole + 1 ? fraction : -1;
-}
-
-const unsigned = (text) => (text.startsWith('-') ? text.slice(1) : text);
-
-/** `-1`, `0.5`, `.5`, `1e3`, `2.5E-2` */
-export function isNumber(text) {
-  const body = unsigned(text);
-  const length = decimalLength(body);
-  if (length < 0) {
-    return false;
-  }
-  if (length === body.length) {
-    return true;
-  }
-  if (body[length] !== 'e' && body[length] !== 'E') {
-    return false;
-  }
-  let exponent = body.slice(length + 1);
-  if (exponent.startsWith('-') || exponent.startsWith('+')) {
-    exponent = exponent.slice(1);
-  }
-  return exponent.length > 0 && skip(exponent, 0, isDigit) === exponent.length;
-}
-
-/** A decimal followed by exactly one of `units`. */
-function isQuantity(text, units) {
-  const length = decimalLength(text);
-  return length > 0 && units.includes(text.slice(length));
-}
-
-const DIMENSION_UNITS = ['px', 'rem', 'em', '%', 'vw', 'vh'];
-const DURATION_UNITS = ['ms', 's'];
-const HEX_LENGTHS = [3, 4, 6, 8];
-const URL_PREFIXES = ['http:', 'https:', 'mailto:', '/', '.'];
 const UNSAFE_SCHEMES = ['javascript:', 'data:', 'vbscript:'];
-const COLOUR_FUNCTIONS = ['oklch', 'rgb'];
-
-export const isDimension = (text) =>
-  text === '0' || isQuantity(unsigned(text), DIMENSION_UNITS);
-
-export const isDuration = (text) => isQuantity(text, DURATION_UNITS);
-
-export const isHexColour = (text) =>
-  text.startsWith('#') &&
-  HEX_LENGTHS.includes(text.length - 1) &&
-  skip(text, 1, isHexDigit) === text.length;
-
-export const isUrl = (text) =>
-  !text.includes(':') || URL_PREFIXES.some((p) => text.startsWith(p));
-
-/** `space.medium`, `colour-1`: lowercase segments joined by dots. */
-export const isTokenName = (text) =>
-  text
-    .split('.')
-    .every(
-      (part) => part.length > 0 && skip(part, 0, isTokenChar) === part.length
-    );
-
-const hasReservedSigil = (text) => text.startsWith('@') || text.startsWith('$');
-
-const STRING_CHECKS = {
-  number: isNumber,
-  dimension: isDimension,
-  duration: isDuration,
-  color: isHexColour,
-  url: isUrl,
-  'token-name': isTokenName,
-};
-
-function isFunctionalColour(value) {
-  const [space, ...channels] = value;
-  return (
-    COLOUR_FUNCTIONS.includes(space) &&
-    (channels.length === 3 || channels.length === 4) &&
-    channels.every(
-      (c) =>
-        typeof c === 'string' && isNumber(c.endsWith('%') ? c.slice(0, -1) : c)
-    )
-  );
-}
-
-const isTypedReference = (value) =>
-  Array.isArray(value) && ['token', 'param', 'or'].includes(value[0]);
-
-/**
- * Whether a property value matches a vocabulary type.
- * @param {string|string[]|undefined} type
- * @param {import('./types.js').RawValue} value
- */
-export function valueMatches(type, value) {
-  if (typeof value === 'string' && hasReservedSigil(value)) {
-    return true; // reported as reserved-sigil instead
-  }
-  if (isTypedReference(value)) {
-    return value[0] === 'or'
-      ? value.slice(1).every((v) => valueMatches(type, v))
-      : value.length === 2 && typeof value[1] === 'string';
-  }
-  if (Array.isArray(type)) {
-    return type[0] === 'enum' && type.slice(1).includes(value);
-  }
-  if (typeof value !== 'string') {
-    if (type === 'color' && Array.isArray(value)) {
-      return isFunctionalColour(value);
-    }
-    return type === 'any' || type === 'action';
-  }
-  return STRING_CHECKS[type]?.(value) ?? true;
-}
 
 const isUnsafeTarget = (target) => {
   const text = String(target ?? '')
@@ -169,24 +42,13 @@ function checkHandler(values, vocabulary, report, at) {
   }
 }
 
-function eachString(value, visit) {
-  if (typeof value === 'string') {
-    visit(value);
-  } else {
-    const values = Array.isArray(value) ? value : value.values;
-    values.forEach((v) => eachString(v, visit));
-  }
-}
-
 function checkProperty(element, property, spec, vocabulary, report) {
   const at = { element: element.id, property: property.name };
-  property.values.forEach((v) =>
-    eachString(v, (text) => {
-      if (hasReservedSigil(text)) {
-        report('reserved-sigil', 'warning', at);
-      }
-    })
-  );
+  for (const value of property.values) {
+    for (const { code, severity } of sigilDiagnostics(value)) {
+      report(code, severity, at);
+    }
+  }
   const type = spec?.properties.get(property.name)?.type;
   if (type === 'action') {
     checkHandler(property.values, vocabulary, report, at);

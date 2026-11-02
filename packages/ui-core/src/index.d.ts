@@ -172,3 +172,154 @@ export function valueMatches(
   type: RawValue | undefined,
   value: RawValue
 ): boolean;
+
+/**
+ * The value layer (docs/spec/values.md): typed values, units, colours and
+ * references, typed by the property types of the vocabulary.
+ */
+export namespace values {
+  /** sRGB, gamma-encoded, every channel 0..1 (`#FFFFFF` is r = g = b = 1). */
+  interface SrgbColor {
+    type: 'color';
+    space: 'srgb';
+    r: number;
+    g: number;
+    b: number;
+    a: number;
+  }
+  /** OKLCH: lightness 0..1, chroma, hue in degrees, alpha 0..1. */
+  interface OklchColor {
+    type: 'color';
+    space: 'oklch';
+    l: number;
+    c: number;
+    h: number;
+    a: number;
+  }
+  type Color = SrgbColor | OklchColor;
+
+  /** A value with its type; a bare `0` dimension has the unit `''`. */
+  type TypedValue =
+    | {
+        type: 'dimension';
+        value: number;
+        unit: 'px' | 'rem' | 'em' | '%' | 'vw' | 'vh' | '';
+      }
+    | { type: 'duration'; value: number; unit: 'ms' | 's' }
+    | Color
+    | { type: 'token-ref'; path: string }
+    | { type: 'element-ref'; id: string }
+    | { type: 'param'; path: string }
+    | { type: 'action'; name: string; args: TypedValue[] }
+    | { type: 'fallback'; options: TypedValue[] }
+    | { type: 'string' | 'enum' | 'url'; value: string }
+    | { type: 'number'; value: number }
+    | { type: 'boolean'; value: boolean }
+    | { type: 'list'; items: TypedValue[]; id?: string };
+
+  /** A vocabulary property type: `'dimension'`, `['enum', 'a', 'b']`. */
+  type ValueType = string | RawValue[];
+
+  interface ValueSpec {
+    type: ValueType;
+    multi?: boolean;
+  }
+
+  interface TypeOptions {
+    /** Types the arguments of known actions (default: ui-dialect/0). */
+    vocabulary?: Vocabulary;
+    /** Where diagnostics point: `{ element, property }`. */
+    at?: DiagnosticLocation;
+  }
+
+  /** `invalid-value` diagnostics also give the `expected` type as text. */
+  interface ValueDiagnostic extends Diagnostic {
+    expected?: string;
+  }
+
+  interface TypedResult {
+    /** `null` when the value is invalid. */
+    value: TypedValue | null;
+    diagnostics: ValueDiagnostic[];
+  }
+
+  interface TypedUiProperty extends UiProperty {
+    typed: (TypedValue | null)[];
+  }
+
+  interface TypedUiNode extends Omit<UiNode, 'properties' | 'children'> {
+    typedPositional: (TypedValue | null)[];
+    properties: TypedUiProperty[];
+    children: TypedUiNode[];
+  }
+
+  interface CssOptions {
+    /** CSS of a `token-ref` or `param`; default `var(--color-primary)`. */
+    refToVar?: (ref: TypedValue, fallback?: string) => string;
+  }
+
+  /** Type one raw value with a property spec (default `{ type: 'any' }`). */
+  function typeValue(
+    raw: RawValue,
+    spec?: ValueSpec,
+    options?: TypeOptions
+  ): TypedResult;
+  /** Type every value of an element and its children. */
+  function typeNode(
+    node: UiNode,
+    vocabulary?: Vocabulary,
+    diagnostics?: Diagnostic[]
+  ): TypedUiNode;
+  function typeDocument(
+    doc: Pick<UiDocument, 'roots'>,
+    vocabulary?: Vocabulary
+  ): { roots: TypedUiNode[]; diagnostics: ValueDiagnostic[] };
+  function valueMatches(type: ValueType | undefined, value: RawValue): boolean;
+  /** The type of a value when no property type is known. */
+  function inferValue(raw: RawValue): TypedValue;
+
+  /** Canonical Links Notation: `16px`, `'#6750A4'`, `(token a.b)`. */
+  function formatValue(value: TypedValue): string;
+  /** Read one value written by `formatValue`; throws on other input. */
+  function parseValue(text: string): RawValue;
+  /** CSS text; `null` for actions. */
+  function toCss(value: TypedValue, options?: CssOptions): string | null;
+  function toRaw(value: TypedValue): RawValue;
+  function defaultRefToVar(ref: TypedValue, fallback?: string): string;
+
+  function parseColor(raw: RawValue): Color | null;
+  function formatColor(color: Color): string;
+  function colorCss(color: Color): string;
+  function oklchToSrgb(color: OklchColor): SrgbColor;
+  function srgbToOklch(color: SrgbColor): OklchColor;
+  /** Upper-case `#RRGGBB`, or `#RRGGBBAA` when not opaque. */
+  function toHex(color: Color): string;
+
+  /** `undefined` when not a reference, `null` when malformed. */
+  function parseReference(
+    raw: RawValue,
+    typeOption: (option: RawValue) => TypedValue | null
+  ): TypedValue | null | undefined;
+  function isReference(raw: RawValue): boolean;
+  function sigilDiagnostics(
+    raw: RawValue,
+    at?: DiagnosticLocation
+  ): Diagnostic[];
+
+  const DIMENSION_UNITS: readonly string[];
+  const DURATION_UNITS: readonly string[];
+  function isNumber(text: string): boolean;
+  function isDimension(text: string): boolean;
+  function isDuration(text: string): boolean;
+  function isHexColour(text: string): boolean;
+  function isUrl(text: string): boolean;
+  function isTokenName(text: string): boolean;
+  function hasReservedSigil(text: string): boolean;
+  function parseNumber(text: string): number | null;
+  function parseDimension(text: string): { value: number; unit: string } | null;
+  function parseDuration(text: string): { value: number; unit: string } | null;
+  function splitQuantity(
+    text: string,
+    units: readonly string[]
+  ): { value: number; unit: string } | null;
+}
