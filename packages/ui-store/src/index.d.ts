@@ -251,6 +251,41 @@ export function openDoubletsWeb(
   load?: () => Promise<unknown>
 ): Promise<{ module: any; links: any }>;
 
+/**
+ * A storage with the doublets interface (the storages of
+ * `@link-foundation/ui-links`, doublets-web's `UnitedLinks` through its
+ * ui-links adapter, a synced client).
+ */
+export interface DoubletsStorageLike extends UnitedLinksLike {
+  each(
+    handler: (link: { id: number; from_id: number; to_id: number }) => number,
+    query?: { id: number; from_id: number; to_id: number }
+  ): unknown;
+}
+/**
+ * Write the doublets of a document into `links`; with `names`, the string
+ * points get their names there too.
+ */
+export function writeDocumentLinks(
+  encoded: EncodedDocument,
+  links: UnitedLinksLike,
+  names?: { setName(id: number, name: string): unknown } | null
+): { names: Map<string, number>; roots: number[] };
+/**
+ * Read a document back from `links`: only the links reachable from `roots`.
+ * Throws a `StoreError` (`bad-doublets`) for doublets of another form.
+ */
+export function readDocumentLinks(
+  links: DoubletsStorageLike,
+  where: {
+    roots: number[];
+    names:
+      | Map<string, number>
+      | Iterable<[string, number]>
+      | { getName(id: number): string | null };
+  }
+): UiDocument;
+
 export interface BundleLimits {
   /** Default: ui-core `DEFAULT_MAX_DEPTH`. */
   maxDepth?: number;

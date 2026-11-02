@@ -49,6 +49,7 @@
     }
   },
   "devDependencies": {
+    "@link-foundation/ui-links": "^0.0.0",
     "doublets-web": "^0.1.3",
     "fake-indexeddb": "^6.2.7",
     "test-anywhere": "^0.8.48"
