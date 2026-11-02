@@ -136,6 +136,7 @@ npm run example:desktop:package
 │   ├── ui-config/        # @link-foundation/ui-config (layered configuration, overrides patches)
 │   ├── ui-convert/       # @link-foundation/ui-convert (HTML/DOM, A2UI, Adaptive Cards, JSON Forms, Lottie <-> LiNo)
 │   ├── ui-core/          # @link-foundation/ui-core
+│   ├── ui-settings/      # @link-foundation/ui-settings (settings schemas, presets, share links)
 │   ├── ui-store/         # @link-foundation/ui-store
 │   └── ui-tokens/        # @link-foundation/ui-tokens (design tokens)
 ├── tests/                # Repository and release-script tests
