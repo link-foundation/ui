@@ -44,6 +44,7 @@ on:
           - '@link-foundation/ui-i18n'
           - '@link-foundation/ui-settings'
           - '@link-foundation/ui-store'
+          - '@link-foundation/ui-style'
           - '@link-foundation/ui-tokens'
 
 # Least-privilege default for the highest-value token in the repository.
