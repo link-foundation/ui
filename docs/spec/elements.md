@@ -71,6 +71,12 @@ warning `unknown-sublink` (its `at.element` is `null`).
 If the vocabulary declares `(children none)` for a kind, a child of such an
 element gives the warning `unexpected-child`; the child is still kept.
 
+Every kind has the property `note` (a `common-property` of the dialect in
+[vocabulary.lino](vocabulary.lino)): one or more strings that explain the
+element to a reader, such as `(note 'Why this is red')`. A note is part of the
+tree, so unlike a `#` comment it is kept by any tool that rewrites the
+document. Renderers MAY ignore it.
+
 ## JSON form
 
 Each element MUST be projected to this JSON object (see
