@@ -486,6 +486,10 @@ export function readSchema(text, options = {}) {
     presets: new Map(),
     migrations: [],
   };
+  if (records.length === 0 && diagnostics.length > 0) {
+    // The text could not be read at all.
+    return { schema, diagnostics };
+  }
   const heads = records.map((record) => {
     const { kind, id, rest } = headOf(record);
     return { kind, id, values: record.values.slice(rest) };
