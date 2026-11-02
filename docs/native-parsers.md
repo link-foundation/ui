@@ -6,9 +6,10 @@ Native renderers must read the same documents the same way, so each one needs
 a parser that behaves exactly like that package. This page records where those
 parsers live and how they are kept in step with it.
 
-| Language | Where                                                         | Status   | Issue                                                  |
-| -------- | ------------------------------------------------------------- | -------- | ------------------------------------------------------ |
-| Swift    | [`native/swift/LinksNotation`](../native/swift/LinksNotation) | vendored | [#29](https://github.com/link-foundation/ui/issues/29) |
+| Language | Where                                                             | Status   | Issue                                                  |
+| -------- | ----------------------------------------------------------------- | -------- | ------------------------------------------------------ |
+| Swift    | [`native/swift/LinksNotation`](../native/swift/LinksNotation)     | vendored | [#29](https://github.com/link-foundation/ui/issues/29) |
+| Kotlin   | [`native/kotlin/links-notation`](../native/kotlin/links-notation) | vendored | [#31](https://github.com/link-foundation/ui/issues/31) |
 
 ## Swift
 
@@ -130,12 +131,137 @@ whenever `native/swift/**` or `docs/spec/**` changes. The issue asked for
 (`scripts/check-ci-workflows.mjs`) requires pinned runner images, so the
 workflow uses `ubuntu-24.04` and `macos-15`.
 
+## Kotlin
+
+Issue: [#31](https://github.com/link-foundation/ui/issues/31). Upstream
+issue: [link-foundation/links-notation#370](https://github.com/link-foundation/links-notation/issues/370)
+("Add Kotlin Multiplatform implementation").
+
+### Options
+
+Upstream has no Kotlin port. It has a Java implementation in `java/`
+(`io.github.link-foundation:links-notation`, Java 21), but that artifact is
+not published yet:
+[links-notation#192](https://github.com/link-foundation/links-notation/issues/192)
+is open.
+
+| Option                                                                 | Works on                                                                                   | Pros                                                                | Cons                                                                                                            |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| A. Wrap the Java artifact (`io.github.link-foundation:links-notation`) | JVM and Android only. Java 21 bytecode on Android needs a check of current AGP/D8 support. | No new parser; upstream keeps parity                                | Blocked until links-notation#192 publishes it; no iOS, web or Wasm, so useless for Compose Multiplatform on iOS |
+| B. Pure Kotlin Multiplatform port (chosen)                             | All KMP targets                                                                            | One parser for Android, iOS, desktop and web; no Java 21 constraint | One more hand-written binding to maintain                                                                       |
+
+### Decision
+
+**Option B**, a pure Kotlin Multiplatform port. Option A cannot be used at all
+while links-notation#192 is open, and it never covers iOS, JS or Wasm.
+
+The port is offered upstream as `kotlin/` in
+[links-notation#370](https://github.com/link-foundation/links-notation/issues/370),
+with a `kotlin` entry in `parity/language-features.json` and the Maven Central
+coordinates `io.github.link-foundation:links-notation-kotlin` (to be confirmed
+by the maintainer). Until upstream takes it, it is **vendored here** under
+[`native/kotlin/links-notation/`](../native/kotlin/links-notation/), where the
+`ui-kotlin` package of #32 can depend on it as a Gradle included build. When
+upstream publishes it, #32 switches to the published artifact and the vendored
+copy is removed.
+
+### The port
+
+- **Project:** Gradle 9.8.2 (wrapper) and Kotlin 2.4.21. There are no runtime
+  dependencies; `kotlin("test")` is used only in `commonTest`. Every source
+  file is in `commonMain`, and none imports `java.*`.
+- **Targets:** `jvm`, Android, `iosArm64`, `iosSimulatorArm64`, `iosX64`, `js`
+  (Node.js) and `wasmJs` (Node.js).
+- **Package:** `io.github.linkfoundation.linksnotation`, the same as the Java
+  implementation.
+- **API:**
+  - `Link(id, values)` with `format()`;
+  - `ParserOptions(maxDepth = 64, maxInputSize = null, comments = true)`;
+  - a sealed `ParseException` with `Syntax(line, column)`,
+    `DepthExceeded(limit)` and `InputTooLarge(limit)`;
+  - `Parser(options).parse(text)`;
+  - `formatLinks(links)`.
+
+  `Link.format(lessParentheses)` and `formatLinks(links, lessParentheses)`
+  mirror the JavaScript optional argument.
+
+- **Parser:** a hand-written recursive-descent port of `js/src/grammar.pegjs`
+  (links-notation 0.27.1), with the `Parser.js` post-processing (indentation
+  paths, nested groups) and the `references.js`, `quotes.js` and `comments.js`
+  rules. It reproduces the Peggy 5.1.0 error reporting: the furthest position
+  reached, the sorted expectation list, and the `Syntax error at line L,
+column C: …` message with the quoted source line and caret.
+- **Tests:** the `generateParityCases` Gradle task turns the upstream parity
+  corpus ([`native/parity/text-fixtures.json`](../native/parity/text-fixtures.json),
+  byte-equal to the Swift package's copy) and the parser vectors into
+  `build/generated/commonTest/ParityCases.kt`, so every target runs them
+  without file I/O. The test classes are:
+  - `ParityTest`, over the upstream corpus;
+  - `SpecVectorsTest`, over the parser vectors, with the limits of
+    `docs/spec/limits.md`; an error vector must be refused with the same
+    diagnostic code, line, column and message;
+  - `LimitsTest`: 64 levels are read and 65 are refused, through both
+    parentheses and indentation, and input over `maxInputSize` is refused;
+  - `ParserTest`: quoting, comments, `lessParentheses`, error messages and
+    reference literals.
+- **CI:** `.github/workflows/kotlin.yml` runs:
+  - the JVM, JS and Wasm tests on Linux;
+  - the Android host tests on Linux;
+  - the iOS simulator tests on macOS.
+- **Differential test:**
+  [`experiments/kotlin-differential/`](../experiments/kotlin-differential/README.md)
+  compares the port with the JavaScript parser on random documents. It checks
+  the parse tree, the `formatLinks` text, and for refused documents the error
+  kind, line, column and full message. It found 0 mismatches in about 50,000
+  documents.
+
+### Differences from the JavaScript parser and from the issue sketch
+
+- **Positions and sizes count UTF-16 code units.** The issue suggested
+  iterating by code points. The port uses UTF-16 units instead, the unit of
+  both Kotlin and JavaScript `String.length`, so a column and a
+  `maxInputSize` mean exactly what they mean in JavaScript. Characters outside
+  the BMP are kept whole: the `unicode-fidelity` case and the differential
+  test cover them.
+- **`DepthExceeded` is a `Syntax` error**, with the line and column of the
+  group or line that went too deep. The JavaScript parser refuses such a
+  document with the same `ParseError` as any other syntax error, so code that
+  catches `Syntax` keeps working, while code that needs the reason can catch
+  `DepthExceeded`.
+- **A malformed reference literal is located.** For `~1{zz}`, the JavaScript
+  parser throws `Parse error: …` without a line or column. The port throws
+  `ParseException.Syntax` at the start of the literal, with the same reason.
+- **`comments` option.** Like JavaScript `new Parser({ comments: false })`,
+  this turns `#` comments off. The default is on.
+- **Android target.** Kotlin 2.4 with Android Gradle plugin 9 no longer
+  supports `androidTarget()` with `com.android.library`. The port uses the
+  AGP 9 `com.android.kotlin.multiplatform.library` plugin, whose target is
+  declared as `android {}`. The build applies it only where an Android SDK is
+  found (`ANDROID_HOME`, `ANDROID_SDK_ROOT` or `local.properties`), so the
+  other targets build on a machine without one.
+
+### Not ported
+
+These are recorded as exceptions, as upstream does for its other partial
+bindings: streaming parsing, the binary protocol, `LinksGroup`, and
+`parseIndentedDocument`.
+
+### Verify
+
+```bash
+cd native/kotlin/links-notation
+./gradlew allTests          # every target the host can run (iOS needs macOS)
+grep -r "import java" src/commonMain && echo "FAIL: JVM-only import" || echo OK
+cd - && node scripts/generate-parser-vectors.mjs --check
+```
+
 ## Parser vectors
 
 [`docs/spec/parser-vectors.json`](spec/parser-vectors.json) records what the
 reference parser makes of every conformance fixture
 (`docs/spec/fixtures/**/*.lino`). It lets every native port check itself
-without Node.js. The Kotlin port ([#31](https://github.com/link-foundation/ui/issues/31)) is meant to reuse it.
+without Node.js. The Swift (`SpecVectorsTests`) and Kotlin (`SpecVectorsTest`)
+ports both run it.
 
 The file is a JSON array with one vector per line, in fixture path order. The
 `id` is the fixture path below `fixtures/`, without `.lino`.

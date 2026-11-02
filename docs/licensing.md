@@ -10,6 +10,10 @@ holds the text of every licence in use.
 - **Code** is public domain under the [Unlicense](../LICENSE) (R25).
 - **Our own assets** are public domain under
   [CC0-1.0](../LICENSES/CC0-1.0.txt) (R26).
+- **Vendored tool scripts** keep their own licence header. The Gradle
+  wrapper of the Kotlin parser (`native/kotlin/links-notation/gradlew`,
+  `gradlew.bat`) is Gradle's Apache-2.0 code, so
+  [Apache-2.0](../LICENSES/Apache-2.0.txt) is in `LICENSES/`.
 - **Third-party icons and assets** are allowed, but each one links to its
   source and states its copyright, licence and attribution (R27) in a record
   in [`assets/assets.lino`](../assets/assets.lino).
