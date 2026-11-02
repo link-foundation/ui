@@ -44,7 +44,10 @@ fail when more than 0.1 % of the pixels differ by more than the per-pixel
 ## Adding tests to a package
 
 1. Create `packages/<name>/e2e/pages/` with static fixture pages. The server
-   mounts them at `/packages/<name>/e2e/pages/`.
+   mounts them at `/packages/<name>/e2e/pages/`. It also serves every
+   package's `src/` at `/packages/<name>/src/`, the `links-notation` dist
+   and the issue-1 samples, so a page can load the packages with an import
+   map and no bundler (see `examples/ui-dom/`).
 2. Create `packages/<name>/e2e/<topic>.e2e.mjs`:
 
    ```js
