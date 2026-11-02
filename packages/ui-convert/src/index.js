@@ -1,6 +1,7 @@
 /**
  * `@link-foundation/ui-convert`: converters between other UI formats and
- * the UI dialect of Links Notation. This release has the HTML/DOM importer.
+ * the UI dialect of Links Notation: the HTML/DOM importer and the A2UI,
+ * Adaptive Cards, JSON Forms and Lottie interop.
  */
 
 export { importHtml, importDom } from './html/import.js';
@@ -25,3 +26,6 @@ export {
 } from './html/vocabulary.js';
 export { readHtml } from './html/from-html.js';
 export { readDom } from './html/from-dom.js';
+
+export { Diagnostics } from './diagnostics.js';
+export * from './interop/index.js';
