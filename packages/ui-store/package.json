@@ -38,6 +38,9 @@
   "dependencies": {
     "@link-foundation/ui-core": "^0.0.0"
   },
+  "devDependencies": {
+    "test-anywhere": "^0.8.48"
+  },
   "publishConfig": {
     "access": "public"
   }
