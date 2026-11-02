@@ -10,7 +10,9 @@
   (property block-height any)
   (property alignment any)
   (property fallback any)
-  (property requires any))
+  (property requires any)
+  (property rule any)
+  (property options any))
 
 (document: kind
   (property source any)
@@ -64,6 +66,19 @@
   (property associated-inputs any)
   (property verb any))
 
+(section: kind
+  (description 'A titled group of elements (JSON Forms Group).')
+  (property title any)
+  (property direction any))
+
+(tabs: kind
+  (description 'Tabs; every child is a tab (JSON Forms Categorization).')
+  (property title any))
+
+(tab: kind
+  (description 'One tab of tabs (JSON Forms Category).')
+  (property title any))
+
 (facts: kind
   (description 'A list of title and value pairs.')
   (property fact any multi)
@@ -97,8 +112,6 @@
   (property format any)
   (property type any)
   (property option any multi)
-  (property rule any multi)
-  (property options any)
   (children none))
 
 (text-field: kind
