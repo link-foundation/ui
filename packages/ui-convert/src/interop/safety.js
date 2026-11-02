@@ -26,3 +26,12 @@ export function isUnsafeUrl(url) {
  */
 export const isObject = (value) =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
+
+/**
+ * Whether an object key could reach the prototype of an object
+ * (`__proto__`, `constructor` or `prototype`). Data paths that name one
+ * are never followed or written.
+ * @param {unknown} key
+ */
+export const isUnsafeKey = (key) =>
+  key === '__proto__' || key === 'constructor' || key === 'prototype';

@@ -158,4 +158,31 @@ describe('JSON Forms scopes', () => {
       normalizeJsonForms(input)
     );
   });
+
+  it('never follows a scope that names __proto__ or constructor', () => {
+    // JSON.parse makes "__proto__" an own key, as untrusted input would.
+    const input = JSON.parse(`{
+      "schema": { "type": "object", "properties": {
+        "__proto__": { "type": "string", "minLength": 2 },
+        "name": { "type": "string" } } },
+      "uischema": { "type": "VerticalLayout", "elements": [
+        { "type": "Control", "scope": "#/properties/__proto__" },
+        { "type": "Control", "scope": "#/properties/constructor" },
+        { "type": "Control", "scope": "#/properties/name" } ] }
+    }`);
+    const prototypeKeys = Object.getOwnPropertyNames(Object.prototype);
+    const { lino, diagnostics } = importJsonForms(input);
+    expect(codes(diagnostics)).toEqual([
+      'unsafe-path',
+      'unsafe-path',
+      'unbound-schema',
+    ]);
+    expect(diagnostics[0].at.path).toBe('/uischema/elements/0/scope');
+    expect(lino).toContain(`(bind '#/properties/__proto__')`);
+    const out = exportJsonForms(lino);
+    expect(errors(out.diagnostics)).toEqual([]);
+    // Compared as text, because toEqual skips an own "__proto__" key.
+    expect(JSON.stringify(out.json)).toBe(JSON.stringify(input));
+    expect(Object.getOwnPropertyNames(Object.prototype)).toEqual(prototypeKeys);
+  });
 });

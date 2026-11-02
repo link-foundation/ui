@@ -15,7 +15,7 @@
 import { Diagnostics } from '../../diagnostics.js';
 import { encodeAny, extraProperty } from '../extra.js';
 import { IdAllocator, element, prop, writeLino } from '../lino.js';
-import { isObject } from '../safety.js';
+import { isObject, isUnsafeKey } from '../safety.js';
 import {
   FORMAT,
   JSON_FORMS_VERSION,
@@ -72,7 +72,15 @@ class FormImporter {
   locate(path) {
     let parent = this.residual;
     for (const [index, name] of path.entries()) {
-      const property = parent?.properties?.[name];
+      const properties = parent?.properties;
+      if (
+        isUnsafeKey(name) ||
+        !isObject(properties) ||
+        !Object.hasOwn(properties, name)
+      ) {
+        return null;
+      }
+      const property = properties[name];
       if (!isObject(property)) {
         return null;
       }
@@ -184,6 +192,12 @@ class FormImporter {
         'control-without-scope',
         'A Control has no string "scope", so it has no binding.',
         { path }
+      );
+    } else if (json.scope.split('/').some(isUnsafeKey)) {
+      this.diagnostics.warning(
+        'unsafe-path',
+        'A scope that names __proto__, constructor or prototype is kept as the raw scope, and its schema is not read.',
+        { path: `${path}/scope` }
       );
     }
     const last = steps?.at(-1) ?? 'field';

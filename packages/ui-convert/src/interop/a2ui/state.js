@@ -4,7 +4,7 @@
  * a time, exactly as a client renderer would apply them.
  */
 
-import { isObject } from '../safety.js';
+import { isObject, isUnsafeKey } from '../safety.js';
 import { MESSAGE_TYPES, SUPPORTED_VERSIONS } from './shared.js';
 
 /**
@@ -14,9 +14,6 @@ import { MESSAGE_TYPES, SUPPORTED_VERSIONS } from './shared.js';
  *   model: unknown }} Surface
  * @typedef {{ surfaces: Map<string, Surface> }} State
  */
-
-/** JSON Pointer steps that could reach the prototype of an object. */
-const FORBIDDEN_STEPS = ['__proto__', 'constructor', 'prototype'];
 
 /** @returns {State} */
 export const emptyState = () => ({ surfaces: new Map() });
@@ -66,7 +63,7 @@ function writeModel(model, steps, value) {
   for (const [i, step] of steps.entries()) {
     const last = i === steps.length - 1;
     const key = Array.isArray(at) ? arrayIndex(at, step) : step;
-    if (key === -1) {
+    if (key === -1 || isUnsafeKey(key)) {
       return root;
     }
     if (last) {
@@ -245,7 +242,7 @@ export class StateFolder {
       );
       return;
     }
-    if (steps.some((step) => FORBIDDEN_STEPS.includes(step))) {
+    if (steps.some(isUnsafeKey)) {
       this.diagnostics.error(
         'unsafe-path',
         'A data model path may not name __proto__, constructor or prototype; the update is skipped.',

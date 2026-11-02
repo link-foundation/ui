@@ -3,6 +3,7 @@
  */
 
 import { loadMapping } from '../mapping.js';
+import { isUnsafeKey } from '../safety.js';
 
 /** The format name used in `(source ...)`, `(extra ...)` and diagnostics. */
 export const FORMAT = 'json-forms';
@@ -20,7 +21,8 @@ const PREFIX = '#/properties/';
 
 /**
  * The data path of a scope made only of `properties` steps
- * (`#/properties/a/properties/b` -> `['a', 'b']`), or `null`.
+ * (`#/properties/a/properties/b` -> `['a', 'b']`), or `null`. A step that
+ * names `__proto__`, `constructor` or `prototype` is not a data path.
  * @param {unknown} scope
  * @returns {string[]|null}
  */
@@ -34,7 +36,8 @@ export function scopePath(scope) {
     !part.includes('/') &&
     !part.includes('.') &&
     !part.includes('~') &&
-    !part.includes('#');
+    !part.includes('#') &&
+    !isUnsafeKey(part);
   return parts.every(plain) ? parts : null;
 }
 
