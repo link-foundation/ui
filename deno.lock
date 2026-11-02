@@ -1473,6 +1473,14 @@
             "npm:test-anywhere@~0.8.48"
           ]
         }
+      },
+      "packages/ui-store": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@link-foundation/ui-core@^0.0.0",
+            "npm:test-anywhere@~0.8.48"
+          ]
+        }
       }
     }
   }

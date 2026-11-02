@@ -121,6 +121,18 @@ export function toTree(doc: UiDocument): UiTree;
 /** Write a UI document as Links Notation text. */
 export function format(doc: UiDocument, options?: FormatOptions): string;
 
+/**
+ * Read Links Notation text into raw values without the element projection.
+ * Throws `UiParseError` when the text cannot be read.
+ */
+export function parseLinks(
+  text: string,
+  options?: { maxDepth?: number; maxInputSize?: number }
+): RawValue[];
+
+/** Write raw values as Links Notation text, one top-level link per line. */
+export function formatLinks(values: RawValue[]): string;
+
 /** One element as a single `Link` (the one-line form). */
 export function elementLink(node: UiNode): Link;
 

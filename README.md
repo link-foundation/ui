@@ -108,7 +108,8 @@ npm run example:desktop:package
 ├── scripts/              # Build and release scripts
 ├── packages/             # npm workspaces (see docs/monorepo.md)
 │   ├── ui-convert/       # @link-foundation/ui-convert (HTML/DOM -> LiNo)
-│   └── ui-core/          # @link-foundation/ui-core
+│   ├── ui-core/          # @link-foundation/ui-core
+│   └── ui-store/         # @link-foundation/ui-store
 ├── tests/                # Repository and release-script tests
 ├── .eslintrc.js          # ESLint configuration
 ├── .prettierrc           # Prettier configuration

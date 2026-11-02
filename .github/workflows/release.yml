@@ -40,6 +40,7 @@ on:
         options:
           - '@link-foundation/ui-core'
           - '@link-foundation/ui-convert'
+          - '@link-foundation/ui-store'
 
 # Least-privilege default for the highest-value token in the repository.
 # Every job starts read-only; the publishing jobs escalate individually.

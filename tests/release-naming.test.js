@@ -47,11 +47,11 @@ describe('release naming in the npm workspaces root', () => {
   it('tags the RELEASE_PACKAGE workspace package as <name>@<version>', () => {
     const options = {
       ...WORKSPACE,
-      env: { RELEASE_PACKAGE: '@link-foundation/ui-convert' },
+      env: { RELEASE_PACKAGE: '@link-foundation/ui-store' },
     };
-    expect(getDefaultTagPrefix(options)).toBe('@link-foundation/ui-convert@');
+    expect(getDefaultTagPrefix(options)).toBe('@link-foundation/ui-store@');
     expect(buildReleaseTag('1.2.3', options)).toBe(
-      '@link-foundation/ui-convert@1.2.3'
+      '@link-foundation/ui-store@1.2.3'
     );
   });
 

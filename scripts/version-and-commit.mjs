@@ -179,11 +179,6 @@ async function getVersion(source = 'local') {
   return packages.map((pkg, i) => `${pkg.name}@${versions[i]}`).join(' ');
 }
 
-/**
- * Read the version of one manifest, locally or from origin/main.
- * @param {string} manifestPath
- * @param {string} source - 'local' or 'remote'
- */
 async function readVersion(manifestPath, source) {
   const packageJsonPath = manifestPath
     .replaceAll('\\', '/')
