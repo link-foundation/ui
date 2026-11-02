@@ -149,8 +149,8 @@ class SurfaceExporter {
     if ((SLOT_KEYS[type] ?? []).some((key) => key in extra)) {
       return;
     }
-    const titles = allValues(node, 'tab').map((v) =>
-      decodeDynamic('tab', v[0])
+    const titles = allValues(node, 'tab-title').map((v) =>
+      decodeDynamic('tab-title', v[0])
     );
     const repeat = bindPath(value(node, 'repeat'));
     Object.assign(

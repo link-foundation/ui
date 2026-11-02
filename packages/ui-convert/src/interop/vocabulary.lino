@@ -88,9 +88,9 @@
   (property direction any))
 
 (tabs: kind
-  (description 'Tabs; every child is a tab (JSON Forms Categorization), or the content of the matching (tab <title>) (A2UI Tabs).')
+  (description 'Tabs; every child is a tab (JSON Forms Categorization), or the content of the matching (tab-title <title>) (A2UI Tabs).')
   (property title any)
-  (property tab any multi))
+  (property tab-title any multi))
 
 (tab: kind
   (description 'One tab of tabs (JSON Forms Category).')

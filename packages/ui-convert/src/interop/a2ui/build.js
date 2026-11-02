@@ -103,7 +103,7 @@ export function nesting(surface) {
 
 /**
  * The slots of a component rebuilt from the ids of its nested children and
- * the `(tab ...)` titles and `(repeat ...)` path of its element. Only keys
+ * the `(tab-title ...)` titles and `(repeat ...)` path of its element. Only keys
  * with something to hold are written.
  * @param {string} type
  * @param {string[]} ids
@@ -132,7 +132,7 @@ export function rebuildSlots(type, ids, parts) {
   return out;
 }
 
-/** The `(tab ...)` titles and template path a component's slots need. */
+/** The `(tab-title ...)` titles and template path a component's slots need. */
 function slotParts(component) {
   const parts = {};
   const { children, tabs } = component;
@@ -308,7 +308,7 @@ export class TreeBuilder {
     keys.forEach((k) => handled.add(k));
     if (rebuilt.tabs) {
       return parts.titles.map((title) =>
-        prop('tab', encodeDynamic('tab', title))
+        prop('tab-title', encodeDynamic('tab-title', title))
       );
     }
     return parts.repeat !== undefined && rebuilt.children
