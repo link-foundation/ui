@@ -65,8 +65,14 @@ The release scripts discover packages through `scripts/workspace-packages.mjs`:
 
 A root `package.json` without `workspaces` keeps the single-package behaviour
 (the root itself is the release package). When several packages are
-publishable, the single-package steps (instant version bump, GitHub release)
-need `RELEASE_PACKAGE=<package-name>`.
+publishable, the changeset release handles all of them: the release check
+looks at every package, merged changesets keep the bump of each package,
+`changeset publish` publishes every package npm does not have yet, the smoke
+test covers each of them, and the release job creates one GitHub release
+`<name>@<version>` per package that has none yet. The manual release steps
+(instant version bump, changeset PR) change one package, so they need
+`RELEASE_PACKAGE=<package-name>`; the release workflow sets it from its
+`package` input.
 
 ## Changesets
 

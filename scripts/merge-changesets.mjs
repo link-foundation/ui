@@ -28,7 +28,7 @@ import { getChangesetDir, getJsRoot, parseJsRootConfig } from './js-paths.mjs';
 import {
   formatChangesetHeader,
   getChangesetVersionTypeRegex,
-  readPackageInfo,
+  readReleasePackages,
 } from './package-info.mjs';
 import { printUntrusted } from './github-actions-log.mjs';
 
@@ -114,12 +114,13 @@ function generateChangesetName() {
 }
 
 /**
- * Parse a changeset file and extract its metadata
+ * Parse a changeset file and extract its metadata. A changeset may bump
+ * several release packages; `types` maps each one it names to its bump type.
  * @param {string} filePath
- * @param {string} packageName
- * @returns {{type: string, description: string, mtime: Date}}
+ * @param {string[]} packageNames
+ * @returns {{types: Record<string, string>, description: string, mtime: Date}}
  */
-function parseChangeset(filePath, packageName) {
+function parseChangeset(filePath, packageNames) {
   let content;
   let stats;
 
@@ -132,16 +133,22 @@ function parseChangeset(filePath, packageName) {
     });
   }
 
-  // Extract version type - support both quoted and unquoted package names
-  const versionTypeRegex = getChangesetVersionTypeRegex(packageName, {
-    requireQuotes: false,
-  });
-  const versionTypeMatch = content.match(versionTypeRegex);
+  // Extract version types - support both quoted and unquoted package names
+  const types = {};
+  for (const packageName of packageNames) {
+    const versionTypeRegex = getChangesetVersionTypeRegex(packageName, {
+      requireQuotes: false,
+    });
+    const versionTypeMatch = content.match(versionTypeRegex);
+    if (versionTypeMatch) {
+      types[packageName] = versionTypeMatch[1];
+    }
+  }
 
-  if (!versionTypeMatch) {
+  if (Object.keys(types).length === 0) {
     throw new Error(
       `Could not parse version type from ${filePath}. Expected a changeset header like ${formatChangesetHeader(
-        packageName,
+        packageNames[0],
         'patch'
       )} with version type major, minor, or patch.`
     );
@@ -153,7 +160,7 @@ function parseChangeset(filePath, packageName) {
     parts.length >= 3 ? parts.slice(2).join('---').trim() : '';
 
   return {
-    type: versionTypeMatch[1],
+    types,
     description,
     mtime: stats.mtime,
   };
@@ -176,16 +183,18 @@ function getHighestBumpType(types) {
 
 /**
  * Create a merged changeset file
- * @param {string} type
+ * @param {Array<[string, string]>} bumps - [packageName, bump type] pairs
  * @param {string[]} descriptions
- * @param {string} packageName
  * @returns {string}
  */
-function createMergedChangeset(type, descriptions, packageName) {
+function createMergedChangeset(bumps, descriptions) {
   const combinedDescription = descriptions.join('\n\n');
+  const headers = bumps.map(([packageName, type]) =>
+    formatChangesetHeader(packageName, type)
+  );
 
   return `---
-${formatChangesetHeader(packageName, type)}
+${headers.join('\n')}
 ---
 
 ${combinedDescription}
@@ -197,8 +206,8 @@ function main() {
   const jsRootConfig = parseJsRootConfig();
   const jsRoot = getJsRoot({ jsRoot: jsRootConfig, verbose: true });
   const changesetDir = getChangesetDir({ jsRoot });
-  const { name: packageName } = readPackageInfo({ jsRoot });
-  console.log(`Package: ${packageName}`);
+  const packageNames = readReleasePackages({ jsRoot }).map((pkg) => pkg.name);
+  console.log(`Packages: ${packageNames.join(', ')}`);
 
   // Get all changeset files
   const changesetFiles = readdirSync(changesetDir).filter(
@@ -220,7 +229,7 @@ function main() {
   const parsedChangesets = [];
   for (const file of changesetFiles) {
     const filePath = join(changesetDir, file);
-    const parsed = parseChangeset(filePath, packageName);
+    const parsed = parseChangeset(filePath, packageNames);
     if (parsed) {
       parsedChangesets.push({
         file,
@@ -238,13 +247,22 @@ function main() {
   // Sort by modification time (oldest first) to preserve chronological order
   parsedChangesets.sort((a, b) => a.mtime.getTime() - b.mtime.getTime());
 
-  // Determine the highest bump type
-  const bumpTypes = parsedChangesets.map((c) => c.type);
-  const highestBumpType = getHighestBumpType(bumpTypes);
-
+  // Determine the highest bump type of every package the changesets name
+  const bumps = [];
   console.log(`\nMerge summary:`);
-  console.log(`  Bump types found: ${[...new Set(bumpTypes)].join(', ')}`);
-  console.log(`  Using highest: ${highestBumpType}`);
+  for (const packageName of packageNames) {
+    const bumpTypes = parsedChangesets
+      .map((c) => c.types[packageName])
+      .filter(Boolean);
+    if (bumpTypes.length === 0) {
+      continue;
+    }
+    const highestBumpType = getHighestBumpType(bumpTypes);
+    bumps.push([packageName, highestBumpType]);
+    console.log(
+      `  ${packageName}: found ${[...new Set(bumpTypes)].join(', ')}, using ${highestBumpType}`
+    );
+  }
 
   // Collect descriptions in chronological order
   const descriptions = parsedChangesets
@@ -254,11 +272,7 @@ function main() {
   console.log(`  Descriptions to merge: ${descriptions.length}`);
 
   // Create merged changeset content
-  const mergedContent = createMergedChangeset(
-    highestBumpType,
-    descriptions,
-    packageName
-  );
+  const mergedContent = createMergedChangeset(bumps, descriptions);
 
   // Generate a unique name for the merged changeset
   const mergedFileName = `merged-${generateChangesetName()}.md`;

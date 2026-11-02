@@ -32,6 +32,14 @@ on:
         description: 'Manual release description (optional)'
         required: false
         type: string
+      package:
+        description: 'Workspace package to release manually'
+        required: true
+        type: choice
+        default: '@link-foundation/ui-core'
+        options:
+          - '@link-foundation/ui-core'
+          - '@link-foundation/ui-convert'
 
 # Least-privilege default for the highest-value token in the repository.
 # Every job starts read-only; the publishing jobs escalate individually.
@@ -642,21 +650,38 @@ jobs:
         run: bash scripts/run-with-budget-warning.sh 600 "npm package smoke test" node scripts/smoke-test-package.mjs --package-version "$PACKAGE_VERSION"
 
       - name: Create GitHub Release
+        id: github_release
         if: steps.publish.outputs.published == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PACKAGE_VERSION: ${{ steps.publish.outputs.published_version }}
+          PUBLISHED_PACKAGES: ${{ steps.publish.outputs.published_packages }}
           REPOSITORY: ${{ github.repository }}
-        run: node scripts/create-github-release.mjs --release-version "$PACKAGE_VERSION" --repository "$REPOSITORY"
+        # One release (tag <name>@<version>) per publishable package. A
+        # release that already exists (a package this push did not change) is
+        # kept as it is, and its notes are not formatted again.
+        run: |
+          created=""
+          for spec in ${PUBLISHED_PACKAGES//,/ }; do
+            if gh release view "$spec" --repo "$REPOSITORY" > /dev/null 2>&1; then
+              echo "GitHub release $spec already exists"
+              continue
+            fi
+            RELEASE_PACKAGE="${spec%@*}" node scripts/create-github-release.mjs --release-version "${spec##*@}" --repository "$REPOSITORY"
+            created="${created:+$created,}$spec"
+          done
+          echo "created=$created" >> "$GITHUB_OUTPUT"
 
       - name: Format GitHub release notes
         if: steps.publish.outputs.published == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PACKAGE_VERSION: ${{ steps.publish.outputs.published_version }}
+          CREATED_RELEASES: ${{ steps.github_release.outputs.created }}
           REPOSITORY: ${{ github.repository }}
           COMMIT_SHA: ${{ github.sha }}
-        run: node scripts/format-github-release.mjs --release-version "$PACKAGE_VERSION" --repository "$REPOSITORY" --commit-sha "$COMMIT_SHA"
+        run: |
+          for spec in ${CREATED_RELEASES//,/ }; do
+            RELEASE_PACKAGE="${spec%@*}" node scripts/format-github-release.mjs --release-version "${spec##*@}" --repository "$REPOSITORY" --commit-sha "$COMMIT_SHA"
+          done
 
   # Manual Instant Release - triggered via workflow_dispatch with instant mode
   # This job is in release.yml because npm trusted publishing
@@ -687,6 +712,9 @@ jobs:
       !contains(needs.*.result, 'failure') &&
       !contains(needs.*.result, 'cancelled')
     runs-on: ubuntu-24.04
+    # A manual release bumps one workspace package.
+    env:
+      RELEASE_PACKAGE: ${{ github.event.inputs.package }}
     # Same publish envelope as the automated release path.
     timeout-minutes: 65
     concurrency:
@@ -806,6 +834,8 @@ jobs:
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
       DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
       RELEASE_VERSION: ${{ needs.release.outputs.published_version || needs.instant-release.outputs.published_version }}
+      # The package the Docker image follows (the manual release package).
+      RELEASE_PACKAGE: ${{ github.event.inputs.package || '@link-foundation/ui-core' }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -962,6 +992,9 @@ jobs:
       github.event.inputs.release_mode == 'changeset-pr' &&
       needs.lint.result == 'success'
     runs-on: ubuntu-24.04
+    # The changeset names one workspace package.
+    env:
+      RELEASE_PACKAGE: ${{ github.event.inputs.package }}
     # PR creation only: install, create a changeset, format, and open a PR.
     timeout-minutes: 10
     concurrency:

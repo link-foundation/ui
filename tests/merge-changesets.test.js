@@ -6,6 +6,7 @@ import {
   mkdtempSync,
   mkdirSync,
   readdirSync,
+  readFileSync,
   rmSync,
   writeFileSync,
 } from 'node:fs';
@@ -130,6 +131,55 @@ ordinary release note
         expect(stop).toBeGreaterThan(-1);
         expect(payload).toBeGreaterThan(stop);
         expect(resume).toBeGreaterThan(payload);
+      } finally {
+        rmSync(root, { recursive: true, force: true });
+      }
+    }
+  );
+
+  itUnless(sandboxed)(
+    'merges the bumps of several workspace packages per package',
+    () => {
+      const root = mkdtempSync(path.join(tmpdir(), 'merge-changesets-'));
+      const changesetDir = path.join(root, '.changeset');
+      mkdirSync(changesetDir, { recursive: true });
+      writeFileSync(
+        path.join(root, 'package.json'),
+        JSON.stringify({ name: 'root', private: true, workspaces: ['pkg/*'] })
+      );
+      for (const name of ['a', 'b']) {
+        mkdirSync(path.join(root, 'pkg', name), { recursive: true });
+        writeFileSync(
+          path.join(root, 'pkg', name, 'package.json'),
+          JSON.stringify({ name: `@scope/${name}`, version: '1.0.0' })
+        );
+      }
+
+      try {
+        writeChangeset(
+          changesetDir,
+          'first.md',
+          "---\n'@scope/a': patch\n---\n\nFix a.\n"
+        );
+        writeChangeset(
+          changesetDir,
+          'second.md',
+          "---\n'@scope/a': minor\n'@scope/b': patch\n---\n\nAdd b.\n"
+        );
+
+        const result = runMergeChangesets(root, { RELEASE_PACKAGE: '' });
+        const files = readdirSync(changesetDir).filter((file) =>
+          file.endsWith('.md')
+        );
+
+        expect(result.status).toBe(0);
+        expect(files.length).toBe(1);
+        const merged = readFileSync(path.join(changesetDir, files[0]), 'utf8');
+        expect(
+          merged.startsWith("---\n'@scope/a': minor\n'@scope/b': patch\n---\n")
+        ).toBe(true);
+        expect(merged).toContain('Fix a.');
+        expect(merged).toContain('Add b.');
       } finally {
         rmSync(root, { recursive: true, force: true });
       }

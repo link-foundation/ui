@@ -44,11 +44,19 @@ describe('release naming in the npm workspaces root', () => {
     expect(isWorkspaceRelease(SINGLE)).toBe(false);
   });
 
-  it('tags the only publishable workspace package as <name>@<version>', () => {
-    expect(getDefaultTagPrefix(WORKSPACE)).toBe('@link-foundation/ui-core@');
-    expect(buildReleaseTag('1.2.3', WORKSPACE)).toBe(
-      '@link-foundation/ui-core@1.2.3'
+  it('tags the RELEASE_PACKAGE workspace package as <name>@<version>', () => {
+    const options = {
+      ...WORKSPACE,
+      env: { RELEASE_PACKAGE: '@link-foundation/ui-convert' },
+    };
+    expect(getDefaultTagPrefix(options)).toBe('@link-foundation/ui-convert@');
+    expect(buildReleaseTag('1.2.3', options)).toBe(
+      '@link-foundation/ui-convert@1.2.3'
     );
+  });
+
+  it('needs RELEASE_PACKAGE when several workspace packages are publishable', () => {
+    expect(() => getDefaultTagPrefix({ ...WORKSPACE, env: {} })).toThrow();
   });
 
   it('uses an explicitly named package and does not double-prefix', () => {

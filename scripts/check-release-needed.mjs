@@ -33,7 +33,7 @@ import { appendFileSync } from 'fs';
 
 import { getJsRoot, parseJsRootConfig } from './js-paths.mjs';
 import { isPackageVersionPublished } from './npm-registry.mjs';
-import { readPackageInfo } from './package-info.mjs';
+import { readPackageInfo, readReleasePackages } from './package-info.mjs';
 import { buildReleaseTag } from './release-naming.mjs';
 import { githubReleaseExists } from './github-release-state.mjs';
 
@@ -54,11 +54,14 @@ function setOutput(name, value) {
 }
 
 /**
- * Get the package name and version from package.json
- * @returns {{ name: string, version: string }}
+ * The packages this release handles: the RELEASE_PACKAGE one, or every
+ * publishable package (one in a single-package repository).
+ * @returns {Array<{ name: string, version: string }>}
  */
-function getPackageInfo() {
-  return readPackageInfo({ jsRoot });
+function getPackages() {
+  return process.env.RELEASE_PACKAGE
+    ? [readPackageInfo({ jsRoot })]
+    : readReleasePackages({ jsRoot });
 }
 
 /**
@@ -71,12 +74,48 @@ function checkVersionOnNpm(packageName, version) {
   return isPackageVersionPublished(packageName, version);
 }
 
+/**
+ * Whether one package needs a release without a version bump: its version
+ * is not on npm, or it is on npm without its GitHub release.
+ * @param {{ name: string, version: string }} pkg
+ * @returns {Promise<boolean>}
+ */
+async function needsRecovery({ name, version }) {
+  console.log(`Checking if ${name}@${version} is published on npm...`);
+  const isPublished = await checkVersionOnNpm(name, version);
+  console.log(`Published on npm: ${isPublished}`);
+
+  if (!isPublished) {
+    console.log(
+      `No changesets but ${name}@${version} not yet published to npm — release needed (self-healing)`
+    );
+    return true;
+  }
+
+  const tag = buildReleaseTag(version, { jsRoot, packageName: name });
+  const releaseExists = await githubReleaseExists(tag);
+  if (releaseExists === false) {
+    console.log(
+      `${tag} is on npm but has no GitHub release — self-healing release creation`
+    );
+    return true;
+  }
+  console.log(
+    releaseExists === null
+      ? `GitHub state of ${tag} unknown — no release will run for it`
+      : `${tag} is already published on npm and GitHub — no release needed`
+  );
+  return false;
+}
+
 async function main() {
   const hasChangesets = process.env.HAS_CHANGESETS === 'true';
-  const { name: packageName, version: currentVersion } = getPackageInfo();
+  const packages = getPackages();
 
-  console.log(`Package: ${packageName}`);
-  console.log(`Current version: ${currentVersion}`);
+  for (const { name, version } of packages) {
+    console.log(`Package: ${name}`);
+    console.log(`Current version: ${version}`);
+  }
   console.log(`Has changesets: ${hasChangesets}`);
 
   if (hasChangesets) {
@@ -86,37 +125,14 @@ async function main() {
     return;
   }
 
-  console.log(
-    `Checking if ${packageName}@${currentVersion} is published on npm...`
-  );
-  const isPublished = await checkVersionOnNpm(packageName, currentVersion);
-  console.log(`Published on npm: ${isPublished}`);
-
-  if (isPublished) {
-    const tag = buildReleaseTag(currentVersion, { jsRoot });
-    const releaseExists = await githubReleaseExists(tag);
-    if (releaseExists === false) {
-      console.log(
-        `${tag} is on npm but has no GitHub release — self-healing release creation`
-      );
-      setOutput('should_release', 'true');
-      setOutput('skip_bump', 'true');
-    } else {
-      console.log(
-        releaseExists === null
-          ? 'GitHub state unknown — no release will run'
-          : `${tag} is already published on npm and GitHub — no release needed`
-      );
-      setOutput('should_release', 'false');
-      setOutput('skip_bump', 'false');
+  let recover = false;
+  for (const pkg of packages) {
+    if (await needsRecovery(pkg)) {
+      recover = true;
     }
-  } else {
-    console.log(
-      `No changesets but v${currentVersion} not yet published to npm — release needed (self-healing)`
-    );
-    setOutput('should_release', 'true');
-    setOutput('skip_bump', 'true');
   }
+  setOutput('should_release', String(recover));
+  setOutput('skip_bump', String(recover));
 }
 
 main().catch((error) => {

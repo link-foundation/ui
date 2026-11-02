@@ -136,8 +136,8 @@ describe('workspace-packages', () => {
 });
 
 describe('repository workspace', () => {
-  it('publishes @link-foundation/ui-core from packages/ui-core', async () => {
+  it('publishes ui-convert and ui-core from packages/', async () => {
     const names = (await listPublishablePackages('.')).map((p) => p.dir);
-    expect(names).toEqual(['packages/ui-core']);
+    expect(names).toEqual(['packages/ui-convert', 'packages/ui-core']);
   });
 });
