@@ -136,12 +136,13 @@ describe('workspace-packages', () => {
 });
 
 describe('repository workspace', () => {
-  it('publishes ui-convert, ui-core and ui-store from packages/', async () => {
+  it('publishes ui-convert, ui-core, ui-store and ui-tokens from packages/', async () => {
     const names = (await listPublishablePackages('.')).map((p) => p.dir);
     expect(names).toEqual([
       'packages/ui-convert',
       'packages/ui-core',
       'packages/ui-store',
+      'packages/ui-tokens',
     ]);
   });
 });

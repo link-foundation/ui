@@ -1,0 +1,36 @@
+:root {
+  /* Text on surfaces */
+  --color-neutral: #1c1b1f;
+  --space-small: 8px;
+  --font-weight-strong: 700;
+  /* Brand colour */
+  --color-primary: #6750a4;
+  --color-on-primary: #ffffff;
+  --color-action: var(--color-primary);
+  --color-scrim: #00000080;
+  --color-accent: oklch(0.7 0.15 300);
+  --space-medium: 16px;
+  --space-gap: var(--space-small);
+  --size-root: 1rem;
+  --motion-duration-short: 150ms;
+  --motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --opacity-disabled: 0.38;
+  --font-family-body: "Roboto", "Noto Sans", sans-serif;
+  --font-weight-regular: 400;
+  --elevation-low: 0px 1px 3px 0px var(--color-scrim);
+  --elevation-high: var(--elevation-low), inset 0px 4px 8px 3px #0000004d;
+  --type-body-font-family: var(--font-family-body);
+  --type-body-font-size: 16px;
+  --type-body-font-weight: var(--font-weight-strong);
+  --type-body-letter-spacing: 0.5px;
+  --type-body-line-height: 1.5;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-primary: #d0bcff;
+    --color-on-primary: #381e72;
+    --color-action: var(--color-primary);
+    --color-surface: #141218;
+  }
+}

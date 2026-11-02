@@ -1,0 +1,65 @@
+{
+  "name": "@link-foundation/ui-tokens",
+  "version": "0.0.0",
+  "description": "Design tokens of the associative UI framework written in Links Notation, with inheritance, aliases and modes, exported to CSS custom properties, DTCG 2025.10 JSON, Swift and Kotlin",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./style-dictionary": {
+      "types": "./src/style-dictionary.d.ts",
+      "default": "./src/style-dictionary.js"
+    }
+  },
+  "types": "./src/index.d.ts",
+  "bin": {
+    "link-ui-tokens": "./bin/cli.js"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "ui",
+    "links-notation",
+    "design-tokens",
+    "dtcg",
+    "css-custom-properties",
+    "swift",
+    "kotlin"
+  ],
+  "license": "Unlicense",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/link-foundation/ui.git",
+    "directory": "packages/ui-tokens"
+  },
+  "homepage": "https://github.com/link-foundation/ui/tree/main/packages/ui-tokens#readme",
+  "bugs": {
+    "url": "https://github.com/link-foundation/ui/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@link-foundation/ui-core": "^0.0.0"
+  },
+  "peerDependencies": {
+    "style-dictionary": ">=4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "style-dictionary": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "test-anywhere": "^0.8.48"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

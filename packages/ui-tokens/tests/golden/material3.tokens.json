@@ -1,0 +1,61 @@
+{
+  "color": {
+    "primary": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.4039,
+          0.3137,
+          0.6431
+        ],
+        "alpha": 1,
+        "hex": "#6750a4"
+      }
+    },
+    "on-primary": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          1,
+          1,
+          1
+        ],
+        "alpha": 1,
+        "hex": "#ffffff"
+      }
+    }
+  },
+  "space": {
+    "medium": {
+      "$type": "dimension",
+      "$value": {
+        "value": 16,
+        "unit": "px"
+      }
+    }
+  },
+  "shape": {
+    "corner": {
+      "medium": {
+        "$type": "dimension",
+        "$value": {
+          "value": 12,
+          "unit": "px"
+        }
+      }
+    }
+  },
+  "motion": {
+    "duration": {
+      "short": {
+        "$type": "duration",
+        "$value": {
+          "value": 150,
+          "unit": "ms"
+        }
+      }
+    }
+  }
+}
