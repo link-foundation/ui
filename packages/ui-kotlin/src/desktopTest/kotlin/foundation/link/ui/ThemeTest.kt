@@ -34,6 +34,14 @@ class ThemeTest {
         assertEquals(TokenValue.Duration(150), theme.token("motion.duration.short"))
     }
 
+    /** Tokens.kt is the #19 Kotlin output for tokens.lino (the ui-tokens golden file) with a package line. */
+    @Test
+    fun generatedTokensAreTheUiTokensGoldenOutput() {
+        val golden = File(repositoryRoot, "packages/ui-tokens/tests/golden/Tokens.kt").readText()
+        val ours = File("src/commonMain/kotlin/foundation/link/ui/tokens/Tokens.kt").readText()
+        assertEquals("package foundation.link.ui.tokens\n\n$golden", ours)
+    }
+
     @Test
     fun tokensLinoLoadedAtRunTimeEqualsTheDefault() {
         val theme = UiTheme.fromLino(tokensLino.readText(), base = null)

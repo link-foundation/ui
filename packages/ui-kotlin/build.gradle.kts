@@ -1,3 +1,4 @@
+import java.time.Duration
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 // ui-kotlin: renders ui-dialect/0 documents with Jetpack Compose / Compose
@@ -99,6 +100,8 @@ kotlin {
 }
 
 tasks.withType<Test>().configureEach {
+    // A hung Compose test fails the build instead of the CI job timeout.
+    timeout.set(Duration.ofMinutes(10))
     // The fixture and snapshot tests read docs/spec/fixtures and
     // src/commonTest/resources/snapshots relative to this directory.
     workingDir = projectDir
