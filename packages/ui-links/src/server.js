@@ -1,0 +1,401 @@
+/**
+ * A links server: the LinksOperation protocol of `clink --serve`
+ * (link-cli's `docs/protocol/links-operations.txt`) over any storage, with
+ * optional permissions, and two extensions for clients that keep a partial
+ * copy of the links (`createSyncedLinks`):
+ *
+ *   (count: (i s t))          -> (count: N)
+ *   (each: (i s t))           -> (i: s t) per link, by address
+ *   (create: (s t))           -> () ((i: s t))
+ *   (update: (i s t))         -> ((i: s t)) ((i: s2 t2))
+ *   (delete: i)               -> ((i: s t)) () per deleted link, users included
+ *   (get-name: i)             -> (name: 'text') or nothing
+ *   (set-name: (i 'text'))    -> (link: i)
+ *   (get-by-name: 'text')     -> (link: i) or nothing
+ *   (remove-name: i)          -> nothing
+ *   ()                        -> every link, names for named addresses
+ *   anything else             -> a substitution query: its changes
+ *
+ *   (auth: token)             -> (subject: i), or an error
+ *   (subscribe: (i s t))      -> (subscription: n); later, pushed to this
+ *                                session only: (notify: n) and the changes
+ *                                other sessions made to matching links
+ *   (unsubscribe: n)          -> nothing
+ *
+ * An error is `(error: 'message')`. A restriction has up to three parts,
+ * `*` matching anything: `()` every link, `(i)`, `(i v)` where `v` is the
+ * source or the target, and `(i s t)`.
+ *
+ * Every request is atomic: a request that fails changes nothing.
+ */
+
+import { ANY } from './constants.js';
+import { deleteCascade } from './decorators.js';
+import {
+  allLinks,
+  getLink,
+  LinksError,
+  normalizeQuery,
+  matches,
+} from './links.js';
+import {
+  decodeBinary,
+  encodeBinary,
+  formatLino,
+  group,
+  named,
+  parseLino,
+} from './lino.js';
+import { createNames } from './names.js';
+import { withPermissions } from './permissions.js';
+import { runQuery, transact } from './query.js';
+
+const OPERATIONS = new Set([
+  'count',
+  'each',
+  'create',
+  'update',
+  'delete',
+  'get-name',
+  'set-name',
+  'get-by-name',
+  'remove-name',
+  'auth',
+  'subscribe',
+  'unsubscribe',
+]);
+
+/** The values of an operation argument: `(a b)` → `[a, b]`, `a` → `[a]`. */
+const argsOf = (value) => (typeof value === 'string' ? [value] : value.values);
+
+/** The arguments of an operation: `n` words, or a `bad-request` error. */
+function one(args, n, what) {
+  if (args.length !== n || args.some((a) => typeof a !== 'string')) {
+    throw new LinksError('bad-request', `Expected ${what}`);
+  }
+  return args;
+}
+
+/** One change as `(before) (after)`; `ref` writes an address. */
+export function changeToLino({ before, after }, ref = String) {
+  const side = (link) =>
+    group(
+      link === null
+        ? []
+        : [named(ref(link.id), [ref(link.from_id), ref(link.to_id)])]
+    );
+  return group([side(before), side(after)]);
+}
+
+/** `(i: s t)` with numbers. */
+const linkLine = (link) =>
+  named(String(link.id), [String(link.from_id), String(link.to_id)]);
+
+/**
+ * A links server over `links`.
+ * @param {object} options
+ * @param {any} options.links  the storage
+ * @param {any} [options.names]  the names store (a new one by default)
+ * @param {ReturnType<typeof import('./permissions.js').createPolicy>} [options.policy]
+ *   permissions; without it every session may do everything
+ * @param {(token: string) => number | null} [options.authenticate]  the
+ *   subject of a token, `null` when the token is not valid
+ * @param {boolean} [options.autoCreate]  queries create missing references
+ */
+export function createLinksServer({
+  links,
+  names = createNames(),
+  policy = null,
+  authenticate = null,
+  autoCreate = false,
+}) {
+  const sessions = new Set();
+  const server = {
+    links,
+    names,
+    policy,
+    authenticate,
+    autoCreate,
+    sessions,
+    /** Send `changes` made by `origin` to every other session that asked. */
+    publish(changes, origin) {
+      const writes = changes.filter(({ before, after }) => before !== after);
+      if (writes.length === 0) {
+        return;
+      }
+      for (const session of sessions) {
+        if (session !== origin) {
+          session.deliver(writes);
+        }
+      }
+    },
+  };
+  return {
+    links,
+    names,
+    policy,
+    /**
+     * A connection: requests run as its subject.
+     * @param {object} [options]
+     * @param {number | null} [options.subject]  the subject before any `auth`
+     * @param {(document: any[]) => void} [options.onPush]  gets pushed
+     *   documents: `(notify: n)` and changes
+     */
+    session: (options) => openSession(server, options),
+    /** The sessions that are open. */
+    get sessions() {
+      return [...sessions];
+    },
+  };
+}
+
+/** Reading addresses and restrictions as the subject of a session sees them. */
+function createReader(view, names) {
+  const address = (text) => {
+    if (/^[0-9]+$/.test(text)) {
+      return Number(text);
+    }
+    if (text === '*') {
+      return ANY;
+    }
+    const id = names.getByName(text);
+    if (id === null) {
+      throw new LinksError('not-found', `Link not found: ${text}`);
+    }
+    return id;
+  };
+  const visibleLink = (id) => {
+    const link = getLink(view, id);
+    if (link === null) {
+      throw new LinksError('not-found', `Link not found: ${id}`);
+    }
+    return link;
+  };
+  const restrictionOf = (value) => {
+    const parts = argsOf(value);
+    if (parts.length > 3 || parts.some((p) => typeof p !== 'string')) {
+      throw new LinksError(
+        'bad-request',
+        'A restriction has up to three parts'
+      );
+    }
+    return parts.map(address);
+  };
+  /** The links of a restriction, by address. */
+  const select = (parts) => {
+    if (parts.length === 2) {
+      const [id, value] = parts;
+      const found = new Map();
+      for (const q of [
+        { id, from_id: value },
+        { id, to_id: value },
+      ]) {
+        for (const link of allLinks(view, q)) {
+          found.set(link.id, link);
+        }
+      }
+      return [...found.values()].sort((a, b) => a.id - b.id);
+    }
+    return allLinks(view, parts);
+  };
+  return { address, visibleLink, restrictionOf, select };
+}
+
+/** The operations of the protocol for one session. */
+function createOperations(server, state, { view, reader, write }) {
+  const { names, policy, authenticate } = server;
+  const { address, visibleLink, restrictionOf, select } = reader;
+  return {
+    count: (arg) => [
+      named('count', [String(select(restrictionOf(arg)).length)]),
+    ],
+    each: (arg) => select(restrictionOf(arg)).map(linkLine),
+    create(arg) {
+      const [s, t] = one(argsOf(arg), 2, '(create: (source target))').map(
+        address
+      );
+      return write((store) => {
+        const id = store.create();
+        store.update(id, s, t);
+      });
+    },
+    update(arg) {
+      const [i, s, t] = one(
+        argsOf(arg),
+        3,
+        '(update: (index source target))'
+      ).map(address);
+      return write((store) => store.update(i, s, t));
+    },
+    delete(arg) {
+      const [i] = one(argsOf(arg), 1, '(delete: index)').map(address);
+      return write((store) => deleteCascade(store, i));
+    },
+    'get-name'(arg) {
+      const [i] = one(argsOf(arg), 1, '(get-name: index)').map(address);
+      const name = getLink(view, i) === null ? null : names.getName(i);
+      return name === null ? [] : [named('name', [name])];
+    },
+    'set-name'(arg) {
+      const [i, name] = one(argsOf(arg), 2, "(set-name: (index 'name'))");
+      const id = address(i);
+      const link = visibleLink(id);
+      if (policy && !policy.canWrite(state.subject, link)) {
+        throw new LinksError('forbidden', `Forbidden: set-name ${id}`);
+      }
+      names.setName(id, name);
+      return [named('link', [String(id)])];
+    },
+    'get-by-name'(arg) {
+      const [name] = one(argsOf(arg), 1, "(get-by-name: 'name')");
+      const id = names.getByName(name);
+      return id === null || getLink(view, id) === null
+        ? []
+        : [named('link', [String(id)])];
+    },
+    'remove-name'(arg) {
+      const [i] = one(argsOf(arg), 1, '(remove-name: index)').map(address);
+      const link = getLink(view, i);
+      if (link !== null) {
+        if (policy && !policy.canWrite(state.subject, link)) {
+          throw new LinksError('forbidden', `Forbidden: remove-name ${i}`);
+        }
+        names.removeName(i);
+      }
+      return [];
+    },
+    auth(arg) {
+      const [token] = one(argsOf(arg), 1, '(auth: token)');
+      const found = authenticate ? authenticate(token) : null;
+      if (found === null || found === undefined) {
+        throw new LinksError('forbidden', 'Forbidden: authentication failed');
+      }
+      state.subject = found;
+      return [named('subject', [String(found)])];
+    },
+    subscribe(arg) {
+      const parts = restrictionOf(arg);
+      const [id = ANY, from = ANY, to = ANY] =
+        parts.length === 2 ? [parts[0]] : parts;
+      const n = state.next++;
+      state.subscriptions.set(n, {
+        query: normalizeQuery([id, from, to]),
+        either: parts.length === 2 ? parts[1] : null,
+      });
+      return [named('subscription', [String(n)])];
+    },
+    unsubscribe(arg) {
+      const [n] = one(argsOf(arg), 1, '(unsubscribe: n)');
+      state.subscriptions.delete(Number(n));
+      return [];
+    },
+  };
+}
+
+function openSession(server, { subject = null, onPush = null } = {}) {
+  const { links, names, policy, autoCreate, sessions } = server;
+  const state = { subject, subscriptions: new Map(), next: 1 };
+  const view = policy
+    ? withPermissions(links, policy, () => state.subject)
+    : links;
+  const context = { links: view, names, autoCreate };
+  const readable = (link) => !policy || policy.canRead(state.subject, link);
+  const nameRef = (id) => names.getName(id) ?? String(id);
+  const write = (fn, ref = String) => {
+    const changes = transact(context, fn);
+    server.publish(changes, api);
+    return changes.map((change) => changeToLino(change, ref));
+  };
+  const operations = createOperations(server, state, {
+    view,
+    reader: createReader(view, names),
+    write,
+  });
+
+  /** Answer one request document. */
+  const handle = (document) => {
+    try {
+      if (document.length === 0) {
+        return allLinks(view).map((link) =>
+          named(nameRef(link.id), [nameRef(link.from_id), nameRef(link.to_id)])
+        );
+      }
+      const [first] = document;
+      if (
+        document.length === 1 &&
+        typeof first !== 'string' &&
+        OPERATIONS.has(first.id) &&
+        first.values.length === 1
+      ) {
+        return operations[first.id](first.values[0]);
+      }
+      return write(
+        (store) => runQuery({ ...context, links: store }, document),
+        nameRef
+      );
+    } catch (error) {
+      if (!(error instanceof LinksError)) {
+        throw error;
+      }
+      return [named('error', [error.message])];
+    }
+  };
+
+  const fits = (subscription, link) =>
+    link !== null &&
+    matches(link, subscription.query) &&
+    (subscription.either === null ||
+      link.from_id === subscription.either ||
+      link.to_id === subscription.either) &&
+    readable(link);
+
+  const api = {
+    get subject() {
+      return state.subject;
+    },
+    handle,
+    /** Answer LiNo text (the text protocol). */
+    request(text) {
+      let document;
+      try {
+        document = parseLino(text);
+      } catch (error) {
+        return formatLino([named('error', [error.message])]);
+      }
+      return formatLino(handle(document));
+    },
+    /** Answer a binary packet with a packet of the same options. */
+    requestBinary(bytes) {
+      const decoded = decodeBinary(bytes);
+      if (decoded === null) {
+        return encodeBinary([named('error', ['Incomplete binary packet'])]);
+      }
+      return encodeBinary(handle(decoded.document), decoded.options);
+    },
+    /** Push the changes the subscriptions of this session ask for. */
+    deliver(changes) {
+      if (!onPush) {
+        return;
+      }
+      for (const [n, subscription] of state.subscriptions) {
+        const seen = changes
+          .map(({ before, after }) => ({
+            before: fits(subscription, before) ? before : null,
+            after: fits(subscription, after) ? after : null,
+          }))
+          .filter(({ before, after }) => before !== null || after !== null);
+        if (seen.length > 0) {
+          onPush([
+            named('notify', [String(n)]),
+            ...seen.map((change) => changeToLino(change)),
+          ]);
+        }
+      }
+    },
+    close() {
+      sessions.delete(api);
+    },
+  };
+  sessions.add(api);
+  return api;
+}

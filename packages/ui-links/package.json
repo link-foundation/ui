@@ -1,0 +1,66 @@
+{
+  "name": "@link-foundation/ui-links",
+  "version": "0.0.0",
+  "description": "Associative links storages behind one doublets interface (memory, doublets-web, SQLite, IndexedDB, localStorage, Links Notation text), link-cli's substitution queries, types and permissions as links, a links protocol server and a synced client that keeps a partial copy",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./tcp": {
+      "types": "./src/tcp.d.ts",
+      "default": "./src/tcp.js"
+    }
+  },
+  "types": "./src/index.d.ts",
+  "files": [
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "links",
+    "doublets",
+    "associative",
+    "links-notation",
+    "link-cli",
+    "permissions",
+    "sync",
+    "indexeddb",
+    "sqlite"
+  ],
+  "license": "Unlicense",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/link-foundation/ui.git",
+    "directory": "packages/ui-links"
+  },
+  "homepage": "https://github.com/link-foundation/ui/tree/main/packages/ui-links#readme",
+  "bugs": {
+    "url": "https://github.com/link-foundation/ui/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "links-notation": "^0.27.1"
+  },
+  "peerDependencies": {
+    "doublets-web": "^0.1.3"
+  },
+  "peerDependenciesMeta": {
+    "doublets-web": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@link-foundation/link-cli-client": "^0.1.0",
+    "doublets-web": "^0.1.3",
+    "fake-indexeddb": "^6.2.7",
+    "test-anywhere": "^0.8.48"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
