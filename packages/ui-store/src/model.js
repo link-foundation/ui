@@ -246,11 +246,14 @@ export function snapshot(model, id) {
 
 /**
  * Build a model from a UI document (or `{ roots, unknown }`). Named elements
- * keep their id; anonymous elements get generated IDs in document order.
+ * keep their id; anonymous elements get generated IDs in document order,
+ * or the IDs of `ids` (the store IDs of every element in pre-order, as the
+ * `ids` of an insert operation) when it is given.
  * @param {{ roots?: UiNode[], unknown?: RawValue[] }} document
+ * @param {string[]} [ids]
  * @returns {Model}
  */
-export function createModel(document = {}) {
+export function createModel(document = {}, ids = undefined) {
   const roots = (document.roots ?? []).map(normalizeNode);
   /** @type {Model} */
   const model = {
@@ -272,11 +275,49 @@ export function createModel(document = {}) {
     }
   }
   model.ids = createIdGenerator((id) => named.has(id) || model.nodes.has(id));
+  const given = ids === undefined ? undefined : givenIds(model, roots, ids);
+  let next = 0;
   for (const node of roots) {
-    const ids = preOrder(node).map((n) => n.id ?? model.ids.next());
-    addSubtree(model, node, ids, null, model.roots.length);
+    const nodes = preOrder(node);
+    const subtree = given
+      ? given.slice(next, next + nodes.length)
+      : nodes.map((n) => n.id ?? model.ids.next());
+    next += nodes.length;
+    addSubtree(model, node, subtree, null, model.roots.length);
   }
   return model;
+}
+
+/**
+ * Check the `ids` option of `createModel` and reserve its IDs of anonymous
+ * elements.
+ * @param {Model} model
+ * @param {UiNode[]} roots
+ * @param {unknown} ids
+ * @returns {string[]}
+ */
+function givenIds(model, roots, ids) {
+  const nodes = roots.flatMap(preOrder);
+  check(
+    Array.isArray(ids) &&
+      ids.length === nodes.length &&
+      new Set(ids).size === ids.length,
+    'bad-op',
+    '`ids` must give one distinct ID per element, in pre-order'
+  );
+  const named = new Set(nodes.map((n) => n.id).filter((id) => id !== null));
+  nodes.forEach((node, i) => {
+    check(
+      isName(ids[i]) &&
+        (node.id === null ? !named.has(ids[i]) : node.id === ids[i]),
+      'bad-op',
+      `ID "${ids[i]}" does not match element id "${node.id}"`
+    );
+    if (node.id === null) {
+      model.ids.reserve(ids[i]);
+    }
+  });
+  return ids;
 }
 
 /**
