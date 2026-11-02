@@ -207,7 +207,7 @@ export type SourceEditResult =
   | { ok: true; text: string; edits: SourceEdit[]; references?: SourceSpan[] }
   | { ok: false; error: string; text: string };
 
-/** The edit ops of issue #16. */
+/** The edit ops of link-foundation/ui#16. */
 export type SourceOp =
   | { op: 'insert'; parentId: string | null; index: number; node: UiNode }
   | { op: 'remove'; id: string }
