@@ -1,0 +1,56 @@
+{
+  "name": "@link-foundation/ui-dom",
+  "version": "0.0.0",
+  "description": "Reference DOM renderer of the associative UI framework written in Links Notation: a ui-store document as plain custom elements in the light DOM, patched incrementally from store events, with adopted token and style CSS and static HTML output",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./html": {
+      "types": "./src/html.d.ts",
+      "default": "./src/html.js"
+    }
+  },
+  "types": "./src/index.d.ts",
+  "files": [
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "ui",
+    "links-notation",
+    "dom",
+    "renderer",
+    "custom-elements",
+    "web-components"
+  ],
+  "license": "Unlicense",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/link-foundation/ui.git",
+    "directory": "packages/ui-dom"
+  },
+  "homepage": "https://github.com/link-foundation/ui/tree/main/packages/ui-dom#readme",
+  "bugs": {
+    "url": "https://github.com/link-foundation/ui/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@link-foundation/ui-core": "^0.0.0",
+    "@link-foundation/ui-store": "^0.0.0",
+    "@link-foundation/ui-style": "^0.0.0",
+    "@link-foundation/ui-tokens": "^0.0.0"
+  },
+  "devDependencies": {
+    "jsdom": "^30.1.3",
+    "test-anywhere": "^0.8.48"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

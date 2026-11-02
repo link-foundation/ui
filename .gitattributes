@@ -17,3 +17,7 @@ packages/ui-style/tests/golden/** text eol=lf
 # UiSwiftUI vendors the ui-tokens Swift output, and tests/ui-swift-tokens.test.js
 # compares it byte for byte with what ui-tokens writes (always LF).
 packages/ui-swift/Sources/UiSwiftUI/Tokens.swift text eol=lf
+
+# The ui-dom snapshots are the exact HTML the renderer writes (always LF), and
+# the tests compare them byte for byte.
+packages/ui-dom/tests/__snapshots__/** text eol=lf
