@@ -78,3 +78,39 @@ export function seededRandom(seed) {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
+
+/**
+ * The `#` comments of a Links Notation text, in order: the part of every
+ * line that `stripComments` blanks, trimmed.
+ * @param {string} text
+ * @param {(text: string) => string} stripComments
+ */
+export function commentsOf(text, stripComments) {
+  const stripped = stripComments(text);
+  const found = [];
+  let start = 0;
+  while (start <= text.length) {
+    let end = text.indexOf('\n', start);
+    if (end === -1) {
+      end = text.length;
+    }
+    for (let i = start; i < end; i++) {
+      if (text[i] !== stripped[i]) {
+        found.push(text.slice(i, end).trim());
+        break;
+      }
+    }
+    start = end + 1;
+  }
+  return found;
+}
+
+/** The `.lino` fixtures of the source edits: `{ name, text }`. */
+export const sourceFixtures = () =>
+  readdirSync(join(LOCAL_FIXTURES_DIR, 'source'))
+    .filter((file) => file.endsWith('.lino'))
+    .sort()
+    .map((file) => ({
+      name: file,
+      text: read(join(LOCAL_FIXTURES_DIR, 'source', file)),
+    }));
