@@ -67,7 +67,7 @@ kotlin {
     if (withAndroid) {
         extensions.configure<com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget>("android") {
             namespace = "foundation.link.ui"
-            compileSdk = 36
+            compileSdk = 37 // Compose 1.12 AARs require API 37 (checkAarMetadata)
             minSdk = 23
         }
     }
