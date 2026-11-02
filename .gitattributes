@@ -1,3 +1,8 @@
 # Shell scripts and Git hooks require LF on every platform.
 *.sh text eol=lf
 .husky/** text eol=lf
+
+# The parser vectors record the exact bytes of every spec fixture (inputs,
+# lines and columns), so neither may gain CRLF on a Windows checkout.
+docs/spec/fixtures/** text eol=lf
+docs/spec/parser-vectors.json text eol=lf
