@@ -1,0 +1,44 @@
+en
+  ui
+    dialog
+      close "Close"
+      ok "OK"
+      cancel "Cancel"
+    settings
+      title "Settings"
+      reset "Reset"
+    locale
+      label "Language"
+ru
+  ui
+    dialog
+      close "Закрыть"
+      ok "ОК"
+      cancel "Отмена"
+    settings
+      title "Настройки"
+      reset "Сбросить"
+    locale
+      label "Язык"
+zh
+  ui
+    dialog
+      close "关闭"
+      ok "确定"
+      cancel "取消"
+    settings
+      title "设置"
+      reset "重置"
+    locale
+      label "语言"
+hi
+  ui
+    dialog
+      close "बंद करें"
+      ok "ठीक है"
+      cancel "रद्द करें"
+    settings
+      title "सेटिंग्स"
+      reset "रीसेट करें"
+    locale
+      label "भाषा"

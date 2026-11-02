@@ -147,6 +147,7 @@ npm run example:desktop:package
 │   ├── ui-config/        # @link-foundation/ui-config (layered configuration, overrides patches)
 │   ├── ui-convert/       # @link-foundation/ui-convert (HTML/DOM, A2UI, Adaptive Cards, JSON Forms, Lottie <-> LiNo)
 │   ├── ui-core/          # @link-foundation/ui-core
+│   ├── ui-i18n/          # @link-foundation/ui-i18n (localisation with lino-i18n, (t KEY) messages)
 │   ├── ui-store/         # @link-foundation/ui-store
 │   ├── ui-swift/         # SwiftUI renderer (Swift package, see Package.swift)
 │   └── ui-tokens/        # @link-foundation/ui-tokens (design tokens)

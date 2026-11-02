@@ -41,6 +41,7 @@ on:
           - '@link-foundation/ui-core'
           - '@link-foundation/ui-config'
           - '@link-foundation/ui-convert'
+          - '@link-foundation/ui-i18n'
           - '@link-foundation/ui-store'
           - '@link-foundation/ui-tokens'
 
@@ -286,6 +287,9 @@ jobs:
       - name: Check code duplication
         run: npm run check:duplication
 
+      - name: Check translations (key parity and hard-coded text)
+        run: npm run check:i18n
+
   # Test matrix: 3 runtimes (Node.js, Bun, Deno) x 3 OS (Ubuntu, macOS, Windows)
   # IMPORTANT: Tests must validate the ACTUAL merge result, not a stale merge preview.
   # See docs/template-history/case-studies/issue-23 for why this is critical.
@@ -392,7 +396,7 @@ jobs:
       - name: Run tests (Deno)
         if: matrix.runtime == 'deno'
         shell: bash
-        run: bash scripts/run-with-budget-warning.sh 100 "Deno test suite" deno test -A --parallel
+        run: bash scripts/run-with-budget-warning.sh 200 "Deno test suite" deno test -A --parallel
 
   # === DOCKER IMAGE BUILD CHECK (pull requests) ===
   # Builds the Dockerfile without pushing so a broken image fails the pull
