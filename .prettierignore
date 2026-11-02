@@ -15,3 +15,5 @@ native/**/build/
 native/**/.gradle/
 # Generated, one parser vector per line (scripts/generate-parser-vectors.mjs)
 docs/spec/parser-vectors.json
+# Importer fixtures are compared byte for byte (packages/ui-convert/tests/html)
+packages/ui-convert/tests/html/fixtures/
