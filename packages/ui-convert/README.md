@@ -5,7 +5,9 @@ Converters between other UI formats and the `ui-dialect/0` dialect of
 part of the associative UI framework
 [`link-foundation/ui`](https://github.com/link-foundation/ui):
 
-- the **HTML/DOM importer** (HTML text or a live DOM to LiNo), and
+- the **HTML/DOM importer** (HTML text or a live DOM to LiNo),
+- the **component importers** for React / MUI JSX and TSX and Vue
+  single-file components, mapped by LiNo match / replace rules, and
 - **interop** with [A2UI](https://a2ui.org),
   [Adaptive Cards](https://adaptivecards.io),
   [JSON Forms](https://jsonforms.io) and [Lottie](https://lottie.github.io):
@@ -144,6 +146,176 @@ blocked on
 [link-foundation/meta-language#230](https://github.com/link-foundation/meta-language/issues/230).
 Until then HTML text is read with parse5; a meta-language reader only needs to
 produce the same intermediate form (`src/html/tree.js`).
+
+## Component import: JSX / TSX (MUI) and Vue
+
+`importJsx(text, options)` and `importVue(text, options)` read React / MUI
+JSX or TSX and Vue single-file components into the dialect. They never run
+the code. They return `{ text, tree, links, spans, applied, diagnostics }`:
+
+- `spans`: link id to `{ start, end }` in the source;
+- `applied`: link id to the mapping rule that produced the link;
+- `diagnostics`: `{ code, severity, message, span, id }`.
+
+```js
+import { importJsx, importVue } from '@link-foundation/ui-convert';
+
+importJsx(`
+<Stack direction="column" spacing={2}>
+  <TextField label="Email" />
+  <Button variant="contained" onClick={signIn}>
+    Sign in
+  </Button>
+</Stack>`).text;
+```
+
+```lino
+(stack-0: stack
+  (direction vertical)
+  (gap (token space.2))
+  (text-field-0-0: text-field
+    (label Email))
+  (button-0-1: button
+    (label 'Sign in')
+    (variant filled)
+    (on press (action signIn))))
+```
+
+```sh
+ui-convert import login.jsx                       # .jsx, .tsx, .vue: --from is implied
+ui-convert import --from jsx Login.js --mapping mui
+ui-convert import --from vue Todo.vue --mapping my-rules.lino --mapping mui
+```
+
+### Mapping rules
+
+Components are mapped by LiNo match / replace rules in the shape of
+[transformer](https://github.com/link-foundation/transformer)
+(`src/rules.js`). The built-in MUI rules are in `src/mappings/mui.lino`:
+
+```lino
+(mui-button-contained: rule
+  (match (Button (variant contained) (children $label) (optional (disabled $disabled))))
+  (replace (button (label $label) (variant filled) (disabled $disabled))))
+```
+
+- `$name` binds a value. It can also sit inside an atom: `space.$n`.
+- `_` matches anything.
+- `(optional (p $v))` matches when the property is there and is skipped
+  otherwise.
+- `(absent p)` matches only when the element has no property `p`.
+- An unbound variable drops its property from the replacement.
+- Rules are tried in order and the first match wins.
+- Properties a rule does not consume stay as `(attr name value)`.
+
+`options.mappings` is a list of built-in names (`'mui'`, the default) and
+rule texts. Each mapping is tried in that order.
+
+| MUI                                             | Dialect                                                         |
+| ----------------------------------------------- | --------------------------------------------------------------- |
+| `Button` `variant` contained / outlined / text  | `button` `(variant filled / outlined / text)`, `(label …)`      |
+| `IconButton` `aria-label`                       | `icon-button (label …)`                                         |
+| `TextField` (`multiline`)                       | `text-field` (`text-area`)                                      |
+| `Checkbox`, `Switch`                            | `checkbox`, `switch`                                            |
+| `Typography` `variant` h1–h6 / body1 / body2    | `text (level 1–6)` / `(variant body-large / body-medium)`       |
+| `Stack` `direction` column / row, `spacing={n}` | `stack (direction vertical / horizontal) (gap (token space.n))` |
+| `Box`, `Card`, `CardContent`, `Dialog`          | `box`, `card`, `card-content`, `dialog`                         |
+| `Tabs` / `Tab`, `List` / `ListItem`             | `tabs` / `tab`, `list` / `list-item`                            |
+| `AppBar`, `Toolbar`                             | `app-bar`, `toolbar`                                            |
+| any other component                             | `(html (tag Name) …)` and an `unmapped-component` info note     |
+
+Lowercase elements (`div`, `button`) use the HTML importer's mapping table.
+
+### JSX
+
+- Supported: elements, fragments (flattened), text children, and string,
+  number and boolean props.
+- `className` and `htmlFor` become `class` and `for`.
+- `style` and `sx` objects with literal values become `(style ...)`.
+  Numbers in `style` get `px`, as in React. `sx` keys are kept as written
+  (`p`).
+- `onClick={save}` becomes `(on press (action save))`. Other handlers
+  become `(on <event> ...)` with the event in kebab-case.
+- Everything else needs the code to run. Examples: a spread
+  `{...props}`, an inline arrow `onClick={() => save(x)}`, a variable
+  value, `{items.map(...)}`, a theme callback in `sx`. Each is kept as
+  `(unsupported jsx-expression '<source>')` with one diagnostic and span.
+- In `.tsx`, type assertions around a value (`x as T`, `x!`,
+  `x satisfies T`) are read as the value.
+- In a whole module, every outermost JSX element is a top-level link.
+
+### Vue
+
+| Template                          | Link                                                            |
+| --------------------------------- | --------------------------------------------------------------- |
+| `label="Email"`                   | a prop, matched by the mapping rules                            |
+| `:spacing="2"`                    | a prop (the value is a literal)                                 |
+| `:checked="item.done"`            | `(bind checked (param item.done))`                              |
+| `v-model="draft.text"`            | `(bind value (param draft.text))`                               |
+| `:style="{ color: 'red' }"`       | `(style (color red))`                                           |
+| `@click="addItem"`                | `(on press (action addItem))`                                   |
+| `v-if="todo.items"` / `v-else`    | `(when (param todo.items))` / `(when (not (param todo.items)))` |
+| `v-for="(item, i) in todo.items"` | `(each item (param todo.items) (index i))`                      |
+
+The following are each kept as `(unsupported vue-directive '<source>')`
+with a diagnostic:
+
+- other directives (`v-else-if`, `v-show`, `v-slot`, custom directives);
+- modifiers (`@click.prevent`, `v-model.trim`);
+- dynamic arguments;
+- expressions that are not paths or handler names.
+
+An interpolation `{{ name }}` is kept as `(unsupported vue-expression ...)`.
+Comments are dropped. `<script>`, `<style>` and custom blocks become raw
+`vue-block` links with `(tag ...)`, `(attr ...)` and `(content ...)`
+(one atom per line), each with an `info` diagnostic.
+
+`when` and `each` follow the reserved links of
+[`docs/spec/behaviour.md`](../../docs/spec/behaviour.md). Their evaluation
+is not part of `ui-dialect/0` yet (#33).
+
+### Differences from the issue's sketch
+
+- **Direction values.** Stack directions use the spec values `vertical` /
+  `horizontal`.
+- **Gap token.** The gap token is the single atom `space.2` of
+  `@link-foundation/ui-tokens`.
+- **Ids.** Ids follow the HTML importer: path ids such as `button-0-1`.
+- **Diagnostics.** They also carry `severity` and the `id` of their link.
+
+### Status: meta-language
+
+The issue asked to parse JSX and Vue with
+[`meta-language`](https://github.com/link-foundation/meta-language). Its npm
+release **0.46.0 has no JSX/TSX and no Vue SFC support**:
+
+- its JavaScript/TypeScript profile only tokenizes;
+- its embedded regions know only Markdown and HTML;
+- it has no HTML element tree.
+
+The request is
+[link-foundation/meta-language#231](https://github.com/link-foundation/meta-language/issues/231)
+(and #230 for HTML). Until it lands, JSX/TSX is read with
+[`@babel/parser`](https://babeljs.io/docs/babel-parser) and Vue with
+[`@vue/compiler-dom`](https://github.com/vuejs/core). Both are MIT and both
+only parse. A meta-language reader only needs to produce the same
+intermediate form (`src/jsx/parse.js`, `src/vue/parse.js`).
+
+### Tests
+
+```bash
+node --test packages/ui-convert/tests/{jsx-import,vue-import,rules,mui-mapping}.test.js
+```
+
+- `jsx-import`, `vue-import`: each fixture in
+  `tests/{jsx,vue}/fixtures` gives its `.lino`, which parses with
+  `links-notation` and the ui-core parser, and every span slices to its
+  source. The unsupported fixtures give one diagnostic with a span per
+  construct.
+- `rules`: `$var` binding, templates, `optional`, `absent`, a non-matching
+  rule and first match wins.
+- `mui-mapping`: one case per MUI component and variant, plus a check that
+  every rule of `mui.lino` is used by a case.
 
 ## Interop: A2UI, Adaptive Cards, JSON Forms and Lottie
 
