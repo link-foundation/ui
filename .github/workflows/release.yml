@@ -39,6 +39,7 @@ on:
         default: '@link-foundation/ui-core'
         options:
           - '@link-foundation/ui-core'
+          - '@link-foundation/ui-config'
           - '@link-foundation/ui-convert'
           - '@link-foundation/ui-store'
 

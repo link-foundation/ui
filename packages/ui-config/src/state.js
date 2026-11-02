@@ -34,8 +34,8 @@ import { freezeValues, valueIn, valuesEqual } from './values.js';
  *   after: readonly RawValue[]|null }} ConfigEvent
  */
 
-/** Every element of a document by id. */
-function elementsById(document) {
+/** Every element of a document by id (the first one for a repeated id). */
+export function elementsById(document) {
   if (document.byId instanceof Map) {
     return document.byId;
   }

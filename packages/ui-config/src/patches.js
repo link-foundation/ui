@@ -3,7 +3,6 @@
  * patches, exporting the editable layers, and the effective document.
  */
 
-import { walk } from '@link-foundation/ui-core';
 import {
   DOCUMENT_LAYER,
   EDITABLE_LAYERS,
@@ -13,6 +12,7 @@ import {
 import { ConfigError, diagnostic, hasError } from './errors.js';
 import { readPatch, writePatch } from './patch.js';
 import { copyValues, findProperty, valuesEqual } from './values.js';
+import { elementsById } from './state.js';
 
 /** @typedef {ReturnType<typeof import('./state.js').createState>} State */
 
@@ -226,12 +226,7 @@ const clone = (node) => ({
 export function effectiveDocument(state) {
   const { document } = state;
   const roots = document.roots.map(clone);
-  const byId = new Map();
-  walk(/** @type {any} */ ({ roots }), (node) => {
-    if (node.id !== null && !byId.has(node.id)) {
-      byId.set(node.id, node);
-    }
-  });
+  const byId = elementsById({ roots });
   const seen = new Set();
   for (const map of state.maps.values()) {
     for (const [k, t] of map) {
