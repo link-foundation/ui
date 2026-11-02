@@ -68,6 +68,17 @@ Scripts, `on*` attributes and `javascript:` URLs are dropped with a
 `dropped-script` diagnostic; see the package README for the mapping table,
 ids, spans and `importDom`.
 
+### Design tokens
+
+[`@link-foundation/ui-tokens`](packages/ui-tokens/README.md) reads design
+tokens written in Links Notation, with inheritance, aliases and modes, and
+writes them as CSS custom properties, DTCG 2025.10 JSON, Swift and Kotlin:
+
+```sh
+npx link-ui-tokens build tokens.lino --set material3 \
+  --css tokens.css --dtcg tokens.json --swift Tokens.swift --kotlin Tokens.kt
+```
+
 ### Development
 
 ```bash
@@ -109,7 +120,8 @@ npm run example:desktop:package
 ├── packages/             # npm workspaces (see docs/monorepo.md)
 │   ├── ui-convert/       # @link-foundation/ui-convert (HTML/DOM -> LiNo)
 │   ├── ui-core/          # @link-foundation/ui-core
-│   └── ui-store/         # @link-foundation/ui-store
+│   ├── ui-store/         # @link-foundation/ui-store
+│   └── ui-tokens/        # @link-foundation/ui-tokens (design tokens)
 ├── tests/                # Repository and release-script tests
 ├── .eslintrc.js          # ESLint configuration
 ├── .prettierrc           # Prettier configuration
