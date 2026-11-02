@@ -43,7 +43,8 @@
   "devDependencies": {
     "@lottie-animation-community/lottie-specs": "^0.3.2",
     "ajv": "^8.17.1",
-    "lottie-web": "^5.13.0"
+    "lottie-web": "^5.13.0",
+    "test-anywhere": "^0.8.48"
   },
   "publishConfig": {
     "access": "public"

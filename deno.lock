@@ -1290,14 +1290,16 @@
             "npm:@lottie-animation-community/lottie-specs@~0.3.2",
             "npm:ajv@^8.17.1",
             "npm:links-notation@~0.27.1",
-            "npm:lottie-web@^5.13.0"
+            "npm:lottie-web@^5.13.0",
+            "npm:test-anywhere@~0.8.48"
           ]
         }
       },
       "packages/ui-core": {
         "packageJson": {
           "dependencies": [
-            "npm:links-notation@~0.27.1"
+            "npm:links-notation@~0.27.1",
+            "npm:test-anywhere@~0.8.48"
           ]
         }
       },

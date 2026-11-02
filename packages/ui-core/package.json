@@ -36,6 +36,9 @@
   "dependencies": {
     "links-notation": "^0.27.1"
   },
+  "devDependencies": {
+    "test-anywhere": "^0.8.48"
+  },
   "publishConfig": {
     "access": "public"
   }
