@@ -2657,8 +2657,7 @@
         "npm:lint-staged@^16.4.0",
         "npm:prettier@^3.6.2",
         "npm:svgo@^4.1.0",
-        "npm:test-anywhere@~0.8.48",
-        "npm:yaml@^2.9.1"
+        "npm:test-anywhere@~0.8.48"
       ]
     },
     "members": {
