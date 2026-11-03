@@ -75,6 +75,10 @@ jobs:
         if: env.UPDATE_SNAPSHOTS != 'true'
         run: npx playwright test
 
+      - name: Update screenshot baselines
+        if: env.UPDATE_SNAPSHOTS == 'true'
+        run: npx playwright test --update-snapshots
+
       - name: Retain network performance traces
         if: always()
         uses: ./.github/actions/artifact-transport
@@ -84,11 +88,7 @@ jobs:
             test-results/**/trace.zip
             test-results/**/attachments/canvas-pan-performance*
           retention-days: 7
-          if-no-files-found: warn
-
-      - name: Update screenshot baselines
-        if: env.UPDATE_SNAPSHOTS == 'true'
-        run: npx playwright test --update-snapshots
+          if-no-files-found: error
 
       - name: Upload test report and diffs
         if: failure()
