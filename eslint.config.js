@@ -2,10 +2,12 @@ import js from '@eslint/js';
 import prettierConfig from 'eslint-config-prettier';
 import prettierPlugin from 'eslint-plugin-prettier';
 import noChangelogCommentsRule from './eslint-rules/no-changelog-comments.js';
+import noModuleStateRule from './eslint-rules/no-module-state.js';
 
 const localPlugin = {
   rules: {
     'no-changelog-comments': noChangelogCommentsRule,
+    'no-module-state': noModuleStateRule,
   },
 };
 
@@ -117,9 +119,32 @@ export default [
     },
   },
   {
+    // The links-view modules keep no state of their own: every instance
+    // (element, zoom, animator) owns its state, so two views never share it.
+    files: ['packages/ui-components/src/**/*.js'],
+    rules: {
+      'local/no-module-state': 'error',
+    },
+  },
+  {
+    // Package example pages run in the browser only.
+    files: ['packages/*/examples/**/*.{js,mjs}'],
+    languageOptions: {
+      globals: {
+        document: 'readonly',
+        window: 'readonly',
+        URL: 'readonly',
+      },
+    },
+  },
+  {
     // Playwright UI tests: callbacks passed to page.evaluate run in the
     // browser, so browser globals are available there.
-    files: ['**/*.e2e.mjs', 'tests/e2e/**/*.spec.js'],
+    files: [
+      '**/*.e2e.mjs',
+      'tests/e2e/**/*.spec.js',
+      'packages/*/tests/e2e/**/*.spec.js',
+    ],
     languageOptions: {
       globals: {
         document: 'readonly',
