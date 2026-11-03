@@ -68,18 +68,21 @@ test('example validation rejects an invented component and property', () => {
 // Match Markdown fences only; LiNo itself is always parsed by the official reader.
 test('mapping snippets are valid style rules, an action and a theme', () => {
   const mapping = readFileSync(`${directory}../mui-mapping.md`, 'utf8');
-  const blocks = [...mapping.matchAll(/```lino\n([\s\S]*?)```/gu)].map(
-    (match) => match[1]
-  );
-  assert.equal(blocks.length, 3);
-  for (const block of blocks) {
-    assert.ok(new Parser().parse(block).length > 0);
+  for (const newline of ['\n', '\r\n']) {
+    const source = mapping.replaceAll('\r\n', '\n').replaceAll('\n', newline);
+    const blocks = [...source.matchAll(/```lino\r?\n([\s\S]*?)```/gu)].map(
+      (match) => match[1]
+    );
+    assert.equal(blocks.length, 3);
+    for (const block of blocks) {
+      assert.ok(new Parser().parse(block).length > 0);
+    }
+    const styles = readStyles(blocks[0]);
+    assert.deepEqual(styles.diagnostics, []);
+    assert.equal(styles.rules.length, 4);
+    assert.deepEqual(parse(blocks[1], { vocabulary }).diagnostics, []);
+    const theme = loadThemes(blocks[2]);
+    assert.deepEqual(theme.diagnostics, []);
+    assert.equal(theme.themes[0].id, 'app-theme');
   }
-  const styles = readStyles(blocks[0]);
-  assert.deepEqual(styles.diagnostics, []);
-  assert.equal(styles.rules.length, 4);
-  assert.deepEqual(parse(blocks[1], { vocabulary }).diagnostics, []);
-  const theme = loadThemes(blocks[2]);
-  assert.deepEqual(theme.diagnostics, []);
-  assert.equal(theme.themes[0].id, 'app-theme');
 });
