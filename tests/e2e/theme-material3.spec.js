@@ -70,6 +70,14 @@ test('variants affect native parts and keyboard focus survives contrast and forc
     n.closest('ui-button').setAttribute('data-theme', 'material3')
   );
   await expect(tonal).toHaveCSS('background-color', tonalColor);
+  await tonal.evaluate((n) =>
+    n.closest('ui-button').setAttribute('data-theme', 'isolated')
+  );
+  await expect(tonal).not.toHaveCSS('background-color', tonalColor);
+  await tonal.evaluate((n) =>
+    n.closest('ui-button').setAttribute('data-theme', 'material3')
+  );
+  await expect(tonal).toHaveCSS('background-color', tonalColor);
   const elevated = page.locator('#light ui-button[variant="elevated"] button');
   await expect(elevated).toHaveCSS('background-color', 'rgb(248, 242, 250)');
   const field = page.locator('#light ui-text-field[variant="filled"] input');

@@ -851,7 +851,7 @@
 }
 }
 @scope ([data-theme="base"]) to ([data-theme]) {
-:scope ui-button:hover, :where(:scope):scope:is(ui-button:hover) {
+ui-button:hover, :where(:scope):is(ui-button:hover) {
   opacity: 0.92;
 }
 
