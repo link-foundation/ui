@@ -129,6 +129,23 @@ const { store } = mountDocument(app, text, { tokens, styles, onAction });
 store.setProp('greeting', 'value', ['Hello again']); // one patch
 ```
 
+### Animations
+
+[`@link-foundation/ui-animation`](packages/ui-animation/README.md) reads
+animations written in Links Notation (keyframe tracks, easings, springs,
+timelines with stagger, `(on pressed ...)` triggers and seeded procedural
+effects), samples them as pure functions of time, validates fills, WCAG
+2.3.1 flashes and reduced motion, and plays them on the Web Animations API.
+GSAP is never used:
+
+```js
+import { createPlayer } from '@link-foundation/ui-animation';
+
+const player = createPlayer(handle, { animations: text, resolveToken });
+player.bindTriggers(store); // (on pressed (play press-feedback))
+await player.play('intro').finished;
+```
+
 ### Behaviour and accessibility
 
 [`@link-foundation/ui-components`](packages/ui-components/README.md) adds
@@ -279,11 +296,13 @@ npm run example:desktop:package
 ├── .github/workflows/    # GitHub Actions CI/CD
 ├── .husky/               # Git hooks (pre-commit)
 ├── examples/             # Usage examples
+│   ├── animation/        # ui-animation page: plays a LiNo timeline on ui-dom nodes
 │   ├── kotlin/           # Compose Desktop window for ui-kotlin (Gradle build)
 │   ├── ui-dom/           # ui-dom page served with an import map (scripts/serve-static.mjs)
 │   └── universal-app/    # React + GitHub Pages + Electron + Capacitor app
 ├── scripts/              # Build and release scripts
 ├── packages/             # npm workspaces (see docs/monorepo.md)
+│   ├── ui-animation/     # @link-foundation/ui-animation (LiNo animations: tracks, springs, timelines, triggers, safety rules, WAAPI player)
 │   ├── ui-components/    # @link-foundation/ui-components (LiNo state machines, actions registry, a11y helpers, charts, diagrams with Dagre layout, SVG and Mermaid, layout and windowing, own CC0 icons, ui-icon, link-view)
 │   ├── ui-config/        # @link-foundation/ui-config (layered configuration, overrides patches)
 │   ├── ui-convert/       # @link-foundation/ui-convert (HTML/DOM, A2UI, Adaptive Cards, JSON Forms, Lottie <-> LiNo)

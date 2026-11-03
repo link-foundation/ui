@@ -9,6 +9,8 @@ publishable artefact is a workspace package under `packages/`.
 ├── package.json            # "private": true, "workspaces": ["packages/*"]
 ├── package-lock.json       # one lock file for the whole workspace
 ├── packages/
+│   ├── ui-animation/       # @link-foundation/ui-animation (animation model,
+│   │                       # safety validation, WAAPI compiler, player)
 │   ├── ui-components/      # @link-foundation/ui-components (behaviour state
 │   │                       # machines, actions registry, a11y helpers, charts,
 │   │                       # diagrams: Dagre layout, SVG, Mermaid,

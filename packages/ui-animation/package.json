@@ -1,0 +1,52 @@
+{
+  "name": "@link-foundation/ui-animation",
+  "version": "0.0.0",
+  "description": "Animations of the associative UI framework written in Links Notation: a declarative model of keyframe tracks, easings, springs, timelines and state triggers, a pure seeded sampler, safety validators and a WAAPI player",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
+  "types": "./src/index.d.ts",
+  "files": [
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "ui",
+    "links-notation",
+    "animation",
+    "waapi",
+    "easing",
+    "spring",
+    "timeline",
+    "reduced-motion"
+  ],
+  "license": "Unlicense",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/link-foundation/ui.git",
+    "directory": "packages/ui-animation"
+  },
+  "homepage": "https://github.com/link-foundation/ui/tree/main/packages/ui-animation#readme",
+  "bugs": {
+    "url": "https://github.com/link-foundation/ui/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@link-foundation/ui-core": "^0.0.0"
+  },
+  "devDependencies": {
+    "@link-foundation/ui-store": "^0.0.0",
+    "@link-foundation/ui-tokens": "^0.0.0",
+    "test-anywhere": "^0.8.48"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
