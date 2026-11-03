@@ -37,6 +37,37 @@ const withValues = (value, values) =>
     : { id: value.id, values: [...value.values, ...values] };
 
 /**
+ * The values of one continuation line `(H x)` of a multi-line link. A line
+ * with several links, `(a 1) (b 2)`, reads as one list of links; its
+ * readers (ui-settings `lineValues`) take each link as a value of its own.
+ */
+function lineValues(item) {
+  const line = item[1];
+  const several =
+    Array.isArray(line) &&
+    line.length > 1 &&
+    line.every(isLink) &&
+    !isPath(line);
+  return several ? line.map(fold) : [fold(line)];
+}
+
+/** Whether a value is a path group `(H (H a) (H b))` with a link `H`. */
+function isPath(value) {
+  if (!Array.isArray(value)) {
+    return false;
+  }
+  const [head, ...rest] = value;
+  return (
+    head !== undefined &&
+    isLink(head) &&
+    rest.length > 0 &&
+    rest.every(
+      (item) => Array.isArray(item) && item.length === 2 && same(item[0], head)
+    )
+  );
+}
+
+/**
  * Fold the path links of the multi-line parenthesized form,
  * `(H (H a) (H b))` with a head `H` that is a link, back into `H` with the
  * values `a b`; the rest of the value is folded the same way.
@@ -46,20 +77,9 @@ export function fold(value) {
     return value;
   }
   const values = parts(value);
-  const [head, ...rest] = values;
-  const path =
-    Array.isArray(value) &&
-    head !== undefined &&
-    isLink(head) &&
-    rest.length > 0 &&
-    rest.every(
-      (item) => Array.isArray(item) && item.length === 2 && same(item[0], head)
-    );
-  if (path) {
-    return withValues(
-      fold(head),
-      rest.map((item) => fold(item[1]))
-    );
+  if (isPath(value)) {
+    const [head, ...rest] = values;
+    return withValues(fold(head), rest.flatMap(lineValues));
   }
   const folded = values.map(fold);
   return Array.isArray(value) ? folded : { id: value.id, values: folded };
