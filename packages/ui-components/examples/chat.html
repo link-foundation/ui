@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Provider-neutral chat — Links UI</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "@link-foundation/ui-store": "/packages/ui-store/src/index.js",
+          "@link-foundation/ui-style": "/packages/ui-style/src/index.js",
+          "@link-foundation/ui-tokens": "/packages/ui-tokens/src/index.js",
+          "@link-foundation/ui-dom": "/packages/ui-dom/src/index.js",
+          "links-notation": "/node_modules/links-notation/dist/index.js",
+          "@floating-ui/core": "/node_modules/@floating-ui/core/dist/floating-ui.core.browser.mjs",
+          "@floating-ui/dom": "/node_modules/@floating-ui/dom/dist/floating-ui.dom.browser.mjs"
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="../src/data/data.css" />
+    <link rel="stylesheet" href="../src/controls/styles.css" />
+    <link rel="stylesheet" href="../src/chat/chat.css" />
+    <style>
+      :root {
+        font-family: system-ui, sans-serif;
+        color-scheme: light dark;
+      }
+      body {
+        margin: 0;
+        background: Canvas;
+        color: CanvasText;
+      }
+      main {
+        max-width: 1160px;
+        padding: 20px;
+        margin: auto;
+      }
+      h1 {
+        margin: 0 0 8px;
+        font-size: 1.6rem;
+      }
+      .settings {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        margin: 16px 0;
+      }
+      .settings select,
+      .settings button {
+        padding: 6px 10px;
+        font: inherit;
+      }
+      .workspace {
+        display: grid;
+        grid-template-columns: 250px minmax(0, 1fr);
+        border: 1px solid GrayText;
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      #chat-root {
+        height: 560px;
+      }
+      aside {
+        padding: 12px;
+        background: var(--chat-sidebar, Canvas);
+        color: var(--chat-text, CanvasText);
+        border-inline-end: 1px solid GrayText;
+      }
+      aside h2 {
+        font-size: 1rem;
+      }
+      ui-chat-list {
+        display: block;
+      }
+      .hint {
+        max-width: 78ch;
+        font-size: 0.9rem;
+      }
+      #events {
+        min-height: 24px;
+      }
+      @media (max-width: 650px) {
+        .workspace {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        aside {
+          display: none;
+        }
+      }
+    </style>
+    <style id="chat-theme"></style>
+  </head>
+  <body>
+    <main>
+      <h1>One conversation, any provider</h1>
+      <p class="hint">
+        10,000 messages, paged in memory. Arrow keys move, Space selects, Enter
+        opens actions. Enter sends; Shift+Enter adds a line.
+      </p>
+      <div class="settings">
+        <label
+          >Skin
+          <select id="skin">
+            <option>t3</option>
+            <option>telegram</option>
+            <option>whatsapp</option>
+            <option>signal</option>
+          </select></label
+        >
+        <label
+          >Style
+          <select id="style">
+            <option>bubbles</option>
+            <option>cards</option>
+            <option>compact</option>
+          </select></label
+        >
+        <label
+          >Theme
+          <select id="mode">
+            <option>system</option>
+            <option>light</option>
+            <option>dark</option>
+          </select></label
+        >
+        <button id="jump" type="button">Jump to #5000</button>
+      </div>
+      <div class="workspace ui-chat-shell">
+        <aside aria-label="Conversations">
+          <h2>Conversations</h2>
+          <div id="chats"></div>
+        </aside>
+        <section
+          id="chat-root"
+          class="ui-chat-shell"
+          aria-label="Design review"
+        ></section>
+      </div>
+      <p id="events" role="status" aria-live="polite"></p>
+    </main>
+    <script type="module" src="./chat.js"></script>
+  </body>
+</html>

@@ -1,0 +1,25 @@
+t3: theme
+  token chat.bg '#eef1f4'
+  token chat.sidebar '#f6f8fa'
+  token chat.bubble.in '#ffffff'
+  token chat.bubble.in.text '#1f2328'
+  token chat.bubble.out '#d8f3d4'
+  token chat.bubble.out.text '#1f2328'
+  token chat.bubble.radius 14px
+  token chat.bubble.tail 14px
+  token chat.bubble.padding.block 0.45rem
+  token chat.bubble.padding.inline 0.75rem
+  token chat.text '#1f2328'
+  token chat.column 44rem
+  token chat.selection.bg '#164e63'
+  token chat.selection.text '#ffffff'
+  mode dark
+    token chat.bg '#0e1116'
+    token chat.sidebar '#161b22'
+    token chat.bubble.in '#1c222b'
+    token chat.bubble.in.text '#e6edf3'
+    token chat.bubble.out '#1c3a28'
+    token chat.bubble.out.text '#e6edf3'
+    token chat.text '#e6edf3'
+    token chat.selection.bg '#b9e6fb'
+    token chat.selection.text '#102b39'

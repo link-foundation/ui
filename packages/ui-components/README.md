@@ -1276,6 +1276,13 @@ The peer range accepts the corresponding stable 0.58 release when available.
 See the [CodeMirror licence](https://github.com/codemirror/dev/blob/main/LICENSE)
 and [Monaco licence](https://github.com/microsoft/monaco-editor/blob/main/LICENSE.txt).
 
+## Chat kit
+
+The provider-neutral [chat kit](src/chat/README.md) supplies a chat list,
+virtual message stream, bubbles, reasoning traces, day separators and a floating
+composer. It uses one LiNo data contract, capability-driven actions, bounded
+history and four light/dark skins. Try [the 10,000-message example](examples/chat.html).
+
 ## Settings panel
 
 Import `createSettingsPanel`, `controlFor` and `buildPanelModel` from

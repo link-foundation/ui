@@ -1,0 +1,6 @@
+stream: message-stream
+  label 'Design review messages'
+  chat c1
+  source history
+compose: composer
+  chat c1

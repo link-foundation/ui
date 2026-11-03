@@ -1,0 +1,42 @@
+c1: chat
+  title 'Design review'
+  unread 2
+  can-edit false
+  can-react true
+  can-reply true
+  max-attachments 2
+alice: participant
+  name Alice
+m1: message
+  chat c1
+  sender alice
+  time '2026-10-30T10:00:00Z'
+  text 'Hi 👋'
+m2: message
+  chat c1
+  sender me
+  reply-to m1
+  status delivered
+  outgoing true
+  text Hello
+a1: attachment
+  message m2
+  name notes.txt
+  url 'https://example.org/notes.txt'
+  mime text/plain
+  size 42
+r1: reaction
+  message m1
+  emoji '👍'
+  count 2
+  selected false
+s1: step
+  message m2
+  title Search
+  state done
+  parent none
+s2: step
+  message m2
+  title 'Read result'
+  state pending
+  parent s1
