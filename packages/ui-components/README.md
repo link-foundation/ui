@@ -1192,3 +1192,10 @@ The chat kit can reuse them without timeline logic here. `anchorScrollTop`
 takes `{keys, offsets, scrollTop}` before, `{keys, offsets}` after, and an anchor
 key, preserving that row's intra-row offset. Range ends are exclusive;
 `indexAt` returns `-1` for an empty collection.
+
+## Chat kit
+
+The provider-neutral [chat kit](src/chat/README.md) supplies a chat list,
+virtual message stream, bubbles, reasoning traces, day separators and a floating
+composer. It uses one LiNo data contract, capability-driven actions, bounded
+history and four light/dark skins. Try [the 10,000-message example](examples/chat.html).

@@ -1,0 +1,4 @@
+cards: theme
+  token chat.style.padding 16px
+  token chat.style.width 1
+  token chat.style.radius 4px
