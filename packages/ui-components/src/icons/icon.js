@@ -64,15 +64,16 @@ ${ICON_TAG}[data-mirror]:dir(rtl) > svg {
  * kind yet (docs/spec/open-questions.md, "Icon element kind"): parse with
  * `iconVocabulary()` to read `(icon close)`.
  */
-export const ICON_KIND_TEXT = `(icon: kind
-  (description 'An icon of a registered icon set; decorative unless it has a label.')
-  (positional name)
-  (property name string)
-  (property set string)
-  (property label string)
-  (property mirror (enum true false))
-  (property note string multi)
-  (children none))`;
+export const ICON_KIND_TEXT = `icon: kind
+  description 'An icon of a registered icon set; decorative unless it has a label.'
+  positional name
+  property name string
+  property set string
+  property label string
+  property mirror
+    enum true false
+  property note string multi
+  children none`;
 
 let vocabulary;
 

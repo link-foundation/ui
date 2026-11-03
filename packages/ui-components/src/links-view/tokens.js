@@ -17,30 +17,45 @@ import {
 } from '@link-foundation/ui-tokens';
 
 /** The token set of a link view (`link-view` theme), light and dark. */
-export const LINK_TOKENS = `(link-view: theme
-  (token color.link.background '#E0F7FA' (description 'Behind the link and the grid.'))
-  (token color.link.line '#263238' (description 'The line of a link.'))
-  (token color.link.source (token color.link.line) (description 'The marker at the source end.'))
-  (token color.link.target (token color.link.line) (description 'The marker at the target end.'))
-  (token color.link.grid.minor '#FFFFFF80' (description 'The grid lines every half step.'))
-  (token color.link.grid.major '#FFFFFFCC' (description 'The grid lines every step.'))
-  (token color.link.blueprint.start '#2E7D32' (description 'The first blueprint point.'))
-  (token color.link.blueprint.end '#C62828' (description 'The last blueprint point.'))
-  (token color.link.blueprint.center '#000000' (description 'The blueprint point at the centre.'))
-  (token color.link.blueprint.point '#1565C0' (description 'The other blueprint points.'))
-  (token color.link.blueprint.guide '#1565C0' (description 'The dashed guide through the points.'))
-  (token color.link.focus '#1565C0' (description 'The focus ring of a link view.'))
-  (mode dark
-    (token color.link.background '#0B1F24')
-    (token color.link.line '#ECEFF1')
-    (token color.link.grid.minor '#FFFFFF1F')
-    (token color.link.grid.major '#FFFFFF47')
-    (token color.link.blueprint.start '#81C784')
-    (token color.link.blueprint.end '#EF9A9A')
-    (token color.link.blueprint.center (token color.link.line))
-    (token color.link.blueprint.point '#64B5F6')
-    (token color.link.blueprint.guide '#64B5F6')
-    (token color.link.focus '#90CAF9')))`;
+export const LINK_TOKENS = `link-view: theme
+  token color.link.background '#E0F7FA'
+    description 'Behind the link and the grid.'
+  token color.link.line '#263238'
+    description 'The line of a link.'
+  token color.link.source
+    token color.link.line
+    description 'The marker at the source end.'
+  token color.link.target
+    token color.link.line
+    description 'The marker at the target end.'
+  token color.link.grid.minor '#FFFFFF80'
+    description 'The grid lines every half step.'
+  token color.link.grid.major '#FFFFFFCC'
+    description 'The grid lines every step.'
+  token color.link.blueprint.start '#2E7D32'
+    description 'The first blueprint point.'
+  token color.link.blueprint.end '#C62828'
+    description 'The last blueprint point.'
+  token color.link.blueprint.center '#000000'
+    description 'The blueprint point at the centre.'
+  token color.link.blueprint.point '#1565C0'
+    description 'The other blueprint points.'
+  token color.link.blueprint.guide '#1565C0'
+    description 'The dashed guide through the points.'
+  token color.link.focus '#1565C0'
+    description 'The focus ring of a link view.'
+  mode dark
+    token color.link.background '#0B1F24'
+    token color.link.line '#ECEFF1'
+    token color.link.grid.minor '#FFFFFF1F'
+    token color.link.grid.major '#FFFFFF47'
+    token color.link.blueprint.start '#81C784'
+    token color.link.blueprint.end '#EF9A9A'
+    token color.link.blueprint.center
+      token color.link.line
+    token color.link.blueprint.point '#64B5F6'
+    token color.link.blueprint.guide '#64B5F6'
+    token color.link.focus '#90CAF9'`;
 
 /** The token path of each colour role the renderers use. */
 export const COLOR_TOKENS = Object.freeze({
