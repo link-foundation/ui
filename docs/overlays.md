@@ -67,7 +67,7 @@ remaining time; queued notifications begin their duration when shown.
 The toaster uses a manual popover; the fallback registers in the toast layer.
 Docked drawers register in the dock layer, shared with #36 windows.
 
-## Requirements and verification plan (#35)
+## Requirements and verification (#35)
 
 | Requirement                                                               | Implementation                         | Verification                                                |
 | ------------------------------------------------------------------------- | -------------------------------------- | ----------------------------------------------------------- |

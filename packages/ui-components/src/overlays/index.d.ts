@@ -69,3 +69,12 @@ export const SURFACE_MACHINE: string;
 export const TOOLTIP_MACHINE: string;
 export const TABS_MACHINE: string;
 export const TOAST_MACHINE: string;
+
+declare module '@link-foundation/ui-dom' {
+  interface RenderOptions {
+    overlays?: {
+      clock?: import('../behavior/index.js').Clock;
+      selection?: () => readonly string[];
+    };
+  }
+}

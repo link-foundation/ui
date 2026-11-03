@@ -75,7 +75,11 @@ export function createPopover(node, initial, ctx, options = {}) {
     }
     if (anchor) {
       cleanupPosition = positionFloating(anchor, node, {
-        placement: atomOf(el, 'placement'),
+        placement:
+          atomOf(el, 'placement') ??
+          (node.parentElement?.getAttribute('role') === 'menuitem'
+            ? 'right-start'
+            : 'bottom-start'),
         offset: Number(atomOf(el, 'offset') ?? 8),
       });
     }

@@ -66,7 +66,11 @@ export function createDialog(node, initial, ctx) {
       event.preventDefault();
       close();
     }),
-    listen(node, 'close', close),
+    listen(node, 'close', () => {
+      if (!node.open) {
+        close();
+      }
+    }),
     listen(node, 'keydown', (event) => {
       if (event.key === 'Escape') {
         event.preventDefault();
