@@ -426,3 +426,160 @@ export function registerLinkViewKind(
   win?: Window & typeof globalThis,
   options?: LinkViewOptions
 ): Readonly<KindSpec>;
+
+// --------------------------------------------------------- links network
+export type NetworkId = string | number;
+export interface NetworkLink {
+  id: NetworkId;
+  source: NetworkId | 0;
+  target: NetworkId | 0;
+  label?: string;
+}
+export interface Network {
+  points: Map<NetworkId, { id: NetworkId }>;
+  links: Map<NetworkId, NetworkLink>;
+}
+export type NetworkPositions = Map<NetworkId, LinkPoint>;
+export interface NetworkLayoutOptions {
+  width?: number;
+  height?: number;
+  alphaMin?: number;
+  maxTicks?: number;
+  pins?: [NetworkId, LinkPoint][];
+}
+export type NetworkLayoutName =
+  | 'circle'
+  | 'grid'
+  | 'hex'
+  | 'spiral'
+  | 'force'
+  | 'layered';
+export type NetworkLayout = (
+  network: Network,
+  options?: NetworkLayoutOptions
+) => NetworkPositions;
+export function buildNetwork(links: Iterable<NetworkLink>): Network;
+export function networkIds(network: Network): NetworkId[];
+export function networkEdges(
+  network: Network
+): { source: NetworkId; target: NetworkId }[];
+export function networkNeighbours(network: Network, id: NetworkId): NetworkId[];
+export const NETWORK_LAYOUTS: Readonly<
+  Record<NetworkLayoutName, NetworkLayout>
+>;
+export const circle: NetworkLayout;
+export const grid: NetworkLayout;
+export const hex: NetworkLayout;
+export const spiral: NetworkLayout;
+export const force: NetworkLayout;
+export const layered: NetworkLayout;
+export function createForceSimulation(
+  network: Network,
+  options?: NetworkLayoutOptions
+): {
+  readonly ticks: number;
+  tick(): boolean;
+  positions(): NetworkPositions;
+};
+export interface NetworkLabel {
+  id: NetworkId;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  priority?: number;
+}
+export function visibleLabels(
+  labels: NetworkLabel[],
+  zoom: number,
+  options?: { minZoom?: number; padding?: number }
+): NetworkId[];
+export interface LayoutJob {
+  layout: NetworkLayoutName;
+  links: NetworkLink[];
+  options?: NetworkLayoutOptions;
+}
+export interface LayoutResult {
+  positions: NetworkPositions;
+  ticks?: number;
+}
+export interface LayoutRunner {
+  run(key: string, job: LayoutJob): Promise<LayoutResult>;
+  cancel(key: string): void;
+  dispose(): void;
+}
+export function createLayoutRunner(options?: {
+  createWorker?: () => Worker;
+}): LayoutRunner;
+export interface NetworkStyle {
+  width?: number;
+  height?: number;
+  view?: View;
+  colors?: LinkColors;
+  style?: 'glyph' | 'node-edge';
+  selected?: NetworkId[];
+  hovered?: NetworkId | null;
+  labels?: { minZoom?: number; padding?: number };
+}
+export function networkToSvg(
+  network: Network,
+  positions: NetworkPositions,
+  style?: NetworkStyle
+): string;
+export function networkToPng(svg: string, scale?: number): Promise<Blob>;
+export interface NetworkStore {
+  get(id: string):
+    | {
+        id: string;
+        kind: string | null;
+        positional: readonly RawValue[];
+        properties: readonly { name: string; values: readonly RawValue[] }[];
+      }
+    | undefined;
+  roots(): readonly string[];
+  children(id: string): readonly string[];
+  subscribe(
+    listener: (
+      events: readonly { id: string; type: string; before: unknown }[]
+    ) => void
+  ): () => void;
+}
+export interface LinksNetworkElement extends HTMLElement {
+  items: NetworkLink[];
+  store: NetworkStore | null;
+  links: { raw: readonly RawValue[] };
+  readonly network: Network;
+  positions: NetworkPositions;
+  readonly pins: NetworkPositions;
+  readonly selection: NetworkId[];
+  select(id: NetworkId | null, additive?: boolean): void;
+  readonly ready: Promise<void>;
+  readonly diagnostics: { severity: string; message: string }[];
+  view: View;
+  readonly drawn: {
+    renderer: 'svg' | 'canvas';
+    links: number;
+    view: View;
+  } | null;
+  layout(): Promise<void>;
+  requestDraw(): void;
+  toSvg(): string;
+  toPng(scale?: number): Promise<Blob>;
+}
+export interface LinksNetworkOptions {
+  tag?: string;
+  animator?: AnimatorOptions;
+  createWorker?: () => Worker;
+}
+export const LINKS_NETWORK_TAG: 'links-network';
+export function defineLinksNetwork(
+  win?: Window & typeof globalThis,
+  options?: LinksNetworkOptions
+): { new (): LinksNetworkElement; prototype: LinksNetworkElement };
+export function linksNetworkKind(options?: { tag?: string }): KindSpec;
+export function registerLinksNetworkKind(
+  win?: Window & typeof globalThis,
+  options?: LinksNetworkOptions
+): Readonly<KindSpec>;
+
+export function networkVocabulary(): import('@link-foundation/ui-core').Vocabulary;

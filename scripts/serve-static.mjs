@@ -28,10 +28,12 @@
  *
  * Usage: node scripts/serve-static.mjs [--port 4173] [--host 127.0.0.1]
  */
+import { createRequire } from 'node:module';
 import { existsSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { buildNetworkWorker } from './build-network-worker.mjs';
 import { startStaticServer } from './lib/static-server.mjs';
 
 const repoRoot = path.resolve(
@@ -41,6 +43,10 @@ const repoRoot = path.resolve(
 
 /** The npm packages the chart gallery loads as ES modules (no bundler). */
 export const BROWSER_MODULES = [
+  'd3-force',
+  'd3-dispatch',
+  'd3-quadtree',
+  'd3-timer',
   'd3-array',
   'd3-color',
   'd3-format',
@@ -86,7 +92,16 @@ export function defaultMounts(root) {
   ]) {
     mounts.push({
       prefix: `/${parts.join('/')}/`,
-      dir: path.join(root, ...parts),
+      dir:
+        parts.join('/') === 'node_modules/d3-force'
+          ? path.dirname(
+              path.dirname(
+                createRequire(
+                  path.join(root, 'packages/ui-components/package.json')
+                ).resolve('d3-force')
+              )
+            )
+          : path.join(root, ...parts),
     });
   }
   const packagesDir = path.join(root, 'packages');
@@ -125,6 +140,7 @@ function parseArgs(argv) {
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const { port, host } = parseArgs(process.argv.slice(2));
+  await buildNetworkWorker(repoRoot);
   const server = await startStaticServer({
     mounts: defaultMounts(repoRoot),
     port,
