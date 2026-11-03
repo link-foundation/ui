@@ -105,6 +105,14 @@ describe('kind registry', () => {
     });
     expect(handle.nodeFor('t').localName).toBe('my-text');
   });
+
+  it('renders when an extension isolated world has a null customElements registry', () => {
+    const { window, container } = createDom();
+    Object.defineProperty(window, 'customElements', { value: null });
+    const { handle } = mountDocument(container, 'title: text Hello');
+    expect(handle.nodeFor('title').textContent).toBe('Hello');
+    handle.destroy();
+  });
 });
 
 describe('unknown kinds', () => {

@@ -139,7 +139,11 @@ export const registeredKinds = () => [...registry.keys()];
  */
 export function ensureTag(win, tag) {
   const elements = win?.customElements;
-  if (elements === undefined || elements.get(tag) !== undefined) {
+  if (
+    elements === null ||
+    elements === undefined ||
+    elements.get(tag) !== undefined
+  ) {
     return;
   }
   // A fresh class per tag: one constructor cannot back two names.
