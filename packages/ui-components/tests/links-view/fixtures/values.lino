@@ -1,0 +1,4 @@
+greeting: hello 'world'
+a: 'a' 'two words'
+zero: 0 ''
+0: 0 zero

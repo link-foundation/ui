@@ -1,7 +1,7 @@
 import { defineKind } from '@link-foundation/ui-dom';
 import { createAnimator } from './animator.js';
 import { createZoomPan } from './zoom-pan.js';
-import { buildNetwork, networkIds } from './network-model.js';
+import { buildNetwork, networkIds, networkInput } from './network-model.js';
 import { circle } from './layouts/circle.js';
 import { NETWORK_LAYOUTS } from './layouts/index.js';
 import { createLayoutRunner } from './create-layout-runner.js';
@@ -135,7 +135,7 @@ function requestLayout(node, state) {
   const layout = node.getAttribute('layout') ?? state.config.layout;
   const job = {
     layout,
-    links: [...state.network.links.values()],
+    links: networkInput(state.network),
     options: {
       width: node.clientWidth || 640,
       height: node.clientHeight || 400,
