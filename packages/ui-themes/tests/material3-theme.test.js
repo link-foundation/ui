@@ -1,3 +1,4 @@
+import process from 'node:process';
 import { it } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
@@ -53,9 +54,20 @@ it('loads Material 3 without errors and every pair passes in every scheme', asyn
 it('does not install Material Web, MUI, Roboto or Material Symbols font packages', () => {
   const tree = JSON.parse(
     execFileSync(
-      'npm',
-      ['ls', '--workspace', '@link-foundation/ui-themes', '--all', '--json'],
-      { encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 }
+      process.platform === 'win32' ? 'npm.cmd' : 'npm',
+      [
+        'ls',
+        '--workspace',
+        '@link-foundation/ui-themes',
+        '--all',
+        '--json',
+        '--package-lock-only',
+      ],
+      {
+        encoding: 'utf8',
+        maxBuffer: 8 * 1024 * 1024,
+        shell: process.platform === 'win32',
+      }
     )
   );
   const visit = (node) => {
