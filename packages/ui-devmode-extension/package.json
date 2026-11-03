@@ -1,0 +1,10 @@
+{
+  "name": "@link-foundation/ui-devmode-extension",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "license": "Unlicense",
+  "scripts": {
+    "build": "node scripts/package.mjs"
+  }
+}

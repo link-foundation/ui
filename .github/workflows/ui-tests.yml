@@ -62,6 +62,9 @@ jobs:
       - name: Build icon sets
         run: npm run build:icons
 
+      - name: Build foreign dev mode and unpacked extension
+        run: npm run build --workspace @link-foundation/ui-devmode-extension
+
       - name: Install Expo example dependencies
         run: npm ci --prefix examples/react-native --no-audit --no-fund
 

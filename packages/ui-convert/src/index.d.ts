@@ -76,6 +76,8 @@ export interface ImportHtmlOptions extends ImportOptions {
 }
 
 export interface ImportDomOptions extends ImportOptions {
+  /** Exclude a node and its descendants before assigning IDs. */
+  ignore?: (node: Node) => boolean;
   /** Source offsets of a DOM node, when the host knows them. */
   location?: (
     node: unknown

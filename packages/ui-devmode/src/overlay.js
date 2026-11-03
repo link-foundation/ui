@@ -33,7 +33,7 @@ const OVERLAY_CSS = `
  *   target: { node: Element, id: string, type: string }|null) => void,
  *   update: () => void, destroy: () => void }}
  */
-export function createOverlay({ document, label }) {
+export function createOverlay({ document, label, container = document.body }) {
   const host = document.createElement('ui-devmode-overlay');
   host.setAttribute('aria-hidden', 'true');
   host.dataset.uiDevmode = 'overlay';
@@ -54,7 +54,7 @@ export function createOverlay({ document, label }) {
     shadow.append(box);
     boxes[which] = box;
   }
-  document.body.append(host);
+  container.append(host);
 
   const place = (which) => {
     const box = boxes[which];
