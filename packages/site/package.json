@@ -1,6 +1,7 @@
 {
   "name": "@link-foundation/ui-site",
   "private": true,
+  "license": "Unlicense",
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
