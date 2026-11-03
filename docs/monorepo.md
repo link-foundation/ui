@@ -9,8 +9,8 @@ publishable artefact is a workspace package under `packages/`.
 ├── package.json            # "private": true, "workspaces": ["packages/*"]
 ├── package-lock.json       # one lock file for the whole workspace
 ├── packages/
-│   ├── ui-components/      # @link-foundation/ui-components (icons: own CC0 set,
-│   │                       # ui-icon, Lucide/Tabler/Material adapters)
+│   ├── ui-components/      # @link-foundation/ui-components (behaviour state
+│   │                       # machines, actions registry, a11y helpers, icons)
 │   ├── ui-config/          # @link-foundation/ui-config (configuration layers)
 │   ├── ui-convert/         # @link-foundation/ui-convert (HTML/DOM import)
 │   ├── ui-dom/             # @link-foundation/ui-dom (DOM renderer)
