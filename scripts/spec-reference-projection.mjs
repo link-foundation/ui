@@ -456,6 +456,10 @@ const STRING_CHECKS = {
   color: (v) => HEX_COLOR.test(v),
   url: (v) => /^(https?:|mailto:|\/|\.)/.test(v) || !v.includes(':'),
   'token-name': (v) => TOKEN_NAME.test(v),
+  boolean: (v) => v === 'true' || v === 'false',
+  // A URL when it has a `:` or a `/`, otherwise an element id.
+  'element-ref-or-url': (v) =>
+    !(v.includes(':') || v.includes('/')) || STRING_CHECKS.url(v),
 };
 
 function isFunctionalColor(value) {

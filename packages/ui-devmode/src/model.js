@@ -119,6 +119,19 @@ export const tokenPath = (values) =>
     ? values[0][1]
     : null;
 
+/** The editor of each named property type. */
+const EDITORS = Object.freeze({
+  string: { editor: 'string' },
+  'element-ref': { editor: 'string' },
+  'element-ref-or-url': { editor: 'string' },
+  url: { editor: 'string' },
+  number: { editor: 'number' },
+  boolean: { editor: 'boolean' },
+  color: { editor: 'color' },
+  dimension: { editor: 'dimension', units: uiValues.DIMENSION_UNITS },
+  duration: { editor: 'dimension', units: uiValues.DURATION_UNITS },
+});
+
 /**
  * The editor of a property type: `string`, `number`, `dimension` (a number
  * with a unit), `color`, `enum`, `boolean`, `token` or `readonly`.
@@ -138,22 +151,9 @@ export function editorFor(type, values) {
       ? { editor: 'boolean' }
       : { editor: 'enum', options };
   }
-  switch (type) {
-    case 'string':
-    case 'element-ref':
-    case 'url':
-      return { editor: 'string' };
-    case 'number':
-      return { editor: 'number' };
-    case 'color':
-      return { editor: 'color' };
-    case 'dimension':
-      return { editor: 'dimension', units: uiValues.DIMENSION_UNITS };
-    case 'duration':
-      return { editor: 'dimension', units: uiValues.DURATION_UNITS };
-    default:
-      return { editor: 'readonly' };
-  }
+  return typeof type === 'string' && Object.hasOwn(EDITORS, type)
+    ? { ...EDITORS[type] }
+    : { editor: 'readonly' };
 }
 
 /**

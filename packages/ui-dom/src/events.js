@@ -10,12 +10,18 @@
 import { isUnsafeUrl } from './diagnostics.js';
 import { vocabulary } from './model.js';
 
-/** UI events → the DOM events that trigger them. */
+/**
+ * UI events → the DOM events that trigger them. `change` is `ui-change`, a
+ * CustomEvent a control dispatches once per committed value change (its
+ * `detail.value` is the new value), not the native `change` of an input,
+ * so a control that is not a native input fires it too.
+ */
 export const DOM_EVENTS = Object.freeze({
   press: 'click',
   focus: 'focusin',
   blur: 'focusout',
   hover: 'pointerenter',
+  change: 'ui-change',
   select: 'ui-select',
   activate: 'ui-activate',
 });

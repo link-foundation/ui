@@ -8,24 +8,21 @@ login: html
   label-0-1: text Email
     tag label
     attr for email
-  email: html
-    tag input
+  email: text-field
     attr type text
     attr name email
     attr placeholder you@example.com
   label-0-3: html
     tag label
-    input-0-3-0: html
-      tag input
+    input-0-3-0: checkbox
       attr type checkbox
       attr name remember
       attr checked
     text-0-3-1: text ' Remember me'
-  textarea-0-4: html
-    tag textarea
+  textarea-0-4: text-area
+    value ~1{4c696e65206f6e650a20206c696e652074776f}
     attr name note
     attr rows 2
-    text-0-4-0: text ~1{4c696e65206f6e650a20206c696e652074776f}
   ok: button
     label OK
     attr class primary

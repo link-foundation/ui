@@ -103,48 +103,22 @@ describe('shared static server', () => {
     for (const [url, file] of [
       ['/examples/ui-dom/', 'examples/ui-dom/index.html'],
       ['/examples/animation/', 'examples/animation/index.html'],
-      [
-        '/packages/ui-animation/src/index.js',
+      ...[
         'packages/ui-animation/src/index.js',
-      ],
-      ['/packages/ui-dom/src/index.js', 'packages/ui-dom/src/index.js'],
-      [
-        '/packages/ui-components/examples/layout.html',
+        'packages/ui-dom/src/index.js',
         'packages/ui-components/examples/layout.html',
-      ],
-      ['/packages/ui-core/src/index.js', 'packages/ui-core/src/index.js'],
-      [
-        '/node_modules/links-notation/dist/index.js',
+        'packages/ui-core/src/index.js',
         'node_modules/links-notation/dist/index.js',
-      ],
-      [
-        '/packages/ui-components/examples/charts.html',
         'packages/ui-components/examples/charts.html',
-      ],
-      [
-        '/node_modules/d3-scale/src/index.js',
         'node_modules/d3-scale/src/index.js',
-      ],
-      [
-        '/node_modules/d3-shape/src/index.js',
         'node_modules/d3-shape/src/index.js',
-      ],
-      [
-        '/node_modules/echarts/dist/echarts.esm.min.mjs',
         'node_modules/echarts/dist/echarts.esm.min.mjs',
-      ],
-      [
-        '/docs/case-studies/issue-1/samples/document.lino',
         'docs/case-studies/issue-1/samples/document.lino',
-      ],
-      [
-        '/packages/ui-components/examples/link-view.html',
         'packages/ui-components/examples/link-view.html',
-      ],
-      [
-        '/packages/ui-components/src/index.js',
         'packages/ui-components/src/index.js',
-      ],
+        'packages/ui-components/stories/button.lino',
+        'packages/ui-components/src/controls/catalog.lino',
+      ].map((file) => [`/${file}`, file]),
     ]) {
       expect(resolveRequestPath(served, url)).toEqual({
         status: 200,

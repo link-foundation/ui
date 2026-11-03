@@ -1,0 +1,14 @@
+slider-stories: stories
+  component slider
+  story default
+    slider 'Volume'
+      value 40
+  story steps
+    slider 'Brightness'
+      value 60
+      step 10
+      value-text '{value} %'
+  story disabled
+    slider 'Balance'
+      value 50
+      disabled true

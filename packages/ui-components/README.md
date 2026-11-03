@@ -30,6 +30,12 @@ Components of the associative UI framework, written in
 - **Layout and windowing** (`./layout`, `./layout.css`): `stack`, `grid`,
   `split`, `tab-group`, `dock`, `window` and `app-shell` kinds for ui-dom,
   a layer manager, and dock layouts saved as Links Notation.
+- **Basic controls** (`./controls`, `./controls.css`): button,
+  icon-button, label, link, text-field, text-area, number-field,
+  color-field, checkbox, radio-group, switch, slider, select, combobox,
+  progress, badge and avatar as ui-dom kinds over native elements, each
+  with its WAI-ARIA pattern, a LiNo machine and stories
+  ([Basic controls](#basic-controls)).
 - **Icons** (`./icons`): a public-domain icon set of our own, the icon
   registry, the `ui-icon` element, and adapters for Lucide, Tabler and
   Material Symbols that emit licence records ([Icons](#icons)).
@@ -49,6 +55,8 @@ npm install @link-foundation/ui-components
 | `@link-foundation/ui-components/diagrams`             | `parseDiagram`, `toMermaid`, `defineDiagram`, ...                       | yes |
 | `@link-foundation/ui-components/layout`               | the layout kinds, `createLayerManager`, `resizeSplit`, `movePanel`, ... | yes |
 | `@link-foundation/ui-components/layout.css`           | the CSS of the layout kinds                                             |     |
+| `@link-foundation/ui-components/controls`             | `mountControls`, `registerControls`, `nextValue`, `parseStories`, ...   | yes |
+| `@link-foundation/ui-components/controls.css`         | the token-only CSS of the basic controls                                |     |
 | `@link-foundation/ui-components/links-view`           | `defineLinkView`, `linkGeometry`, `renderLinkSvg`, ...                  | yes |
 | `@link-foundation/ui-components/icons`                | `resolveIcon`, `registerIconSet`, `ui-icon`, ...                        | yes |
 | `.../icons/adapters/{lucide,tabler,material-symbols}` | an icon source over the npm package of the set                          | no  |
@@ -841,6 +849,88 @@ a floating panel is a `float PANEL` line with the indented lines `x ...`,
 `y ...`, `width ...`, `height ...` and `region SIDE`, and a closed panel is a
 `closed PANEL SIDE` line. Reading the written text gives the same layout
 back, and the parenthesized form reads the same.
+
+## Basic controls
+
+`./controls` adds the basic controls to ui-dom. Each kind renders native
+elements in light DOM (a `<button>`, an `<input>`, ...) with Open UI part
+names in `data-part`, follows its
+[APG pattern](https://www.w3.org/WAI/ARIA/apg/patterns/) and, when it has
+state, runs its machine (`src/controls/machines/<kind>.lino`).
+
+```js
+import { mountControls } from '@link-foundation/ui-components/controls';
+
+const mounted = mountControls(
+  form,
+  `(settings: document
+  (email: text-field 'Email' (name email) (type email) (required true))
+  (wifi: switch 'Wi-Fi' (name wifi) (checked true))
+  (volume: slider 'Volume' (name volume) (min 0) (max 100) (step 5) (value 40))
+  (save: button 'Save' (on press (emit save))))`
+);
+mounted.store.get('volume'); // the committed values live in the store
+```
+
+```html
+<link rel="stylesheet" href="@link-foundation/ui-components/controls.css" />
+```
+
+`mountControls(container, text, options)` is `mountBehavior` with the
+control kinds: every value a control commits is written to the store with
+one `setProp` (one transaction per user change), then the element's
+`(on change ...)` handlers run. `registerControls()` registers the kinds
+with ui-dom for `mountDocument`; parse with
+`{ vocabulary: controlsVocabulary() }` to check their properties.
+
+| Kind           | Element and role                               | Keyboard                                                                     |
+| -------------- | ---------------------------------------------- | ---------------------------------------------------------------------------- |
+| `button`       | `<button type=button>`                         | Enter, Space                                                                 |
+| `icon-button`  | `<button aria-label>`; no `label` is an error  | Enter, Space                                                                 |
+| `label`        | `<label for>` of a control                     |                                                                              |
+| `link`         | `<a href>`; unsafe URLs are never followed     | Enter                                                                        |
+| `text-field`   | `<input>` and its `<label>`                    | commits on Enter or leaving; Escape restores                                 |
+| `text-area`    | `<textarea>` and its `<label>`                 | commits on leaving; Escape restores                                          |
+| `number-field` | `<input role=spinbutton>`                      | arrows step (Shift ×10), PageUp/PageDown, Home/End                           |
+| `color-field`  | a hex `<input>` and `<input type=color>`       | commits a normalised `#rrggbb`                                               |
+| `checkbox`     | `<input type=checkbox>`, `(checked mixed)`     | Space                                                                        |
+| `radio-group`  | `radiogroup` of `radio`s, one tab stop         | arrows move and check, Space checks                                          |
+| `switch`       | `<button role=switch aria-checked>`            | Space, Enter                                                                 |
+| `slider`       | `slider` with `aria-valuenow/min/max/text`     | arrows step (Shift ×10), PageUp/PageDown, Home/End                           |
+| `select`       | select-only `combobox` and a `listbox`         | arrows, Home/End open and move, Enter/Space choose, Escape closes, typeahead |
+| `combobox`     | `<input role=combobox>` with list autocomplete | typing filters, arrows move, Enter chooses, Escape closes or clears          |
+| `option`       | `option` of a select or a combobox             |                                                                              |
+| `progress`     | `progressbar`; no `value` is indeterminate     |                                                                              |
+| `badge`        | a short status text with a `tone`              |                                                                              |
+| `avatar`       | `<img alt>`, or initials with `role=img`       |                                                                              |
+
+Every input control has a `name` and takes part in its native `<form>`
+(`FormData`). The key bindings of `bindKeys` ignore keys typed in text
+inputs, so a letter typed in a field never fires a page shortcut.
+`controls.css` uses only design tokens (with system colour fallbacks), has
+`:focus-visible` rings and a `forced-colors: active` block.
+
+### Stories and the catalog
+
+Each control has stories in `stories/<kind>.lino` and an entry in
+`src/controls/catalog.lino`:
+
+```lino
+button-stories: stories
+  component button
+  story filled
+    button 'Save'
+      variant filled
+button: control
+  title 'Button'
+  stories button-stories
+  apg button
+```
+
+`parseStories`, `parseCatalog` and `storiesDocument` read them; the page
+`e2e/pages/controls.html` shows a form of every control and a gallery of
+every story. `tests/controls/catalog.test.js` fails when a control lacks
+its kind entry, story file, catalog entry or test file.
 
 ## Icons
 

@@ -1,0 +1,10 @@
+switch-stories: stories
+  component switch
+  story off
+    switch 'Bluetooth'
+  story on
+    switch 'Wi-Fi'
+      checked true
+  story disabled
+    switch 'Airplane mode'
+      disabled true

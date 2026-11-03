@@ -1,13 +1,11 @@
 div-0: html
   tag div
   attr class widget
-  a-0-1: html
-    tag a
+  a-0-1: link
+    label Home
     attr title Home
-    text-0-1-0: text Home
-  a-0-2: html
-    tag a
-    text-0-2-0: text Spaced
+  a-0-2: link
+    label Spaced
   button-0-3: button
     label Press
   img-0-7: image

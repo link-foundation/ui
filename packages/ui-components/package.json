@@ -1,7 +1,7 @@
 {
   "name": "@link-foundation/ui-components",
   "version": "0.0.0",
-  "description": "Components of the associative UI framework written in Links Notation: behaviour state machines in LiNo with a DOM-free interpreter, an actions registry that never evaluates code, DOM accessibility helpers (focus trap, roving tabindex, typeahead, key bindings, live region), charts described with the grammar of Vega-Lite (data, mark, encoding), rendered as deterministic SVG with d3-scale and d3-shape, with an accessible table twin and an optional lazy ECharts adapter, diagrams described in LiNo (flowchart, state, sequence, class), laid out by Dagre or a layout plugin, rendered as accessible SVG, exported to Mermaid text or rendered by a lazily loaded Mermaid adapter, layout elements (stack, grid, split, tab-group, dock, window, app-shell) rendered by ui-dom with a layer manager and dock layouts saved as Links Notation, a public-domain icon set, the ui-icon element and adapters for Lucide, Tabler and Material Symbols that emit asset records, and link-view, one link drawn from links-visuals geometry with shared SVG and Canvas markers, per-instance zoom and pan, and an idle-free animator",
+  "description": "Components of the associative UI framework written in Links Notation: basic controls (button, text, number and colour fields, checkbox, radio group, switch, slider, select, combobox, progress, badge, avatar) on native elements with WAI-ARIA keyboard behaviour, their stories and catalog, behaviour state machines in LiNo with a DOM-free interpreter, an actions registry that never evaluates code, DOM accessibility helpers (focus trap, roving tabindex, typeahead, key bindings, live region), charts described with the grammar of Vega-Lite (data, mark, encoding), rendered as deterministic SVG with d3-scale and d3-shape, with an accessible table twin and an optional lazy ECharts adapter, diagrams described in LiNo (flowchart, state, sequence, class), laid out by Dagre or a layout plugin, rendered as accessible SVG, exported to Mermaid text or rendered by a lazily loaded Mermaid adapter, layout elements (stack, grid, split, tab-group, dock, window, app-shell) rendered by ui-dom with a layer manager and dock layouts saved as Links Notation, a public-domain icon set, the ui-icon element and adapters for Lucide, Tabler and Material Symbols that emit asset records, and link-view, one link drawn from links-visuals geometry with shared SVG and Canvas markers, per-instance zoom and pan, and an idle-free animator",
   "type": "module",
   "exports": {
     ".": {
@@ -37,6 +37,11 @@
       "default": "./src/layout/index.js"
     },
     "./layout.css": "./src/layout/layout.css",
+    "./controls": {
+      "types": "./src/controls/index.d.ts",
+      "default": "./src/controls/index.js"
+    },
+    "./controls.css": "./src/controls/styles.css",
     "./links-view": {
       "types": "./src/links-view/index.d.ts",
       "default": "./src/links-view/index.js"
@@ -68,6 +73,7 @@
   "files": [
     "src/",
     "dist/",
+    "stories/",
     "README.md",
     "LICENSE"
   ],
@@ -93,6 +99,9 @@
     "links",
     "visualisation",
     "canvas",
+    "controls",
+    "forms",
+    "wai-aria",
     "layout",
     "split",
     "dock",

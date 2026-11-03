@@ -115,6 +115,24 @@ function mountStore(store, insert) {
 }
 
 /**
+ * The context a kind gets: the document, the render options, a diagnostic
+ * reporter, and the child elements in the mounted store.
+ */
+const kindContext = (document, options, report, mounted) => (id, kind) => ({
+  document,
+  options,
+  diagnostic(code, severity, at = {}) {
+    report(diagnostic(code, severity, { element: id, kind, ...at }));
+  },
+  children: () => {
+    const { store } = mounted;
+    return store === null
+      ? []
+      : store.children(id).map((child) => elementOf(store.get(child)));
+  },
+});
+
+/**
  * @param {TreeOptions} tree
  */
 export function createTree({
@@ -131,14 +149,9 @@ export function createTree({
   const ids = new WeakMap();
   /** @type {Map<string, {el: Element, spec: object, unbind?: () => void}>} */
   const state = new Map();
-
-  const contextOf = (id, kind) => ({
-    document,
-    options,
-    diagnostic(code, severity, at = {}) {
-      report(diagnostic(code, severity, { element: id, kind, ...at }));
-    },
-  });
+  /** The store of the last `mount` (for `ctx.children`). */
+  const mounted = { store: null };
+  const contextOf = kindContext(document, options, report, mounted);
 
   const idFor = (node) => closestId(ids, node);
 
@@ -283,7 +296,10 @@ export function createTree({
     move,
     remove,
     rename,
-    mount: (store) => mountStore(store, insert),
+    mount(store) {
+      mounted.store = store;
+      mountStore(store, insert);
+    },
     clear,
     nodeFor: (id) => nodes.get(id) ?? null,
     idFor,

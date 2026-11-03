@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ui-components basic controls</title>
+    <!--
+      No bundler: the workspace packages load as ES modules from their src/
+      folders. Serve the repository with `node scripts/serve-static.mjs` and
+      open http://127.0.0.1:4173/packages/ui-components/e2e/pages/controls.html
+    -->
+    <script type="importmap">
+      {
+        "imports": {
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "@link-foundation/ui-store": "/packages/ui-store/src/index.js",
+          "@link-foundation/ui-style": "/packages/ui-style/src/index.js",
+          "@link-foundation/ui-tokens": "/packages/ui-tokens/src/index.js",
+          "@link-foundation/ui-dom": "/packages/ui-dom/src/index.js",
+          "@link-foundation/ui-components/controls": "/packages/ui-components/src/controls/index.js",
+          "@link-foundation/ui-components/a11y": "/packages/ui-components/src/a11y/index.js",
+          "@link-foundation/ui-components/icons": "/packages/ui-components/src/icons/index.js",
+          "links-notation": "/node_modules/links-notation/dist/index.js"
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="../../src/controls/styles.css" />
+    <style>
+      /* The design tokens of the page's two themes (the controls read only these). */
+      :root {
+        /* The same width with and without a scrollbar: a full-page
+           screenshot resizes the viewport to the page height. */
+        scrollbar-gutter: stable;
+        color-scheme: light;
+        --color-primary: #6750a4;
+        --color-on-primary: #ffffff;
+        --color-primary-container: #eaddff;
+        --color-on-primary-container: #21005d;
+        --color-error: #b3261e;
+        --color-on-error: #ffffff;
+        --color-surface: #fffbfe;
+        --color-on-surface: #1d1b20;
+        --color-surface-variant: #e7e0ec;
+        --color-on-surface-variant: #49454f;
+        --color-surface-container: #f3edf7;
+        --color-outline: #79747e;
+        --color-disabled: #6b6870;
+      }
+      :root[data-theme='dark'] {
+        color-scheme: dark;
+        --color-primary: #d0bcff;
+        --color-on-primary: #381e72;
+        --color-primary-container: #4f378b;
+        --color-on-primary-container: #eaddff;
+        --color-error: #f2b8b5;
+        --color-on-error: #601410;
+        --color-surface: #141218;
+        --color-on-surface: #e6e0e9;
+        --color-surface-variant: #49454f;
+        --color-on-surface-variant: #cac4d0;
+        --color-surface-container: #211f26;
+        --color-outline: #938f99;
+        --color-disabled: #a19ca8;
+      }
+      body {
+        margin: 0;
+        padding: 24px;
+        background: var(--color-surface);
+        color: var(--color-on-surface);
+        font:
+          16px/1.5 system-ui,
+          sans-serif;
+      }
+      h1 {
+        margin: 0 0 16px;
+        font-size: 1.5rem;
+      }
+      #app > ui-document {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px 24px;
+        align-items: start;
+      }
+      #submit {
+        min-block-size: 40px;
+        padding: 0 24px;
+        border: 0;
+        border-radius: 20px;
+        background: var(--color-primary);
+        color: var(--color-on-primary);
+        font: inherit;
+      }
+      #submit:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+      }
+      h2 {
+        margin: 32px 0 16px;
+        font-size: 1.25rem;
+      }
+      #stories > ui-document {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px 24px;
+        align-items: start;
+      }
+      output {
+        font-family: ui-monospace, monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1 data-i18n="title">Basic controls</h1>
+      <form id="form" action="#submitted">
+        <div id="app"></div>
+        <p>
+          <button id="submit" type="submit" data-i18n="submit">Submit</button>
+        </p>
+      </form>
+      <p>
+        <span data-i18n="changes">Changes</span>:
+        <output id="changes" aria-live="polite"></output>
+      </p>
+      <p>
+        <span data-i18n="shortcuts">Shortcuts</span>:
+        <output id="shortcuts">0</output>
+      </p>
+      <p>
+        <span data-i18n="diagnostics">Diagnostics</span>:
+        <output id="diagnostics">none</output>
+      </p>
+      <h2 data-i18n="stories">Stories</h2>
+      <div id="stories"></div>
+    </main>
+    <script type="module">
+      import '@link-foundation/ui-components/icons';
+      import {
+        mountControls,
+        parseCatalog,
+        parseStories,
+        storiesDocument,
+      } from '@link-foundation/ui-components/controls';
+      import { bindKeys } from '@link-foundation/ui-components/a11y';
+
+      const MESSAGES = {
+        en: {
+          title: 'Basic controls',
+          submit: 'Submit',
+          changes: 'Changes',
+          shortcuts: 'Shortcuts',
+          diagnostics: 'Diagnostics',
+          stories: 'Stories',
+          save: 'Save',
+          close: 'Close',
+          name: 'Name',
+          notes: 'Notes',
+          quantity: 'Quantity',
+          colour: 'Colour',
+          terms: 'I accept the terms',
+          size: 'Size',
+          small: 'Small',
+          medium: 'Medium',
+          large: 'Large',
+          wifi: 'Wi-Fi',
+          volume: 'Volume',
+          fruit: 'Fruit',
+          choose: 'Choose a fruit',
+          apple: 'Apple',
+          pear: 'Pear',
+          plum: 'Plum',
+          city: 'City',
+          upload: 'Upload',
+          loading: 'Loading',
+          unread: 'unread messages',
+          docs: 'Documentation',
+          email: 'Email',
+          required: 'Required field',
+        },
+        ru: {
+          title: 'Базовые элементы управления',
+          submit: 'Отправить',
+          changes: 'Изменения',
+          shortcuts: 'Сочетания клавиш',
+          diagnostics: 'Диагностика',
+          stories: 'Истории',
+          save: 'Сохранить',
+          close: 'Закрыть',
+          name: 'Имя',
+          notes: 'Заметки',
+          quantity: 'Количество',
+          colour: 'Цвет',
+          terms: 'Я принимаю условия',
+          size: 'Размер',
+          small: 'Маленький',
+          medium: 'Средний',
+          large: 'Большой',
+          wifi: 'Wi-Fi',
+          volume: 'Громкость',
+          fruit: 'Фрукт',
+          choose: 'Выберите фрукт',
+          apple: 'Яблоко',
+          pear: 'Груша',
+          plum: 'Слива',
+          city: 'Город',
+          upload: 'Загрузка',
+          loading: 'Подготовка',
+          unread: 'непрочитанных сообщений',
+          docs: 'Документация',
+          email: 'Почта',
+          required: 'Обязательное поле',
+        },
+      };
+
+      /** The document of every basic control, its labels in a locale. */
+      const page = (t) => `(page: document
+  (save: button '${t.save}' (on press (emit saved)))
+  (close: icon-button close (label '${t.close}') (variant outlined) (on press (emit closed)))
+  (docs: link '${t.docs}' (href 'https://example.com/docs') (external true))
+  (legend: label '${t.required}' (for email) (required true))
+  (email: text-field '${t.email}' (type email) (name email) (value 'ada@example.com') (required true))
+  (name: text-field (label '${t.name}') (name name) (value Ada) (on change (emit name-changed)))
+  (notes: text-area (label '${t.notes}') (name notes) (rows 2))
+  (quantity: number-field (label '${t.quantity}') (name quantity) (value 2) (min 0) (max 10))
+  (colour: color-field (label '${t.colour}') (name colour) (value '#6750a4'))
+  (terms: checkbox (label '${t.terms}') (name terms) (checked mixed))
+  (size: radio-group (label '${t.size}') (name size) (value medium)
+    (small: radio (label '${t.small}') (value small))
+    (medium: radio (label '${t.medium}') (value medium))
+    (large: radio (label '${t.large}') (value large) (disabled true)))
+  (wifi: switch (label '${t.wifi}') (name wifi) (checked true))
+  (volume: slider (label '${t.volume}') (name volume) (value 40) (step 10) (value-text '{value} %'))
+  (fruit: select (label '${t.fruit}') (name fruit) (placeholder '${t.choose}')
+    (apple: option (label '${t.apple}') (value apple))
+    (pear: option (label '${t.pear}') (value pear))
+    (plum: option (label '${t.plum}') (value plum)))
+  (city: combobox (label '${t.city}') (name city)
+    (berlin: option (label Berlin) (value berlin))
+    (paris: option (label Paris) (value paris))
+    (prague: option (label Prague) (value prague)))
+  (upload: progress (label '${t.upload}') (value 60))
+  (loading: progress (label '${t.loading}'))
+  (unread: badge 3 (label '${t.unread}') (tone primary))
+  (ada: avatar 'Ada Lovelace')
+  (grace: avatar 'Grace Hopper' (size large)))`;
+
+      // The gallery: every story of every control in the catalog.
+      const read = (url) => fetch(url).then((response) => response.text());
+      const catalog = parseCatalog(
+        await read('/packages/ui-components/src/controls/catalog.lino')
+      );
+      const storySets = await Promise.all(
+        [...catalog.keys()].map(async (kind) =>
+          parseStories(
+            await read(`/packages/ui-components/stories/${kind}.lino`)
+          )
+        )
+      );
+      const gallery = mountControls(
+        document.getElementById('stories'),
+        storiesDocument(storySets)
+      );
+
+      const app = document.getElementById('app');
+      const changes = [];
+      let mounted = null;
+      let shortcuts = 0;
+
+      /** Remount the controls with the labels of a locale. */
+      function mount(locale) {
+        mounted?.destroy();
+        app.replaceChildren();
+        changes.length = 0;
+        document.getElementById('changes').textContent = '';
+        mounted = mountControls(app, page(MESSAGES[locale]), {
+          host: { emit: () => {} },
+          onAction: (detail) =>
+            changes.push(`${detail.source}:${detail.event}`),
+        });
+        window.controls = mounted;
+        const codes = [...mounted.diagnostics, ...gallery.diagnostics].map(
+          (d) => d.code
+        );
+        document.getElementById('diagnostics').textContent =
+          codes.length === 0 ? 'none' : codes.join(', ');
+      }
+
+      app.addEventListener('ui-change', (event) => {
+        const { source, property, value } = event.detail;
+        const text = `${source}.${property}=${value}`;
+        changes.push(text);
+        document.getElementById('changes').textContent = text;
+      });
+
+      // A letter shortcut on the page: typing in a field must never fire it.
+      bindKeys(document, {
+        s: () => {
+          shortcuts += 1;
+          document.getElementById('shortcuts').textContent = String(shortcuts);
+        },
+      });
+
+      document.getElementById('form').addEventListener('submit', (event) => {
+        event.preventDefault();
+        window.submitted = [...new FormData(event.target)];
+      });
+
+      /** Test hook: switch theme and locale. */
+      window.setUi = ({ theme, locale }) => {
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.lang = locale;
+        for (const el of document.querySelectorAll('[data-i18n]')) {
+          el.textContent = MESSAGES[locale][el.dataset.i18n];
+        }
+        mount(locale);
+      };
+      window.changes = changes;
+      window.gallery = gallery;
+      window.setUi({ theme: 'light', locale: 'en' });
+      app.dataset.ready = 'true';
+    </script>
+  </body>
+</html>

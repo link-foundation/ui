@@ -1,0 +1,9 @@
+link-stories: stories
+  component link
+  story internal
+    link 'Read the guide'
+      href '/docs/guide'
+  story external
+    link 'Open UI'
+      href 'https://open-ui.org/'
+      external true

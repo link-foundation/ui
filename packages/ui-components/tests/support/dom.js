@@ -35,6 +35,20 @@ export function press(target, key, init = {}) {
   return down;
 }
 
-/** Wait for queued microtasks (the renderer's patch) to run. */
-export const microtasks = () =>
-  new Promise((resolve) => setTimeout(resolve, 0));
+/** Timer turns `microtasks()` waits (see there why more than one). */
+const TURNS = 3;
+
+/**
+ * Wait for queued microtasks (the renderer's patch, the refresh of a
+ * `watchChildren` observer) to run. One `setTimeout(0)` is enough in
+ * Node, but not in Deno: there jsdom's MutationObserver notification runs
+ * from the Node-compat tick drain, and the microtask its callback queues
+ * can run after an expired timer of the same drain (#34, see
+ * `experiments/radio-group-deno-flake.probe.mjs`). A few timer turns let
+ * every chained microtask run on both.
+ */
+export async function microtasks() {
+  for (let turn = 0; turn < TURNS; turn++) {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  }
+}

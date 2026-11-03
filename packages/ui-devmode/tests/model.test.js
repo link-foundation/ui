@@ -89,12 +89,15 @@ describe('property rows', () => {
     expect(rows.map((r) => [r.name, r.editor, r.text, r.layer])).toEqual([
       ['label', 'string', 'OK', 'site'],
       ['variant', 'enum', 'filled', 'site'],
+      ['icon', 'string', '', 'defaults'],
+      ['type', 'enum', '', 'defaults'],
       ['disabled', 'boolean', '', 'defaults'],
       ['style', 'string', '', 'defaults'],
       ['on', 'readonly', 'press (navigate home)', 'site'],
     ]);
     expect(rows.find((r) => r.name === 'variant').options).toEqual([
       'filled',
+      'tonal',
       'outlined',
       'text',
     ]);
@@ -115,6 +118,8 @@ describe('property rows', () => {
       options: ['a', 'b'],
     });
     expect(editorFor(['enum', 'true', 'false'], []).editor).toBe('boolean');
+    expect(editorFor('boolean', []).editor).toBe('boolean');
+    expect(editorFor('element-ref-or-url', ['/a']).editor).toBe('string');
     expect(editorFor('dimension', [['token', 'space.medium']]).editor).toBe(
       'token'
     );

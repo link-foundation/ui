@@ -1,0 +1,10 @@
+combobox-stories: stories
+  component combobox
+  story default
+    combobox 'City'
+      berlin: option 'Berlin'
+        value berlin
+      paris: option 'Paris'
+        value paris
+      prague: option 'Prague'
+        value prague

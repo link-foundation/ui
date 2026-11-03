@@ -14,7 +14,12 @@
  *   kinds when imported);
  * - `./icons`: the own CC0-1.0 set, the icon registry and `ui-icon` (the
  *   icon set adapters are `./icons/adapters/<set>`);
- * - `./links-view`: `link-view`, one link drawn from links-visuals geometry.
+ * - `./links-view`: `link-view`, one link drawn from links-visuals geometry;
+ * - `./data`: measured virtual lists, trees and tables (`./data.css` styles
+ *   them), plus pure range, selection and sorting models;
+ * - `./controls`: the basic controls (button, text field, checkbox, select,
+ *   ...) rendered by ui-dom, their stories and catalog (`./controls.css`
+ *   styles them).
  *
  * See README.md.
  */
@@ -26,4 +31,5 @@ export * from './diagrams/index.js';
 export * from './layout/index.js';
 export * from './links-view/index.js';
 export * from './icons/index.js';
+export * from './controls/index.js';
 export * from './data/index.js';

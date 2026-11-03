@@ -51,10 +51,12 @@ export function dataVocabulary() {
     const base = defaultVocabulary();
     const data = loadVocabulary(DATA_VOCABULARY_TEXT).kinds;
     for (const kind of data.values()) {
-      kind.properties.set(
-        'note',
-        base.kinds.get('document').properties.get('note')
-      );
+      for (const name of ['note', 'machine']) {
+        kind.properties.set(
+          name,
+          base.kinds.get('document').properties.get(name)
+        );
+      }
     }
     cached = {
       ...base,

@@ -1,0 +1,10 @@
+option-stories: stories
+  component option
+  story disabled
+    select 'Shipping'
+      value standard
+      standard: option 'Standard'
+        value standard
+      express: option 'Express'
+        value express
+        disabled true

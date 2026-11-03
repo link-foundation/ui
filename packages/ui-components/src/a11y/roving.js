@@ -131,6 +131,18 @@ export function createRovingTabindex(items, options = {}) {
       return list()[index] ?? null;
     },
     focus,
+    /**
+     * Make item `i` the tab stop without focusing it (a selection made
+     * another way); returns whether `i` is an item.
+     */
+    select(i) {
+      if (i < 0 || i >= list().length) {
+        return false;
+      }
+      index = i;
+      update();
+      return true;
+    },
     update,
     handleKeyDown,
     /**

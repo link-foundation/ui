@@ -1,0 +1,17 @@
+button-stories: stories
+  component button
+  story filled
+    button 'Save'
+      variant filled
+  story tonal
+    button 'Save draft'
+      variant tonal
+  story outlined
+    button 'Cancel'
+      variant outlined
+  story text
+    button 'Learn more'
+      variant text
+  story disabled
+    button 'Save'
+      disabled true

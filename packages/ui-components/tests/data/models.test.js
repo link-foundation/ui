@@ -2,6 +2,20 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { selectItem } from '../../src/data/selection-model.js';
 import { nextSort, sortItems } from '../../src/data/sort-model.js';
+import { defaultVocabulary } from '@link-foundation/ui-core';
+import { dataVocabulary } from '../../src/data/vocabulary.js';
+
+test('data kinds preserve the common dialect properties', () => {
+  const base = defaultVocabulary().kinds.get('document').properties;
+  for (const kind of ['list', 'tree', 'table']) {
+    for (const name of ['note', 'machine']) {
+      assert.deepEqual(
+        dataVocabulary().kinds.get(kind).properties.get(name),
+        base.get(name)
+      );
+    }
+  }
+});
 
 test('single, multi, range, toggle and missing anchors', () => {
   const base = { keys: ['a', 'b', 'c', 'd'], mode: 'multi' };
