@@ -846,6 +846,7 @@
   --color-on-surface: CanvasText;
   --color-on-surface-variant: CanvasText;
   --color-primary: Highlight;
+  --color-outline: CanvasText;
   --color-on-primary: HighlightText;
   --color-button-text: ButtonText;
 }

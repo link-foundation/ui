@@ -1,0 +1,46 @@
+fluent2-shape: theme
+  token fluent.border-radius-none 0
+    fluent borderRadiusNone
+    source-value 0
+  token fluent.border-radius-small 2px
+    fluent borderRadiusSmall
+    source-value 2px
+  token shape.corner.small 4px
+    fluent borderRadiusMedium
+    source-value 4px
+  token fluent.border-radius-large 6px
+    fluent borderRadiusLarge
+    source-value 6px
+  token fluent.border-radius-x-large 8px
+    fluent borderRadiusXLarge
+    source-value 8px
+  token fluent.border-radius2-x-large 12px
+    fluent borderRadius2XLarge
+    source-value 12px
+  token fluent.border-radius3-x-large 16px
+    fluent borderRadius3XLarge
+    source-value 16px
+  token fluent.border-radius4-x-large 24px
+    fluent borderRadius4XLarge
+    source-value 24px
+  token fluent.border-radius5-x-large 32px
+    fluent borderRadius5XLarge
+    source-value 32px
+  token fluent.border-radius6-x-large 40px
+    fluent borderRadius6XLarge
+    source-value 40px
+  token fluent.border-radius-circular 10000px
+    fluent borderRadiusCircular
+    source-value 10000px
+  token fluent.stroke-width-thin 1px
+    fluent strokeWidthThin
+    source-value 1px
+  token fluent.stroke-width-thick 2px
+    fluent strokeWidthThick
+    source-value 2px
+  token fluent.stroke-width-thicker 3px
+    fluent strokeWidthThicker
+    source-value 3px
+  token fluent.stroke-width-thickest 4px
+    fluent strokeWidthThickest
+    source-value 4px

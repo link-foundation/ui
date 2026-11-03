@@ -105,6 +105,9 @@ describe('property rows', () => {
       'outlined',
       'text',
       'elevated',
+      'secondary',
+      'transparent',
+
       'bordered',
       'borderless',
       'prominent',

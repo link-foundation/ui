@@ -1,0 +1,120 @@
+map Button
+  kind button
+  prop appearance primary
+    variant filled
+  prop appearance secondary
+    variant secondary
+  prop appearance outline
+    variant outlined
+  prop appearance subtle
+    variant text
+  prop appearance transparent
+    variant transparent
+  prop disabled true
+    disabled true
+  status mapped
+map ToggleButton
+  kind button
+  status partial
+  note 'The application owns checked state and toggle behavior; no automatic checked prop conversion.'
+map Input
+  kind text-field
+  prop value *
+    value *
+  prop placeholder *
+    placeholder *
+  status mapped
+map Textarea
+  kind text-area
+  prop value *
+    value *
+  status mapped
+map Checkbox
+  kind checkbox
+  prop checked true
+    checked true
+  prop checked mixed
+    checked mixed
+  status mapped
+map RadioGroup
+  kind radio-group
+  prop value *
+    value *
+  prop layout horizontal
+    orientation horizontal
+  status mapped
+  note 'Use radio children with label/value.'
+map Switch
+  kind switch
+  prop checked true
+    checked true
+  status mapped
+map Slider
+  kind slider
+  prop value *
+    value *
+  prop min *
+    min *
+  prop max *
+    max *
+  prop step *
+    step *
+  status mapped
+map Dropdown
+  kind select
+  prop selectedOptions *
+    value *
+  status partial
+  note 'Single selection only.'
+map Combobox
+  kind combobox
+  prop value *
+    value *
+  status partial
+  note 'Multiple selection requires application handling.'
+map Dialog
+  kind dialog
+  prop open true
+    open true
+  status mapped
+map Menu
+  kind menu
+  status mapped
+map Tooltip
+  kind tooltip
+  prop content *
+    label *
+  status mapped
+map Toast
+  kind toast
+  status mapped
+map Drawer
+  kind drawer
+  prop open true
+    open true
+  status mapped
+map TabList
+  kind tabs
+  prop selectedValue *
+    active *
+  status mapped
+  note 'Map the selected value to the corresponding tab element ID.'
+map Card
+  kind stack
+  status partial
+  note 'Use a stack for static cards; interactive card selection needs application behavior.'
+map Avatar
+  kind avatar
+  prop name *
+    name *
+  status mapped
+map Badge
+  kind badge
+  prop color brand
+    tone primary
+  status partial
+  note 'Fluent appearance palette is not automatically converted.'
+map Spinner
+  kind progress
+  status partial
+  note 'Indeterminate progress uses the existing progress kind; circular spinner anatomy is not implemented.'
