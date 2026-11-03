@@ -136,7 +136,7 @@ describe('workspace-packages', () => {
 });
 
 describe('repository workspace', () => {
-  it('publishes ui-config, ui-convert, ui-core, ui-dom, ui-i18n, ui-links, ui-settings, ui-store, ui-style and ui-tokens from packages/', async () => {
+  it('publishes ui-config, ui-convert, ui-core, ui-dom, ui-i18n, ui-links, ui-react, ui-settings, ui-store, ui-style and ui-tokens from packages/', async () => {
     const names = (await listPublishablePackages('.')).map((p) => p.dir);
     expect(names).toEqual([
       'packages/ui-config',
@@ -145,6 +145,7 @@ describe('repository workspace', () => {
       'packages/ui-dom',
       'packages/ui-i18n',
       'packages/ui-links',
+      'packages/ui-react',
       'packages/ui-settings',
       'packages/ui-store',
       'packages/ui-style',
