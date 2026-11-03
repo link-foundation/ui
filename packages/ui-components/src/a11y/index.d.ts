@@ -15,6 +15,8 @@ export interface RovingTabindex {
   readonly index: number;
   readonly item: HTMLElement | null;
   focus(index: number): boolean;
+  /** Make an item the tab stop without focusing it. */
+  select(index: number): boolean;
   update(): void;
   handleKeyDown(event: KeyboardEvent): boolean;
   attach(container: HTMLElement): () => void;

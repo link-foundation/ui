@@ -1,0 +1,13 @@
+(color-field-machine: machine
+  (initial idle)
+  (context (disabled false) (invalid false))
+  (state idle
+    (on commit (do read-value) (when not-disabled))
+    (on pick (do read-picker) (when not-disabled))
+    (on revert (do restore-value) (when not-disabled)))
+  (part input
+    (attr aria-invalid (context invalid))
+    (on change commit)
+    (key Escape revert))
+  (part indicator
+    (on change pick)))
