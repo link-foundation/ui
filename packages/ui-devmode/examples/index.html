@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ui-devmode example</title>
+    <!--
+      No bundler: the workspace packages load as ES modules from their src/
+      folders. Serve the repository with `node scripts/serve-static.mjs` and
+      open http://127.0.0.1:4173/packages/ui-devmode/examples/?ui-dev
+    -->
+    <script type="importmap">
+      {
+        "imports": {
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "@link-foundation/ui-store": "/packages/ui-store/src/index.js",
+          "@link-foundation/ui-style": "/packages/ui-style/src/index.js",
+          "@link-foundation/ui-tokens": "/packages/ui-tokens/src/index.js",
+          "@link-foundation/ui-dom": "/packages/ui-dom/src/index.js",
+          "@link-foundation/ui-config": "/packages/ui-config/src/index.js",
+          "@link-foundation/ui-devmode": "/packages/ui-devmode/src/index.js",
+          "links-notation": "/node_modules/links-notation/dist/index.js"
+        }
+      }
+    </script>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: system-ui, sans-serif;
+      }
+      body {
+        margin: 0;
+        padding: 24px;
+        background: Canvas;
+        color: CanvasText;
+      }
+      main {
+        max-width: 44rem;
+      }
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        margin-top: 24px;
+        padding-top: 16px;
+        border-top: 1px solid GrayText;
+      }
+      output,
+      kbd,
+      code {
+        font-family: ui-monospace, monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>ui-devmode example</h1>
+      <p>
+        <code>document.lino</code> rendered by ui-dom, configured by ui-config
+        and inspected by dev mode. Press <kbd>Alt+Shift+D</kbd> (or open the
+        page with <a href="?ui-dev"><code>?ui-dev</code></a>) to open the
+        inspector, hover the page and click an element to select it. Edits go
+        to the session layer; <em>Save</em> moves them to the user layer, kept
+        in <code>localStorage</code>.
+      </p>
+      <div id="app"></div>
+      <div class="controls">
+        <label for="notes">Notes (the shortcut does nothing here)</label>
+        <input id="notes" type="text" />
+        <span
+          >Last action:
+          <output id="action" aria-live="polite">none</output></span
+        >
+        <button id="forget" type="button">Forget saved changes</button>
+      </div>
+    </main>
+  </body>
+  <script type="module" src="./main.js"></script>
+</html>
