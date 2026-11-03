@@ -25,6 +25,13 @@ export type Easing =
 
 export type Quantity = { value: number; unit: string };
 
+/** `(envelope bell|sustain [(attack TIME)] [(release TIME)])` (ms). */
+export type Envelope = {
+  type: 'bell' | 'sustain';
+  attack?: number;
+  release?: number;
+};
+
 export type AnimValue =
   | { type: 'number'; value: number }
   | { type: 'color'; color: Record<string, unknown> }
@@ -65,7 +72,7 @@ export interface AnimationFields {
   effect: EffectUse | null;
   /** `(persist true)`: a final clip-path/transform value may persist. */
   persist: boolean;
-  envelope: 'bell' | 'sustain' | null;
+  envelope: Envelope | null;
 }
 
 export interface Animation extends AnimationFields {
@@ -186,7 +193,7 @@ export function sampleTyped(
   effects: Record<string, unknown>;
 };
 export function envelopeWeight(
-  envelope: 'bell' | 'sustain' | null,
+  envelope: Envelope | null,
   progress: number,
   duration: number
 ): number;
