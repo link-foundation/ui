@@ -118,12 +118,44 @@ function headerKey(state, event) {
   event.stopPropagation();
 }
 
+function gridEndpoint(state, event) {
+  if (
+    state.kind !== 'table' ||
+    !(event.ctrlKey || event.metaKey) ||
+    !['Home', 'End'].includes(event.key)
+  ) {
+    return false;
+  }
+  const end = event.key === 'End';
+  state.cell = end ? Math.max(0, state.columns.length - 1) : 0;
+  if (end) {
+    state.focus(state.items.length - 1);
+  } else {
+    state.header.header.firstChild?.firstChild.focus();
+  }
+  event.preventDefault();
+  event.stopPropagation();
+  return true;
+}
+
+function firstRowUp(state, index, event) {
+  if (state.kind !== 'table' || index !== 0 || event.key !== 'ArrowUp') {
+    return false;
+  }
+  event.preventDefault();
+  state.header.header.children[state.cell]?.firstChild.focus();
+  return true;
+}
+
 export function dataKeydown(state, event) {
   if (
     event.target.closest?.(
       'input,textarea,select,[contenteditable=true],.ui-data-resize'
     )
   ) {
+    return;
+  }
+  if (gridEndpoint(state, event)) {
     return;
   }
   if (state.kind === 'table' && event.target.closest?.('.ui-data-header')) {
@@ -136,9 +168,7 @@ export function dataKeydown(state, event) {
   if (index < 0) {
     return;
   }
-  if (state.kind === 'table' && index === 0 && event.key === 'ArrowUp') {
-    event.preventDefault();
-    state.header.header.children[state.cell]?.firstChild.focus();
+  if (firstRowUp(state, index, event)) {
     return;
   }
   const result = keyTarget(state, state.items[index], index, event);

@@ -1065,8 +1065,8 @@ A table reads `columns` records with `label`, `sortable`, `align` (`start` or
 `end`) and `width` (pixels). The caption names the grid. Sort cycles ascending,
 descending, none; equal values retain input order and none restores source
 order. Arrows move between cells; Home/End move within a row, Ctrl/Cmd+Home/End
-move to the first/last data cell, and Up from the first row reaches the header.
-Header arrows navigate sortable headers, Down returns to the data. Space selects
+move to the first header/last data cell, and Up from the first row reaches the header.
+Header arrows navigate columns, Down returns to the data. Space selects
 rows and Shift extends selection. Header buttons activate sorting with
 Enter/Space. Column dividers resize by pointer drag; focus a divider by clicking
 it and use Left/Right (10px), Home (48px), End (600px). The header stays visible

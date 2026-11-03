@@ -36,6 +36,25 @@ async function screenshot(locator, name, info) {
   }
 }
 
+async function sortWithKeyboard(page, header) {
+  await expect(focused(page)).toHaveAttribute('data-sort', 'name');
+  await expect(focused(page)).toHaveAttribute('tabindex', '0');
+  await page.keyboard.press('ArrowRight');
+  await page.keyboard.press('Enter');
+  await expect(header).toHaveAttribute('aria-sort', 'descending');
+  await page.keyboard.press('Space');
+  await expect(header).toHaveAttribute('aria-sort', 'none');
+  await page.keyboard.press('Enter');
+  await expect(header).toHaveAttribute('aria-sort', 'ascending');
+  await page.keyboard.press('Control+End');
+  await expect(focused(page).locator('..')).toHaveAttribute(
+    'data-key',
+    'person-9999'
+  );
+  await page.keyboard.press('Control+Home');
+  await page.keyboard.press('ArrowRight');
+}
+
 test('100000 rows: DOM bound, correct contents at 50000, focus retained outside range and prepend 50 within 1px', async ({
   page,
 }, info) => {
@@ -66,6 +85,24 @@ test('100000 rows: DOM bound, correct contents at 50000, focus retained outside 
   );
   await expect(anchor).toHaveAttribute('aria-setsize', '100050');
   expect(await rows(page).count()).toBeLessThan(200);
+});
+
+test('keyed source reordering retains the focused row', async ({ page }) => {
+  await open(page);
+  await page.evaluate(() => {
+    window.dataExample.rows.set([
+      { id: 'a', label: 'Alpha' },
+      { id: 'b', label: 'Beta' },
+      { id: 'c', label: 'Charlie' },
+    ]);
+  });
+  await key(page, 'b').focus();
+  await page.evaluate(() => {
+    const source = window.dataExample.rows;
+    source.set([...source.get()].reverse());
+  });
+  await expect(focused(page)).toHaveAttribute('data-key', 'b');
+  await expect(focused(page)).toHaveAttribute('aria-posinset', '2');
 });
 
 test('listbox: ArrowDown/Up, Home/End, PageDown/Up, Space, Shift, Ctrl/Meta+A and typeahead', async ({
@@ -173,20 +210,14 @@ test('grid: all arrows, Home/End, Ctrl+Home/End, PageUp/Down, Space, stable sort
     'person-9999'
   );
   await page.keyboard.press('Control+Home');
+  await expect(focused(page)).toHaveAttribute('data-sort', 'name');
+  await page.keyboard.press('ArrowDown');
   await expect(focused(page).locator('..')).toHaveAttribute(
     'data-key',
     'person-0'
   );
   await page.keyboard.press('ArrowUp');
-  await expect(focused(page)).toHaveAttribute('data-sort', 'name');
-  await expect(focused(page)).toHaveAttribute('tabindex', '0');
-  await page.keyboard.press('ArrowRight');
-  await page.keyboard.press('Enter');
-  await expect(header).toHaveAttribute('aria-sort', 'descending');
-  await page.keyboard.press('Space');
-  await expect(header).toHaveAttribute('aria-sort', 'none');
-  await page.keyboard.press('Enter');
-  await expect(header).toHaveAttribute('aria-sort', 'ascending');
+  await sortWithKeyboard(page, header);
   await page.keyboard.press('ArrowDown');
   await page.keyboard.press('PageDown');
   const focusedBox = await focused(page).boundingBox();

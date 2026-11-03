@@ -78,6 +78,11 @@ test('LiNo binding, template, selection/activation registry and source updates',
       view.app.ownerDocument.activeElement
     );
     assert.equal(first.getAttribute('aria-setsize'), '4');
+    source.set([items[2], items[1], items[0]]);
+    assert.equal(
+      view.app.querySelector('[data-key=b]'),
+      view.app.ownerDocument.activeElement
+    );
   } finally {
     view.close();
   }
@@ -233,6 +238,43 @@ test('table columns, stable sorting, grid navigation and keyboard resize', () =>
     const resize = headers[0].lastChild;
     view.press(resize, 'ArrowRight');
     assert.equal(resize.getAttribute('aria-valuenow'), '170');
+  } finally {
+    view.close();
+  }
+});
+
+test('grid command endpoints include headers, including unsortable columns', () => {
+  const view = mount(
+    `people: table
+  caption People
+  items
+    param people
+  columns
+    name: column
+      label Name
+    age: column
+      label Age
+      sortable true
+`,
+    { people: items.map((item) => ({ ...item, name: item.label })) }
+  );
+  try {
+    const headers = view.app.querySelectorAll('[role=columnheader]');
+    const cell = view.app.querySelector('[role=gridcell]');
+    const active = () => view.app.ownerDocument.activeElement;
+    cell.focus();
+    view.press(cell, 'Home', { ctrlKey: true });
+    assert.equal(active(), headers[0].firstChild);
+    assert.equal(active().getAttribute('aria-disabled'), 'true');
+    view.press(active(), 'ArrowRight');
+    assert.equal(active(), headers[1].firstChild);
+    view.press(active(), 'End', { ctrlKey: true });
+    assert.equal(active().parentElement.dataset.key, 'c');
+    assert.equal(active().dataset.cell, '1');
+    view.press(active(), 'Home', { metaKey: true });
+    assert.equal(active(), headers[0].firstChild);
+    view.press(active(), 'ArrowDown');
+    assert.equal(active(), cell);
   } finally {
     view.close();
   }

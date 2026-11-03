@@ -72,6 +72,8 @@ export function createViewport(
     if (disposed) {
       return;
     }
+    const focused = root.ownerDocument.activeElement;
+    const restoreFocus = body.contains(focused);
     const wanted = wantedIndices(root, items, offsets, virtualized, active);
     pruneRows(items, wanted, mounted, observer);
     let previous = null;
@@ -97,6 +99,14 @@ export function createViewport(
         );
       }
       previous = row;
+    }
+    // Moving an existing DOM node blurs it in browsers without moveBefore.
+    if (
+      restoreFocus &&
+      focused.isConnected &&
+      root.ownerDocument.activeElement !== focused
+    ) {
+      focused.focus({ preventScroll: true });
     }
     changed?.();
   }
