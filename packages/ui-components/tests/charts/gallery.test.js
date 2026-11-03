@@ -54,16 +54,28 @@ describe('the chart gallery', () => {
     }
   });
 
-  it('maps every import to a file in the repository', () => {
+  it('maps every import to a file of the npm install', () => {
     const map = JSON.parse(
       document.querySelector('script[type="importmap"]').textContent
     );
     const root = new URL('../../../../', import.meta.url);
+    const lock = JSON.parse(
+      readFileSync(new URL('package-lock.json', root), 'utf8')
+    );
     for (const [name, path] of Object.entries(map.imports)) {
-      expect([name, existsSync(new URL(`.${path}`, root))]).toEqual([
-        name,
-        true,
-      ]);
+      // The gallery is served from npm's hoisted node_modules, which the
+      // lockfile describes. Deno keeps only direct dependencies at the top
+      // of node_modules, so a file is checked where its package is present.
+      const pkg = /^\/(node_modules\/(?:@[^/]+\/)?[^/]+)\//u.exec(path)?.[1];
+      if (pkg !== undefined) {
+        expect([name, lock.packages[pkg] !== undefined]).toEqual([name, true]);
+      }
+      if (pkg === undefined || existsSync(new URL(`${pkg}/`, root))) {
+        expect([name, existsSync(new URL(`.${path}`, root))]).toEqual([
+          name,
+          true,
+        ]);
+      }
     }
   });
 
