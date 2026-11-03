@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LiNo source editor</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "@marijn/find-cluster-break": "/node_modules/@marijn/find-cluster-break/src/index.js",
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "@link-foundation/ui-dom": "/packages/ui-dom/src/index.js",
+          "@link-foundation/ui-style": "/packages/ui-style/src/index.js",
+          "@link-foundation/ui-store": "/packages/ui-store/src/index.js",
+          "@link-foundation/ui-tokens": "/packages/ui-tokens/src/index.js",
+          "links-notation": "/node_modules/links-notation/dist/index.js",
+          "@codemirror/commands": "/node_modules/@codemirror/commands/dist/index.js",
+          "@codemirror/language": "/node_modules/@codemirror/language/dist/index.js",
+          "@codemirror/state": "/node_modules/@codemirror/state/dist/index.js",
+          "@codemirror/streamparser": "/node_modules/@codemirror/streamparser/dist/index.js",
+          "@codemirror/view": "/node_modules/@codemirror/view/dist/index.js",
+          "crelt": "/node_modules/crelt/index.js",
+          "style-mod": "/node_modules/style-mod/src/style-mod.js",
+          "w3c-keyname": "/node_modules/w3c-keyname/index.js",
+          "@lezer/common": "/node_modules/@lezer/common/dist/index.js",
+          "@lezer/highlight": "/node_modules/@lezer/highlight/dist/index.js",
+          "@lezer/lr": "/node_modules/@lezer/lr/dist/index.js",
+          "@codemirror/lang-css": "/node_modules/@codemirror/lang-css/dist/index.js",
+          "@codemirror/autocomplete": "/node_modules/@codemirror/autocomplete/dist/index.js",
+          "@lezer/css": "/node_modules/@lezer/css/dist/index.js",
+          "@codemirror/lang-javascript": "/node_modules/@codemirror/lang-javascript/dist/index.js",
+          "@codemirror/lint": "/node_modules/@codemirror/lint/dist/index.js",
+          "@lezer/javascript": "/node_modules/@lezer/javascript/dist/index.js",
+          "@codemirror/lang-json": "/node_modules/@codemirror/lang-json/dist/index.js",
+          "@lezer/json": "/node_modules/@lezer/json/dist/index.js",
+          "@codemirror/lang-markdown": "/node_modules/@codemirror/lang-markdown/dist/index.js",
+          "@codemirror/lang-html": "/node_modules/@codemirror/lang-html/dist/index.js",
+          "@lezer/html": "/node_modules/@lezer/html/dist/index.js",
+          "@lezer/markdown": "/node_modules/@lezer/markdown/dist/index.js",
+          "@floating-ui/dom": "/node_modules/@floating-ui/dom/dist/floating-ui.dom.mjs",
+          "@floating-ui/core": "/node_modules/@floating-ui/core/dist/floating-ui.core.mjs",
+          "@floating-ui/utils": "/node_modules/@floating-ui/utils/dist/floating-ui.utils.mjs",
+          "@floating-ui/utils/dom": "/node_modules/@floating-ui/utils/dist/floating-ui.utils.dom.mjs"
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="../src/controls/styles.css" />
+    <link rel="stylesheet" href="../src/editor/editor.css" />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --color-primary: #6750a4;
+        --color-on-primary: #ffffff;
+        --color-surface: #fffbfe;
+        --color-on-surface: #1d1b20;
+        --color-on-surface-variant: #49454f;
+        --color-surface-container: #f3edf7;
+        --color-outline: #79747e;
+        --color-error: #b3261e;
+        --color-editor-string: #205b32;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --color-primary: #d0bcff;
+          --color-on-primary: #381e72;
+          --color-surface: #141218;
+          --color-on-surface: #e6e0e9;
+          --color-on-surface-variant: #cac4d0;
+          --color-surface-container: #211f26;
+          --color-outline: #938f99;
+          --color-error: #f2b8b5;
+          --color-editor-string: #98d5a5;
+        }
+      }
+      body {
+        margin: 24px auto;
+        max-width: 960px;
+        padding: 0 16px;
+        font:
+          16px/1.5 system-ui,
+          sans-serif;
+        color: var(--color-on-surface);
+        background: var(--color-surface);
+      }
+      .examples {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-block: 16px;
+      }
+      .examples button {
+        color: var(--color-on-surface);
+        background: var(--color-surface-container);
+        border: 1px solid var(--color-outline);
+        border-radius: 4px;
+        font: inherit;
+        padding: 8px;
+      }
+      #saved {
+        display: block;
+        margin-block: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>LiNo source editor</h1>
+      <p>
+        Drafts stay with each document. Save accepts empty text. Opening a file
+        only edits its source.
+      </p>
+      <p>
+        Press Escape then Tab to leave the editor. Arrow keys switch document
+        tabs.
+      </p>
+      <div id="editor-host"></div>
+
+      <div class="examples">
+        <button id="external" type="button">Simulate external update</button>
+        <button id="error" type="button">Show unclosed link</button>
+        <button id="engine" type="button">Load optional Monaco</button>
+      </div>
+      <output id="saved" aria-live="polite"></output>
+    </main>
+    <script type="module" src="./editor.js"></script>
+  </body>
+</html>
