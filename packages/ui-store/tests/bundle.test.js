@@ -41,10 +41,10 @@ describe('bundle', () => {
     source.store.setProp('late', 'style', ['After compact']);
     const text = await source.persistence.exportBundle();
     expect(
-      text.startsWith(`(${BUNDLE_HEAD} (schema 1) (name demo) (snapshot_tx `)
+      text.startsWith(`${BUNDLE_HEAD}\n  schema 1\n  name demo\n  snapshot_tx `)
     ).toBe(true);
-    expect(text).toContain('\n(document ');
-    expect(text).toContain('\n(tx ');
+    expect(text).toContain('\ndocument\n');
+    expect(text).toContain('\ntx ');
 
     const targetDB = freshIndexedDB();
     const target = await open(targetDB, { name: 'copy' });
@@ -54,7 +54,7 @@ describe('bundle', () => {
     expect(target.store.toLino()).toBe(source.store.toLino());
     deepStrictEqual(target.store.toDocument(), source.store.toDocument());
     expect(await target.persistence.exportBundle()).toBe(
-      text.replace('(name demo)', '(name copy)')
+      text.replace('\n  name demo\n', '\n  name copy\n')
     );
     expect(reloads).toBe(1);
     // Edits after the import continue the transaction numbers.
@@ -81,13 +81,13 @@ describe('bundle', () => {
     ]);
     await source.persistence.compact();
     const exact = await source.persistence.exportBundle();
-    expect(exact).toContain('\n(document_tree ');
+    expect(exact).toContain('\ndocument_tree\n  roots\n    e');
     const target = await open(freshIndexedDB(), { name: 'copy' });
     await target.persistence.importBundle(exact);
     deepStrictEqual(target.store.toDocument(), source.store.toDocument());
     const broken = exact.replace(
-      '(document_tree (roots (e',
-      '(document_tree (roots (x'
+      '\ndocument_tree\n  roots\n    e',
+      '\ndocument_tree\n  roots\n    x'
     );
     expect(await codeOf(target.persistence.importBundle(broken))).toBe(
       'bad-bundle'
@@ -107,8 +107,8 @@ describe('bundle', () => {
     const good = await persistence.exportBundle();
 
     const deep = good.replace(
-      '(document ',
-      `(document ${'('.repeat(40)}x${')'.repeat(40)} `
+      '\ndocument\n',
+      `\ndocument ${'('.repeat(40)}x${')'.repeat(40)}\n`
     );
     expect(await codeOf(persistence.importBundle(deep, { maxDepth: 20 }))).toBe(
       'UiParseError'
@@ -121,9 +121,9 @@ describe('bundle', () => {
 
     const broken = [
       '(something_else (schema 1))',
-      good.replace('(schema 1)', '(schema 2)'),
-      good.replace(/\(snapshot_tx \d+\)/u, '(snapshot_tx -1)'),
-      good.replace('(document ', '(doc '),
+      good.replace('\n  schema 1\n', '\n  schema 2\n'),
+      good.replace(/\n {2}snapshot_tx \d+\n/u, '\n  snapshot_tx -1\n'),
+      good.replace('\ndocument\n', '\ndoc\n'),
       `${good}(tx 1 (origin user) (setProp ok label X))\n`,
     ];
     for (const text of broken) {
