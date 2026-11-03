@@ -136,6 +136,9 @@ jobs:
           # - @csstools/color-helpers, @csstools/css-syntax-patches-for-csstree:
           #   MIT-0 (MIT without the attribution clause), transitive dev-only
           #   dependencies of jsdom, used by the ui-convert DOM import tests.
+          # - khroma: MIT (its licence file) but no licence field; transitive
+          #   dependency of mermaid, the optional peer of ui-components, which
+          #   is installed in this repository for its tests only.
           allow-dependencies-licenses: >-
             pkg:npm/%40axe-core/playwright,
             pkg:npm/axe-core,
@@ -156,7 +159,8 @@ jobs:
             pkg:npm/chainsaw,
             pkg:npm/truncate-utf8-bytes,
             pkg:npm/%40csstools/color-helpers,
-            pkg:npm/%40csstools/css-syntax-patches-for-csstree
+            pkg:npm/%40csstools/css-syntax-patches-for-csstree,
+            pkg:npm/khroma
 
   npm-audit:
     name: Audit npm lock (${{ matrix.directory }})

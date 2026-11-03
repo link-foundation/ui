@@ -1,7 +1,7 @@
 {
   "name": "@link-foundation/ui-components",
   "version": "0.0.0",
-  "description": "Components of the associative UI framework written in Links Notation: behaviour state machines in LiNo with a DOM-free interpreter, an actions registry that never evaluates code, DOM accessibility helpers (focus trap, roving tabindex, typeahead, key bindings, live region), and layout elements (stack, grid, split, tab-group, dock, window, app-shell) rendered by ui-dom with a layer manager and dock layouts saved as Links Notation",
+  "description": "Components of the associative UI framework written in Links Notation: behaviour state machines in LiNo with a DOM-free interpreter, an actions registry that never evaluates code, DOM accessibility helpers (focus trap, roving tabindex, typeahead, key bindings, live region), diagrams described in LiNo (flowchart, state, sequence, class), laid out by Dagre or a layout plugin, rendered as accessible SVG, exported to Mermaid text or rendered by a lazily loaded Mermaid adapter, and layout elements (stack, grid, split, tab-group, dock, window, app-shell) rendered by ui-dom with a layer manager and dock layouts saved as Links Notation",
   "type": "module",
   "exports": {
     ".": {
@@ -19,6 +19,10 @@
     "./a11y": {
       "types": "./src/a11y/index.d.ts",
       "default": "./src/a11y/index.js"
+    },
+    "./diagrams": {
+      "types": "./src/diagrams/index.d.ts",
+      "default": "./src/diagrams/index.js"
     },
     "./layout": {
       "types": "./src/layout/index.d.ts",
@@ -40,6 +44,11 @@
     "a11y",
     "aria",
     "keyboard",
+    "diagram",
+    "flowchart",
+    "mermaid",
+    "dagre",
+    "svg",
     "layout",
     "split",
     "dock",
@@ -61,14 +70,24 @@
     "node": ">=20"
   },
   "dependencies": {
+    "@dagrejs/dagre": "3.1.3",
     "@link-foundation/ui-core": "^0.0.0",
     "@link-foundation/ui-dom": "^0.0.0",
     "@link-foundation/ui-style": "^0.0.0",
     "@link-foundation/ui-tokens": "^0.0.0",
     "links-notation": "^0.27.1"
   },
+  "peerDependencies": {
+    "mermaid": "^11.0.0 || ^12.0.0"
+  },
+  "peerDependenciesMeta": {
+    "mermaid": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "jsdom": "^30.1.3",
+    "mermaid": "11.17.2",
     "test-anywhere": "^0.8.48"
   },
   "publishConfig": {
