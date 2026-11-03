@@ -20,6 +20,9 @@ import { atom, elementOf } from './model.js';
  *   renderers of this render, before the registry
  * @property {(detail: {source: string|null, event: string,
  *   action: readonly any[]}, event: Event) => void} [onAction]
+ * @property {(name: string) => boolean} [isAction]  which action names
+ *   handlers may use (default: the vocabulary actions); others are
+ *   reported as `unknown-action` and never dispatched
  * @property {(diagnostic: object) => void} [onDiagnostic]
  * @property {(events: readonly object[]) => void} [onPatch]  called once
  *   per applied patch with its store events

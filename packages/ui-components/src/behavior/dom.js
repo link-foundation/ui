@@ -241,13 +241,20 @@ function contextOf(view, machine) {
   return context;
 }
 
-/** Report every handler action that is not registered (none runs). */
+/**
+ * Report handler actions that are text, not links, such as
+ * `(on press 'alert(1)')`, as `unknown-action`: ui-dom drops them as
+ * `invalid-handler`, and none ever runs. (ui-dom itself reports links
+ * whose name `registry.has` does not know.)
+ */
 function checkHandlers(store, registry, reportOnce) {
   for (const view of viewsOf(store)) {
     for (const property of view.properties) {
       if (property.name === 'on') {
         const at = { element: view.name ?? view.id };
-        checkHandler(registry, property.values, at).forEach((d) =>
+        const [event, ...actions] = property.values;
+        const texts = actions.filter((action) => !Array.isArray(action));
+        checkHandler(registry, [event, ...texts], at).forEach((d) =>
           reportOnce(`${view.id}:${JSON.stringify(d.at)}`, d)
         );
       }
@@ -379,6 +386,7 @@ export function mountBehavior(container, text, options = {}) {
     ...options,
     css: `${BEHAVIOR_CSS}${options.css ?? ''}`,
     onDiagnostic: report,
+    isAction: (name) => registry.has(name),
     onAction(detail, event) {
       const [name, ...args] = detail.action;
       registry.dispatch(name, args, {

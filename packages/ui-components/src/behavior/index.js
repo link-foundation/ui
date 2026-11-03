@@ -13,7 +13,7 @@ export {
   parseDelay,
   toValue,
 } from './parse-machine.js';
-export { interpret, createManualClock } from './interpret.js';
+export { interpret, createManualClock, attrValue } from './interpret.js';
 export {
   createActionRegistry,
   dispatchHandler,

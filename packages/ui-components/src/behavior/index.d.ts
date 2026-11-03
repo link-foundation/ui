@@ -95,6 +95,13 @@ export interface ManualClock extends Clock {
 
 export function createManualClock(): ManualClock;
 
+/** The text of an attribute value form, or `null` to leave it out. */
+export function attrValue(
+  raw: RawValue,
+  state: string,
+  context: Readonly<Record<string, unknown>>
+): string | null;
+
 export interface Snapshot {
   readonly state: string;
   readonly context: Readonly<Record<string, unknown>>;
