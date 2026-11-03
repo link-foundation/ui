@@ -483,8 +483,85 @@ npx playwright test tests/e2e/interop-lottie.spec.js
 ## License
 
 [Unlicense](LICENSE) (public domain). Dependencies: `@link-foundation/ui-core`
-and `links-notation` (Unlicense), `parse5` (MIT). Only the tests use `jsdom`
+and `links-notation` (Unlicense), `parse5` and `prettier` (MIT). The export
+build tests also use Vite and its Vue plugin (MIT), React (MIT) and Vue (MIT).
+Only the tests use `jsdom`
 (MIT), `ajv` (MIT), `lottie-web` (MIT) and
 `@lottie-animation-community/lottie-specs` (MIT). The test fixtures copied
 from other projects keep their licences (see
 `tests/fixtures/interop/REUSE.toml`).
+
+## Export to source
+
+`exportDocument` is a one-way convenience for committing and editing source.
+LiNo remains the source of truth; the runtime adapters remain the normal rendering
+path. The asynchronous API uses Prettier 3 for JSX, Vue and CSS formatting:
+
+```js
+import { exportDocument } from '@link-foundation/ui-convert';
+
+const { files, diagnostics } = await exportDocument(source, {
+  target: 'react', // react | vue | swiftui | compose
+  mode: 'wrapper', // wrapper (default) | eject; native targets always emit native source
+  componentName: 'App',
+});
+// files: [{ path: 'App.jsx', contents: '...' }]
+```
+
+`source` accepts LiNo text or a ui-core document tree. Export does not mutate the
+tree. Component names must start with an uppercase letter and contain only ASCII
+letters, digits and underscores; names that collide with generated view imports
+are rejected. All files and diagnostics have deterministic order.
+
+- **React/Vue wrapper:** imports the public `UiView` adapter, embeds the original
+  LiNo (escaping backslashes, backticks, interpolation and script terminators),
+  and supplies one empty handler per distinct action head. Pass an `actions`
+  object to override the stubs. Handlers receive the adapter's normal action
+  detail and event. Unknown extensions are retained and reported in comments.
+- **React/Vue eject:** emits semantic HTML using the reverse HTML import table,
+  stable IDs, generated classes and a separate CSS file. Stacks use flex layouts;
+  token references become CSS custom properties such as `var(--space-medium)`.
+  Theme token declarations become custom properties. Buttons map their variants
+  to CSS. Actions call the supplied handler with the literal LiNo arguments.
+  Unsupported events, styles, kinds and properties yield comments and warnings.
+  Supply the relevant token CSS when tokens are defined outside the document.
+- **SwiftUI/Compose:** emits source using the kind tables in
+  `src/export/targets/*.lino`, with four spaces per indentation level. Stacks,
+  text, buttons, text fields and toggles are supported; fields use local editable
+  state. Button actions call an optional dictionary/map of handlers accepting
+  string argument arrays/lists. SwiftUI filled buttons use
+  `.buttonStyle(.borderedProminent)`. Other unsupported native features are
+  reported rather than inferred. Token references use `Tokens.spaceMedium`
+  (Swift) / `Tokens.SpaceMedium` (Kotlin), matching ui-tokens; include its generated
+  token file in your native project. There is no native runtime dependency.
+
+Every unsupported construct produces both an output comment and a diagnostic
+`{ code: 'unsupported', severity: 'warning', id, target, message }`. Parse
+errors also remain in `diagnostics`. Exporters do not execute document code.
+The supported subset is intentionally smaller than the runtime renderer;
+round-trip code editing and other platform exporters are outside this API.
+
+```bash
+npx ui-convert export --target react --mode eject --out generated app.lino
+npx ui-convert export --target vue --component-name Login app.lino
+npx ui-convert export --target swiftui docs/case-studies/issue-1/samples/document.lino
+npx ui-convert export --target compose --out generated app.lino
+```
+
+Without `--out`, stdout contains the source files in returned order (component,
+then CSS for web eject); diagnostics go to stderr. With `--out`, all files are
+written into that directory. A file named `-` reads stdin. Existing JSON interop
+exports continue to use `--format` and cannot be combined with `--target`.
+
+Verification: `node --test packages/ui-convert/tests/export/*.test.js` checks the
+`document`, `form` and `unsupported` goldens for all targets/modes, determinism,
+wrapper escaping, Vite builds, live jsdom equality with the original `UiView`,
+handler overrides, CLI behavior and the React form's exact import round trip.
+Native compilation is optional: Swift checks require `swiftc` and an Apple SDK;
+Kotlin checks require `kotlinc` and `UI_CONVERT_COMPOSE_CLASSPATH` with the actual
+Compose libraries. Missing SDKs produce explicit skips; no native APIs are mocked.
+
+The basic native APIs were checked against the official
+[SwiftUI state/binding documentation](https://developer.apple.com/documentation/swiftui/managing-model-data-in-your-app)
+and [Compose text field documentation](https://developer.android.com/develop/ui/compose/text/user-input).
+A runnable generated-code preview is in [examples/code-export](../../examples/code-export/).
