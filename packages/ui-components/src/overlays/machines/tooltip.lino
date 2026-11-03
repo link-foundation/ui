@@ -1,0 +1,29 @@
+tooltip: machine
+  initial closed
+  state closed
+    on enter
+      target waiting
+  state waiting
+    after 500ms
+      target open
+    on leave
+      target closed
+    on close
+      target closed
+  state open
+    on enter
+      target open
+    on leave
+      target closing
+    on close
+      target closed
+  state closing
+    after 100ms
+      target closed
+    on enter
+      target open
+    on close
+      target closed
+  part content
+    attr data-state
+      state

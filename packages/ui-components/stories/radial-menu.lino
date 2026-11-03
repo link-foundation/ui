@@ -1,0 +1,19 @@
+node-menu: radial-menu
+  anchor open-radial
+  label 'Node actions'
+  radius 108
+  item editor
+    label Editor
+    icon settings
+    on select
+      emit open-editor
+  item insert
+    label Insert
+    icon plus
+    on select
+      emit insert
+  item delete
+    label Delete
+    icon close
+    on select
+      emit delete

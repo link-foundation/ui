@@ -75,6 +75,12 @@ export function defaultMounts(root) {
     ...BROWSER_MODULES.map((name) => ['node_modules', name]),
     ['node_modules', 'echarts', 'dist'],
     ['node_modules', '@dagrejs', 'dagre', 'dist'],
+    ...['dom', 'core', 'utils'].map((name) => [
+      'node_modules',
+      '@floating-ui',
+      name,
+      'dist',
+    ]),
     ['node_modules', 'mermaid', 'dist'],
     ['docs', 'case-studies', 'issue-1', 'samples'],
   ]) {
@@ -89,8 +95,8 @@ export function defaultMounts(root) {
       for (const sub of [
         ['e2e', 'pages'],
         ['src'],
-        ['examples'],
         ['stories'],
+        ['examples'],
         ['dist'],
       ]) {
         const dir = path.join(packagesDir, name, ...sub);

@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Overlays and navigation</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "@link-foundation/ui-store": "/packages/ui-store/src/index.js",
+          "@link-foundation/ui-style": "/packages/ui-style/src/index.js",
+          "@link-foundation/ui-tokens": "/packages/ui-tokens/src/index.js",
+          "@link-foundation/ui-dom": "/packages/ui-dom/src/index.js",
+          "@link-foundation/ui-components": "/packages/ui-components/src/index.js",
+          "@link-foundation/ui-components/behavior": "/packages/ui-components/src/behavior/index.js",
+          "@link-foundation/ui-components/behavior/dom": "/packages/ui-components/src/behavior/dom.js",
+          "@link-foundation/ui-components/a11y": "/packages/ui-components/src/a11y/index.js",
+          "links-notation": "/node_modules/links-notation/dist/index.js",
+          "@link-foundation/ui-components/overlays": "/packages/ui-components/src/overlays/index.js",
+          "@floating-ui/dom": "/node_modules/@floating-ui/dom/dist/floating-ui.dom.mjs",
+          "@floating-ui/core": "/node_modules/@floating-ui/core/dist/floating-ui.core.mjs",
+          "@floating-ui/utils": "/node_modules/@floating-ui/utils/dist/floating-ui.utils.mjs",
+          "@floating-ui/utils/dom": "/node_modules/@floating-ui/utils/dist/floating-ui.utils.dom.mjs"
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="../../src/overlays/styles.css" />
+    <link rel="stylesheet" href="../../src/layout/layout.css" />
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+      body {
+        margin: 0;
+        padding: 32px;
+        background: Canvas;
+        color: CanvasText;
+        font:
+          16px/1.5 system-ui,
+          sans-serif;
+      }
+      main {
+        max-width: 960px;
+        margin: auto;
+      }
+      h1 {
+        margin-top: 0;
+      }
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-block: 24px;
+      }
+      .controls button,
+      #context-target {
+        font: inherit;
+        padding: 10px 16px;
+        color: CanvasText;
+        background: Canvas;
+        border: 1px solid GrayText;
+        border-radius: 8px;
+      }
+      #context-target {
+        display: block;
+        margin-bottom: 24px;
+      }
+      #app > ui-document > [data-kind='tabs'] {
+        display: block;
+        padding-block: 16px;
+      }
+      #events {
+        display: block;
+        min-height: 24px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Overlays and navigation</h1>
+      <p>
+        Native top-layer surfaces, keyboard navigation and shared Links Notation
+        stories.
+      </p>
+      <div class="controls">
+        <button id="open-dialog">Dialog</button
+        ><button id="open-alert">Alert dialog</button>
+        <button id="open-popover">Popover</button
+        ><button id="open-menu">Menu</button>
+        <button id="open-radial">Radial menu</button
+        ><button id="open-tooltip">Copy link</button>
+        <button id="open-drawer">Modal drawer</button
+        ><button id="open-docked">Docked drawer</button>
+        <button id="add-toast">Show toast</button
+        ><button id="add-error">Show error</button>
+      </div>
+      <button id="context-target">
+        Message target (right click or Shift+F10)
+      </button>
+      <p id="outside-target">This area keeps the browser context menu.</p>
+      <div id="app"></div>
+      <output id="events" aria-label="Last action"></output>
+    </main>
+    <script type="module">
+      import { mountDocument } from '@link-foundation/ui-dom';
+      import {
+        overlayController,
+        overlayVocabulary,
+      } from '@link-foundation/ui-components/overlays';
+      import {
+        layoutVocabulary,
+        windowController,
+      } from '../../src/layout/index.js';
+      import { formatLinks } from '@link-foundation/ui-core';
+      const stories = [
+        'dialog',
+        'alert-dialog',
+        'popover',
+        'tooltip',
+        'menu',
+        'context-menu',
+        'radial-menu',
+        'tabs',
+        'drawer',
+        'toaster',
+      ];
+      const sources = await Promise.all(
+        stories.map(async (name) =>
+          (await fetch(`../../stories/${name}.lino`)).text()
+        )
+      );
+      const win = `background-window: window
+  title 'Background window'
+  open false
+  x 560
+  y 140
+  width 300
+  height 240
+  window-text: text 'Raising this window cannot cover a modal.'
+`;
+      const vocabulary = layoutVocabulary();
+      for (const [name, spec] of overlayVocabulary().kinds)
+        if (!vocabulary.kinds.has(name)) vocabulary.kinds.set(name, spec);
+      const app = document.getElementById('app');
+      window.actions = [];
+      const mounted = mountDocument(
+        app,
+        `gallery: document\n${[...sources, win]
+          .join('\n')
+          .split('\n')
+          .map((line) => '  ' + line)
+          .join('\n')}`,
+        {
+          parseOptions: { vocabulary },
+          overlays: { selection: () => ['selected-other-message'] },
+          onAction(detail) {
+            window.actions.push(detail);
+            document.getElementById('events').textContent =
+              `${detail.source}: ${detail.action.join(' ')}${detail.target ? ' (target ' + detail.target + ')' : ''}`;
+          },
+        }
+      );
+      window.gallery = mounted;
+      const controller = (id) => overlayController(mounted.handle.nodeFor(id));
+      window.controller = controller;
+      for (const [button, id] of [
+        ['open-dialog', 'confirm'],
+        ['open-alert', 'alert'],
+        ['open-drawer', 'modal-drawer'],
+        ['open-docked', 'docked-drawer'],
+      ])
+        document
+          .getElementById(button)
+          .addEventListener('click', () => controller(id).open());
+      let count = 0;
+      window.addToast = (assertive = false, duration = 5000) => {
+        count++;
+        const text = formatLinks([
+          {
+            id: `toast-${count}`,
+            values: [
+              'toast',
+              ['label', assertive ? 'Could not save message' : 'Message saved'],
+              ['duration', String(duration)],
+              ['politeness', assertive ? 'assertive' : 'polite'],
+            ],
+          },
+        ]);
+        const holder = document.createElement('div');
+        const item = mountDocument(holder, text);
+        mounted.handle
+          .nodeFor('notifications')
+          .append(item.handle.nodeFor(`toast-${count}`));
+        return `toast-${count}`;
+      };
+      document
+        .getElementById('add-toast')
+        .addEventListener('click', () => window.addToast());
+      document
+        .getElementById('add-error')
+        .addEventListener('click', () => window.addToast(true));
+      window.raiseWindow = () =>
+        windowController(mounted.handle.nodeFor('background-window')).show(
+          false
+        );
+      app.dataset.ready = 'true';
+    </script>
+  </body>
+</html>

@@ -1,0 +1,30 @@
+message-menu: menu
+  anchor open-menu
+  label 'Message actions'
+  reply: menu-item
+    label Reply
+    on select
+      emit reply
+  quote: menu-item
+    label 'Quote and Reply'
+  edit: menu-item
+    label Edit
+  pin: menu-item
+    label Pin
+  copy: menu-item
+    label Copy
+  forward: menu-item
+    label Forward
+  divider: menu-separator
+  delete-message: menu-item
+    label Delete
+  select-message: menu-item
+    label Select
+  more: menu-item
+    label More
+    submenu: menu
+      label 'More actions'
+      archive: menu-item
+        label Archive
+      mute: menu-item
+        label Mute

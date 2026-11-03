@@ -1,0 +1,7 @@
+panel-tabs: tabs
+  label 'Panel example'
+  panel-tab: tab
+    label Details
+    panel tab-panel-example
+  tab-panel-example: tab-panel
+    panel-text: text 'A labelled panel.'

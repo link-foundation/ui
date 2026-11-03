@@ -1,0 +1,3 @@
+hint: tooltip
+  anchor open-tooltip
+  label 'Copy the message link'

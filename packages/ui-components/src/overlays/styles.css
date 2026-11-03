@@ -1,0 +1,155 @@
+/* Overlay styling uses theme tokens with system-colour fallbacks. */
+:root {
+  --ui-toast-duration: 5000ms;
+  --ui-overlay-radius: var(--shape-radius-medium, 12px);
+  --ui-overlay-transition: var(--motion-duration-short, 150ms);
+}
+.ui-overlay[hidden] {
+  display: none !important;
+}
+.ui-overlay {
+  box-sizing: border-box;
+}
+.ui-overlay:is([popover], dialog) {
+  color: var(--color-on-surface, CanvasText);
+  background: var(--color-surface, Canvas);
+  border: 1px solid var(--color-outline, GrayText);
+  border-radius: var(--ui-overlay-radius);
+  padding: var(--space-4, 16px);
+  box-shadow: 0 8px 32px var(--color-shadow, rgb(0 0 0 / 20%));
+  max-width: calc(100vw - 32px);
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+}
+.ui-overlay[popover]:not([data-kind='toaster']) {
+  margin: 0;
+  inset: auto;
+}
+.ui-overlay::backdrop {
+  background: transparent;
+}
+.ui-overlay:modal::backdrop {
+  background: var(--color-scrim, rgb(0 0 0 / 45%));
+}
+.ui-overlay [data-part='title'] {
+  margin: 0 0 16px;
+  font-size: 1.25rem;
+}
+.ui-overlay [data-part='actions'] {
+  display: flex;
+  gap: 8px;
+  margin-top: 24px;
+  justify-content: end;
+}
+.ui-overlay :is(button, [role='menuitem']),
+.ui-overlay[role='menuitem'] {
+  font: inherit;
+  color: inherit;
+}
+.ui-overlay button {
+  border: 1px solid var(--color-outline, GrayText);
+  border-radius: var(--shape-radius-small, 6px);
+  padding: 8px 16px;
+  background: var(--color-surface-container, Canvas);
+}
+.ui-overlay :focus-visible,
+.ui-overlay:focus-visible {
+  outline: 3px solid var(--color-primary, Highlight);
+  outline-offset: 2px;
+}
+.ui-overlay[role='menu'] {
+  min-width: 200px;
+  padding: 8px;
+}
+.ui-overlay [role='menuitem'] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+.ui-overlay [role='menuitem']:focus {
+  background: var(--color-secondary-container, Canvas);
+}
+.ui-overlay [role='separator'] {
+  border-bottom: 1px solid var(--color-outline, GrayText);
+  margin: 4px 8px;
+}
+.ui-overlay [aria-disabled='true'] {
+  opacity: 0.6;
+  cursor: default;
+}
+.ui-overlay[data-presentation='radial'] {
+  width: var(--ui-radial-size);
+  height: var(--ui-radial-size);
+  border-radius: 50%;
+  overflow: visible;
+}
+.ui-overlay[data-presentation='radial'] > [role='menuitem'] {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border: 1px solid var(--color-outline, GrayText);
+  background: var(--color-surface, Canvas);
+}
+.ui-overlay [role='tablist'] {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid var(--color-outline, GrayText);
+  padding-bottom: 8px;
+}
+.ui-overlay [role='tab'][aria-selected='true'] {
+  border-bottom: 3px solid var(--color-primary, Highlight);
+}
+.ui-overlay [role='tabpanel'] {
+  padding: 16px 0;
+}
+.ui-overlay[data-kind='toaster'] {
+  position: fixed;
+  inset: auto 16px 16px auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+}
+.ui-overlay[data-kind='toast'] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  background: var(--color-surface, Canvas);
+  border: 1px solid var(--color-outline, GrayText);
+  border-radius: 8px;
+  margin-top: 8px;
+  padding: 12px;
+}
+.ui-overlay[data-kind='drawer'] {
+  margin: 0;
+  inset: 0 0 0 auto;
+  height: 100dvh;
+  max-height: 100dvh;
+  width: var(--ui-drawer-width, 320px);
+  border-radius: 0;
+}
+.ui-overlay[data-kind='drawer'][data-side='left'] {
+  inset: 0 auto 0 0;
+}
+.ui-overlay[data-kind='drawer'][data-side='top'] {
+  inset: 0 0 auto;
+  width: 100vw;
+  height: auto;
+}
+.ui-overlay[data-kind='drawer'][data-side='bottom'] {
+  inset: auto 0 0;
+  width: 100vw;
+  height: auto;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ui-overlay button,
+  .ui-overlay [role='menuitem'] {
+    transition: background-color var(--ui-overlay-transition);
+  }
+}

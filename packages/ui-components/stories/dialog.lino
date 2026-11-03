@@ -1,0 +1,16 @@
+confirm: dialog
+  title 'Delete message?'
+  body
+    text 'This cannot be undone.'
+  actions
+    cancel: button
+      label Cancel
+      on press
+        emit close
+    delete: button
+      label Delete
+      variant filled
+      on press
+        emit delete
+  on close
+    emit dialog-closed

@@ -63,6 +63,11 @@
       "default": "./src/icons/adapters/material-symbols.js"
     },
     "./dist/icons/*": "./dist/icons/*",
+    "./overlays": {
+      "types": "./src/overlays/index.d.ts",
+      "default": "./src/overlays/index.js"
+    },
+    "./overlays.css": "./src/overlays/styles.css",
     "./data": {
       "types": "./src/data/index.d.ts",
       "default": "./src/data/index.js"
@@ -125,6 +130,7 @@
   },
   "dependencies": {
     "@dagrejs/dagre": "3.1.3",
+    "@floating-ui/dom": "1.8.0",
     "@link-foundation/ui-core": "^0.0.0",
     "@link-foundation/ui-dom": "^0.0.0",
     "@link-foundation/ui-style": "^0.0.0",

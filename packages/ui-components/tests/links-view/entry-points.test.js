@@ -20,6 +20,7 @@ const ENTRY_POINTS = [
   'layout',
   'links-view',
   'icons',
+  'overlays',
   'controls',
   'data',
 ];

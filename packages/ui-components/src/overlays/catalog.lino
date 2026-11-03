@@ -1,0 +1,89 @@
+dialog-catalog: component-entry
+  kind dialog
+  story 'packages/ui-components/stories/dialog.lino'
+  keyboard 'Tab Shift+Tab Escape'
+  machine surface
+
+alert-dialog-catalog: component-entry
+  kind alert-dialog
+  story 'packages/ui-components/stories/alert-dialog.lino'
+  keyboard 'Tab Shift+Tab Escape'
+  machine surface
+
+popover-catalog: component-entry
+  kind popover
+  story 'packages/ui-components/stories/popover.lino'
+  keyboard 'Escape'
+  machine surface
+
+tooltip-catalog: component-entry
+  kind tooltip
+  story 'packages/ui-components/stories/tooltip.lino'
+  keyboard 'Tab Escape'
+  machine tooltip
+
+menu-catalog: component-entry
+  kind menu
+  story 'packages/ui-components/stories/menu.lino'
+  keyboard 'ArrowDown ArrowUp Home End Enter Space Escape ArrowRight ArrowLeft typeahead'
+  machine surface
+
+menu-item-catalog: component-entry
+  kind menu-item
+  story 'packages/ui-components/stories/menu-item.lino'
+  keyboard 'Enter Space'
+  machine surface
+
+menu-separator-catalog: component-entry
+  kind menu-separator
+  story 'packages/ui-components/stories/menu-separator.lino'
+  keyboard 'none'
+  machine surface
+
+context-menu-catalog: component-entry
+  kind context-menu
+  story 'packages/ui-components/stories/context-menu.lino'
+  keyboard 'ContextMenu Shift+F10 ArrowDown ArrowUp Home End Enter Space Escape typeahead'
+  machine surface
+
+radial-menu-catalog: component-entry
+  kind radial-menu
+  story 'packages/ui-components/stories/radial-menu.lino'
+  keyboard 'ArrowRight ArrowLeft ArrowDown ArrowUp Home End Enter Space Escape'
+  machine surface
+
+tabs-catalog: component-entry
+  kind tabs
+  story 'packages/ui-components/stories/tabs.lino'
+  keyboard 'ArrowRight ArrowLeft Home End Enter Space'
+  machine tabs
+
+tab-catalog: component-entry
+  kind tab
+  story 'packages/ui-components/stories/tab.lino'
+  keyboard 'ArrowRight ArrowLeft Enter Space'
+  machine tabs
+
+tab-panel-catalog: component-entry
+  kind tab-panel
+  story 'packages/ui-components/stories/tab-panel.lino'
+  keyboard 'Tab'
+  machine tabs
+
+toast-catalog: component-entry
+  kind toast
+  story 'packages/ui-components/stories/toast.lino'
+  keyboard 'Tab Enter Space'
+  machine toast
+
+toaster-catalog: component-entry
+  kind toaster
+  story 'packages/ui-components/stories/toaster.lino'
+  keyboard 'Tab'
+  machine toast
+
+drawer-catalog: component-entry
+  kind drawer
+  story 'packages/ui-components/stories/drawer.lino'
+  keyboard 'Tab Shift+Tab Escape'
+  machine surface

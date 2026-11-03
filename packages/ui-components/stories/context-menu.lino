@@ -1,0 +1,15 @@
+target-menu: context-menu
+  anchor context-target
+  label 'Target message actions'
+  target-reply: menu-item
+    label Reply
+    on select
+      emit target-reply
+  target-copy: menu-item
+    label Copy
+    on select
+      emit target-copy
+  target-delete: menu-item
+    label Delete
+    on select
+      emit target-delete

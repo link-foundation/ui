@@ -102,6 +102,9 @@ export interface ActionDetail {
   readonly event: string;
   /** The action and its arguments: `['navigate', 'home']`. */
   readonly action: readonly RawValue[];
+  /** Context-menu target and current selection are independent. */
+  readonly target?: string;
+  readonly selection?: readonly string[];
 }
 
 export type Kinds = Map<string, KindSpec> | Record<string, KindSpec>;
@@ -210,6 +213,8 @@ export const UNKNOWN_KIND: Readonly<KindSpec>;
 /** The DOM event of each document event. */
 export const DOM_EVENTS: Readonly<{
   press: 'click';
+  close: 'ui-close';
+  select: 'ui-select';
   focus: 'focusin';
   blur: 'focusout';
   hover: 'pointerenter';

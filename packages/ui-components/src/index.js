@@ -31,5 +31,6 @@ export * from './diagrams/index.js';
 export * from './layout/index.js';
 export * from './links-view/index.js';
 export * from './icons/index.js';
+export * from './overlays/index.js';
 export * from './controls/index.js';
 export * from './data/index.js';

@@ -1079,6 +1079,15 @@ The machine format starts small on purpose. These are not supported yet:
 The code is [Unlicense](LICENSE). The own icons are CC0-1.0. Third-party
 icons keep their licences, as recorded in [Adapters](#adapters).
 
+## Overlays and navigation
+
+`@link-foundation/ui-components/overlays` registers dialog, alert-dialog,
+popover, tooltip, menu, menu-item, menu-separator, context-menu, radial-menu,
+tabs, tab, tab-panel, toast, toaster and drawer. Load `overlays.css` and see
+[the overlay guide](../../docs/overlays.md) for LiNo examples, controllers,
+keyboard behavior, injected clocks and the runnable gallery.
+`positionFloating` is also exported as the shared positioning API for select.
+
 ## Lists, trees and tables
 
 Import `@link-foundation/ui-components/data` to register the `list`, `tree`
