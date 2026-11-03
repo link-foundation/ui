@@ -1078,3 +1078,108 @@ The machine format starts small on purpose. These are not supported yet:
 
 The code is [Unlicense](LICENSE). The own icons are CC0-1.0. Third-party
 icons keep their licences, as recorded in [Adapters](#adapters).
+
+## Lists, trees and tables
+
+Import `@link-foundation/ui-components/data` to register the `list`, `tree`
+and `table` ui-dom kinds and load `@link-foundation/ui-components/data.css`.
+Parse with `{ vocabulary: dataVocabulary() }`. The
+[data gallery](examples/data.html) runs without a bundler when served with
+`node scripts/serve-static.mjs`.
+
+```lino
+chats: list
+  label Chats
+  items
+    param chats
+  selection multi
+  virtualized true
+  item-height 32
+  template chat-row
+  on select
+    navigate chat
+      param item.id
+
+people: table
+  caption People
+  items
+    param people
+  columns
+    name: column
+      label Name
+      sortable true
+    age: column
+      label Age
+      sortable true
+      align end
+```
+
+`items (param chats)` reads `options.data.sources.chats`. A source is an
+array or an observable `{ get(): Item[], subscribe(listener): unsubscribe }`;
+`createDataSource(items)` provides that adapter with `set(items)`. Each item
+has a stable, unique string `id` and a `label` (falling back to `name`, then
+`id`). Updating the source retains measurements and focus by ID. Inline
+records are also supported:
+
+```lino
+choices: list
+  label Choices
+  items
+    (id first) (label First)
+    (id second) (label Second)
+```
+
+The original issue's `$chats` and `$item.id` examples were working names.
+Use the dialect's structured `param` links instead: dollar sigils remain
+reserved. `on select` and `on activate` go through ui-dom and the #33 action
+registry (`mountBehavior`); `(param item.id)` resolves an own property of the
+current item. No action or template text is evaluated. `ui-select` carries
+`{item, selected}` and `ui-activate` carries `{item}` for host listeners.
+
+`selection` is `single` (default), `multi`, or `none`. Single selection follows
+arrow/typeahead focus; multi selection moves focus independently, Space toggles,
+Shift extends a range, Ctrl/Cmd toggles on click, and Ctrl/Cmd+A selects all.
+Home/End, PageUp/PageDown and typeahead work on listboxes and trees. Trees
+also support Right/Left for expansion/parent navigation and `*` for sibling
+expansion. Enter activates; double-click also activates.
+
+A tree item may have `children: Item[]` or `hasChildren: true`. For lazy branches,
+provide `options.data.loadChildren(item, {signal}) -> Promise<Item[]>`. Loaded
+children are cached by parent ID; loading/error text is announced, closing a
+branch during a load leaves it closed, and destroying a render aborts pending
+requests. Reopen a failed branch to retry. Tree `aria-level`, `aria-posinset`
+and `aria-setsize` describe the complete visible hierarchy, including rows
+outside the rendered window.
+
+A table reads `columns` records with `label`, `sortable`, `align` (`start` or
+`end`) and `width` (pixels). The caption names the grid. Sort cycles ascending,
+descending, none; equal values retain input order and none restores source
+order. Arrows move between cells; Home/End move within a row, Ctrl/Cmd+Home/End
+move to the first header/last data cell, and Up from the first row reaches the header.
+Header arrows navigate columns, Down returns to the data. Space selects
+rows and Shift extends selection. Header buttons activate sorting with
+Enter/Space. Column dividers resize by pointer drag; focus a divider by clicking
+it and use Left/Right (10px), Home (48px), End (600px). The header stays visible
+inside the table's scrolling viewport.
+
+`template NAME` selects a trusted host renderer from
+`options.data.templates[NAME](item, {document})`, returning a string or a DOM
+node. Strings render as text. Listbox options should contain text, without
+interactive descendants (use a grid for interactive cells). Tree labels can use
+the same template contract. `item-height` is the positive estimated/minimum
+height in CSS pixels; actual variable row heights come from one shared
+`ResizeObserver` per viewport, with writes deferred to `requestAnimationFrame`.
+`virtualized false` deliberately renders the whole collection. Virtualization
+is on by default, with one viewport of overscan, retaining focused rows outside
+the range. The scroll area is styled through `.ui-data-scroll`; native wheel,
+touch and nested scroll chaining are preserved. Each component also accepts
+`loading true`, `error 'message'`, and `empty 'message'`.
+
+The DOM-free modules `data/virtual-range.js`, `data/selection-model.js`,
+`data/sort-model.js`, and `data/tree-model.js` can be imported by relative source
+path internally. Public exports include `listOffsets`, `indexAt`, `listRange`,
+`anchorScrollTop`, `selectItem`, `nextSort`, `sortItems`, and `flattenTree`.
+The chat kit can reuse them without timeline logic here. `anchorScrollTop`
+takes `{keys, offsets, scrollTop}` before, `{keys, offsets}` after, and an anchor
+key, preserving that row's intra-row offset. Range ends are exclusive;
+`indexAt` returns `-1` for an empty collection.

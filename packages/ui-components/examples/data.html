@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lists, trees and tables — Links UI</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "@link-foundation/ui-store": "/packages/ui-store/src/index.js",
+          "@link-foundation/ui-style": "/packages/ui-style/src/index.js",
+          "@link-foundation/ui-tokens": "/packages/ui-tokens/src/index.js",
+          "@link-foundation/ui-dom": "/packages/ui-dom/src/index.js",
+          "@link-foundation/ui-components/data": "/packages/ui-components/src/data/index.js",
+          "@link-foundation/ui-components/behavior/dom": "/packages/ui-components/src/behavior/dom.js",
+          "links-notation": "/node_modules/links-notation/dist/index.js"
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="../src/data/data.css" />
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: system-ui, sans-serif;
+      }
+      body {
+        margin: 0;
+        background: Canvas;
+        color: CanvasText;
+      }
+      main {
+        max-width: 1160px;
+        margin: auto;
+        padding: 24px;
+      }
+      h1 {
+        margin: 0 0 8px;
+      }
+      .intro {
+        max-width: 70ch;
+      }
+      .gallery {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+      }
+      .people {
+        grid-column: 1 / -1;
+      }
+      #sidebar {
+        height: 400px;
+        overflow: auto;
+        padding: 8px;
+        border: 1px solid GrayText;
+      }
+      .sidebar-tail {
+        height: 160px;
+        padding-top: 16px;
+      }
+      button {
+        background: Canvas;
+        color: CanvasText;
+        border: 1px solid GrayText;
+        padding: 8px;
+        font: inherit;
+      }
+      @media (max-width: 700px) {
+        .gallery {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Data, at any scale</h1>
+      <p class="intro">
+        100,000 list items, a 2,000-node outline and a 10,000-row table. Use
+        arrow keys, Home, End and typeahead. Space selects; Shift extends a
+        selection. Sort columns or resize them by dragging their dividers.
+      </p>
+      <p><button id="prepend" type="button">Prepend 50 items</button></p>
+      <div class="gallery">
+        <section aria-labelledby="list-title">
+          <h2 id="list-title">100,000 items</h2>
+          <aside id="sidebar" aria-label="Scrolling sidebar">
+            <div id="list"></div>
+            <div class="sidebar-tail">
+              The sidebar scrolls independently of its list.
+            </div>
+          </aside>
+        </section>
+        <section aria-labelledby="tree-title">
+          <h2 id="tree-title">2,000-node outline</h2>
+          <div id="tree"></div>
+          <p>The “On demand” branch loads children through the host adapter.</p>
+        </section>
+        <section class="people" aria-labelledby="table-title">
+          <h2 id="table-title">10,000 people</h2>
+          <div id="table"></div>
+        </section>
+      </div>
+      <p id="action" role="status" aria-live="polite"></p>
+    </main>
+    <script type="module" src="./data.js"></script>
+  </body>
+</html>

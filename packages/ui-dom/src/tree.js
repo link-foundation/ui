@@ -169,6 +169,7 @@ export function createTree({
     entry.unbind = bindHandlers(node, target, handlers, {
       idFor,
       onAction: options.onAction,
+      diagnostic: ctx.diagnostic,
     });
   }
 

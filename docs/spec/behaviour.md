@@ -108,3 +108,18 @@ linksql substitution syntax are **deferred**; `when` is listed as a reserved
 property name in the vocabulary. See [open-questions.md](open-questions.md).
 
 Fixtures: `behaviour/`, `references/param-binding`.
+
+## Data display events
+
+The data display extension (#37) adds `select` and `activate` to ui-dom's event
+bindings, dispatched by listboxes, trees and grids. Handlers are ordinary `on`
+action links and use the same actions registry as other controls. Within those
+events, `(param item.id)` (or another dot-separated own-property path under
+`item`) supplies a value from the event's current item. Inherited properties and
+`__proto__`, `prototype`, `constructor` paths are not resolved. Missing paths
+supply `undefined`; they cannot select or execute host code. Outside a data
+event, `param` links are kept as data for the host to resolve.
+
+The data vocabulary also defines `items (param SOURCE)`, resolved from the host's
+`data.sources` adapter. This uses the structured parameter form of v0;
+`$SOURCE` remains a reserved sigil, and is not a new dialect shorthand.
