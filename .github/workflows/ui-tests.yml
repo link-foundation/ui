@@ -75,6 +75,17 @@ jobs:
         if: env.UPDATE_SNAPSHOTS != 'true'
         run: npx playwright test
 
+      - name: Retain network performance traces
+        if: always()
+        uses: ./.github/actions/artifact-transport
+        with:
+          name: network-performance-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            test-results/**/trace.zip
+            test-results/**/attachments/canvas-pan-performance*
+          retention-days: 7
+          if-no-files-found: warn
+
       - name: Update screenshot baselines
         if: env.UPDATE_SNAPSHOTS == 'true'
         run: npx playwright test --update-snapshots
