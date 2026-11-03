@@ -17,7 +17,11 @@ import { materialCss } from './materials.js';
 import { PROPERTIES, declarationCss } from './properties.js';
 
 /** A theme boundary can itself be the selected control. */
-function scopedSelector(selector, scope) {
+function scopedSelector(selector, scope, atRoot) {
+  // The enclosing @scope bounds descendants, including ancestors at its root.
+  if (scope === ':scope') {
+    return `${selector}, ${atRoot}`;
+  }
   return scope
     ? `${scope} ${selector}, :where(:scope)${scope}:is(${selector})`
     : selector;
@@ -113,13 +117,16 @@ function compound(selector, tagFor) {
  * @param {string} [suffix]  pseudo-classes of the states
  * @returns {string}
  */
-function selectorCss(selector, tagFor, suffix = '') {
+function selectorCss(selector, tagFor, suffix = '', atRoot = false) {
   const [first, ...rest] = selector.within;
   const own =
     compound(selector, tagFor) +
     rest.map((ancestor) => `:is(${selectorCss(ancestor, tagFor)} *)`).join('') +
     suffix;
-  return first === undefined ? own : `${selectorCss(first, tagFor)} ${own}`;
+  if (first === undefined) {
+    return atRoot ? `:where(:scope):is(${own})` : own;
+  }
+  return `${selectorCss(first, tagFor, '', atRoot)} ${own}`;
 }
 
 /** Keep only the last declaration of each property, at its position. */
@@ -157,7 +164,7 @@ export function compileCss(rules, options = {}) {
         ({ kind, conditions }, i) =>
           `${'  '.repeat(i)}@${kind} ${conditionsCss(conditions)} {`
       ),
-      `${pad}${scopedSelector(selectorCss(entry.selector, tagFor, states), options.scope)} {`,
+      `${pad}${scopedSelector(selectorCss(entry.selector, tagFor, states), options.scope, selectorCss(entry.selector, tagFor, states, true))} {`,
       ...lastDeclarations(entry.declarations).map(
         (decl) =>
           `${pad}  ${PROPERTIES[decl.property].css}: ${declarationCss(decl, ctx)};`
@@ -174,7 +181,8 @@ export function compileCss(rules, options = {}) {
         material.value.value,
         scopedSelector(
           selectorCss(entry.selector, tagFor, states),
-          options.scope
+          options.scope,
+          selectorCss(entry.selector, tagFor, states, true)
         ),
         entry.at,
         options

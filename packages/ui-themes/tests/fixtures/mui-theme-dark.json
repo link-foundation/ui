@@ -1,0 +1,17 @@
+{
+  "palette": {
+    "mode": "dark",
+    "primary": {
+      "main": "#90CAF9",
+      "contrastText": "#000000"
+    },
+    "background": {
+      "default": "#121212",
+      "paper": "#222222"
+    },
+    "text": {
+      "primary": "#FFFFFF",
+      "secondary": "#CCCCCC"
+    }
+  }
+}

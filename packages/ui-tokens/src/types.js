@@ -27,6 +27,7 @@
  *   value; `null` for an alias without `(type ...)`
  * @property {TokenValue} value  as written; an alias is a `token-ref`
  * @property {string} [description]
+ * @property {string} [m3] original Material 3 token name
  * @property {string} [mode]  the mode of a `(mode NAME ...)` token
  */
 
@@ -46,6 +47,7 @@
  * @property {TokenValue} raw  as written, aliases kept
  * @property {string} [alias]  the path a whole-token alias points to
  * @property {string} [description]
+ * @property {string} [m3] original Material 3 token name
  * @property {string} set  the set that defines the token
  * @property {string} [mode]  the mode whose override defines the token
  */

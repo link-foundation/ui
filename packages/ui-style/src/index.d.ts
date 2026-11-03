@@ -96,6 +96,7 @@ export interface CompileOptions {
   transparency?: 'on' | 'off';
   reducedTransparency?: boolean;
   /** Zero-specificity theme boundary selector, including the boundary itself. */
+  /** Use ':scope' inside a CSS @scope rule to include the boundary itself. */
   scope?: string;
   /** Default `(kind) => 'ui-' + kind` (escaped); the result is used verbatim. */
   tagFor?: (kind: string) => string;

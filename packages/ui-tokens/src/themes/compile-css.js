@@ -181,8 +181,11 @@ export function compileThemeCss(theme, options = {}) {
     reducedTransparency: options.reducedTransparency,
   });
   if (style) {
-    css.push(`@scope (${root}) to (:scope [data-theme]) {\n${style}\n}`);
+    css.push(`@scope (${root}) to ([data-theme]) {\n${style}\n}`);
   }
-  css.push(themeExtrasCss(theme, root, options));
+  const extras = themeExtrasCss(theme, root, options);
+  if (extras) {
+    css.push(extras);
+  }
   return css.join('\n');
 }

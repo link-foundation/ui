@@ -2,6 +2,13 @@ import { parseNested } from '@link-foundation/ui-core';
 
 const raw = (link) => (link.values.length ? link.values.map(raw) : link.id);
 
+function validKind(kind, status, fields) {
+  const count = fields.filter((field) => field[0] === 'kind').length;
+  return typeof kind === 'string'
+    ? count === 1
+    : kind === null && status === 'none' && count === 0;
+}
+
 /** Read the shared #48 table format without interpreting source-language code. */
 export function readMapping(text) {
   const names = new Set();
@@ -22,7 +29,7 @@ export function readMapping(text) {
       ) {
         throw new TypeError('Invalid mapping field');
       }
-      const kind = fields.find((field) => field[0] === 'kind')?.[1];
+      const kind = fields.find((field) => field[0] === 'kind')?.[1] ?? null;
       const status = fields.find((field) => field[0] === 'status')?.[1];
       const props = fields
         .filter((field) => field[0] === 'prop')
@@ -30,9 +37,8 @@ export function readMapping(text) {
       if (
         head !== 'map' ||
         typeof name !== 'string' ||
-        typeof kind !== 'string' ||
+        !validKind(kind, status, fields) ||
         names.has(name) ||
-        fields.filter((field) => field[0] === 'kind').length !== 1 ||
         fields.filter((field) => field[0] === 'status').length !== 1 ||
         !props.every(
           ({ property, value, target }) =>

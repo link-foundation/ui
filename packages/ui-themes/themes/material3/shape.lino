@@ -1,0 +1,16 @@
+material3-shape: theme
+  source 'https://m3.material.io/styles/shape/corner-radius-scale'
+  token shape.corner.none 0px
+    m3 md.sys.shape.corner.none
+  token shape.corner.extra-small 4px
+    m3 md.sys.shape.corner.extra-small
+  token shape.corner.small 8px
+    m3 md.sys.shape.corner.small
+  token shape.corner.medium 12px
+    m3 md.sys.shape.corner.medium
+  token shape.corner.large 16px
+    m3 md.sys.shape.corner.large
+  token shape.corner.extra-large 28px
+    m3 md.sys.shape.corner.extra-large
+  token shape.corner.full 9999px
+    m3 md.sys.shape.corner.full

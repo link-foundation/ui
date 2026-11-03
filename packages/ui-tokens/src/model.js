@@ -48,7 +48,7 @@ function tokensVocabulary() {
   return vocabulary;
 }
 
-const META = new Set(['description', 'type']);
+const META = new Set(['description', 'type', 'm3']);
 const isMeta = (raw) =>
   Array.isArray(raw) &&
   META.has(raw[0]) &&
@@ -115,6 +115,9 @@ function readToken(values, at, diagnostics) {
   }
   if (at.mode !== undefined) {
     token.mode = at.mode;
+  }
+  if (meta.m3 !== undefined) {
+    token.m3 = meta.m3;
   }
   return token;
 }

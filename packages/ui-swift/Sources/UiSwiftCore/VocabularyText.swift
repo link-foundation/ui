@@ -55,7 +55,7 @@ button: kind
   positional label
   property label string
   property variant
-    enum filled tonal outlined text bordered borderless prominent
+    enum filled tonal outlined text elevated bordered borderless prominent
   property icon string
   property type
     enum button submit reset
@@ -177,6 +177,8 @@ text-field: kind
   description 'A single-line text input.'
   positional label
   property label string
+  property variant
+    enum filled outlined
   property name string
   property value string
   property placeholder string

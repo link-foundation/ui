@@ -1,8 +1,11 @@
-/* global URL */
 /** Shipped themes remain LiNo data, loaded in browsers or Node without a build. */
 import { loadThemes, resolveTheme } from '@link-foundation/ui-tokens/themes';
 
+import { readThemeFile } from './material3/mapping.js';
 export { readMapping } from './mapping.js';
+export { getMuiMapping } from './material3/mapping.js';
+export { materialThemeFromSeed } from './material3/seed.js';
+export { muiThemeToLino } from './material3/mui.js';
 
 const fragments = [
   'colors',
@@ -15,19 +18,7 @@ const fragments = [
   'templates',
 ];
 export function listThemes() {
-  return ['base', 'hig', 'hig-ios', 'hig-macos'];
-}
-
-async function readThemeFile(path) {
-  const url = new URL(`../themes/${path}.lino`, import.meta.url);
-  if (url.protocol === 'file:') {
-    return (await import('node:fs/promises')).readFile(url, 'utf8');
-  }
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`Cannot load theme data: ${path} (${response.status})`);
-  }
-  return response.text();
+  return ['base', 'material3', 'hig', 'hig-ios', 'hig-macos'];
 }
 
 /** @param {string} id @returns {Promise<import('@link-foundation/ui-tokens/themes').Theme>} */
@@ -36,16 +27,30 @@ export async function loadTheme(id) {
     throw new RangeError(`Unknown theme: ${id}`);
   }
   const files =
-    id === 'base'
-      ? ['base/theme']
-      : [
-          ...fragments.map((name) => `hig/${name}`),
-          'hig/theme',
-          ...(id === 'hig' ? [] : [`${id}/theme`]),
-        ];
+    id === 'material3'
+      ? [
+          'base/theme',
+          ...[
+            'colors',
+            'type',
+            'shape',
+            'elevation',
+            'motion',
+            'styles',
+            'templates',
+            'theme',
+          ].map((name) => `material3/${name}`),
+        ]
+      : id === 'base'
+        ? ['base/theme']
+        : [
+            ...fragments.map((name) => `hig/${name}`),
+            'hig/theme',
+            ...(id === 'hig' ? [] : [`${id}/theme`]),
+          ];
   const sources = [];
   for (const file of files) {
-    sources.push(await readThemeFile(file));
+    sources.push(await readThemeFile(`${file}.lino`));
   }
   const { themes, diagnostics } = loadThemes(sources.join('\n'));
   if (diagnostics.some((d) => d.severity === 'error')) {
@@ -57,5 +62,5 @@ export async function loadTheme(id) {
 /** SwiftUI view/modifier rows in the shared mapping format. */
 export async function getSwiftuiMapping() {
   const { readMapping } = await import('./mapping.js');
-  return readMapping(await readThemeFile('hig/swiftui-mapping'));
+  return readMapping(await readThemeFile('hig/swiftui-mapping.lino'));
 }

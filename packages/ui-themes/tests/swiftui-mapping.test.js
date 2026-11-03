@@ -45,6 +45,13 @@ it('generated HIG mapping documentation is up to date', async () => {
   assert.equal(await generatedHigDoc(), actual);
 });
 
+it('shared loader preserves missing equivalents in the MUI row format', () => {
+  assert.deepEqual(readMapping('map Card\n  status none'), [
+    { name: 'Card', kind: null, status: 'none', props: [] },
+  ]);
+  assert.throws(() => readMapping('map Card\n  status mapped'), TypeError);
+});
+
 it('shared loader refuses malformed mapping rows', () => {
   assert.throws(
     () =>

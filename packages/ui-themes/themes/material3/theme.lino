@@ -1,0 +1,7 @@
+material3: theme
+  extends base material3-colors material3-type material3-shape material3-elevation material3-motion material3-styles material3-templates
+  source 'https://m3.material.io/'
+  token space.unit 8px
+  token space.small 8px
+  token space.medium 16px
+  token size.target.minimum 48px

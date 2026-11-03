@@ -11,6 +11,6 @@
 - [ ] Review full diff, changesets, merge latest main, commit atomic implementation; run four required gates on exact commit, push only prepared branch.
 - [ ] Collect every same-revision CI result and preserve all failed logs before a corrective push; update PR evidence and mark ready only when green.
 
-The #12 digest names semantic concepts but does not include the numeric HIG tables promised by #50. Record primary HIG URLs and explicit theme choices in docs/themes/hig.md. #48 is not merged, so create its specified shared row loader here without implementing the sibling theme.
+The #12 digest names semantic concepts but does not include the numeric HIG tables promised by #50. Record primary HIG URLs and explicit theme choices in docs/themes/hig.md. #48 merged during validation. Merge its Material 3 API and documentation generator, preserving both theme families and mapping APIs.
 
 Browser evidence: all five focused checks pass in installed Chrome; the root configuration exercises Chromium and WebKit in CI. Six review images are in docs/screenshots/hig/. Required repository gates and final CI are pending.
