@@ -1,0 +1,17 @@
+{
+  "palette": {
+    "primary": {
+      "main": "#654321",
+      "light": "#ABCDEF"
+    }
+  },
+  "spacing": [0, 4, 8],
+  "components": {
+    "MuiButton": {
+      "defaultProps": {
+        "disableRipple": true
+      }
+    }
+  },
+  "unknown": true
+}

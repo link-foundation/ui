@@ -1,10 +1,13 @@
-/* global URL */
 /** Shipped themes remain LiNo data, loaded in browsers or Node without a build. */
+import { readThemeFile } from './material3/mapping.js';
+export { getMuiMapping } from './material3/mapping.js';
+export { materialThemeFromSeed } from './material3/seed.js';
+export { muiThemeToLino } from './material3/mui.js';
 import { classicThemes } from './classic/catalog.js';
 import { loadThemes, resolveTheme } from '@link-foundation/ui-tokens/themes';
 
 export function listThemes() {
-  return ['base', ...classicThemes.map((t) => t.id)];
+  return ['base', 'material3', ...classicThemes.map((t) => t.id)];
 }
 
 // Share source reads within one runtime, while resolving a fresh theme per caller.
@@ -12,21 +15,19 @@ let registryPromise;
 async function registry() {
   const paths = [
     'base/theme.lino',
+    ...[
+      'colors',
+      'type',
+      'shape',
+      'elevation',
+      'motion',
+      'styles',
+      'templates',
+      'theme',
+    ].map((name) => `material3/${name}.lino`),
     ...new Set(classicThemes.map((t) => t.path)),
   ];
-  const texts = await Promise.all(
-    paths.map(async (path) => {
-      const url = new URL(`../themes/${path}`, import.meta.url);
-      if (url.protocol === 'file:') {
-        return (await import('node:fs/promises')).readFile(url, 'utf8');
-      }
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`Theme source ${path}: HTTP ${response.status}`);
-      }
-      return response.text();
-    })
-  );
+  const texts = await Promise.all(paths.map(readThemeFile));
   const { themes, diagnostics } = loadThemes(texts.join('\n'));
   if (diagnostics.some((d) => d.severity === 'error')) {
     throw new Error(diagnostics.map((d) => d.message).join('; '));

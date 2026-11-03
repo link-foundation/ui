@@ -16,7 +16,9 @@ it('every classic LiNo file parses and every registered theme compiles strictly 
     assert.deepEqual(loadThemes(text).diagnostics, [], file);
   }
   assert.ok(listThemes().includes('deepcase-classic'));
-  for (const id of listThemes().filter((id) => id !== 'base')) {
+  for (const id of listThemes().filter(
+    (id) => !['base', 'material3'].includes(id)
+  )) {
     const theme = await loadTheme(id);
     assert.deepEqual(theme.diagnostics, [], id);
     const diagnostics = [];

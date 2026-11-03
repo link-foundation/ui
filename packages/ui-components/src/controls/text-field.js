@@ -108,7 +108,7 @@ export function receiveText(input, control, value) {
 export const TEXT_FIELD_KIND = Object.freeze({
   tag: 'ui-text-field',
   childrenSlot: null,
-  attributes: { disabled: 'boolean', invalid: 'boolean' },
+  attributes: { variant: 'string', disabled: 'boolean', invalid: 'boolean' },
   create: (el, ctx) =>
     createTextControl(el, ctx, {
       tag: 'ui-text-field',

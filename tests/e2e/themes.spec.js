@@ -54,6 +54,17 @@ test('four panels, nested surfaces, template parts and accessible contrast', asy
   const buttonBoundary = page.locator('#light ui-button');
   await buttonBoundary.hover();
   await expect(buttonBoundary).toHaveCSS('opacity', '0.92');
+  // An outer theme's styles stop at a nested, different theme boundary.
+  await page.evaluate(() => {
+    const button = document.querySelector('#light ui-button');
+    button.removeAttribute('data-theme');
+    const boundary = document.createElement('div');
+    boundary.dataset.theme = 'isolated';
+    button.before(boundary);
+    boundary.append(button);
+  });
+  await buttonBoundary.hover();
+  await expect(buttonBoundary).toHaveCSS('opacity', '1');
   expect(errors).toEqual([]);
 });
 

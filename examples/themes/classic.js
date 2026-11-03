@@ -62,7 +62,7 @@ for (const kind of ['button-group', 'graph-canvas']) {
 }
 const themes = await Promise.all(
   listThemes()
-    .filter((id) => id !== 'base')
+    .filter((id) => classicThemes.some((theme) => theme.id === id))
     .map(loadTheme)
 );
 const chrome = await (

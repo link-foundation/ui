@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { listThemes, loadTheme } from '../src/index.js';
 
 it('loads every shipped theme as data with a dark mode', async () => {
-  assert.equal(listThemes()[0], 'base');
+  assert.deepEqual(listThemes().slice(0, 2), ['base', 'material3']);
   for (const id of listThemes()) {
     const theme = await loadTheme(id);
     assert.equal(theme.id, id);

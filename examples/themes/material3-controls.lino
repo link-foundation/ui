@@ -1,0 +1,44 @@
+controls: stack
+  button-filled: button
+    label 'Filled button'
+    variant filled
+  button-tonal: button
+    label 'Tonal button'
+    variant tonal
+  button-outlined: button
+    label 'Outlined button'
+    variant outlined
+  button-text: button
+    label 'Text button'
+    variant text
+  button-elevated: button
+    label 'Elevated button'
+    variant elevated
+  field-filled: text-field
+    label 'Filled field'
+    variant filled
+    value 'Ada Lovelace'
+  field-outlined: text-field
+    label 'Outlined field'
+    variant outlined
+    value 'Ada Lovelace'
+  check: checkbox
+    label 'Keep my preferences'
+    checked true
+  radio-options: radio-group
+    label Delivery
+    value email
+    email: radio
+      label Email
+      value email
+    post: radio
+      label Post
+      value post
+  notifications: switch
+    label Notifications
+    checked true
+  volume: slider
+    label Volume
+    min 0
+    max 100
+    value 40

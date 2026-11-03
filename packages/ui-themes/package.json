@@ -35,9 +35,14 @@
   },
   "dependencies": {
     "@link-foundation/ui-tokens": "^0.0.0",
+    "@material/material-color-utilities": "0.3.0",
     "@link-foundation/ui-core": "^0.0.0"
   },
   "publishConfig": {
     "access": "public"
+  },
+  "devDependencies": {
+    "links-notation": "^0.27.1",
+    "prettier": "^3.6.2"
   }
 }
