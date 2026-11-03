@@ -112,7 +112,7 @@ text with an error message, so a diagram never just disappears.
 
 The drawing has `role="img"` and an `aria-label` that names the diagram and
 counts its nodes and connections. A visually hidden list of the nodes and of
-the connections ("Signed in? leads to Home: yes") follows it. The fallback
+the connections ("Signed in? leads to Home (yes)") follows it. The fallback
 source is a focusable `pre`. axe finds no WCAG 2.2 A/AA violation on the
 example page.
 

@@ -63,7 +63,7 @@ test.describe('diagrams example', () => {
       'Signed in?',
       'Home',
       'Start leads to Signed in?',
-      'Signed in? leads to Home: yes',
+      'Signed in? leads to Home (yes)',
     ]);
     await expect(page.locator('#order-state svg[role="img"]')).toBeVisible();
 
@@ -115,9 +115,7 @@ test.describe('diagrams example', () => {
     await expect(view.getByRole('alert')).toContainText(
       'The diagram could not be drawn with Mermaid'
     );
-    await expect(view.locator('pre code')).toContainText(
-      'start --> check{"Signed in?"}'
-    );
+    await expect(view.locator('pre code')).toContainText('check -->|yes| home');
     await expect(view.locator('svg')).toHaveCount(0);
     // Our renderer is not affected.
     await expect(page.locator('#login-svg svg[role="img"]')).toBeVisible();
