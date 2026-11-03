@@ -1,0 +1,12 @@
+text-area-stories: stories
+  component text-area
+  story default
+    text-area 'Notes'
+      rows 3
+  story filled
+    text-area 'Bio'
+      value 'Wrote the first program.'
+      rows 2
+  story disabled
+    text-area 'Comment'
+      disabled true

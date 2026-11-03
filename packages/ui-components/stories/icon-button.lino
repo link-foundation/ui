@@ -1,0 +1,13 @@
+icon-button-stories: stories
+  component icon-button
+  story standard
+    icon-button close
+      label 'Close'
+  story outlined
+    icon-button search
+      label 'Search'
+      variant outlined
+  story disabled
+    icon-button settings
+      label 'Settings'
+      disabled true

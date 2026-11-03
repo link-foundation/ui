@@ -1,0 +1,64 @@
+number-field-machine: machine
+  initial ready
+  context
+    disabled false
+    readonly false
+    invalid false
+  state ready
+    on commit
+      do read-value
+    on revert
+      do restore-value
+      when editable
+    on arrow-up
+      do
+        numeric-key ArrowUp
+      when editable
+    on arrow-down
+      do
+        numeric-key ArrowDown
+      when editable
+    on shift-arrow-up
+      do
+        numeric-key ArrowUp shift
+      when editable
+    on shift-arrow-down
+      do
+        numeric-key ArrowDown shift
+      when editable
+    on page-up
+      do
+        numeric-key PageUp
+      when editable
+    on page-down
+      do
+        numeric-key PageDown
+      when editable
+    on home
+      do
+        numeric-key Home
+      when editable
+    on end
+      do
+        numeric-key End
+      when editable
+  part input
+    attr role spinbutton
+    attr aria-valuenow
+      context value
+    attr aria-valuemin
+      context min
+    attr aria-valuemax
+      context max
+    attr aria-invalid
+      context invalid
+    on change commit
+    key ArrowUp arrow-up
+    key ArrowDown arrow-down
+    key Shift+ArrowUp shift-arrow-up
+    key Shift+ArrowDown shift-arrow-down
+    key PageUp page-up
+    key PageDown page-down
+    key Home home
+    key End end
+    key Escape revert

@@ -315,6 +315,9 @@ private fun stringMatches(type: String, value: String): Boolean = when (type) {
     "color" -> HEX_COLOR.matches(value)
     "url" -> URL.containsMatchIn(value) || ':' !in value
     "token-name" -> TOKEN_NAME.matches(value)
+    "boolean" -> value == "true" || value == "false"
+    // A URL when it has a `:` or a `/`, otherwise an element id.
+    "element-ref-or-url" -> (':' !in value && '/' !in value) || stringMatches("url", value)
     else -> true
 }
 

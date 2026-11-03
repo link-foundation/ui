@@ -78,7 +78,7 @@ describe('values: typing', () => {
         severity: 'error',
         message: diagnostics[1].message,
         at: { element: 'ok', property: 'variant' },
-        expected: '(enum filled outlined text)',
+        expected: '(enum filled tonal outlined text)',
       },
     ]);
     expect(diagnostics[0].message).toContain('gap');
@@ -95,11 +95,16 @@ describe('values: typing', () => {
     }
   });
 
-  it('types (enum true false) and boolean values', () => {
-    const { roots, diagnostics } = typeText("(b: button 'B' (disabled true))");
+  it('types (enum true false mixed) and boolean values', () => {
+    const { roots, diagnostics } = typeText(
+      "(b: button 'B' (disabled true))\n(c: checkbox 'C' (checked mixed))"
+    );
     expect(diagnostics).toEqual([]);
     expect(typedProperties(roots[0])).toEqual([
-      ['disabled', [{ type: 'enum', value: 'true' }]],
+      ['disabled', [{ type: 'boolean', value: true }]],
+    ]);
+    expect(typedProperties(roots[1])).toEqual([
+      ['checked', [{ type: 'enum', value: 'mixed' }]],
     ]);
     expect(values.typeValue('false', { type: 'boolean' }).value).toEqual({
       type: 'boolean',

@@ -40,6 +40,10 @@ private func stringMatches(_ type: String, _ value: String) -> Bool {
     case "color": return isUiHexColor(value)
     case "url": return matches(#"^(https?:|mailto:|/|\.)"#, value) || !value.contains(":")
     case "token-name": return matches(tokenNamePattern, value)
+    case "boolean": return value == "true" || value == "false"
+    // A URL when it has a `:` or a `/`, otherwise an element id.
+    case "element-ref-or-url":
+        return !(value.contains(":") || value.contains("/")) || stringMatches("url", value)
     default: return true
     }
 }

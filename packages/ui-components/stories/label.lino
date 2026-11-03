@@ -1,0 +1,7 @@
+label-stories: stories
+  component label
+  story plain
+    label 'Display name'
+  story required
+    label 'Required field'
+      required true

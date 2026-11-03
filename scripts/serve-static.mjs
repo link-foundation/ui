@@ -13,6 +13,8 @@
  *   /packages/<name>/examples/ -> packages/<name>/examples/ (when present;
  *                                the ui-components chart, diagram and icon
  *                                galleries)
+ *   /packages/<name>/stories/ -> packages/<name>/stories/ (when present; the
+ *                                story files of the controls gallery)
  *   /packages/<name>/dist/    -> packages/<name>/dist/ (build output, such
  *                                as the icon modules of build-icons.mjs)
  *   /node_modules/links-notation/dist/ -> the browser build of links-notation

@@ -1,0 +1,12 @@
+badge-stories: stories
+  component badge
+  story count
+    badge 3
+      label 'unread messages'
+      tone primary
+  story neutral
+    badge 'New'
+  story error
+    badge 2
+      label 'errors'
+      tone error

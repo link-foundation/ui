@@ -1,0 +1,7 @@
+avatar-stories: stories
+  component avatar
+  story initials
+    avatar 'Ada Lovelace'
+  story large
+    avatar 'Grace Hopper'
+      size large

@@ -1,0 +1,17 @@
+checkbox-machine: machine
+  initial ready
+  context
+    checked false
+    disabled false
+    invalid false
+  state ready
+    on toggle
+      do
+        toggle checked
+      when not-disabled
+  part input
+    attr aria-invalid
+      context invalid
+    attr data-state
+      context checked
+    on change toggle
