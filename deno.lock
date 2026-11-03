@@ -13,7 +13,10 @@
     "npm:ajv@^8.17.1": "8.20.0",
     "npm:axe-core@4.14.0": "4.14.0",
     "npm:command-stream@2.4.0": "2.4.0",
+    "npm:d3-scale@4.0.2": "4.0.2",
+    "npm:d3-shape@3.2.0": "3.2.0",
     "npm:doublets-web@~0.1.3": "0.1.3",
+    "npm:echarts@6.1.0": "6.1.0",
     "npm:eslint-config-prettier@^10.1.8": "10.1.8_eslint@10.13.0",
     "npm:eslint-plugin-prettier@^5.5.4": "5.5.6_eslint@10.13.0_eslint-config-prettier@10.1.8_prettier@3.8.4",
     "npm:eslint@^10.13.0": "10.13.0",
@@ -1299,6 +1302,13 @@
     "doublets-web@0.1.3": {
       "integrity": "sha512-8HVF+X/qSzacm947mKi5gw3aa2V0GOpbwMZXxFDROc4k1PVPOVwMR7b3PfiZND2E2k6lxXUk5BlIWHxLbsx/+A=="
     },
+    "echarts@6.1.0": {
+      "integrity": "sha512-q0yaFPggC9FUdsWH4blavRWFmxdrIodbkoKNAjJudAI6CA9gNPxHtV2RcZNEepZVlk4yvBYkOkbk6HIVpIyHZA==",
+      "dependencies": [
+        "tslib",
+        "zrender"
+      ]
+    },
     "emoji-regex@10.6.0": {
       "integrity": "sha512-toUI84YS5YmxW219erniWD0CIVOo46xGKColeNQRgOzDorgBi1v4D71/OFzgD9GO2UGKIv1C3Sp8DAn0+j5w7A=="
     },
@@ -2246,6 +2256,9 @@
     "ts-dedent@2.3.0": {
       "integrity": "sha512-JfJeIHke7y2egdGGgRAvpCwYFUsHlM2gPcrVOxFkznt/4uzQ7HFmvE63iFHVLBJNDuyDOQgijDK/tXH/f6Msjg=="
     },
+    "tslib@2.3.0": {
+      "integrity": "sha512-N82ooyxVNm6h1riLCoyS9e3fuJ3AMG2zIZs2Gd1ATcSFjSA23Q0fzjjZeh0jbJvWVDZ0cJT8yaNNaaXHzueNjg=="
+    },
     "type-check@0.4.0": {
       "integrity": "sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==",
       "dependencies": [
@@ -2365,6 +2378,12 @@
     },
     "yoctocolors@2.2.0": {
       "integrity": "sha512-xYqdZFUK/VYazNl/oCDYN+3WloWQwMfZxBoiNt6qNyk+xfOdi598muWE42rNZFp1kNOiqW936q5RhUdnpqElSg=="
+    },
+    "zrender@6.1.0": {
+      "integrity": "sha512-oEGMDB6pOP2S6OwRR4PdVv610zrjnA3Bh+JnSG12fYJlBKjtNAoEb5fSUoCOOINlH96I2fU38/A2UpRKs67xYQ==",
+      "dependencies": [
+        "tslib"
+      ]
     }
   },
   "workspace": {
@@ -2396,6 +2415,10 @@
             "npm:@dagrejs/dagre@3.1.3",
             "npm:@link-foundation/ui-core@^0.0.0",
             "npm:@link-foundation/ui-dom@^0.0.0",
+            "npm:@link-foundation/ui-tokens@^0.0.0",
+            "npm:d3-scale@4.0.2",
+            "npm:d3-shape@3.2.0",
+            "npm:echarts@6.1.0",
             "npm:jsdom@^30.1.3",
             "npm:links-notation@~0.27.1",
             "npm:mermaid@11.17.2",
