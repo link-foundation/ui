@@ -134,6 +134,16 @@ export function parseLinks(
 ): RawValue[];
 
 /**
+ * Read Links Notation text into `links-notation` links, with the lines
+ * indented under a line as values of its link (the nested form). Throws the
+ * errors of the parser.
+ */
+export function parseNested(
+  text: string,
+  options?: { maxDepth?: number; maxInputSize?: number }
+): Link[];
+
+/**
  * Write raw values as Links Notation text: nested by default, or one
  * top-level link per line with `style: 'inline'`.
  */

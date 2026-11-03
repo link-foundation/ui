@@ -22,7 +22,8 @@
  */
 
 import { defineKind } from '@link-foundation/ui-dom';
-import { Link, Parser } from 'links-notation';
+import { parseNested } from '@link-foundation/ui-core';
+import { Link } from 'links-notation';
 import { bindKeys } from '../a11y/keys.js';
 import {
   atomOf,
@@ -83,7 +84,7 @@ export function sizesFromLino(text) {
   }
   let links;
   try {
-    links = new Parser().parse(text);
+    links = parseNested(text);
   } catch {
     return null;
   }

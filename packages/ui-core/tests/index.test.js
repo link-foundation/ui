@@ -29,6 +29,7 @@ describe('@link-foundation/ui-core', () => {
         'loadVocabulary',
         'parse',
         'parseLinks',
+        'parseNested',
         'parseOrThrow',
         'projectLink',
         'projectLinks',

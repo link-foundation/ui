@@ -7,6 +7,7 @@ import { describe, it, expect } from 'test-anywhere';
 import {
   formatLinks,
   parseLinks,
+  parseNested,
   UiParseError,
 } from '@link-foundation/ui-core';
 
@@ -107,5 +108,31 @@ describe('parseLinks / formatLinks', () => {
     expect(codeOf('(a b')).toBe('syntax-error');
     expect(codeOf(42)).toBe('syntax-error');
     expect(codeOf('(a b)', { maxInputSize: 2 })).toBe('input-too-large');
+  });
+});
+
+describe('parseNested', () => {
+  const text = (link) => link.format();
+
+  it('reads indented lines as values of the line above them', () => {
+    const nested = 'r: rule\n  match\n    A\n  replace a\n';
+    expect(parseNested(nested).map(text)).toEqual([
+      '(r: rule (match (A)) (replace a))',
+    ]);
+    expect(parseNested('(r: rule (match (A)) (replace a))').map(text)).toEqual([
+      '(r: rule (match (A)) (replace a))',
+    ]);
+  });
+
+  it('keeps top-level links apart', () => {
+    expect(parseNested('a b\nc\n  d\n').map(text)).toEqual([
+      '(a b)',
+      '(c (d))',
+    ]);
+  });
+
+  it('throws the errors of the parser and applies its limits', () => {
+    expect(() => parseNested('(a b')).toThrow();
+    expect(() => parseNested('((((a))))', { maxDepth: 2 })).toThrow();
   });
 });

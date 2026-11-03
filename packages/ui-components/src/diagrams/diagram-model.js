@@ -15,7 +15,8 @@
  * `(H (H a) (H b))` it returns is folded back into `(H a b)` here.
  */
 
-import { Link, Parser } from 'links-notation';
+import { parseNested } from '@link-foundation/ui-core';
+import { Link } from 'links-notation';
 
 /** @typedef {'flowchart'|'sequence'|'state'|'class'} DiagramKind */
 /** @typedef {'down'|'up'|'right'|'left'} DiagramDirection */
@@ -426,7 +427,7 @@ export function diagramFromLinks(links) {
  * @returns {DiagramModel}
  */
 export function parseDiagram(text) {
-  return diagramFromLinks(new Parser().parse(text));
+  return diagramFromLinks(parseNested(text));
 }
 
 const ref = (id) => new Link(id);

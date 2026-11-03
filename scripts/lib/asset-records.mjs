@@ -7,7 +7,7 @@
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join, posix, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { Parser } from 'links-notation';
+import { parseNested } from '../../packages/ui-core/src/links.js';
 
 /**
  * @typedef {object} AssetRecord
@@ -140,7 +140,7 @@ const isField = (link) =>
  * @returns {AssetRecord[]}
  */
 export function parseAssetRecords(text) {
-  const links = new Parser().parse(text);
+  const links = parseNested(text);
   /** @type {Map<string, {fields: Map<string, string[]>, errors: string[]}>} */
   const raw = new Map();
   const order = [];

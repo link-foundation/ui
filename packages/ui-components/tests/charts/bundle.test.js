@@ -75,7 +75,10 @@ describe('the bundle of the chart entries', () => {
       expect(packages.has('echarts')).toBe(false);
     }
     const { packages } = staticGraph(new URL('charts/index.js', SRC));
+    // ui-core reads the nested form of a chart (#133); it imports only
+    // links-notation.
     expect([...packages].sort()).toEqual([
+      '@link-foundation/ui-core',
       'd3-scale',
       'd3-shape',
       'links-notation',

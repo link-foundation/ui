@@ -35,7 +35,7 @@
  * Rules are tried in order and the first match wins.
  */
 
-import { Parser } from 'links-notation';
+import { parseNested } from '@link-foundation/ui-core';
 
 /**
  * @typedef {string | Term[]} Term
@@ -123,8 +123,7 @@ function readRule(link) {
  * @returns {Rule[]}
  */
 export function readRules(text) {
-  return new Parser()
-    .parse(text)
+  return parseNested(text)
     .map((link) => readRule(unfold(link)))
     .filter((rule) => rule !== null);
 }

@@ -15,7 +15,7 @@
  * link renames them.
  */
 
-import { Parser } from 'links-notation';
+import { parseNested } from '@link-foundation/ui-core';
 import { decodeAny, encodeAny } from './extra.js';
 import { readSibling } from './vocabulary.js';
 
@@ -27,7 +27,7 @@ const plain = (link) =>
  * @param {string} text
  * @returns {(string|string[])[][]}
  */
-export const readTable = (text) => new Parser().parse(text).map(plain);
+export const readTable = (text) => parseNested(text).map(plain);
 
 /** The value after a `since` marker in a link, or `undefined`. */
 function since(link) {

@@ -13,7 +13,8 @@
  * `Link#format` (one-line links); this module only indents the lines.
  */
 
-import { Link, Parser, escapeReference } from 'links-notation';
+import { parseNested } from '@link-foundation/ui-core';
+import { Link, escapeReference } from 'links-notation';
 
 /**
  * A link as the chart reader sees it: an atom has no values.
@@ -97,11 +98,12 @@ export function unfoldLinks(links) {
 }
 
 /**
- * Parse LiNo text with the official parser.
+ * Parse LiNo text with the official parser; indented lines are values of
+ * the line above them (the nested form).
  * @param {string} text
  * @returns {Link[]}
  */
-export const parseLino = (text) => new Parser().parse(text);
+export const parseLino = (text) => parseNested(text);
 
 /** Whether a node is an atom (a reference without values). */
 export const isAtom = (node) => node.values.length === 0 && node.id !== null;
