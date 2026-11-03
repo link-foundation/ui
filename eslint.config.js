@@ -157,6 +157,17 @@ export default [
     },
   },
   {
+    // Behaviour is data: an action or guard name selects a registered
+    // function and is never evaluated, so no source file may turn text
+    // into code (tests/behavior/lint-rules.test.js checks the rules).
+    files: ['packages/ui-components/src/**/*.js'],
+    rules: {
+      'no-eval': 'error',
+      'no-new-func': 'error',
+      'no-implied-eval': 'error',
+    },
+  },
+  {
     // Test files have different requirements
     files: ['tests/**/*.js', 'packages/*/tests/**/*.js', '**/*.test.js'],
     rules: {
