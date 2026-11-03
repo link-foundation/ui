@@ -48,6 +48,7 @@ on:
           - '@link-foundation/ui-store'
           - '@link-foundation/ui-style'
           - '@link-foundation/ui-tokens'
+          - '@link-foundation/ui-vue'
 
 # Least-privilege default for the highest-value token in the repository.
 # Every job starts read-only; the publishing jobs escalate individually.
