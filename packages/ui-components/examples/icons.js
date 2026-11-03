@@ -41,7 +41,9 @@ async function loadSet(set) {
 
 function showCredits(set) {
   const records = iconRecords([set]);
-  const unique = (field) => [...new Set(records.map((r) => r[field]))];
+  const unique = (field) => [
+    ...new Set(records.flatMap((r) => r[field].split('; ')).sort()),
+  ];
   const owners = unique('copyright').filter((c) => c !== 'none');
   credits.textContent = `${set}: ${unique('license').join(', ')}, ${
     owners.length === 0 ? 'public domain (ours)' : `© ${owners.join('; ')}`
