@@ -112,7 +112,10 @@ describe('createPlayer: play', () => {
   });
 
   it('seeks deterministically', () => {
-    const linear = SAMPLE_TEXT.replace('(easing standard)', '(easing linear)');
+    const linear = SAMPLE_TEXT.replace(
+      '  easing standard\n',
+      '  easing linear\n'
+    );
     for (let round = 0; round < 3; round++) {
       const { calls, player } = setup(linear);
       const run = player.play('press-feedback');

@@ -4,7 +4,10 @@
 import { createStore, logFromLino, logToLino } from '@link-foundation/ui-store';
 
 const store = createStore({
-  text: "(main: stack (ok: button (label 'OK')) (text 'Hello'))",
+  text: `main: stack
+  ok: button
+    label 'OK'
+  text 'Hello'`,
 });
 
 store.subscribe((events, entry) => {
@@ -34,7 +37,10 @@ console.log(log);
 
 // Replaying the log on the original document gives the same document.
 const copy = createStore({
-  text: "(main: stack (ok: button (label 'OK')) (text 'Hello'))",
+  text: `main: stack
+  ok: button
+    label 'OK'
+  text 'Hello'`,
 });
 copy.replay(logFromLino(log));
 console.log(copy.toLino() === store.toLino());

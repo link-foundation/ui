@@ -1,4 +1,4 @@
-(list: VStack
-  (Text First)
-  (Text Second)
-  (separator: Text -))
+list: VStack
+  Text First
+  Text Second
+  separator: Text -

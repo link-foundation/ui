@@ -137,9 +137,16 @@ describe('setPositional', () => {
     const text = logToLino(store.log());
     expect(text).toBe(
       [
-        "(tx 1 (origin user) (setPositional greeting 'Hi there' x))",
-        '(tx 2 (origin user) (setPositional _3))',
-        '(tx 3 (origin undo) (undoes 2) (setPositional _3 a))',
+        'tx 1',
+        '  origin user',
+        "  setPositional greeting 'Hi there' x",
+        'tx 2',
+        '  origin user',
+        '  setPositional _3',
+        'tx 3',
+        '  origin undo',
+        '  undoes 2',
+        '  setPositional _3 a',
         '',
       ].join('\n')
     );

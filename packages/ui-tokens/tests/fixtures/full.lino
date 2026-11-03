@@ -1,41 +1,57 @@
-(base: theme
-  (token color.neutral '#1C1B1F' (description 'Text on surfaces'))
-  (token space.small 8px)
-  (token font.weight.strong bold))
+base: theme
+  token color.neutral '#1C1B1F'
+    description 'Text on surfaces'
+  token space.small 8px
+  token font.weight.strong bold
 
-(brand: theme
-  (extends base)
-  (token color.primary '#6750A4' (description 'Brand colour'))
-  (token color.on-primary '#FFFFFF')
-  (token color.action (token color.primary))
-  (token color.scrim '#00000080')
-  (token color.accent (oklch 0.7 0.15 300))
-  (token space.medium 16px)
-  (token space.gap (token space.small))
-  (token size.root 1rem)
-  (token motion.duration.short 150ms)
-  (token motion.easing.standard (cubic-bezier 0.2 0 0 1))
-  (token opacity.disabled 0.38)
-  (token font.family.body Roboto 'Noto Sans' sans-serif)
-  (token font.weight.regular 400 (type fontWeight))
-  (token elevation.low
-    (shadow
-      (color (token color.scrim))
-      (offset-x 0px)
-      (offset-y 1px)
-      (blur 3px)
-      (spread 0px)))
-  (token elevation.high
-    (token elevation.low)
-    (shadow (color '#0000004D') (offset-x 0px) (offset-y 4px) (blur 8px) (spread 3px) (inset true)))
-  (token type.body
-    (typography
-      (font-family (token font.family.body))
-      (font-size 16px)
-      (font-weight (token font.weight.strong))
-      (letter-spacing 0.5px)
-      (line-height 1.5)))
-  (mode dark
-    (token color.primary '#D0BCFF')
-    (token color.on-primary '#381E72')
-    (token color.surface '#141218')))
+brand: theme
+  extends base
+  token color.primary '#6750A4'
+    description 'Brand colour'
+  token color.on-primary '#FFFFFF'
+  token color.action
+    token color.primary
+  token color.scrim '#00000080'
+  token color.accent
+    oklch 0.7 0.15 300
+  token space.medium 16px
+  token space.gap
+    token space.small
+  token size.root 1rem
+  token motion.duration.short 150ms
+  token motion.easing.standard
+    cubic-bezier 0.2 0 0 1
+  token opacity.disabled 0.38
+  token font.family.body Roboto 'Noto Sans' sans-serif
+  token font.weight.regular 400
+    type fontWeight
+  token elevation.low
+    shadow
+      color
+        token color.scrim
+      offset-x 0px
+      offset-y 1px
+      blur 3px
+      spread 0px
+  token elevation.high
+    token elevation.low
+    shadow
+      color '#0000004D'
+      offset-x 0px
+      offset-y 4px
+      blur 8px
+      spread 3px
+      inset true
+  token type.body
+    typography
+      font-family
+        token font.family.body
+      font-size 16px
+      font-weight
+        token font.weight.strong
+      letter-spacing 0.5px
+      line-height 1.5
+  mode dark
+    token color.primary '#D0BCFF'
+    token color.on-primary '#381E72'
+    token color.surface '#141218'

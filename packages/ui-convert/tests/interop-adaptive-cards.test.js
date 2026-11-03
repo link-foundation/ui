@@ -107,7 +107,7 @@ describe('Adaptive Cards versions', () => {
       body: [{ ...text('Hi'), futureStyle: { glow: true } }],
     };
     const imported = importAdaptiveCard(future);
-    expect(imported.lino).toContain('(extra adaptive-cards');
+    expect(imported.lino).toContain('\n      extra adaptive-cards ');
     expect(exportAdaptiveCard(imported.lino).json).toEqual(future);
   });
 

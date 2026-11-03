@@ -73,6 +73,6 @@ describe('typeValue', () => {
     });
     expect(doc.diagnostics).toEqual([]);
     expect(doc.roots[0].properties[0].values).toEqual([['t', 'ok.label']]);
-    expect(format(doc)).toContain('(label (t ok.label))');
+    expect(format(doc)).toContain('\n  label\n    t ok.label\n');
   });
 });

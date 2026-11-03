@@ -10,10 +10,12 @@
  * multi-line and indented forms of a chart give the same spec.
  *
  * Text is written only through links-notation `escapeReference` (atoms) and
- * `Link#format` (one-line links); this module only indents the lines.
+ * `Link#format` (one-line links), and through ui-core `formatLinks` (the
+ * nested form, the default for written charts).
  */
 
-import { Link, Parser, escapeReference } from 'links-notation';
+import { formatLinks, parseNested } from '@link-foundation/ui-core';
+import { Link, escapeReference } from 'links-notation';
 
 /**
  * A link as the chart reader sees it: an atom has no values.
@@ -97,11 +99,12 @@ export function unfoldLinks(links) {
 }
 
 /**
- * Parse LiNo text with the official parser.
+ * Parse LiNo text with the official parser; indented lines are values of
+ * the line above them (the nested form).
  * @param {string} text
  * @returns {Link[]}
  */
-export const parseLino = (text) => new Parser().parse(text);
+export const parseLino = (text) => parseNested(text);
 
 /** Whether a node is an atom (a reference without values). */
 export const isAtom = (node) => node.values.length === 0 && node.id !== null;
@@ -143,34 +146,13 @@ export function formatNode(node) {
   return toLink(node).format();
 }
 
-const MAX_LINE = 80;
-
 /**
- * LiNo text of a node: one line when it fits, otherwise the head on the
- * first line and one child per indented line (the multi-line form).
+ * LiNo text of a node in the nested form (#133): the head on the first line
+ * and every value that is itself a link on an indented line of its own,
+ * written by ui-core `formatLinks`.
  * @param {Node} node
- * @param {string} [indent]
- * @returns {string}
+ * @returns {string} the text, ending with a line break
  */
-export function formatPretty(node, indent = '') {
-  const line = formatNode(node);
-  if (
-    isAtom(node) ||
-    indent.length + line.length <= MAX_LINE ||
-    node.values.every(isAtom)
-  ) {
-    return line;
-  }
-  const lead = [];
-  let i = 0;
-  while (i < node.values.length && isAtom(node.values[i])) {
-    lead.push(escapeReference(node.values[i].id));
-    i += 1;
-  }
-  const id = node.id === null ? '' : `${escapeReference(node.id)}: `;
-  const inner = `${indent}  `;
-  const children = node.values
-    .slice(i)
-    .map((child) => `\n${inner}${formatPretty(child, inner)}`);
-  return `(${id}${lead.join(' ')}${children.join('')})`;
+export function formatNested(node) {
+  return formatLinks([isAtom(node) ? node.id : toLink(node)]);
 }

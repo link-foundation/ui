@@ -50,8 +50,14 @@ wherever a typed value is expected; their resolved value is then checked.
 ## Colours
 
 ```lino
-(chip: style (background '#6750A4') (color (oklch 0.6 0.2 300)))
-(scrim: style (background '#6750A4CC') (color (rgb 103 80 164)))
+chip: style
+  background '#6750A4'
+  color
+    oklch 0.6 0.2 300
+scrim: style
+  background '#6750A4CC'
+  color
+    rgb 103 80 164
 ```
 
 A bare `#` MUST NOT be used: `#` starts a comment, so the comment swallows the
@@ -65,8 +71,13 @@ A `:` inside a bare value is a syntax error (`(t a:b)`; fixture
 and MUST quote URLs:
 
 ```lino
-(narrow: style (state hover (opacity 0.8)) (media (max-width 640px)))
-(logo: image 'https://example.com/logo.svg' (aspect 16 9))
+narrow: style
+  state hover
+    opacity 0.8
+  media
+    max-width 640px
+logo: image 'https://example.com/logo.svg'
+  aspect 16 9
 ```
 
 ## References
@@ -78,9 +89,14 @@ Canonical v0 references are **structured links**, as in the samples:
 - an element: its bare id, `(target ok)`.
 
 ```lino
-(card: stack (gap (token space.medium)))
-(draft: text (bind value (param draft.text)))
-(wave: animation (target hello))
+card: stack
+  gap
+    token space.medium
+draft: text
+  bind value
+    param draft.text
+wave: animation
+  target hello
 ```
 
 The prefixes `@` and `$` are **reserved**. A value that starts with either of
@@ -104,7 +120,9 @@ A token whose resolution reaches itself again MUST give the error
 SHOULD be a literal:
 
 ```lino
-(spaced: stack (gap (or (token space.large) (token space.medium) 8px)))
+spaced: stack
+  gap
+    or (token space.large) (token space.medium) 8px
 ```
 
 Fixtures: `values/`, `references/`.

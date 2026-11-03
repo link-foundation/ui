@@ -1,9 +1,16 @@
 /**
- * The operation log as Links Notation: one link per transaction.
+ * The operation log as Links Notation: one link per transaction, written in
+ * the nested form.
  *
  * ```lino
- * (tx 4 (origin devmode) (label 'Edit label') (setProp ok label 'Cancel'))
- * (tx 5 (origin undo) (undoes 4) (setProp ok label 'OK'))
+ * tx 4
+ *   origin devmode
+ *   label 'Edit label'
+ *   setProp ok label Cancel
+ * tx 5
+ *   origin undo
+ *   undoes 4
+ *   setProp ok label OK
  * ```
  *
  * The text is written with `formatLinks` and read with `parseLinks` of
@@ -85,8 +92,8 @@ function encodeEntry(entry) {
 }
 
 /**
- * The log (from `store.log()`) as Links Notation text, one transaction per
- * line.
+ * The log (from `store.log()`) as Links Notation text, one top-level link
+ * per transaction, in the nested form.
  * @param {readonly import('./index.js').LogEntry[]} entries
  * @returns {string}
  */

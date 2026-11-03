@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect } from 'test-anywhere';
-import { Parser } from 'links-notation';
+import { parseNested } from '@link-foundation/ui-core';
 import {
   ChartSpecError,
   chartFromLinks,
@@ -14,7 +14,8 @@ import {
 } from '../../src/charts/chart-model.js';
 import { chartFixtures, fixture, thrown } from './helpers.js';
 
-const parse = (text) => new Parser().parse(text);
+// The readers' own parse: indented lines are values of the line above.
+const parse = (text) => parseNested(text);
 
 describe('chartFromLinks / chartToLino', () => {
   it('round-trips every fixture through the official parser', () => {
@@ -75,7 +76,9 @@ describe('chartFromLinks / chartToLino', () => {
     );
     expect(spec.encoding.x.type).toBe('nominal');
     expect(spec.encoding.y.type).toBe('quantitative');
-    expect(chartToLino(spec)).toContain('(type nominal)');
+    expect(chartToLino(spec)).toContain(
+      '    x\n      field a\n      type nominal\n'
+    );
   });
 
   it('keeps the other charts of a document and skips other links', () => {
@@ -107,12 +110,18 @@ describe('chartFromLinks / chartToLino', () => {
     expect(line.mark).toBe('area');
   });
 
-  it('writes LiNo that the official parser reads', () => {
+  it('writes LiNo in the nested form that the official parser reads (#133)', () => {
     const spec = chartFromLinks(parse(fixture('products-bar.lino')));
     const text = chartToLino(spec);
-    expect(text.startsWith('(products: chart\n')).toBe(true);
-    expect(text).toContain("(title 'Sales by product')");
-    expect(parse(text).length).toBeGreaterThan(0);
+    expect(text.startsWith('products: chart\n')).toBe(true);
+    expect(text).toContain("\n  title 'Sales by product'\n");
+    expect(text).toContain(
+      '\n  mark bar\n  encoding\n    x\n      field product\n'
+    );
+    // A tooltip entry is a link of links with no head: one line, in parentheses.
+    expect(text).toContain('\n      (field product) (type nominal)\n');
+    expect(parse(text).length).toBe(1);
+    expect(parseChart(text)).toEqual(spec);
   });
 });
 

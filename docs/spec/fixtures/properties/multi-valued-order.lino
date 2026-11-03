@@ -1,1 +1,7 @@
-(ok: button (on press (emit pressed)) (on focus (emit focused)) (on press (navigate home)))
+ok: button
+  on press
+    emit pressed
+  on focus
+    emit focused
+  on press
+    navigate home

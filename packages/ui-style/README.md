@@ -71,17 +71,29 @@ A rule is a `style` element with an id. It has one selector, declarations,
 and blocks that apply in a state or under a condition:
 
 ```lino
-(card-style: style
-  (selector (type card) (within (type dialog)))
-  (padding (token space.medium))
-  (media (max-width 640px)
-    (padding (token space.small))
-    (state hover (opacity 0.92)))
-  (container (min-width 400px)
-    (direction horizontal))
-  (media (prefers-color-scheme dark) (prefers-reduced-motion reduce)
-    (border-color (token color.outline)))
-  (state disabled (opacity 0.38)))
+card-style: style
+  selector
+    type card
+    within
+      type dialog
+  padding
+    token space.medium
+  media
+    max-width 640px
+    padding
+      token space.small
+    state hover
+      opacity 0.92
+  container
+    min-width 400px
+    direction horizontal
+  media
+    prefers-color-scheme dark
+    prefers-reduced-motion reduce
+    border-color
+      token color.outline
+  state disabled
+    opacity 0.38
 ```
 
 | Link                               | Meaning                                                                                                       |

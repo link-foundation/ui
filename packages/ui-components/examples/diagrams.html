@@ -17,6 +17,7 @@
       {
         "imports": {
           "@link-foundation/ui-components": "/packages/ui-components/src/diagrams/index.js",
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
           "links-notation": "/node_modules/links-notation/dist/index.js",
           "@dagrejs/dagre": "/node_modules/@dagrejs/dagre/dist/dagre.esm.js",
           "mermaid": "/node_modules/mermaid/dist/mermaid.esm.min.mjs"
@@ -101,31 +102,58 @@
         <div class="row">
           <!-- prettier-ignore -->
           <ui-diagram id="login-svg">
-            (login-flow: diagram
-              (kind flowchart)
-              (direction down)
-              (start: node (label Start))
-              (check: node (label 'Signed in?') (shape diamond))
-              (home: node (label Home))
-              (edge (from start) (to check))
-              (edge (from check) (to home) (label yes)))
+            login-flow: diagram
+              kind flowchart
+              direction down
+              start: node
+                label Start
+              check: node
+                label 'Signed in?'
+                shape diamond
+              home: node
+                label Home
+              edge
+                from start
+                to check
+              edge
+                from check
+                to home
+                label yes
           </ui-diagram>
           <!-- prettier-ignore -->
           <ui-diagram id="order-state">
-            (order: diagram
-              (kind state)
-              (direction right)
-              (label 'Order lifecycle')
-              (active: group (label Active))
-              (begin: node (shape start))
-              (cart: node (label 'In cart') (group active))
-              (paid: node (label Paid) (shape stadium) (group active))
-              (shipped: node (label Shipped))
-              (done: node (shape end))
-              (edge (from begin) (to cart))
-              (edge (from cart) (to paid) (label 'check out'))
-              (edge (from paid) (to shipped))
-              (edge (from shipped) (to done)))
+            order: diagram
+              kind state
+              direction right
+              label 'Order lifecycle'
+              active: group
+                label Active
+              begin: node
+                shape start
+              cart: node
+                label 'In cart'
+                group active
+              paid: node
+                label Paid
+                shape stadium
+                group active
+              shipped: node
+                label Shipped
+              done: node
+                shape end
+              edge
+                from begin
+                to cart
+              edge
+                from cart
+                to paid
+                label 'check out'
+              edge
+                from paid
+                to shipped
+              edge
+                from shipped
+                to done
           </ui-diagram>
         </div>
       </section>
@@ -152,22 +180,39 @@
     <!-- prettier-ignore -->
     <template id="mermaid-template">
       <ui-diagram id="login-mermaid" renderer="mermaid">
-        (login-flow: diagram
-          (kind flowchart)
-          (direction down)
-          (start: node (label Start))
-          (check: node (label 'Signed in?') (shape diamond))
-          (home: node (label Home))
-          (edge (from start) (to check))
-          (edge (from check) (to home) (label yes)))
+        login-flow: diagram
+          kind flowchart
+          direction down
+          start: node
+            label Start
+          check: node
+            label 'Signed in?'
+            shape diamond
+          home: node
+            label Home
+          edge
+            from start
+            to check
+          edge
+            from check
+            to home
+            label yes
       </ui-diagram>
       <ui-diagram id="sign-in-sequence">
-        (sign-in: diagram
-          (kind sequence)
-          (user: node (label User))
-          (app: node (label App))
-          (edge (from user) (to app) (label 'types a password'))
-          (edge (from app) (to user) (label 'shows home')))
+        sign-in: diagram
+          kind sequence
+          user: node
+            label User
+          app: node
+            label App
+          edge
+            from user
+            to app
+            label 'types a password'
+          edge
+            from app
+            to user
+            label 'shows home'
       </ui-diagram>
       <ui-mermaid-view id="raw-mermaid" label="A raw Mermaid flowchart">
         flowchart LR

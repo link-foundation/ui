@@ -184,18 +184,18 @@ describe('link-ui-tokens import', () => {
         out,
       ]);
       expect(code).toBe(0);
-      expect(read(out)).toBe(`(material3: theme
-  (token color.primary '#6750A4')
-  (token color.on-primary '#FFFFFF')
-  (token space.medium 16px)
-  (token shape.corner.medium 12px)
-  (token motion.duration.short 150ms))
+      expect(read(out)).toBe(`material3: theme
+  token color.primary '#6750A4'
+  token color.on-primary '#FFFFFF'
+  token space.medium 16px
+  token shape.corner.medium 12px
+  token motion.duration.short 150ms
 `);
       const stdout = await run([
         'import',
         join(GOLDEN, 'material3.tokens.json'),
       ]);
-      expect(stdout.stdout.startsWith('(tokens: theme\n')).toBe(true);
+      expect(stdout.stdout.startsWith('tokens: theme\n')).toBe(true);
     }));
 });
 

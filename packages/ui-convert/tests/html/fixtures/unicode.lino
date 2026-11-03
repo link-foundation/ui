@@ -1,25 +1,25 @@
-(привет: html
-  (tag section)
-  (attr lang ru)
-  (h1-0-0: text 'Привет, мир'
-    (level 1))
-  (p-0-1: text "Ünïcödé — “quotes” and 'apostrophes' & entities <tag>"
-    (tag p))
-  (p-0-2: text '日本語のテキスト 👋🏽'
-    (tag p))
-  (button-0-3: button
-    (label 'Готово ✓')
-    (attr id 'ok:go')
-    (attr title Нажми))
-  (pre-0-4: html
-    (tag pre)
-    (text-0-4-0: text ~1{20206b6565700a2020202073706163696e672020}))
-  (span-0-5: text 'many spaces here'
-    (tag span))
-  (dup: text one
-    (tag p))
-  (dup-3: text two
-    (tag p)
-    (attr id dup))
-  (dup-2: text three
-    (tag p)))
+привет: html
+  tag section
+  attr lang ru
+  h1-0-0: text 'Привет, мир'
+    level 1
+  p-0-1: text "Ünïcödé — “quotes” and 'apostrophes' & entities <tag>"
+    tag p
+  p-0-2: text '日本語のテキスト 👋🏽'
+    tag p
+  button-0-3: button
+    label 'Готово ✓'
+    attr id 'ok:go'
+    attr title Нажми
+  pre-0-4: html
+    tag pre
+    text-0-4-0: text ~1{20206b6565700a2020202073706163696e672020}
+  span-0-5: text 'many spaces here'
+    tag span
+  dup: text one
+    tag p
+  dup-3: text two
+    tag p
+    attr id dup
+  dup-2: text three
+    tag p

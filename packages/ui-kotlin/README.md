@@ -74,10 +74,10 @@ leaves the property out; it never throws.
 Example (`docs/case-studies/issue-1/samples/document.lino`):
 
 ```lino
-(app: Column (scroll vertical)
-  (body: Column (spacing 16)
-    (greeting: Text 'Hello, links')
-    (ok: Button (label OK))))
+app: Column (scroll vertical)
+  body: Column (spacing 16)
+    greeting: Text 'Hello, links'
+    ok: Button (label OK)
 ```
 
 ### Differences from the Swift snapshots (#30)

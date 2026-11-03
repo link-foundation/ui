@@ -124,15 +124,15 @@ describe('mapping', () => {
     expect(diagnostics).toEqual([]);
     expect(text).toBe(
       [
-        '(a-0: link',
-        '  (label Docs)',
-        '  (href /docs)',
-        '  (attr class nav))',
-        '(ol-1: list',
-        '  (tag ol)',
-        '  (li-1-0: html',
-        '    (tag li)',
-        '    (text-1-0-0: text One)))',
+        'a-0: link',
+        '  label Docs',
+        '  href /docs',
+        '  attr class nav',
+        'ol-1: list',
+        '  tag ol',
+        '  li-1-0: html',
+        '    tag li',
+        '    text-1-0-0: text One',
         '',
       ].join('\n')
     );
@@ -144,12 +144,12 @@ describe('mapping', () => {
     );
     expect(text).toBe(
       [
-        '(div-0: html',
-        '  (tag div)',
-        '  (attr class card)',
-        '  (attr data-id 7)',
-        '  (attr hidden)',
-        "  (attr aria-label 'Card one'))",
+        'div-0: html',
+        '  tag div',
+        '  attr class card',
+        '  attr data-id 7',
+        '  attr hidden',
+        "  attr aria-label 'Card one'",
         '',
       ].join('\n')
     );

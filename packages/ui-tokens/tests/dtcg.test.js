@@ -89,12 +89,12 @@ describe('DTCG round trip', () => {
   it('is lossless for the issue-1 sample', () => {
     const { lino, again } = roundTrip(sample(), 'material3');
     expect(comparable(again)).toEqual(comparable(sample()));
-    expect(lino).toBe(`(material3: theme
-  (token color.primary '#6750A4')
-  (token color.on-primary '#FFFFFF')
-  (token space.medium 16px)
-  (token shape.corner.medium 12px)
-  (token motion.duration.short 150ms))
+    expect(lino).toBe(`material3: theme
+  token color.primary '#6750A4'
+  token color.on-primary '#FFFFFF'
+  token space.medium 16px
+  token shape.corner.medium 12px
+  token motion.duration.short 150ms
 `);
   });
 
@@ -169,11 +169,16 @@ describe('fromDtcg', () => {
       },
       { id: 'imported' }
     );
-    expect(lino).toBe(`(imported: theme
-  (token color.base '#FF0000' (description "It's red"))
-  (token color.link (token color.base) (type color))
-  (token color.pointer (token color.base) (type color))
-  (token size.root 16))
+    expect(lino).toBe(`imported: theme
+  token color.base '#FF0000'
+    description "It's red"
+  token color.link
+    token color.base
+    type color
+  token color.pointer
+    token color.base
+    type color
+  token size.root 16
 `);
     const resolved = resolveText(lino, 'imported');
     expect(resolved.diagnostics).toEqual([]);
@@ -185,7 +190,7 @@ describe('fromDtcg', () => {
       fromDtcg(
         '{"a": {"$type": "duration", "$value": {"value": 0.2, "unit": "s"}}}'
       )
-    ).toBe('(tokens: theme\n  (token a 0.2s))\n');
+    ).toBe('tokens: theme\n  token a 0.2s\n');
   });
 
   it('spells the type out when the value would read as another', () => {
@@ -194,9 +199,9 @@ describe('fromDtcg', () => {
       f: { $type: 'fontFamily', $value: 'Inter' },
       n: { $type: 'number', $value: 1 },
     });
-    expect(lino).toContain('(token w 400 (type fontWeight))');
-    expect(lino).toContain('(token f Inter)');
-    expect(lino).toContain('(token n 1)');
+    expect(lino).toContain('\n  token w 400\n    type fontWeight\n');
+    expect(lino).toContain('\n  token f Inter\n');
+    expect(lino).toContain('\n  token n 1\n');
   });
 
   it('throws on what it cannot represent', () => {

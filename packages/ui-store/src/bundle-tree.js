@@ -9,9 +9,18 @@
  * differently. Every part is tagged, so nothing depends on a vocabulary:
  *
  * ```lino
- * (document_tree
- *   (roots (e (id ok) (kind button) (pos) (props (p label (s OK))) (children) (unknown)))
- *   (unknown))
+ * document_tree
+ *   roots
+ *     e
+ *       id ok
+ *       kind button
+ *       pos
+ *       props
+ *         p label
+ *           s OK
+ *       children
+ *       unknown
+ *   unknown
  * ```
  *
  * A value is `(s word)` (a string), `(a value...)` (a link without an id) or

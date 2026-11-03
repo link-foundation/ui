@@ -1,7 +1,7 @@
-(material3: theme
-  (extends base)
-  (token color.primary '#6750A4')
-  (token color.on-primary '#FFFFFF')
-  (token space.medium 16px)
-  (token shape.corner.medium 12px)
-  (token motion.duration.short 150ms))
+material3: theme
+  extends base
+  token color.primary '#6750A4'
+  token color.on-primary '#FFFFFF'
+  token space.medium 16px
+  token shape.corner.medium 12px
+  token motion.duration.short 150ms

@@ -16,6 +16,13 @@ links-notation [#282](https://github.com/link-foundation/links-notation/issues/2
 a parenthesised group opens a nested context with the same line rules as the
 file root.
 
+Documents SHOULD be written in the indented form, also called the nested
+form, with as few parentheses as possible
+([#133](https://github.com/link-foundation/ui/issues/133)). Writers
+(`format` and `formatLinks` of ui-core) produce it by default. The one-line
+and multi-line forms stay valid input, and the examples below use them to
+show the shapes.
+
 The **tree projection** turns all three shapes into one element tree.
 Implementations MUST produce byte-identical tree JSON for the three forms of
 one document; the `shapes/` fixtures prove it.

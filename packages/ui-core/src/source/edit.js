@@ -718,7 +718,18 @@ export function moveNode(text, id, parentId, index, options) {
         render
       );
       if (insertion.start > removal.start && insertion.start < removal.end) {
-        throw new SourceEditError('The node cannot be moved into itself');
+        if (parent.start >= node.start && parent.end <= node.end) {
+          throw new SourceEditError('The node cannot be moved into itself');
+        }
+        // In the indented form an element's lines can end with the node's
+        // own lines (`after` is an ancestor of the node, nothing closes it):
+        // insert at the line break just before the removed lines.
+        const at =
+          removal.start === source.lineStart(removal.start)
+            ? (source.previousBreak(removal.start) ?? removal.start)
+            : removal.start;
+        insertion.start = at;
+        insertion.end = at;
       }
       return { edits: [removal, insertion] };
     },

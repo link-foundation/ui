@@ -1,2 +1,8 @@
-(logo: image 'https://example.com/logo.svg' (alt 'Logo') (aspect 16 9))
-(narrow: style (media (max-width 640px)) (state hover (opacity 0.8)))
+logo: image 'https://example.com/logo.svg'
+  alt 'Logo'
+  aspect 16 9
+narrow: style
+  media
+    max-width 640px
+  state hover
+    opacity 0.8

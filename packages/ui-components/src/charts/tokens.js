@@ -10,6 +10,8 @@
  * (`chartTokensLino()` is the theme), and a lone SVG still has its colours.
  */
 
+import { formatLinks } from '@link-foundation/ui-core';
+
 /** The number of categorical series colours. */
 export const SERIES_COUNT = 8;
 
@@ -77,19 +79,23 @@ export function tokenColor(path, tokens = null) {
 
 /**
  * The chart tokens as a `@link-foundation/ui-tokens` theme in Links
- * Notation, with the dark values as `(mode dark ...)`.
+ * Notation, in the nested form (#133), with the dark values under
+ * `mode dark`.
  * @param {string} [name]  the theme name
  * @returns {string}
  */
 export function chartTokensLino(name = 'charts') {
-  const line = ([path, value]) => `(token ${path} '${value}')`;
-  const light = Object.entries(CHART_TOKENS.light).map(
-    (entry) => `  ${line(entry)}`
-  );
-  const dark = Object.entries(CHART_TOKENS.dark).map(
-    (entry) => `    ${line(entry)}`
-  );
-  return `(${name}: theme\n${light.join('\n')}\n  (mode dark\n${dark.join('\n')}))\n`;
+  const token = ([path, value]) => ['token', path, value];
+  return formatLinks([
+    {
+      id: name,
+      values: [
+        'theme',
+        ...Object.entries(CHART_TOKENS.light).map(token),
+        ['mode', 'dark', ...Object.entries(CHART_TOKENS.dark).map(token)],
+      ],
+    },
+  ]);
 }
 
 const declarations = (mode) =>

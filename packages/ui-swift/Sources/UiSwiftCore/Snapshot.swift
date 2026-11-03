@@ -1,13 +1,14 @@
 // The render tree written as Links Notation (`dumpLino`), for snapshot tests
 // that compare the Swift renderer with the other ports (#32). Every link is
 // written with the LinksNotation formatter, so a value is quoted exactly when
-// the formatter quotes it; the only text added here is the indentation of
-// the children and the closing parentheses.
+// the formatter quotes it. The tree is written in the nested form (#133): one
+// node per line, without the parentheses around the node, its children
+// indented under it.
 //
-//     (app: ScrollView
-//       (body: VStack (spacing 16)
-//         (greeting: Text 'Hello, links')
-//         (ok: Button (label OK))))
+//     app: ScrollView
+//       body: VStack (spacing 16)
+//         greeting: Text 'Hello, links'
+//         ok: Button (label OK)
 
 import LinksNotation
 
@@ -40,13 +41,14 @@ extension RenderNode {
         return Link(id: id, values: values)
     }
 
-    /// The node and its children, one node per line, children indented by two spaces.
+    /// The node and its children in the nested form: one node per line,
+    /// without the parentheses around the node, children indented by two spaces.
     public func dumpLino(indent: String = "") -> String {
         let head = headLink.format()
-        guard !children.isEmpty else { return indent + head }
-        let lines = children.map { $0.dumpLino(indent: indent + "  ") }
-        // `head` ends with the `)` that closes the node; move it after the children.
-        return indent + String(head.dropLast()) + "\n" + lines.joined(separator: "\n") + ")"
+        // A line of the indented form is a link already: its outer parentheses are left out.
+        let line = indent + (head.hasPrefix("(") && head.hasSuffix(")") ? String(head.dropFirst().dropLast()) : head)
+        guard !children.isEmpty else { return line }
+        return line + "\n" + children.map { $0.dumpLino(indent: indent + "  ") }.joined(separator: "\n")
     }
 }
 

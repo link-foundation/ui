@@ -42,7 +42,7 @@ describe('values', () => {
     });
     expect(diff(schema, values)).toEqual({ 'liquid.blur': 24 });
     expect(toLino(schema, diff(schema, values))).toBe(
-      '(settings (version 2) (liquid.blur 24))'
+      'settings\n  version 2\n  liquid.blur 24'
     );
   });
 

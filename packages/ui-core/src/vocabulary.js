@@ -5,7 +5,7 @@
  * vocabulary that knows only the kinds `kind`, `action` and `dialect`.
  */
 
-import { Parser } from 'links-notation';
+import { parseNested } from './links.js';
 import { projectLinks } from './project.js';
 import { VOCABULARY_TEXT } from './vocabulary-text.js';
 
@@ -71,7 +71,7 @@ function readKind(element) {
  * @throws {Error} when the text is not a valid vocabulary
  */
 export function loadVocabulary(text) {
-  const links = new Parser().parse(text);
+  const links = parseNested(text);
   const { roots, diagnostics } = projectLinks(links, bootstrap);
   if (diagnostics.length > 0) {
     throw new Error(

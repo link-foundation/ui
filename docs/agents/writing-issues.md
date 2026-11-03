@@ -2,9 +2,10 @@
 
 Most issues in this repository are solved by AI coding agents, many of them
 less capable than the agent or person who wrote the issue. An issue is ready
-when such an agent can deliver it without asking a question. Use the
-[Feature or Bug form](https://github.com/link-foundation/ui/issues/new/choose);
-the forms ask for the sections below.
+when such an agent can deliver it without asking a question. Open a
+[new issue](https://github.com/link-foundation/ui/issues/new) of type Feature
+or Bug and write the sections below yourself; this repository has no issue
+templates.
 
 **Model issue:** [#14 — ui-core: parse Links Notation into the UI element tree](https://github.com/link-foundation/ui/issues/14).
 Its source file is
@@ -14,8 +15,7 @@ and the template is described in the
 
 ## Required sections
 
-Feature issues use these sections, in this order. The Feature form produces
-them with the same headings.
+Feature issues use these sections, in this order, with the same headings.
 
 | Section                   | Purpose                                                                     |
 | ------------------------- | --------------------------------------------------------------------------- |
@@ -96,11 +96,16 @@ rules in [`docs/spec/values.md`](../spec/values.md) apply:
 - quote hex colours: `'#6750A4'`, because a bare `#` starts a comment;
 - quote URLs: `'https://example.com/logo.svg'`, because a bare value must not
   contain `:`;
+- write the nested form: one link per line, with the links of its values
+  indented under it and no parentheses that the indentation makes unneeded
+  ([`docs/agents/conventions.md`](conventions.md#links-notation-in-the-nested-form));
 - use a `lino` code block, so the example can be copied into a fixture:
 
   ```lino
-  (chip: style (background '#6750A4'))
-  (logo: image 'https://example.com/logo.svg' (aspect 16 9))
+  chip: style
+    background '#6750A4'
+  logo: image 'https://example.com/logo.svg'
+    aspect 16 9
   ```
 
 ## No copyrighted text

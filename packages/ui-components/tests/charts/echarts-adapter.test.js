@@ -137,8 +137,8 @@ describe('renderECharts', () => {
 
 describe('<ui-chart> with (renderer echarts)', () => {
   const lino = fixture('sales-line.lino').replace(
-    '(sales: chart',
-    '(sales: chart (renderer echarts)'
+    'sales: chart\n',
+    'sales: chart\n  renderer echarts\n'
   );
 
   it('draws with ECharts and keeps the SVG as the accessible image', async () => {

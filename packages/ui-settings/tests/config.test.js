@@ -21,11 +21,11 @@ describe('bindConfig', () => {
       value: ['24'],
     });
     expect(settings.get('liquid.blur')).toBe(24);
-    expect(config.exportPatch()).toBe(`(user-overrides: overrides
-  (layer user)
-  (base app)
-  (set settings liquid.blur 24)
-  (set settings accent '#000000'))
+    expect(config.exportPatch()).toBe(`user-overrides: overrides
+  layer user
+  base app
+  set settings liquid.blur 24
+  set settings accent '#000000'
 `);
   });
 

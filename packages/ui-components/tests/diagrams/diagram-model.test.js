@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect } from 'test-anywhere';
-import { Parser } from 'links-notation';
+import { parseNested } from '@link-foundation/ui-core';
 import {
   DiagramError,
   describeDiagram,
@@ -15,7 +15,8 @@ import {
 } from '@link-foundation/ui-components/diagrams';
 import { fixture, linoFixtures } from './fixtures.js';
 
-const parse = (text) => new Parser().parse(text);
+// The readers' own parse: indented lines are values of the line above.
+const parse = (text) => parseNested(text);
 
 /** The DiagramError thrown by `fn` (fails when nothing is thrown). */
 function errorOf(fn) {
@@ -91,17 +92,26 @@ describe('diagramToLino', () => {
     });
   }
 
-  it('writes the multi-line form and leaves out default values', () => {
+  it('writes the nested form and leaves out default values (#133)', () => {
     expect(diagramToLino(parseDiagram(fixture('login-flow.lino')))).toBe(
       [
-        '(login-flow: diagram',
-        '  (kind flowchart)',
-        '  (direction down)',
-        '  (start: node (label Start))',
-        "  (check: node (label 'Signed in?') (shape diamond))",
-        '  (home: node (label Home))',
-        '  (edge (from start) (to check))',
-        '  (edge (from check) (to home) (label yes)))',
+        'login-flow: diagram',
+        '  kind flowchart',
+        '  direction down',
+        '  start: node',
+        '    label Start',
+        '  check: node',
+        "    label 'Signed in?'",
+        '    shape diamond',
+        '  home: node',
+        '    label Home',
+        '  edge',
+        '    from start',
+        '    to check',
+        '  edge',
+        '    from check',
+        '    to home',
+        '    label yes',
         '',
       ].join('\n')
     );

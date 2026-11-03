@@ -1,18 +1,26 @@
-(any-button: style
-  (selector (type button))
-  (background '#111111')
-  (color '#111111')
-  (radius 1px)
-  (opacity 0.1))
-(ok-button: style
-  (selector (id ok))
-  (background '#333333'))
-(filled-button: style
-  (selector (type button) (variant filled))
-  (background '#222222')
-  (color '#222222'))
-(late-button: style
-  (selector (type button))
-  (radius 2px)
-  (state hover (opacity 0.5))
-  (media (min-width 600px) (opacity 0.6)))
+any-button: style
+  selector
+    type button
+  background '#111111'
+  color '#111111'
+  radius 1px
+  opacity 0.1
+ok-button: style
+  selector
+    id ok
+  background '#333333'
+filled-button: style
+  selector
+    type button
+    variant filled
+  background '#222222'
+  color '#222222'
+late-button: style
+  selector
+    type button
+  radius 2px
+  state hover
+    opacity 0.5
+  media
+    min-width 600px
+    opacity 0.6

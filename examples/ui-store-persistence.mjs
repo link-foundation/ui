@@ -14,7 +14,10 @@ const indexedDB = new IDBFactory();
 const options = {
   name: 'demo',
   indexedDB,
-  initialText: "(main: stack (ok: button (label 'OK')) (text 'Hello'))",
+  initialText: `main: stack
+  ok: button
+    label 'OK'
+  text 'Hello'`,
   channel: false,
 };
 

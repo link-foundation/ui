@@ -7,6 +7,7 @@ import { describe, it, expect } from 'test-anywhere';
 import {
   formatLinks,
   parseLinks,
+  parseNested,
   UiParseError,
 } from '@link-foundation/ui-core';
 
@@ -32,9 +33,71 @@ describe('parseLinks / formatLinks', () => {
       ['b', { id: 'ok', values: ['button', ['label', 'OK']] }, ['c', ['d']]],
       ['single'],
     ];
-    const text = formatLinks(values);
-    expect(text.split('\n').length).toBe(values.length + 1);
-    expect(parseLinks(text)).toEqual(values);
+    const inline = formatLinks(values, { style: 'inline' });
+    expect(inline.split('\n').length).toBe(values.length + 1);
+    expect(parseLinks(inline)).toEqual(values);
+    const nested = formatLinks(values);
+    expect(nested).toBe(
+      [
+        '(lonely:)',
+        'a ~1{} \'x y\' "it\'s" `say "hi" it\'s`',
+        'b',
+        '  ok: button',
+        '    label OK',
+        '  c',
+        '    d',
+        'single',
+        '',
+      ].join('\n')
+    );
+    expect(parseLinks(nested)).toEqual(values);
+  });
+
+  it('writes links-notation links the same as their raw values', () => {
+    const [link] = parseNested(
+      '(shell: dock (persist main) (left: region (panels a b)))'
+    );
+    expect(formatLinks([link])).toBe(
+      'shell: dock\n  persist main\n  left: region\n    panels a b\n'
+    );
+    expect(formatLinks([link])).toBe(formatLinks(parseLinks(link.format())));
+  });
+
+  it('reads the nested form and the one-line form as the same values', () => {
+    const nested =
+      'tx 4\n  origin devmode\n  setProp ok label\n    text Cancel\n';
+    expect(parseLinks(nested)).toEqual(
+      parseLinks('(tx 4 (origin devmode) (setProp ok label (text Cancel)))')
+    );
+  });
+
+  it('round-trips generated values in every style', () => {
+    // A small deterministic generator: quoting, ids, newlines, nesting.
+    let seed = 133;
+    const next = (n) => {
+      seed = (seed * 1103515245 + 12345) % 2147483648;
+      return seed % n;
+    };
+    const refs = ['a', 'b c', "it's", 'x:y', '(p)', 'say "hi"', 'l\nm', '1'];
+    const value = (depth) => {
+      if (depth > 3 || next(3) === 0) {
+        return refs[next(refs.length)];
+      }
+      const values = Array.from({ length: 1 + next(4) }, () =>
+        value(depth + 1)
+      );
+      return next(2) === 0 ? values : { id: refs[next(refs.length)], values };
+    };
+    for (let i = 0; i < 300; i += 1) {
+      const values = Array.from({ length: 1 + next(3) }, () => value(0));
+      for (const style of ['indented', 'multiline', 'inline']) {
+        expect(parseLinks(formatLinks(values, { style }))).toEqual(values);
+      }
+    }
+  });
+
+  it('rejects an unknown style', () => {
+    expect(() => formatLinks([], { style: 'yaml' })).toThrow(TypeError);
   });
 
   it('writes nothing for no values', () => {
@@ -55,5 +118,31 @@ describe('parseLinks / formatLinks', () => {
     expect(codeOf('(a b')).toBe('syntax-error');
     expect(codeOf(42)).toBe('syntax-error');
     expect(codeOf('(a b)', { maxInputSize: 2 })).toBe('input-too-large');
+  });
+});
+
+describe('parseNested', () => {
+  const text = (link) => link.format();
+
+  it('reads indented lines as values of the line above them', () => {
+    const nested = 'r: rule\n  match\n    A\n  replace a\n';
+    expect(parseNested(nested).map(text)).toEqual([
+      '(r: rule (match (A)) (replace a))',
+    ]);
+    expect(parseNested('(r: rule (match (A)) (replace a))').map(text)).toEqual([
+      '(r: rule (match (A)) (replace a))',
+    ]);
+  });
+
+  it('keeps top-level links apart', () => {
+    expect(parseNested('a b\nc\n  d\n').map(text)).toEqual([
+      '(a b)',
+      '(c (d))',
+    ]);
+  });
+
+  it('throws the errors of the parser and applies its limits', () => {
+    expect(() => parseNested('(a b')).toThrow();
+    expect(() => parseNested('((((a))))', { maxDepth: 2 })).toThrow();
   });
 });

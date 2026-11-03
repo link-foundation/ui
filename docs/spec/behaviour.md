@@ -5,7 +5,10 @@
 An event handler is the multi-valued property `on`:
 
 ```lino
-(save: button 'Save' (on press (emit save) (navigate home)))
+save: button 'Save'
+  on press
+    emit save
+    navigate home
 ```
 
 - Its first value MUST be an event name (an atom such as `press`, `focus`,
@@ -45,7 +48,9 @@ run (fixture `behaviour/unsafe-url`).
 Bindings are **reserved** in v0 with the shape
 
 ```lino
-(draft: text (bind value (param draft.text)))
+draft: text
+  bind value
+    param draft.text
 ```
 
 `bind` names the bound property, then a `(param path)` reference. The
@@ -61,15 +66,32 @@ one with the common property `machine`, which can map machine parts to other
 elements:
 
 ```lino
-(toggle-machine: machine
-  (initial off)
-  (context (pressed false))
-  (state off (on toggle (target on) (do (set pressed true))))
-  (state on (on toggle (target off) (do (set pressed false))))
-  (part root (attr aria-pressed (context pressed)) (key Enter toggle)))
+toggle-machine: machine
+  initial off
+  context
+    pressed false
+  state off
+    on toggle
+      target on
+      do
+        set pressed true
+  state on
+    on toggle
+      target off
+      do
+        set pressed false
+  part root
+    attr aria-pressed
+      context pressed
+    key Enter toggle
 
-(bold: button (label Bold) (machine toggle-machine))
-(more: button (label Details) (machine disclosure-machine (content panel)))
+bold: button
+  label Bold
+  machine toggle-machine
+more: button
+  label Details
+  machine disclosure-machine
+    content panel
 ```
 
 States are flat in v0. A transition is `(on EVENT (target S) (do ACTION...)

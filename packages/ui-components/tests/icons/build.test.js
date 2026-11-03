@@ -20,12 +20,12 @@ import {
 import { ROOT, SVG, inFixture, read } from './helpers.js';
 
 const record = (id, files, license, copyright = 'none') =>
-  `(${id}: asset
-  (kind icon)
-  (files ${files})
-  (license ${license})
-  (copyright '${copyright}')
-  (attribution none))
+  `${id}: asset
+  kind icon
+  files ${files}
+  license ${license}
+  copyright '${copyright}'
+  attribution none
 `;
 
 const hasError = (errors, ...parts) =>
@@ -93,8 +93,8 @@ describe('build-icons failures', () => {
       'MIT',
       'Someone'
     ).replace(
-      '(attribution none)',
-      "(source 'https://developer.apple.com/sf-symbols/')\n  (attribution none)"
+      '  attribution none',
+      "  source 'https://developer.apple.com/sf-symbols/'\n  attribution none"
     )}`;
     await inFixture({ extra, records }, async (root) => {
       const { errors } = await buildIcons({ root, sets: ['apple'] });
@@ -123,8 +123,8 @@ describe('build-icons failures', () => {
       writeFileSync(
         lino,
         read(lino).replace(
-          /\(icon-close: asset([^]*?)\(license CC0-1\.0\)/,
-          '(icon-close: asset$1(license MIT)'
+          /^icon-close: asset([^]*?)license CC0-1\.0$/mu,
+          'icon-close: asset$1license MIT'
         )
       );
       const { errors } = await buildIcons({ root, sets: ['own'] });

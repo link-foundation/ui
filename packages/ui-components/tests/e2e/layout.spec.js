@@ -77,7 +77,7 @@ test.describe('layout gallery: keyboard and persistence', () => {
     await expect(divider(page)).toHaveAttribute('aria-valuenow', '41');
     expect(
       await page.evaluate(() => globalThis.localStorage.getItem('gallery.chat'))
-    ).toBe('(sizes 41 59)');
+    ).toBe('sizes 41 59');
     const before = await page.locator('[data-link-id=chat-list]').boundingBox();
 
     await page.reload();

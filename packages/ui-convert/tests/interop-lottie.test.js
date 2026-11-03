@@ -145,8 +145,8 @@ describe('Lottie unknown properties', () => {
   it('keeps them in extra and writes them back', () => {
     const imported = importLottie(animation);
     expect(imported.diagnostics).toEqual([]);
-    expect(imported.lino).toContain(`(extra lottie '{"glow":true}')`);
-    expect(imported.lino).toContain(`(extra lottie '{"layerFuture":"y"}')`);
+    expect(imported.lino).toContain(` extra lottie '{"glow":true}'\n`);
+    expect(imported.lino).toContain(` extra lottie '{"layerFuture":"y"}'\n`);
     expect(exportLottie(imported.lino).json).toEqual(animation);
   });
 });
@@ -176,7 +176,7 @@ describe('Lottie rejected input', () => {
   });
 
   it('keeps the composition settings and the supported layers', () => {
-    expect(lino).toContain('(frame-rate 30)');
+    expect(lino).toContain('\n  frame-rate 30\n');
     expect(lino).toContain('box: shape');
   });
 

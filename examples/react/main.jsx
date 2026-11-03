@@ -20,7 +20,11 @@ import sampleTokens from '../../docs/case-studies/issue-1/samples/tokens.lino?ra
 
 const { store } = storeOfSource(sampleDocument);
 const { store: chartStore } = storeOfSource(
-  "(report: document (body: stack (sales: chart (title 'Presses') (series 1))))"
+  `report: document
+  body: stack
+    sales: chart
+      title 'Presses'
+      series 1`
 );
 
 /** The `chart` kind: a bar per value of `series`. */

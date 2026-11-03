@@ -21,17 +21,47 @@ import {
   toShareHash,
 } from '@link-foundation/ui-settings';
 
-const { schema, diagnostics } =
-  readSchema(`(settings-schema: schema (version 2))
-(appearance: section (label 'Appearance'))
-(liquid.blur: (type range) (default 18) (min 0) (max 40) (step 1) (unit px)
-  (section appearance) (label 'Blur') (apply (css-var --liquid-blur)))
-(theme.mode: (type choice) (default auto) (options auto light dark)
-  (section appearance) (apply (data-attr theme-mode)))
-(motion.reduce: (type toggle) (default false) (section appearance) (comfort))
-(accent: (type color) (default '#3390EC') (apply (css-var --accent)))
-(preset calm (label 'Calm') (set liquid.blur 24) (set theme.mode dark))
-(migration (from 1) (to 2) (rename blur liquid.blur) (old-default liquid.blur 12))`);
+const { schema, diagnostics } = readSchema(`settings-schema: schema
+  version 2
+appearance: section
+  label 'Appearance'
+liquid.blur:
+  type range
+  default 18
+  min 0
+  max 40
+  step 1
+  unit px
+  section appearance
+  label 'Blur'
+  apply
+    css-var --liquid-blur
+theme.mode:
+  type choice
+  default auto
+  options auto light dark
+  section appearance
+  apply
+    data-attr theme-mode
+motion.reduce:
+  type toggle
+  default false
+  section appearance
+  (comfort)
+accent:
+  type color
+  default '#3390EC'
+  apply
+    css-var --accent
+preset calm
+  label 'Calm'
+  set liquid.blur 24
+  set theme.mode dark
+migration
+  from 1
+  to 2
+  rename blur liquid.blur
+  old-default liquid.blur 12`);
 console.log(schema.fields.size, diagnostics);
 // 4 []
 
@@ -66,8 +96,8 @@ console.log(randomize(schema, calm, { random, locked: ['accent'] }));
 
 // Values are user overrides of the `settings` element of a document.
 const config = createConfig({
-  document: parse(`(app: document
-  (settings: group))`),
+  document: parse(`app: document
+  settings: group`),
 });
 const settings = bindConfig(config, schema);
 settings.update({ 'liquid.blur': 24, 'theme.mode': 'dark' });

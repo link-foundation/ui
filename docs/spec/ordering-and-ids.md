@@ -15,7 +15,13 @@ implementation, editor or exporter:
   values; it is listed so that tools treat keyframes as a sequence.)
 
 ```lino
-(ok: button (on press (emit pressed)) (on focus (emit focused)) (on press (navigate home)))
+ok: button
+  on press
+    emit pressed
+  on focus
+    emit focused
+  on press
+    navigate home
 ```
 
 keeps three `on` properties in this order (fixture

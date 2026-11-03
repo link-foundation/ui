@@ -1,3 +1,8 @@
-(hello: text 'Hello')
-(wave: animation (target hello) (duration 300ms))
-(nav: button 'Next' (on press (navigate hello) (focus hello)))
+hello: text 'Hello'
+wave: animation
+  target hello
+  duration 300ms
+nav: button 'Next'
+  on press
+    navigate hello
+    focus hello

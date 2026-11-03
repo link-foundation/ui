@@ -1,2 +1,2 @@
-(box: Column (spacing 16) (padding 24))
-(hero: Image (url hero.png) (alt Hero))
+box: Column (spacing 16) (padding 24)
+hero: Image (url hero.png) (alt Hero)

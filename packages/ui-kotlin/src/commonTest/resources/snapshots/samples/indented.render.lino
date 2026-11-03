@@ -1,4 +1,4 @@
-(app: Column (scroll vertical)
-  (body: Column
-    (greeting: Text 'Hello, links')
-    (ok: Button (label OK))))
+app: Column (scroll vertical)
+  body: Column
+    greeting: Text 'Hello, links'
+    ok: Button (label OK)

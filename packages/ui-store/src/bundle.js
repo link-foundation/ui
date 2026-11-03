@@ -1,11 +1,19 @@
 /**
- * The export bundle of a persistent store: one Links Notation document.
+ * The export bundle of a persistent store: one Links Notation document,
+ * written in the nested form.
  *
  * ```lino
- * (ui_store_bundle (schema 1) (name demo) (snapshot_tx 12))
- * (document (ok: button (label OK)))
- * (ids ok _2)
- * (tx 13 (origin devmode) (setProp ok label Cancel))
+ * ui_store_bundle
+ *   schema 1
+ *   name demo
+ *   snapshot_tx 12
+ * document
+ *   ok: button
+ *     label OK
+ * ids ok _2
+ * tx 13
+ *   origin devmode
+ *   setProp ok label Cancel
  * ```
  *
  * `document` is the snapshot at transaction `snapshot_tx`; the `tx` links
@@ -60,10 +68,7 @@ export const DEFAULT_BUNDLE_LIMITS = Object.freeze({
  */
 export function writeBundle({ name, snapshotTx, document, ids, entries }) {
   const unlimited = { maxDepth: Infinity, maxInputSize: Infinity };
-  const documentLinks = parseLinks(
-    format(document, { style: 'inline' }),
-    unlimited
-  );
+  const documentLinks = parseLinks(format(document), unlimited);
   const exact = treeLink(document);
   const lossy =
     JSON.stringify(treeLink(readDocument(documentLinks, unlimited))) !==

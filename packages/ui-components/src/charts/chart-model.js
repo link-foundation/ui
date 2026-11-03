@@ -22,7 +22,7 @@
 
 import { ChartSpecError, at, fail } from './errors.js';
 import {
-  formatPretty,
+  formatNested,
   headName,
   isAtom,
   parseLino,
@@ -569,7 +569,7 @@ function chartNode(spec) {
 }
 
 /**
- * Write a spec (of any kind) as LiNo text, in the multi-line form.
+ * Write a spec (of any kind) as LiNo text, in the nested form.
  * @param {ChartSpec|import('./small-model.js').SmallChartSpec} spec
  * @returns {string} LiNo text
  */
@@ -578,5 +578,5 @@ export function chartToLino(spec) {
     spec.kind === undefined || spec.kind === 'chart'
       ? chartNode(spec)
       : smallChartNode(spec);
-  return `${formatPretty(node)}\n`;
+  return formatNested(node);
 }

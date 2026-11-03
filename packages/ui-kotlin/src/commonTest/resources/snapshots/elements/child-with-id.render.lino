@@ -1,4 +1,4 @@
-(page: Column (scroll vertical)
-  (main: Column
-    (intro: Text One)
-    (outro: Text Two)))
+page: Column (scroll vertical)
+  main: Column
+    intro: Text One
+    outro: Text Two

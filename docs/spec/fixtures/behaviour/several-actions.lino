@@ -1,2 +1,7 @@
-(save: button 'Save' (on press (set status value 'Saving') (emit save) (toggle menu open) (focus status)))
-(status: text '')
+save: button 'Save'
+  on press
+    set status value 'Saving'
+    emit save
+    toggle menu open
+    focus status
+status: text ''

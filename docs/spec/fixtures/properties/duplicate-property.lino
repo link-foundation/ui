@@ -1,1 +1,4 @@
-(ok: button (label 'First') (variant filled) (label 'Second'))
+ok: button
+  label 'First'
+  variant filled
+  label 'Second'

@@ -178,7 +178,7 @@ test('renders attributions grouped by licence in every format', () => {
   );
   assert.match(
     renderAttributions(records, { format: 'lino' }),
-    /\(lucide-check: attribution \(group ISC\)/
+    /^lucide-check: attribution\n {2}group ISC\n {2}copyright /m
   );
   assert.throws(() => renderAttributions(records, { format: 'pdf' }));
 });

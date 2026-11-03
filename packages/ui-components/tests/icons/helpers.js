@@ -54,9 +54,9 @@ export async function inFixture({ extra = {}, records = '' } = {}, body) {
       recursive: true,
     });
     const own = read(join(ROOT, 'assets/assets.lino'))
-      .split(/\n(?=\()/)
-      .filter((block) => block.startsWith('(icon-'))
-      .join('\n');
+      .split('\n\n')
+      .filter((block) => block.startsWith('icon-'))
+      .join('\n\n');
     writeFileSync(join(root, 'assets/assets.lino'), `${own}\n${records}`);
     for (const [file, text] of Object.entries(extra)) {
       mkdirSync(dirname(join(root, file)), { recursive: true });

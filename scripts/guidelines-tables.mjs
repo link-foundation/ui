@@ -15,7 +15,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { Parser } from 'links-notation';
+import { parseNested } from '../packages/ui-core/src/links.js';
 import prettier from 'prettier';
 
 export const guidelinesDir = join(
@@ -34,7 +34,7 @@ const NONE = '—';
  * @returns {Array<{id: string, type: string, fields: Record<string, string[]>}>}
  */
 export function parseRecords(text) {
-  const links = new Parser().parse(text);
+  const links = parseNested(text);
   return links.map((link) => {
     const [head, ...rest] = link.values;
     /** @type {Record<string, string[]>} */

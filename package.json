@@ -81,8 +81,7 @@
     "lint-staged": "^16.4.0",
     "prettier": "^3.6.2",
     "svgo": "^4.1.0",
-    "test-anywhere": "^0.8.48",
-    "yaml": "^2.9.1"
+    "test-anywhere": "^0.8.48"
   },
   "lint-staged": {
     "*.{js,mjs,cjs}": [

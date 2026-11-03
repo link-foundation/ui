@@ -1,4 +1,14 @@
-(broken: chart
-  (data (row (a 1) (b 2)) (row (a 2) (b 3)))
-  (mark line)
-  (encoding (x (field a)) (y (field c))))
+broken: chart
+  data
+    row
+      a 1
+      b 2
+    row
+      a 2
+      b 3
+  mark line
+  encoding
+    x
+      field a
+    y
+      field c

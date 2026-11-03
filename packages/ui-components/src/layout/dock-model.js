@@ -4,23 +4,38 @@
  * from Links Notation (`dockLayoutFromLinks`) and written back
  * (`dockLayoutToLino`), so it is saved and restored as LiNo:
  *
- *   (designer-shell: dock
- *     (persist designer.layout)
- *     (left: region (size 16rem) (panels toolbox outline))
- *     (right: region (size 20rem) (panels properties))
- *     (center: region (panels canvas))
- *     (bottom: region (size 12rem) (collapsed true) (panels problems))
- *     (float search (x 40) (y 60) (width 320) (height 240) (region left))
- *     (closed history right))
+ *   designer-shell: dock
+ *     persist designer.layout
+ *     left: region
+ *       size 16rem
+ *       panels toolbox outline
+ *     right: region
+ *       size 20rem
+ *       panels properties
+ *     center: region
+ *       panels canvas
+ *     bottom: region
+ *       size 12rem
+ *       collapsed true
+ *       panels problems
+ *     float search
+ *       x 40
+ *       y 60
+ *       width 320
+ *       height 240
+ *       region left
+ *     closed history right
  *
  * Reading goes through `links-notation` and the ui-core projection (no
- * regular expressions); writing goes through `links-notation` `Link`
- * objects, so quoting follows the parser. Every change returns a new
+ * regular expressions), so any form of the text reads; writing builds
+ * `links-notation` `Link` objects and writes them in the nested form with
+ * ui-core `formatLinks`, so quoting follows the parser. Every change returns a new
  * layout and leaves its input alone.
  */
 
 import {
   elementLink,
+  formatLinks,
   parse as parseUi,
   projectLinks,
 } from '@link-foundation/ui-core';
@@ -268,28 +283,23 @@ const closedLink = (c) =>
   ]);
 
 /**
- * Write a dock layout as Links Notation: the dock on several lines, one
- * line per region, floating panel and closed panel.
+ * Write a dock layout as Links Notation in the nested form: the dock line,
+ * then one indented block per region, floating panel and closed panel.
  * @param {DockLayout} layout
  * @param {{ indent?: string }} [options]
  * @returns {string}
  */
 export function dockLayoutToLino(layout, options = {}) {
-  const indent = options.indent ?? '  ';
-  const head = new Link(layout.id ?? null, [new Link('dock')]).format();
-  const lines = [
+  const dock = new Link(layout.id ?? null, [
+    new Link('dock'),
     ...(layout.persist === null
       ? []
       : [new Link(null, [new Link('persist'), new Link(layout.persist)])]),
     ...layout.regions.map((region) => elementLink(regionNode(region))),
     ...layout.floating.map(floatLink),
     ...layout.closed.map(closedLink),
-  ].map((link) => indent + link.format());
-  if (lines.length === 0) {
-    return `${head}\n`;
-  }
-  lines[lines.length - 1] += ')';
-  return `${[head.slice(0, -1), ...lines].join('\n')}\n`;
+  ]);
+  return formatLinks([dock], { indent: options.indent ?? '  ' });
 }
 
 /**

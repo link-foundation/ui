@@ -7,7 +7,7 @@
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join, posix, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { Parser } from 'links-notation';
+import { parseNested } from '../../packages/ui-core/src/links.js';
 
 /**
  * @typedef {object} AssetRecord
@@ -140,7 +140,7 @@ const isField = (link) =>
  * @returns {AssetRecord[]}
  */
 export function parseAssetRecords(text) {
-  const links = new Parser().parse(text);
+  const links = parseNested(text);
   /** @type {Map<string, {fields: Map<string, string[]>, errors: string[]}>} */
   const raw = new Map();
   const order = [];
@@ -461,15 +461,16 @@ const RECORD_FIELDS = [
 ];
 
 /**
- * Write an asset record in the multi-line form of assets/assets.lino, so
- * parseAssetRecords() reads it back. `(attribution none)` and an empty
- * `files` list are left out.
+ * Write an asset record in the nested form of assets/assets.lino (#133),
+ * so parseAssetRecords() reads it back: the `ID: asset` line, then one
+ * indented line per field. `attribution none` and an empty `files` list are
+ * left out.
  *
  * @param {Partial<AssetRecord> & {id: string}} record
  * @returns {string}
  */
 export function formatAssetRecord(record) {
-  const lines = [`(${record.id}: asset`];
+  const lines = [`${record.id}: asset`];
   for (const [field, key] of RECORD_FIELDS) {
     const value = record[key];
     if (
@@ -480,12 +481,12 @@ export function formatAssetRecord(record) {
       continue;
     }
     const values = Array.isArray(value) ? value : [value];
-    lines.push(`  (${field} ${values.map(linoValue).join(' ')})`);
+    lines.push(`  ${field} ${values.map(linoValue).join(' ')}`);
   }
   if (record.optIn) {
-    lines.push('  (opt-in true)');
+    lines.push('  opt-in true');
   }
-  return `${lines.join('\n')})`;
+  return lines.join('\n');
 }
 
 const tomlString = (value) => JSON.stringify(value);

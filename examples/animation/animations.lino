@@ -1,25 +1,55 @@
-(panel-enter: animation
-  (duration 300ms)
-  (easing (cubic-bezier 0.2 0 0 1))
-  (fill backwards)
-  (track opacity (key 0 0) (key 1 1))
-  (track translate (key 0 '0 8px') (key 1 '0 0'))
-  (track clip-path (key 0 'inset(0 100% 0 0)') (key 1 'inset(0 0% 0 0)'))
-  (reduced-motion (duration 0ms)))
-(bounce: animation
-  (duration 600ms)
-  (easing (spring (stiffness 300) (damping 20) (mass 1)))
-  (track scale (key 0 0.9) (key 1 1))
-  (reduced-motion (duration 0ms)))
-(title-reveal: animation (target title) (duration 900ms) (effect decipher (seed 42)))
-(press-feedback: animation
-  (target ok)
-  (duration (token motion.duration.short))
-  (easing standard)
-  (track scale (key 0 1) (key 0.5 0.96) (key 1 1))
-  (reduced-motion (duration 0ms))
-  (on pressed))
-(intro: timeline
-  (at 0ms (play panel-enter (target sidebar)))
-  (at 0ms (play title-reveal))
-  (at 120ms (stagger 50ms (play bounce) (targets item-1 item-2 item-3))))
+panel-enter: animation
+  duration 300ms
+  easing
+    cubic-bezier 0.2 0 0 1
+  fill backwards
+  track opacity
+    key 0 0
+    key 1 1
+  track translate
+    key 0 '0 8px'
+    key 1 '0 0'
+  track clip-path
+    key 0 'inset(0 100% 0 0)'
+    key 1 'inset(0 0% 0 0)'
+  reduced-motion
+    duration 0ms
+bounce: animation
+  duration 600ms
+  easing
+    spring
+      stiffness 300
+      damping 20
+      mass 1
+  track scale
+    key 0 0.9
+    key 1 1
+  reduced-motion
+    duration 0ms
+title-reveal: animation
+  target title
+  duration 900ms
+  effect decipher
+    seed 42
+press-feedback: animation
+  target ok
+  duration
+    token motion.duration.short
+  easing standard
+  track scale
+    key 0 1
+    key 0.5 0.96
+    key 1 1
+  reduced-motion
+    duration 0ms
+  on pressed
+intro: timeline
+  at 0ms
+    play panel-enter
+      target sidebar
+  at 0ms
+    play title-reveal
+  at 120ms
+    stagger 50ms
+      play bounce
+      targets item-1 item-2 item-3

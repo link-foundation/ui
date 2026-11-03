@@ -1,0 +1,11 @@
+(app: document
+  (title 'Links UI demo')
+  (theme material3)
+  (body: stack
+    (direction vertical)
+    (gap (token space.medium))
+    (greeting: text 'Hello, links')
+    (ok: button
+      (label 'OK')
+      (variant filled)
+      (on press (navigate home)))))

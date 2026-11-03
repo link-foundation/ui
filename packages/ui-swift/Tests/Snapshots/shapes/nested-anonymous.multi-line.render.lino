@@ -1,2 +1,2 @@
-(s: VStack
-  (Text y))
+s: VStack
+  Text y

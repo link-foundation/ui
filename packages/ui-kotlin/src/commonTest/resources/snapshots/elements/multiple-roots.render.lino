@@ -1,2 +1,2 @@
-(home: Column (scroll vertical))
-(about: Column (scroll vertical))
+home: Column (scroll vertical)
+about: Column (scroll vertical)

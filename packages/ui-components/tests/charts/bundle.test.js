@@ -75,7 +75,10 @@ describe('the bundle of the chart entries', () => {
       expect(packages.has('echarts')).toBe(false);
     }
     const { packages } = staticGraph(new URL('charts/index.js', SRC));
+    // ui-core reads the nested form of a chart (#133); it imports only
+    // links-notation.
     expect([...packages].sort()).toEqual([
+      '@link-foundation/ui-core',
       'd3-scale',
       'd3-shape',
       'links-notation',
@@ -146,8 +149,8 @@ describe('the modules loaded at run time', () => {
 
       const chart = win.document.createElement('ui-chart');
       chart.lino = fixture('sales-line.lino').replace(
-        '(sales: chart',
-        '(sales: chart (renderer echarts)'
+        'sales: chart\n',
+        'sales: chart\n  renderer echarts\n'
       );
       win.document.body.append(chart);
       await chart.ready;

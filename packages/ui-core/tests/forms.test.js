@@ -1,6 +1,7 @@
 /**
- * The three forms of one document (one line, multi-line parentheses,
- * indented) give the same tree (docs/spec/projection.md).
+ * The forms of one document (one line, multi-line parentheses, indented
+ * with inline links, and the nested form of the sample, the default since
+ * #133) give the same tree (docs/spec/projection.md).
  */
 
 import { describe, it, expect } from 'test-anywhere';
@@ -13,17 +14,23 @@ import {
   specFixtures,
 } from './helpers.js';
 
-const multiLine = read(join(SAMPLES_DIR, 'document.lino'));
+const nested = read(join(SAMPLES_DIR, 'document.lino'));
+const multiLine = read(join(LOCAL_FIXTURES_DIR, 'document.multiline.lino'));
 const oneLine = read(join(LOCAL_FIXTURES_DIR, 'document.one-line.lino'));
 const indented = read(join(LOCAL_FIXTURES_DIR, 'document.indented.lino'));
 
-describe('three forms of samples/document.lino', () => {
-  const trees = [multiLine, oneLine, indented].map((text) => parse(text));
+describe('four forms of samples/document.lino', () => {
+  const trees = [nested, multiLine, oneLine, indented].map((text) =>
+    parse(text)
+  );
 
-  it('are really written in three different ways', () => {
-    expect(new Set([multiLine, oneLine, indented]).size).toBe(3);
+  it('are really written in four different ways', () => {
+    expect(new Set([nested, multiLine, oneLine, indented]).size).toBe(4);
     expect(oneLine.trim().includes('\n')).toBe(false);
     expect(indented.includes('(app:')).toBe(false);
+    expect(indented.includes('(')).toBe(true);
+    // The nested form needs no parentheses at all.
+    expect(nested.includes('(')).toBe(false);
   });
 
   it('give deep-equal trees with no diagnostics', () => {

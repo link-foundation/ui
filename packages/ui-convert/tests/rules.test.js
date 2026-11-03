@@ -142,13 +142,13 @@ describe('mappings option', () => {
     const { text, applied } = importJsx('<Button>Go</Button>', {
       mappings: [own, 'mui'],
     });
-    expect(text).toContain('(variant tonal)');
+    expect(text).toContain('\n  variant tonal\n');
     expect([...applied.values()]).toEqual(['my-button']);
   });
 
   it('gives (html (tag X)) with no mappings', () => {
     expect(importJsx('<Button>Go</Button>', { mappings: [] }).text).toContain(
-      '(button-0: html\n  (tag Button)'
+      'button-0: html\n  tag Button\n'
     );
   });
 });

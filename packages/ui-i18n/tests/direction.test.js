@@ -41,7 +41,7 @@ describe('localizeDocument', () => {
     const [root] = doc.roots;
     expect(propAtom(root, 'dir')).toBe('rtl');
     expect(propAtom(root, 'lang')).toBe('ar');
-    expect(format(doc)).toContain('(dir rtl)');
+    expect(format(doc)).toContain('\n  dir rtl\n');
   });
 
   it('replaces messages with text and keeps the source document', () => {
@@ -53,16 +53,16 @@ describe('localizeDocument', () => {
     expect(format(source)).toBe(before);
     expect(format(doc)).toBe(
       [
-        '(app: document',
-        '  (i18n required)',
-        '  (lang ru)',
-        '  (dir ltr)',
-        '  (ok: button',
-        '    (label Хорошо))',
-        '  (close: button',
-        '    (label Закрыть))',
-        "  (greeting: text 'Привет, Ada!')",
-        "  (count: text '3 файла'))",
+        'app: document',
+        '  i18n required',
+        '  lang ru',
+        '  dir ltr',
+        '  ok: button',
+        '    label Хорошо',
+        '  close: button',
+        '    label Закрыть',
+        "  greeting: text 'Привет, Ada!'",
+        "  count: text '3 файла'",
         '',
       ].join('\n')
     );

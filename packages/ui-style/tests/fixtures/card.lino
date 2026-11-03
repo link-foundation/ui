@@ -1,21 +1,46 @@
-(card-style: style
-  (selector (type card) (within (type dialog)))
-  (padding (token space.medium))
-  (media (max-width 640px)
-    (padding (token space.small))
-    (state hover (opacity 0.92)))
-  (container (min-width 400px)
-    (direction horizontal))
-  (media (prefers-color-scheme dark) (prefers-reduced-motion reduce)
-    (border-color (token color.outline)))
-  (state disabled (opacity 0.38)))
-(chip-style: style
-  (selector (type chip) (id 'chip 1') (label "it's") (within (type list)) (within (type dialog)))
-  (radius 8px 8px 0 0)
-  (gap 4px 0.5rem)
-  (font-size 14px)
-  (font-weight 500)
-  (border-width 1px)
-  (state selected (background (or (token color.selected) '#E8DEF8')))
-  (state checked (color (oklch 0.5 0.1 300)))
-  (state focus (scale (token motion.scale.focus))))
+card-style: style
+  selector
+    type card
+    within
+      type dialog
+  padding
+    token space.medium
+  media
+    max-width 640px
+    padding
+      token space.small
+    state hover
+      opacity 0.92
+  container
+    min-width 400px
+    direction horizontal
+  media
+    prefers-color-scheme dark
+    prefers-reduced-motion reduce
+    border-color
+      token color.outline
+  state disabled
+    opacity 0.38
+chip-style: style
+  selector
+    type chip
+    id 'chip 1'
+    label "it's"
+    within
+      type list
+    within
+      type dialog
+  radius 8px 8px 0 0
+  gap 4px 0.5rem
+  font-size 14px
+  font-weight 500
+  border-width 1px
+  state selected
+    background
+      or (token color.selected) '#E8DEF8'
+  state checked
+    color
+      oklch 0.5 0.1 300
+  state focus
+    scale
+      token motion.scale.focus

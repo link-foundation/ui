@@ -1,19 +1,44 @@
-(devmode-inspector: devmode-panel
-  (label inspector.label)
-  (devmode-title: devmode-heading (label inspector.title))
-  (devmode-actions: devmode-toolbar
-    (label toolbar.label)
-    (devmode-pick: devmode-action (label toolbar.pick) (command pick) (toggle true))
-    (devmode-save: devmode-action (label toolbar.save) (command save))
-    (devmode-discard: devmode-action (label toolbar.discard) (command discard))
-    (devmode-close: devmode-action (label toolbar.close) (command close)))
-  (devmode-selection: devmode-status (label selection.none) (role selection))
-  (devmode-views: devmode-tabs
-    (label tabs.label)
-    (devmode-outline: devmode-tab (label tab.outline) (view outline))
-    (devmode-properties: devmode-tab (label tab.properties) (view properties))
-    (devmode-styles: devmode-tab (label tab.styles) (view styles))
-    (devmode-tokens: devmode-tab (label tab.tokens) (view tokens))
-    (devmode-animations: devmode-tab (label tab.animations) (view animations))
-    (devmode-source: devmode-tab (label tab.source) (view source)))
-  (devmode-status: devmode-status (role live)))
+devmode-inspector: devmode-panel
+  label inspector.label
+  devmode-title: devmode-heading
+    label inspector.title
+  devmode-actions: devmode-toolbar
+    label toolbar.label
+    devmode-pick: devmode-action
+      label toolbar.pick
+      command pick
+      toggle true
+    devmode-save: devmode-action
+      label toolbar.save
+      command save
+    devmode-discard: devmode-action
+      label toolbar.discard
+      command discard
+    devmode-close: devmode-action
+      label toolbar.close
+      command close
+  devmode-selection: devmode-status
+    label selection.none
+    role selection
+  devmode-views: devmode-tabs
+    label tabs.label
+    devmode-outline: devmode-tab
+      label tab.outline
+      view outline
+    devmode-properties: devmode-tab
+      label tab.properties
+      view properties
+    devmode-styles: devmode-tab
+      label tab.styles
+      view styles
+    devmode-tokens: devmode-tab
+      label tab.tokens
+      view tokens
+    devmode-animations: devmode-tab
+      label tab.animations
+      view animations
+    devmode-source: devmode-tab
+      label tab.source
+      view source
+  devmode-status: devmode-status
+    role live

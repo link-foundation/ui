@@ -1,1 +1,5 @@
-(accent: style (background (oklch 0.62 0.19 255)) (color (rgb 103 80 164)))
+accent: style
+  background
+    oklch 0.62 0.19 255
+  color
+    rgb 103 80 164

@@ -1,2 +1,6 @@
-(spaced: stack (gap (or (token space.large) (token space.medium) 8px)))
-(tinted: style (background (or (token color.accent) '#3390EC')))
+spaced: stack
+  gap
+    or (token space.large) (token space.medium) 8px
+tinted: style
+  background
+    or (token color.accent) '#3390EC'

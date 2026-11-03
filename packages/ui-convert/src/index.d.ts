@@ -64,7 +64,7 @@ export interface ImportOptions {
   mapping?: readonly MappingRule[];
   /** Keep HTML comments as `comment` elements (default `false`). */
   comments?: boolean;
-  /** Output style of `text` (default `multiline`). */
+  /** Output style of `text` (default `indented`, the nested form). */
   style?: 'inline' | 'multiline' | 'indented';
   /** Indentation of `text` (default two spaces). */
   indent?: string;
@@ -207,7 +207,7 @@ export interface ImportComponentOptions {
   mappings?: string[];
   /** Default: `componentVocabulary()`. */
   vocabulary?: Vocabulary;
-  /** Output style of `text` (default `multiline`). */
+  /** Output style of `text` (default `indented`, the nested form). */
   style?: 'inline' | 'multiline' | 'indented';
   indent?: string;
 }
@@ -338,7 +338,7 @@ export class Diagnostics {
 }
 
 export interface InteropImportOptions {
-  /** Output style of `lino` (default `multiline`). */
+  /** Output style of `lino` (default `indented`, the nested form). */
   style?: 'inline' | 'multiline' | 'indented';
 }
 

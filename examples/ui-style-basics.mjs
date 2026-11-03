@@ -11,13 +11,20 @@ import {
 } from '@link-foundation/ui-style';
 
 const { rules, diagnostics } = readStyles(`
-(button-style: style
-  (selector (type button) (variant filled))
-  (background (token color.primary))
-  (radius (token shape.corner.medium))
-  (state hover (elevation 2))
-  (media (max-width 640px)
-    (padding (token space.small))))
+button-style: style
+  selector
+    type button
+    variant filled
+  background
+    token color.primary
+  radius
+    token shape.corner.medium
+  state hover
+    elevation 2
+  media
+    max-width 640px
+    padding
+      token space.small
 `);
 console.log(diagnostics); // []
 
@@ -36,13 +43,15 @@ console.log(compileCss(rules));
 // }
 
 const { sets } = readTokens(`
-(material3: theme
-  (token color.primary '#6750A4')
-  (token shape.corner.medium 12px)
-  (token space.small 8px))
+material3: theme
+  token color.primary '#6750A4'
+  token shape.corner.medium 12px
+  token space.small 8px
 `);
 const tokens = resolveTokens(sets, 'material3');
-const doc = parse('(ok: button (label OK) (variant filled))');
+const doc = parse(`ok: button
+  label OK
+  variant filled`);
 const ok = doc.byId.get('ok');
 
 const { style, sources } = resolveStyle(rules, tokens, ok, [], {
@@ -57,7 +66,8 @@ for (const [property, value] of Object.entries(style)) {
 // elevation 2 (button-style)
 // padding 8px (button-style)
 
-// CSS syntax in a bare value is a diagnostic, never accepted.
+// CSS syntax in a bare value is a diagnostic, never accepted. The bad input
+// is kept on one line, as it would be typed.
 const bad = readStyles(
   '(b: style (selector (type button)) (state :hover (elevation 2)))'
 );
