@@ -25,6 +25,9 @@ export interface DevModePolicy {
   writeLayers: readonly WritableLayer[];
   /** Ids of read-only elements (their descendants are read-only too). */
   lockedElements: ReadonlySet<string>;
+  repository?: string;
+  siteConfig?: string;
+  comfortKeys: ReadonlySet<string>;
   warnings: readonly PolicyWarning[];
 }
 
@@ -143,3 +146,53 @@ export interface DevModeController {
 }
 
 export function mountDevMode(options: MountDevModeOptions): DevModeController;
+
+export interface OverrideExport {
+  text: string;
+  links: import('@link-foundation/ui-core').RawValue[];
+  count: number;
+}
+export function exportOverrides(
+  config: import('@link-foundation/ui-config').Config,
+  options?: {
+    id?: string;
+    base?: string;
+    layers?: WritableLayer[];
+  }
+): OverrideExport;
+export const URL_BUDGET: 8192;
+export const BACKUP_KEY: 'ui-overrides:before-the-link';
+export function encodeShareHash(text: string): string;
+export function decodeShareHash(hash: string): string | null;
+export function shareUrl(
+  location: string | URL | Pick<Location, 'href'>,
+  text: string
+): { url: string; tooLong: boolean };
+export interface ValidationSchema {
+  document: import('@link-foundation/ui-core').UiDocument;
+  vocabulary?: import('@link-foundation/ui-core').Vocabulary;
+}
+export interface ValidationReport {
+  links: import('@link-foundation/ui-core').RawValue[];
+  rejected: { link: unknown; reason: string }[];
+}
+export function validateOverrides(
+  text: string,
+  options: {
+    schema: ValidationSchema | import('@link-foundation/ui-core').UiDocument;
+    policy?: DevModePolicy;
+  }
+): ValidationReport;
+export function applySharedOverrides(options: {
+  config: import('@link-foundation/ui-config').Config;
+  location?: Location;
+  history?: History;
+  storage: Pick<Storage, 'setItem'>;
+  schema?: ValidationSchema | import('@link-foundation/ui-core').UiDocument;
+  policy?: DevModePolicy;
+  text?: string;
+  document?: Document;
+  t?: ReturnType<typeof translator>;
+}):
+  | (ValidationReport & { applied: boolean; keep(): void; discard(): void })
+  | null;

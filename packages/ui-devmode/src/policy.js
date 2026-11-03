@@ -52,6 +52,9 @@ const READ_ONLY_LAYERS = new Set(['defaults', 'theme', 'site']);
  * @property {string} shortcut  the key combination, `Alt+Shift+D` by default
  * @property {readonly ('user'|'session')[]} writeLayers  lowest first
  * @property {ReadonlySet<string>} lockedElements  read-only element ids
+ * @property {ReadonlySet<string>} comfortKeys  protected property or token keys
+ * @property {string|undefined} repository  optional GitHub owner/repo
+ * @property {string|undefined} siteConfig  committed site configuration path
  * @property {readonly PolicyWarning[]} warnings
  */
 
@@ -93,6 +96,15 @@ const entriesOf = (node) => [
 const atoms = (values) => values.filter((v) => typeof v === 'string');
 
 const READERS = {
+  repository(policy, values) {
+    policy.repository = atoms(values)[0];
+  },
+  'site-config'(policy, values) {
+    policy.siteConfig = atoms(values)[0];
+  },
+  'comfort-keys'(policy, values) {
+    policy.comfortKeys = new Set(atoms(values));
+  },
   enabled(policy, values, report) {
     const [value] = values;
     if (values.length !== 1 || (value !== 'true' && value !== 'false')) {
@@ -156,6 +168,9 @@ export const defaultPolicy = () =>
     shortcut: DEFAULT_SHORTCUT,
     writeLayers: [...WRITABLE_LAYERS],
     lockedElements: new Set(),
+    comfortKeys: new Set(),
+    repository: undefined,
+    siteConfig: undefined,
     warnings: [],
   });
 
@@ -165,6 +180,7 @@ function freezePolicy(policy) {
     entry: Object.freeze(policy.entry),
     writeLayers: Object.freeze([...policy.writeLayers]),
     lockedElements: Object.freeze(policy.lockedElements),
+    comfortKeys: Object.freeze(policy.comfortKeys),
     warnings: Object.freeze([...policy.warnings]),
   });
 }

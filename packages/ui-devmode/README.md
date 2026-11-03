@@ -143,3 +143,81 @@ with dev mode. Run `node scripts/serve-static.mjs` and open
 ## License
 
 [Unlicense](LICENSE)
+
+## Make these the defaults and share a preview
+
+The inspector's **Make these the defaults** button opens a modal with three
+read-only fields: the LiNo overrides, a share link and an agent instruction.
+Each has a Copy button; blocked clipboard access selects the text for manual
+copy. Escape closes the dialog and returns focus to its button. Links above
+8,192 characters cannot be copied; copy the LiNo field instead.
+
+Extend the site's dev-mode policy with these optional fields:
+
+```lino
+site-dev-mode: dev-mode
+  repository link-foundation/ui
+  site-config site/config/site.lino
+  comfort-keys motion.mode sound.on sound.volume
+```
+
+A valid repository enables a budgeted **Open as GitHub issue** link. Missing
+instruction values are explicit `<unknown repository>` or `<unknown siteConfig>`
+markers. The instruction template is shipped as `src/agent-instruction.txt`.
+
+```js
+import {
+  applySharedOverrides,
+  exportOverrides,
+  shareUrl,
+  parseDevModePolicy,
+} from '@link-foundation/ui-devmode';
+import { renderAgentInstruction } from '@link-foundation/ui-devmode/agent-instruction';
+
+const policy = parseDevModePolicy(sitePolicyText);
+const { text, links, count } = exportOverrides(config);
+const { url, tooLong } = shareUrl(window.location, text);
+const instruction = renderAgentInstruction({
+  repository: policy.repository,
+  siteConfig: policy.siteConfig,
+  overrides: text,
+});
+const report = applySharedOverrides({
+  config,
+  policy,
+  location: window.location,
+  history: window.history,
+  storage: window.localStorage,
+  document: window.document,
+});
+```
+
+Call `applySharedOverrides` after restoring writable layers and binding the
+configuration to the renderer. It validates `#ui-overrides=` text, saves both
+previous writable layers as a **Before the link** LiNo backup under
+`ui-overrides:before-the-link`, overlays accepted changes into `session`,
+removes the hash with `history.replaceState`, and shows the Keep/Discard banner.
+Keep retains the session preview; Discard restores the previous session. User
+and site layers are untouched. If backup storage fails, nothing is applied.
+
+For pasted text, pass `text` to the same function; it uses identical validation
+without changing the URL. `validateOverrides(text, { schema, policy })` is also
+available independently. `schema` is a ui-core document or
+`{ document, vocabulary }` for an extended dialect; the apply function defaults
+to `config.effective()`. Include token/theme nodes in that configuration to
+share token edits. Tokens must already exist; their existing scalar value
+determines their type. Actions, unknown targets/properties, invalid values,
+locked elements (including descendants), and declared comfort keys are rejected.
+A comfort key matches a property name, `element.property`, or a token key.
+Rejected links are reported in the banner and never evaluated. Input is limited
+to 65,536 characters and depth 16 through the official parser.
+
+`exportOverrides(config, { id, base, layers })` returns `{ text, links, count }`.
+Only `user` and `session` layers are accepted; their effective difference from
+site is sorted by element ID, property and token key. The codec exports
+`encodeShareHash`, `decodeShareHash` (malformed hashes return `null`) and
+`shareUrl` (`{ url, tooLong }`, including the full URL in its budget).
+
+The runnable example is `packages/ui-devmode/examples/?ui-dev`.
+`packages/ui-devmode/e2e/defaults.e2e.mjs` covers label editing, share preview,
+Keep/Discard, clipboard fallback, modal keyboard use, axe and URL budgets.
