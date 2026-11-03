@@ -24,6 +24,8 @@ const ENTRY_POINTS = [
   'controls',
   'data',
   'chat',
+
+  'settings',
 ];
 const SRC = new URL('../../src/', import.meta.url);
 

@@ -1,0 +1,108 @@
+settings-panel {
+  display: block;
+  box-sizing: border-box;
+  max-inline-size: 64rem;
+  padding: 1.25rem;
+  background: var(--color-surface, #fffbfe);
+  color: var(--color-on-surface, #1d1b20);
+  font:
+    1rem/1.5 system-ui,
+    sans-serif;
+}
+settings-panel[hidden],
+settings-panel [hidden] {
+  display: none !important;
+}
+settings-panel[data-mode='drawer'] {
+  position: fixed;
+  inset-block: 0;
+  inset-inline-end: 0;
+  inline-size: min(42rem, 100%);
+  overflow: auto;
+  z-index: 10;
+  box-shadow: 0 0 1rem #0004;
+}
+settings-panel .settings-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-block: 1rem;
+}
+settings-panel .settings-row {
+  display: grid;
+  grid-template-columns:
+    minmax(7rem, 1fr) minmax(10rem, 2fr) minmax(3rem, auto)
+    auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding-block: 1rem;
+  border-block-end: 1px solid var(--color-outline, #79747e);
+}
+settings-panel .settings-changed {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+settings-panel [data-changed] {
+  border-inline-start: 0.25rem solid var(--color-primary, #6750a4);
+  padding-inline-start: 0.5rem;
+}
+settings-panel .settings-control {
+  min-inline-size: 0;
+}
+settings-panel input,
+settings-panel select,
+settings-panel textarea,
+settings-panel button {
+  font: inherit;
+  max-inline-size: 100%;
+  box-sizing: border-box;
+}
+settings-panel > textarea,
+settings-panel > input {
+  inline-size: 100%;
+}
+settings-panel button,
+settings-panel input,
+settings-panel select,
+settings-panel summary {
+  min-block-size: 2.75rem;
+}
+settings-panel button {
+  cursor: pointer;
+}
+settings-panel :focus-visible {
+  outline: 3px solid var(--color-primary, #6750a4);
+  outline-offset: 3px;
+}
+settings-panel fieldset {
+  min-inline-size: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+settings-panel fieldset input {
+  inline-size: 6rem;
+}
+settings-panel details {
+  margin-block: 1rem;
+}
+settings-panel summary {
+  cursor: pointer;
+  font-weight: bold;
+}
+@media (max-width: 700px) {
+  settings-panel .settings-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  settings-panel .settings-control {
+    grid-column: 1 / -1;
+  }
+}
+@media (prefers-color-scheme: dark) {
+  settings-panel {
+    background: var(--color-surface, #1d1b20);
+    color: var(--color-on-surface, #fffbfe);
+    color-scheme: dark;
+  }
+}

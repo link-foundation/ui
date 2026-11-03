@@ -23,7 +23,6 @@
  *
  * See README.md.
  */
-
 export * from './behavior/index.js';
 export * from './a11y/index.js';
 export * from './charts/index.js';
@@ -35,3 +34,4 @@ export * from './overlays/index.js';
 export * from './controls/index.js';
 export * from './data/index.js';
 export * from './chat/index.js';
+export * from './settings/index.js';
