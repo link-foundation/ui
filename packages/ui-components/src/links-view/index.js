@@ -70,3 +70,30 @@ export {
   linkViewKind,
   registerLinkViewKind,
 } from './link-view.js';
+export {
+  buildNetwork,
+  networkIds,
+  networkEdges,
+  networkNeighbours,
+} from './network-model.js';
+export {
+  NETWORK_LAYOUTS,
+  circle,
+  grid,
+  hex,
+  spiral,
+  force,
+  layered,
+} from './layouts/index.js';
+export { createForceSimulation } from './layouts/force.js';
+export { createLayoutRunner } from './create-layout-runner.js';
+export { visibleLabels } from './labels.js';
+export { networkToSvg, networkToPng } from './export.js';
+export {
+  LINKS_NETWORK_TAG,
+  defineLinksNetwork,
+  linksNetworkKind,
+  registerLinksNetworkKind,
+} from './links-network.js';
+
+export { networkVocabulary } from './network-vocabulary.js';

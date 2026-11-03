@@ -1193,6 +1193,68 @@ takes `{keys, offsets, scrollTop}` before, `{keys, offsets}` after, and an ancho
 key, preserving that row's intra-row offset. Range ends are exclusive;
 `indexAt` returns `-1` for an empty collection.
 
+### Links network
+
+`@link-foundation/ui-components/links-view` also exports `defineLinksNetwork`
+and `registerLinksNetworkKind`. Pass `parseOptions: { vocabulary: networkVocabulary() }`
+to `mountDocument` when rendering the kind and its LiNo event handlers. Define the element explicitly, set `items` to
+`{ id, source, target, label? }[]`, or set `store` to a real `ui-store` instance.
+Store nodes of kind `link` use `source`/`target` properties (or the first two
+positional values). The subscription applies committed insert, update, remove
+and rename events while preserving unrelated SVG items and positions.
+
+```lino
+network: links-network
+  layout circle
+  style glyph
+  labels
+    min-zoom 0.6
+  items
+    link
+      id a
+      source p
+      target q
+    link
+      id b
+      source a
+      target 0
+```
+
+IDs refer to points or the centre anchors of other links; `0` is a free end.
+Cycles and self-references are supported. `layout` selects `circle`, `grid`,
+`hex`, `spiral`, `force` or `layered` (Dagre). `style-mode` selects `glyph` or
+`node-edge`; `theme` selects `light` or `dark` (system by default), with the
+same `--color-link-*` overrides as `link-view`. Layout work runs in a
+cancellable worker; `ready` resolves when it completes, and `layout()` requests
+another layout. Dragged vertices remain pinned across layouts. Force uses a
+fixed seed, `alphaMin` and at most 300 ticks, with no ongoing animation.
+
+Click selects; Shift+click toggles an additional item; drag pins a vertex;
+background drag pans; the wheel zooms. Home selects the first vertex, arrows
+select the nearest neighbour in the pressed direction, Shift+arrows extend the
+selection, Enter dispatches `ui-activate` (and the `activate` hook), Escape clears selection, `+`/`-` zoom,
+`0` resets, Alt+arrows pan and Shift+F10 opens the `networkcontextmenu` hook.
+The hooks bubble across the shadow root with `detail: { id, item, originalEvent }`.
+`selectionchange` carries `detail.ids`; `ui-select` carries `detail.item` for LiNo handlers. A live status announces selection in
+both SVG and Canvas. The `networkStore` ui-dom render option can supply the
+store to a registered kind. Applications handle activation and editing.
+
+Up to 2,000 links use SVG; larger networks use Canvas. Geometry and marker
+shapes are shared. Labels hide below the configured zoom and use greedy
+priority overlap removal. `toSvg()` returns the preview markup, and
+`toPng(scale)` returns a PNG Blob. The pure APIs `buildNetwork`, `NETWORK_LAYOUTS`,
+`visibleLabels`, `createLayoutRunner`, `networkToSvg` and `networkToPng` work
+independently of the custom element. Worker cancellation rejects with
+`AbortError`; other errors appear in `diagnostics` and `layouterror`.
+
+Run `node scripts/serve-static.mjs` and open
+`/packages/ui-components/examples/links-network.html` for 10, 500 and 5,000
+links. The server and package prepack build the self-contained worker with
+pinned npm dependencies and accompanying license notices; there is no CDN or
+runtime download. Consumers must preserve the relative
+`dist/network-layout.worker.mjs` asset when bundling the package, or inject a
+`createWorker` factory for their bundler's worker handling.
+
 ## Code and LiNo source editor
 
 Import `@link-foundation/ui-components/editor` to register `<ui-code-editor>`
