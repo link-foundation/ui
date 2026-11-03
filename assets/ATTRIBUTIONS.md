@@ -110,3 +110,10 @@
   - Copyright: W3C and Design Tokens Community Group Contributors
   - Licence: [BSD-3-Clause](https://www.w3.org/Consortium/Legal/2008/03-bsd-license.html)
   - Modified: yes
+
+## MIT
+
+- [fluent2-token-notice](https://github.com/microsoft/fluentui/tree/master/packages/tokens) (data): `assets/fluent2/LICENSE.txt`
+  - Copyright: Microsoft Corporation
+  - Licence: [MIT](https://github.com/microsoft/fluentui/blob/master/LICENSE)
+  - Attribution: Fluent UI token data: Copyright (c) Microsoft Corporation. MIT licensed. Generated theme data retains the source token names and values.

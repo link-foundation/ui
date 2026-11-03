@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import process from 'node:process';
 import { getSwiftuiMapping } from '../src/index.js';
 import { getMuiMapping } from '../src/material3/mapping.js';
+import { mappingTable } from '../src/mapping.js';
 
 /** Deterministic documentation generated from the canonical LiNo table. */
 export async function mappingMarkdown() {
@@ -46,9 +47,20 @@ in emphasized.join-x and emphasized.join-y. Compose these pieces to recover
 the [published path](https://github.com/material-components/material-components-android/blob/master/docs/theming/Motion.md);
 no single cubic approximation is presented as the M3 path.
 
-| MUI component | UI kind | Status | Prop translations |
-| --- | --- | --- | --- |
-${rows.map((row) => `| ${row.component} | ${row.kind ? `\`${row.kind}\`` : '—'} | ${row.status} | ${row.props.map((p) => `\`${p.name}=${p.value}\` → \`${p.target.name}=${p.target.value}\``).join('; ') || '—'} |`).join('\n')}
+${mappingTable(
+  ['MUI component', 'UI kind', 'Status', 'Prop translations'],
+  rows.map((row) => [
+    row.component,
+    row.kind ? `\`${row.kind}\`` : '—',
+    row.status,
+    row.props
+      .map(
+        (p) =>
+          `\`${p.name}=${p.value}\` → \`${p.target.name}=${p.target.value}\``
+      )
+      .join('; ') || '—',
+  ])
+)}
 `,
     { parser: 'markdown' }
   );

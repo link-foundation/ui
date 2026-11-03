@@ -1,0 +1,82 @@
+fluent2-type: theme
+  token fluent.font-size-base100 10px
+    fluent fontSizeBase100
+    source-value 10px
+  token fluent.font-size-base200 12px
+    fluent fontSizeBase200
+    source-value 12px
+  token type.body.medium.size 14px
+    fluent fontSizeBase300
+    source-value 14px
+  token fluent.font-size-base400 16px
+    fluent fontSizeBase400
+    source-value 16px
+  token fluent.font-size-base500 20px
+    fluent fontSizeBase500
+    source-value 20px
+  token fluent.font-size-base600 24px
+    fluent fontSizeBase600
+    source-value 24px
+  token fluent.font-size-hero700 28px
+    fluent fontSizeHero700
+    source-value 28px
+  token fluent.font-size-hero800 32px
+    fluent fontSizeHero800
+    source-value 32px
+  token fluent.font-size-hero900 40px
+    fluent fontSizeHero900
+    source-value 40px
+  token fluent.font-size-hero1000 68px
+    fluent fontSizeHero1000
+    source-value 68px
+  token fluent.line-height-base100 14px
+    fluent lineHeightBase100
+    source-value 14px
+  token fluent.line-height-base200 16px
+    fluent lineHeightBase200
+    source-value 16px
+  token type.body.medium.line-height 20px
+    fluent lineHeightBase300
+    source-value 20px
+  token fluent.line-height-base400 22px
+    fluent lineHeightBase400
+    source-value 22px
+  token fluent.line-height-base500 28px
+    fluent lineHeightBase500
+    source-value 28px
+  token fluent.line-height-base600 32px
+    fluent lineHeightBase600
+    source-value 32px
+  token fluent.line-height-hero700 36px
+    fluent lineHeightHero700
+    source-value 36px
+  token fluent.line-height-hero800 40px
+    fluent lineHeightHero800
+    source-value 40px
+  token fluent.line-height-hero900 52px
+    fluent lineHeightHero900
+    source-value 52px
+  token fluent.line-height-hero1000 92px
+    fluent lineHeightHero1000
+    source-value 92px
+  token fluent.font-family-base "'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif"
+    fluent fontFamilyBase
+    source-value "'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif"
+  token fluent.font-family-monospace "Consolas, 'Courier New', Courier, monospace"
+    fluent fontFamilyMonospace
+    source-value "Consolas, 'Courier New', Courier, monospace"
+  token fluent.font-family-numeric "Bahnschrift, 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif"
+    fluent fontFamilyNumeric
+    source-value "Bahnschrift, 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif"
+  token fluent.font-weight-regular 400
+    fluent fontWeightRegular
+    source-value 400
+  token fluent.font-weight-medium 500
+    fluent fontWeightMedium
+    source-value 500
+  token fluent.font-weight-semibold 600
+    fluent fontWeightSemibold
+    source-value 600
+  token fluent.font-weight-bold 700
+    fluent fontWeightBold
+    source-value 700

@@ -22,9 +22,7 @@ function scopedSelector(selector, scope, atRoot) {
   if (scope === ':scope') {
     return `${selector}, ${atRoot}`;
   }
-  return scope
-    ? `${scope} ${selector}, :where(:scope)${scope}:is(${selector})`
-    : selector;
+  return scope ? `${scope} ${selector}, ${atRoot}` : selector;
 }
 
 /**
@@ -42,6 +40,13 @@ function scopedSelector(selector, scope, atRoot) {
  */
 
 const hex = (c) => `\\${c.codePointAt(0).toString(16)} `;
+const disabledControl = `:is([disabled], [aria-disabled='true'], :has([data-part='input']:disabled), :has([data-part='thumb'][aria-disabled='true']))`;
+const HOST_STATES = {
+  hover: `:hover:not(${disabledControl})`,
+  pressed: `:active:not(${disabledControl})`,
+  disabled: disabledControl,
+  checked: `:has([data-part='input']:is(:checked, [aria-checked='true']))`,
+};
 const isControl = (code) => code <= 0x1f || code === 0x7f;
 const isDigit = (c) => c >= '0' && c <= '9';
 
@@ -97,16 +102,22 @@ export function quoteString(text) {
 }
 
 /** The selector of one element: `ui-button#ok[variant='filled']`. */
-function compound(selector, tagFor) {
+function compound(selector, tagFor, hostStates = '') {
   const text =
     (selector.type === null ? '' : tagFor(selector.type)) +
     (selector.id === null ? '' : `#${escapeIdentifier(selector.id)}`) +
     selector.props
+      .filter(({ name }) => name !== 'part')
       .map(
         ({ name, value }) => `[${escapeIdentifier(name)}=${quoteString(value)}]`
       )
       .join('');
-  return text === '' ? '*' : text;
+  const part = selector.props.find(({ name }) => name === 'part');
+  return (
+    (text === '' ? '*' : text) +
+    hostStates +
+    (part ? ` [data-part=${quoteString(part.value)}]` : '')
+  );
 }
 
 /**
@@ -117,16 +128,33 @@ function compound(selector, tagFor) {
  * @param {string} [suffix]  pseudo-classes of the states
  * @returns {string}
  */
-function selectorCss(selector, tagFor, suffix = '', atRoot = false) {
+function selectorCss(
+  selector,
+  tagFor,
+  suffix = '',
+  hostStates = '',
+  atRoot = ''
+) {
   const [first, ...rest] = selector.within;
   const own =
-    compound(selector, tagFor) +
+    compound(selector, tagFor, hostStates) +
     rest.map((ancestor) => `:is(${selectorCss(ancestor, tagFor)} *)`).join('') +
     suffix;
-  if (first === undefined) {
-    return atRoot ? `:where(:scope):is(${own})` : own;
+  if (first !== undefined) {
+    return `${selectorCss(first, tagFor, '', '', atRoot)} ${own}`;
   }
-  return `${selectorCss(first, tagFor, '', atRoot)} ${own}`;
+  if (!atRoot) {
+    return own;
+  }
+  const part = selector.props.find(({ name }) => name === 'part');
+  if (!part) {
+    return `${atRoot}:is(${own})`;
+  }
+  const host = {
+    ...selector,
+    props: selector.props.filter(({ name }) => name !== 'part'),
+  };
+  return `${atRoot}:is(${compound(host, tagFor, hostStates)}) [data-part=${quoteString(part.value)}]${suffix}`;
 }
 
 /** Keep only the last declaration of each property, at its position. */
@@ -157,6 +185,33 @@ export function compileCss(rules, options = {}) {
       continue;
     }
     const states = entry.states.map((state) => STATE_CSS[state]).join('');
+    const part = entry.selector.props.find(({ name }) => name === 'part');
+    // Control interaction states also reach non-interactive visual parts.
+    const hostStates = part
+      ? entry.states
+          .filter((state) => Object.hasOwn(HOST_STATES, state))
+          .map((state) => HOST_STATES[state])
+          .join('')
+      : '';
+    const partStates = part
+      ? entry.states
+          .filter((state) => !Object.hasOwn(HOST_STATES, state))
+          .map((state) => STATE_CSS[state])
+          .join('')
+      : states;
+    const selector = selectorCss(
+      entry.selector,
+      tagFor,
+      partStates,
+      hostStates
+    );
+    const atRoot = selectorCss(
+      entry.selector,
+      tagFor,
+      partStates,
+      hostStates,
+      `:where(:scope)${options.scope === ':scope' ? '' : (options.scope ?? '')}`
+    );
     const depth = entry.at.length;
     const pad = '  '.repeat(depth);
     const lines = [
@@ -164,7 +219,7 @@ export function compileCss(rules, options = {}) {
         ({ kind, conditions }, i) =>
           `${'  '.repeat(i)}@${kind} ${conditionsCss(conditions)} {`
       ),
-      `${pad}${scopedSelector(selectorCss(entry.selector, tagFor, states), options.scope, selectorCss(entry.selector, tagFor, states, true))} {`,
+      `${pad}${scopedSelector(selector, options.scope, atRoot)} {`,
       ...lastDeclarations(entry.declarations).map(
         (decl) =>
           `${pad}  ${PROPERTIES[decl.property].css}: ${declarationCss(decl, ctx)};`
