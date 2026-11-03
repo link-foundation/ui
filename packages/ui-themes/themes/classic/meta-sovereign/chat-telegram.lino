@@ -1,0 +1,74 @@
+chat-telegram: theme
+  extends base
+  token color.primary '#185F96'
+  token color.on-primary '#FFFFFF'
+  token color.surface '#FFFFFF'
+  token color.on-surface '#17212B'
+  token color.on-surface-variant
+    token color.on-surface
+  token color.outline '#17212B'
+  token motion.duration.short 150ms
+  token bubble.radius 15px
+  mode dark
+    token color.primary '#185F96'
+    token color.on-primary '#FFFFFF'
+    token color.surface '#121820'
+    token color.on-surface '#F0F5FA'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#F0F5FA'
+    token motion.duration.short 150ms
+    token bubble.radius 15px
+  mode high-contrast
+    token chat.text '#000000'
+    token chat.sidebar '#FFFFFF'
+    token chat.bubble.in '#FFFFFF'
+    token chat.bubble.in.text '#000000'
+    token chat.bubble.out '#000000'
+    token chat.bubble.out.text '#FFFFFF'
+    token chat.edge '#000000'
+    token color.primary '#000000'
+    token color.on-primary '#FFFFFF'
+    token color.surface '#FFFFFF'
+    token color.on-surface '#000000'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#000000'
+    token motion.duration.short 150ms
+  motion reduced
+    token motion.duration.short 0ms
+    token effect.glow 0
+    token effect.scanline 0
+    token effect.flicker 0
+  token chat.bg '#dbddbb'
+  token chat.bg.second '#6ba587'
+  token chat.bg.third '#d5d88d'
+  token chat.bg.fourth '#88b884'
+  token chat.sidebar '#ffffff'
+  token chat.bubble.in '#ffffff'
+  token chat.bubble.in.text '#000000'
+  token chat.bubble.out '#effdde'
+  token chat.bubble.out.text '#000000'
+  token chat.bubble.radius 15px
+  token chat.bubble.tail 15px
+  token chat.bubble.padding.block 0.4rem
+  token chat.bubble.padding.inline 0.7rem
+  token chat.text '#17212b'
+  token chat.column 44rem
+  token chat.selection.bg '#164e63'
+  token chat.selection.text '#ffffff'
+  mode dark
+    token chat.bg '#0e1621'
+    token chat.bg.second '#0e1621'
+    token chat.bg.third '#0e1621'
+    token chat.bg.fourth '#0e1621'
+    token chat.sidebar '#17212b'
+    token chat.bubble.in '#182533'
+    token chat.bubble.in.text '#f5f5f5'
+    token chat.bubble.out '#2b5278'
+    token chat.bubble.out.text '#f5f5f5'
+    token chat.text '#f4f6f8'
+    token chat.selection.bg '#b9e6fb'
+    token chat.selection.text '#102b39'
+  pair chat.bubble.in.text chat.bubble.in
+  pair chat.bubble.out.text chat.bubble.out

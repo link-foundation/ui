@@ -205,3 +205,12 @@ dtcg-resolver-schema: asset
   notice 'https://www.w3.org/Consortium/Legal/2008/03-bsd-license.html'
   attribution none
   modified yes
+
+classic-deepcase-references: asset
+  kind image
+  files 'assets/classic-themes/*.png'
+  license Unlicense
+  copyright 'deep-foundation contributors'
+  source 'https://github.com/deep-foundation/deepcase-app/issues/76'
+  notice 'https://github.com/deep-foundation/deepcase-app/blob/main/LICENSE'
+  attribution none

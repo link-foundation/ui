@@ -110,3 +110,9 @@
   - Copyright: W3C and Design Tokens Community Group Contributors
   - Licence: [BSD-3-Clause](https://www.w3.org/Consortium/Legal/2008/03-bsd-license.html)
   - Modified: yes
+
+## Unlicense
+
+- [classic-deepcase-references](https://github.com/deep-foundation/deepcase-app/issues/76) (image): `assets/classic-themes/*.png`
+  - Copyright: deep-foundation contributors
+  - Licence: [Unlicense](https://github.com/deep-foundation/deepcase-app/blob/main/LICENSE)
