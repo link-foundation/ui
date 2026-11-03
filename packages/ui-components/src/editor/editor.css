@@ -1,0 +1,106 @@
+/* Editor parts use the same tokens as the basic controls. */
+ui-code-editor {
+  display: block;
+  color: var(--color-on-surface, CanvasText);
+  background: var(--color-surface, Canvas);
+  border: 1px solid var(--color-outline, GrayText);
+  border-radius: var(--shape-corner-medium, 8px);
+  overflow: hidden;
+}
+ui-code-editor [role='tablist'],
+.ui-editor-toolbar,
+.ui-editor-conflict > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-small, 8px);
+  padding: var(--space-small, 8px);
+}
+ui-code-editor [role='tab'] {
+  font: inherit;
+  padding: var(--space-small, 8px) var(--space-medium, 16px);
+  background: var(--color-surface-container, Canvas);
+  color: inherit;
+  border: 1px solid var(--color-outline, GrayText);
+  border-radius: var(--shape-corner-small, 4px);
+}
+ui-code-editor [role='tab'][aria-selected='true'] {
+  border-bottom: 3px solid var(--color-primary, Highlight);
+  font-weight: bold;
+}
+ui-code-editor :focus-visible {
+  outline: 2px solid var(--color-primary, Highlight);
+  outline-offset: 2px;
+}
+.ui-editor-area {
+  min-height: 18rem;
+  border-block: 1px solid var(--color-outline, GrayText);
+}
+.ui-editor-area .cm-editor {
+  background: var(--color-surface, Canvas);
+  color: var(--color-on-surface, CanvasText);
+}
+.ui-editor-area .cm-gutters {
+  background: var(--color-surface-container, Canvas);
+  color: var(--color-on-surface-variant, CanvasText);
+  border-color: var(--color-outline, GrayText);
+}
+.ui-editor-area .cm-cursor {
+  border-color: var(--color-on-surface, CanvasText);
+}
+.ui-lino-id,
+.ui-lino-colon,
+.ui-lino-paren {
+  color: var(--color-primary, LinkText);
+  font-weight: bold;
+}
+.ui-lino-string {
+  color: var(--color-editor-string, var(--color-on-surface, CanvasText));
+}
+.ui-lino-comment {
+  color: var(--color-on-surface-variant, CanvasText);
+  font-style: italic;
+}
+.ui-lino-match {
+  outline: 1px solid var(--color-primary, Highlight);
+}
+.ui-editor-conflict {
+  padding: var(--space-small, 8px);
+  background: var(--color-surface-container, Canvas);
+  border-block: 2px solid var(--color-primary, Highlight);
+}
+.ui-editor-compare {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-medium, 16px);
+  padding: var(--space-medium, 16px);
+}
+.ui-editor-compare pre {
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+ui-code-editor [hidden] {
+  display: none;
+}
+ui-code-editor [aria-label='Diagnostics'] {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+ui-code-editor [aria-label='Diagnostics']:empty {
+  display: none;
+}
+ui-code-editor [aria-label='Diagnostics'] button {
+  font: inherit;
+  text-align: start;
+  color: var(--color-error, CanvasText);
+  background: transparent;
+  border: 0;
+}
+@media (forced-colors: active) {
+  .ui-lino-match {
+    outline-color: Highlight;
+  }
+  ui-code-editor [role='tab'][aria-selected='true'] {
+    border-color: Highlight;
+  }
+}
