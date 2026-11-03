@@ -143,6 +143,12 @@ plus the DOM event) is handled in this order:
 
 `actionNames(['emit', 'save'])` returns `['save', 'emit']`.
 
+`UiView` receives the actions of its own document through the ui-dom
+`onAction` option, not with a `ui-action` listener on its root. The DOM event
+still bubbles for other listeners. A `UiView` inside a custom-kind component
+of another `UiView` sits under the outer root, so a root listener would make
+the outer view handle the inner view's actions as well.
+
 ### Custom kinds with Vue components
 
 ```js
