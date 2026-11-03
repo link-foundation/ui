@@ -109,10 +109,27 @@ const { store } = mountDocument(app, text, { tokens, styles, onAction });
 store.setProp('greeting', 'value', ['Hello again']); // one patch
 ```
 
+### Behaviour and accessibility
+
+[`@link-foundation/ui-components`](packages/ui-components/README.md) adds
+behaviour written as LiNo state machines (`toggle`, `disclosure`), an actions
+registry that never evaluates code, and keyboard and focus helpers:
+
+```js
+import { mountBehavior } from '@link-foundation/ui-components/behavior/dom';
+
+mountBehavior(
+  app,
+  `(page: document
+  (bold: button (label Bold) (machine toggle-machine)))`
+);
+// Enter, Space or a click switch aria-pressed on the button
+```
+
 ### Layout and windowing
 
-[`@link-foundation/ui-components`](packages/ui-components/README.md) adds the
-layout kinds `stack`, `grid`, `split`, `tab-group`, `dock`, `window` and
+[`@link-foundation/ui-components/layout`](packages/ui-components/README.md#layout-and-windowing)
+adds the layout kinds `stack`, `grid`, `split`, `tab-group`, `dock`, `window` and
 `app-shell` to ui-dom, with a layer manager and dock layouts saved as Links
 Notation:
 
@@ -233,7 +250,7 @@ npm run example:desktop:package
 │   └── universal-app/    # React + GitHub Pages + Electron + Capacitor app
 ├── scripts/              # Build and release scripts
 ├── packages/             # npm workspaces (see docs/monorepo.md)
-│   ├── ui-components/    # @link-foundation/ui-components (layout: stack, grid, split, tab-group, dock, window, app-shell)
+│   ├── ui-components/    # @link-foundation/ui-components (LiNo state machines, actions registry, a11y helpers, layout and windowing)
 │   ├── ui-config/        # @link-foundation/ui-config (layered configuration, overrides patches)
 │   ├── ui-convert/       # @link-foundation/ui-convert (HTML/DOM, A2UI, Adaptive Cards, JSON Forms, Lottie <-> LiNo)
 │   ├── ui-core/          # @link-foundation/ui-core

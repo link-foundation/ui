@@ -147,7 +147,7 @@ export function createTree({
     entry.unbind?.();
     entry.unbind = undefined;
     const ctx = contextOf(id, entry.el.kind);
-    const handlers = handlersOf(entry.el, ctx.diagnostic);
+    const handlers = handlersOf(entry.el, ctx.diagnostic, options.isAction);
     if (!interactive || handlers.length === 0) {
       return;
     }

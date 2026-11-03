@@ -7,7 +7,7 @@ import { mountDocument } from '@link-foundation/ui-dom';
 import {
   createLayerManager,
   layoutVocabulary,
-} from '@link-foundation/ui-components';
+} from '@link-foundation/ui-components/layout';
 
 const text = await (
   await fetch(new URL('layout.lino', import.meta.url))
