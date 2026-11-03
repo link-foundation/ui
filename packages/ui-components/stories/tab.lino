@@ -1,0 +1,7 @@
+single-tabs: tabs
+  label Single
+  tab-example: tab
+    label Details
+    panel single-panel
+  single-panel: tab-panel
+    single-text: text 'Details content.'

@@ -1,0 +1,11 @@
+surface: machine
+  initial closed
+  state closed
+    on open
+      target open
+  state open
+    on close
+      target closed
+  part content
+    attr data-state
+      state

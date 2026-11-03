@@ -29,6 +29,38 @@ const attributeNames = (root) =>
     [...el.attributes].map((a) => a.name)
   );
 
+it('maps overlay close/select and preserves target independently from selection', () => {
+  const { window, handle, actions } = mountWithActions(`surface: button
+  on close
+    emit dismissed
+  on select
+    emit chosen
+`);
+  const node = handle.nodeFor('surface').querySelector('button');
+  node.dispatchEvent(new window.CustomEvent('ui-close'));
+  node.dispatchEvent(
+    new window.CustomEvent('ui-select', {
+      detail: {
+        target: 'message-7',
+        selection: ['message-2'],
+        source: 'untrusted',
+        action: ['emit', 'untrusted'],
+      },
+    })
+  );
+  expect(actions).toEqual([
+    { source: 'surface', event: 'close', action: ['emit', 'dismissed'] },
+    {
+      source: 'surface',
+      event: 'select',
+      action: ['emit', 'chosen'],
+      target: 'message-7',
+      selection: ['message-2'],
+    },
+  ]);
+  handle.destroy();
+});
+
 describe('events', () => {
   it('maps press to a click of the native button and calls onAction', () => {
     const { handle, actions } = mountWithActions(sample('document'));

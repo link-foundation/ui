@@ -1,0 +1,4 @@
+details: popover
+  anchor open-popover
+  label 'Message details'
+  details-text: text 'Sent today. Delivered to everyone.'

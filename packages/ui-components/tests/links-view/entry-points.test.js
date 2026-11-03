@@ -19,6 +19,7 @@ const ENTRY_POINTS = [
   'layout',
   'links-view',
   'icons',
+  'overlays',
 ];
 const SRC = new URL('../../src/', import.meta.url);
 

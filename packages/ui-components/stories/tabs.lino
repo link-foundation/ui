@@ -1,0 +1,25 @@
+settings-tabs: tabs
+  label Settings
+  first: tab
+    label General
+    panel general
+  second: tab
+    label Advanced
+    panel advanced
+  general: tab-panel
+    general-text: text 'General settings content.'
+  advanced: tab-panel
+    advanced-text: text 'Advanced settings content.'
+manual-tabs: tabs
+  label 'Manual settings'
+  activation manual
+  manual-first: tab
+    label Overview
+    panel overview
+  manual-second: tab
+    label History
+    panel history
+  overview: tab-panel
+    overview-text: text 'Overview content.'
+  history: tab-panel
+    history-text: text 'History content.'

@@ -13,6 +13,8 @@ import { vocabulary } from './model.js';
 /** UI events → the DOM events that trigger them. */
 export const DOM_EVENTS = Object.freeze({
   press: 'click',
+  close: 'ui-close',
+  select: 'ui-select',
   focus: 'focusin',
   blur: 'focusout',
   hover: 'pointerenter',
@@ -95,6 +97,12 @@ export function bindHandlers(node, target, handlers, host) {
           source: host.idFor(node),
           event,
           action,
+          ...(domEventObject.detail?.target === undefined
+            ? {}
+            : {
+                target: domEventObject.detail.target,
+                selection: domEventObject.detail.selection,
+              }),
         });
         node.dispatchEvent(
           new win.CustomEvent('ui-action', {

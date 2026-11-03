@@ -73,6 +73,12 @@ export function defaultMounts(root) {
     ...BROWSER_MODULES.map((name) => ['node_modules', name]),
     ['node_modules', 'echarts', 'dist'],
     ['node_modules', '@dagrejs', 'dagre', 'dist'],
+    ...['dom', 'core', 'utils'].map((name) => [
+      'node_modules',
+      '@floating-ui',
+      name,
+      'dist',
+    ]),
     ['node_modules', 'mermaid', 'dist'],
     ['docs', 'case-studies', 'issue-1', 'samples'],
   ]) {
@@ -84,7 +90,13 @@ export function defaultMounts(root) {
   const packagesDir = path.join(root, 'packages');
   if (existsSync(packagesDir)) {
     for (const name of readdirSync(packagesDir).sort()) {
-      for (const sub of [['e2e', 'pages'], ['src'], ['examples'], ['dist']]) {
+      for (const sub of [
+        ['e2e', 'pages'],
+        ['src'],
+        ['stories'],
+        ['examples'],
+        ['dist'],
+      ]) {
         const dir = path.join(packagesDir, name, ...sub);
         if (existsSync(dir)) {
           mounts.push({ prefix: `/packages/${name}/${sub.join('/')}/`, dir });

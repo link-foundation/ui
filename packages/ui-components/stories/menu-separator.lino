@@ -1,0 +1,7 @@
+separator-menu: menu
+  label Actions
+  before-separator: menu-item
+    label Copy
+  separator-example: menu-separator
+  after-separator: menu-item
+    label Delete

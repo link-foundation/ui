@@ -1,0 +1,6 @@
+standalone-menu: menu
+  label Actions
+  item-example: menu-item
+    label Reply
+    on select
+      emit reply

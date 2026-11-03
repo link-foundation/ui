@@ -1,0 +1,12 @@
+modal-drawer: drawer
+  title 'Message inspector'
+  side right
+  modal true
+  body
+    text 'Inspect and edit message properties.'
+docked-drawer: drawer
+  title 'Docked inspector'
+  side left
+  modal false
+  body
+    text 'The rest of the page stays interactive.'

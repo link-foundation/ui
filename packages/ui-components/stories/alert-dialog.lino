@@ -1,0 +1,4 @@
+alert: alert-dialog
+  title 'Discard changes?'
+  body
+    text 'Unsaved changes will be lost.'

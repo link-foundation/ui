@@ -1,0 +1,16 @@
+toast: machine
+  initial queued
+  state queued
+    on show
+      target visible
+  state visible
+    on pause
+      target paused
+    on close
+      target closed
+  state paused
+    on resume
+      target visible
+    on close
+      target closed
+  state closed

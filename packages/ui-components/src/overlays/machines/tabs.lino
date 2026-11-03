@@ -1,0 +1,7 @@
+tabs: machine
+  initial active
+  context
+    active ''
+  state active
+    on select
+      do select-tab

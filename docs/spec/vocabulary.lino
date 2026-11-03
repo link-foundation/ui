@@ -142,3 +142,141 @@ toggle: action
 focus: action
   description 'Move keyboard focus to an element.'
   argument target element-ref
+
+dialog: kind
+  description 'The dialog overlay/navigation primitive.'
+  property title string
+  property body any
+  property actions any
+  property open
+    enum true false
+  property on action multi
+  children any
+
+alert-dialog: kind
+  description 'The alert-dialog overlay/navigation primitive.'
+  property title string
+  property body any
+  property actions any
+  property open
+    enum true false
+  property on action multi
+  children any
+
+popover: kind
+  description 'The popover overlay/navigation primitive.'
+  property anchor element-ref
+  property label string
+  property placement string
+  property offset number
+  property open
+    enum true false
+  property on action multi
+  children any
+
+tooltip: kind
+  description 'The tooltip overlay/navigation primitive.'
+  property anchor element-ref
+  property label string
+  property value string
+  property on action multi
+  children none
+
+menu: kind
+  description 'The menu overlay/navigation primitive.'
+  property anchor element-ref
+  property label string
+  property placement string
+  property open
+    enum true false
+  property on action multi
+  children any
+
+menu-item: kind
+  description 'The menu-item overlay/navigation primitive.'
+  positional label
+  property label string
+  property icon string
+  property disabled
+    enum true false
+  property on action multi
+  children any
+
+menu-separator: kind
+  description 'The menu-separator overlay/navigation primitive.'
+  property on action multi
+  children none
+
+context-menu: kind
+  description 'The context-menu overlay/navigation primitive.'
+  property anchor element-ref
+  property label string
+  property long-press number
+  property on action multi
+  children any
+
+radial-menu: kind
+  description 'The radial-menu overlay/navigation primitive.'
+  property anchor element-ref
+  property label string
+  property radius number
+  property start-angle number
+  property presentation
+    enum radial linear
+  property item any multi
+  property on action multi
+  children any
+
+tabs: kind
+  description 'The tabs overlay/navigation primitive.'
+  property label string
+  property activation
+    enum automatic manual
+  property active element-ref
+  property on action multi
+  children any
+
+tab: kind
+  description 'The tab overlay/navigation primitive.'
+  positional label
+  property label string
+  property panel element-ref
+  property disabled
+    enum true false
+  property on action multi
+  children any
+
+tab-panel: kind
+  description 'The tab-panel overlay/navigation primitive.'
+  property on action multi
+  children any
+
+toast: kind
+  description 'The toast overlay/navigation primitive.'
+  positional label
+  property label string
+  property duration number
+  property politeness
+    enum polite assertive
+  property on action multi
+  children none
+
+toaster: kind
+  description 'The toaster overlay/navigation primitive.'
+  property max number
+  property on action multi
+  children any
+
+drawer: kind
+  description 'The drawer overlay/navigation primitive.'
+  property title string
+  property body any
+  property actions any
+  property open
+    enum true false
+  property modal
+    enum true false
+  property side
+    enum left right top bottom
+  property on action multi
+  children any
