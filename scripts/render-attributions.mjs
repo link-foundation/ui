@@ -152,20 +152,21 @@ function renderLino(records) {
     for (const record of list) {
       const info = describe(record);
       const fields = [
-        `(group ${linoValue(license)})`,
-        `(copyright ${linoValue(info.copyright)})`,
-        `(license ${linoValue(record.license ?? '')})`,
+        `group ${linoValue(license)}`,
+        `copyright ${linoValue(info.copyright)}`,
+        `license ${linoValue(record.license ?? '')}`,
       ];
       if (record.source) {
-        fields.push(`(source ${linoValue(record.source)})`);
+        fields.push(`source ${linoValue(record.source)}`);
       }
       if (info.licenseLink) {
-        fields.push(`(notice ${linoValue(info.licenseLink)})`);
+        fields.push(`notice ${linoValue(info.licenseLink)}`);
       }
       if (info.text) {
-        fields.push(`(text ${linoValue(info.text)})`);
+        fields.push(`text ${linoValue(info.text)}`);
       }
-      lines.push(`(${record.id}: attribution ${fields.join(' ')})`);
+      // The nested form (#133): the record line, one indented line a field.
+      lines.push([`${record.id}: attribution`, ...fields].join('\n  '));
     }
   }
   return lines.length ? `${lines.join('\n')}\n` : '';
