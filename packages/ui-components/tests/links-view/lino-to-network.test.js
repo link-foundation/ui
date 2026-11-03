@@ -8,7 +8,7 @@ import {
   rmSync,
   writeFileSync,
 } from 'node:fs';
-import { URL } from 'node:url';
+import { fileURLToPath, URL } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -213,8 +213,8 @@ test('CLI writes valid SVG and refuses invalid syntax or options', () => {
   try {
     const out = join(dir, 'cycle.svg');
     execFileSync(process.execPath, [
-      cli.pathname,
-      new URL('./fixtures/cycle.lino', import.meta.url).pathname,
+      fileURLToPath(cli),
+      fileURLToPath(new URL('./fixtures/cycle.lino', import.meta.url)),
       '--layout',
       'force',
       '--out',
@@ -233,7 +233,7 @@ test('CLI writes valid SVG and refuses invalid syntax or options', () => {
       () =>
         execFileSync(
           process.execPath,
-          [cli.pathname, invalid, '--out', invalidOut],
+          [fileURLToPath(cli), invalid, '--out', invalidOut],
           { stdio: 'pipe' }
         ),
       (error) => {
@@ -243,7 +243,7 @@ test('CLI writes valid SVG and refuses invalid syntax or options', () => {
       }
     );
     assert.throws(() =>
-      execFileSync(process.execPath, [cli.pathname, '--layout', 'bad'], {
+      execFileSync(process.execPath, [fileURLToPath(cli), '--layout', 'bad'], {
         stdio: 'pipe',
       })
     );
@@ -251,8 +251,8 @@ test('CLI writes valid SVG and refuses invalid syntax or options', () => {
       execFileSync(
         process.execPath,
         [
-          cli.pathname,
-          new URL('./fixtures/cycle.lino', import.meta.url).pathname,
+          fileURLToPath(cli),
+          fileURLToPath(new URL('./fixtures/cycle.lino', import.meta.url)),
           '--out',
         ],
         { stdio: 'pipe' }
