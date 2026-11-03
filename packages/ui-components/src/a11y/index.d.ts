@@ -1,4 +1,7 @@
-import type { Diagnostic, Service } from '../behavior/index.js';
+import type {
+  Diagnostic,
+  Service,
+} from '@link-foundation/ui-components/behavior';
 
 export const FOCUSABLE: string;
 export function tabbables(container: Element): HTMLElement[];

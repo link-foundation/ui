@@ -45,20 +45,12 @@ describe('behavior: no DOM', () => {
   });
 
   it('loads and runs a machine in a process without window or document', () => {
-    const script = `
-      if (typeof window !== 'undefined' || typeof document !== 'undefined') {
-        throw new Error('expected no DOM globals');
-      }
-      const b = await import('@link-foundation/ui-components/behavior');
-      const service = b.interpret(b.createMachine(b.TOGGLE_MACHINE));
-      service.send('toggle');
-      console.log(JSON.stringify([service.state, service.attrs('root')]));
-    `;
-    const output = execFileSync(
-      process.execPath,
-      ['--input-type=module', '-e', script],
-      { cwd: fileURLToPath(new URL('.', import.meta.url)), encoding: 'utf8' }
+    const script = fileURLToPath(
+      new URL('fixtures/run-without-dom.mjs', import.meta.url)
     );
+    // Deno runs a file with `deno run`; Node and Bun take the file itself.
+    const args = globalThis.Deno ? ['run', '-A', script] : [script];
+    const output = execFileSync(process.execPath, args, { encoding: 'utf8' });
     expect(JSON.parse(output)).toEqual(['on', { 'aria-pressed': 'true' }]);
   });
 });

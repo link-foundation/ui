@@ -9,7 +9,7 @@ import type {
   HostActions,
   Machine,
   Service,
-} from './index.js';
+} from '@link-foundation/ui-components/behavior';
 
 export interface BehaviorOptions {
   actions?: ActionRegistry | Record<string, ActionFn>;

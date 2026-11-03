@@ -1,2 +1,2 @@
-export * from './behavior/index.js';
-export * from './a11y/index.js';
+export * from '@link-foundation/ui-components/behavior';
+export * from '@link-foundation/ui-components/a11y';

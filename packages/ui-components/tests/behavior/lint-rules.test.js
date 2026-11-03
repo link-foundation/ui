@@ -58,14 +58,16 @@ describe('lint: no code from text under ui-components/src', () => {
     ]);
   });
 
-  it('passes on the real sources', async () => {
+  // Only the code-execution rules: formatting rules depend on the checkout
+  // (Windows checks out CRLF line breaks) and are checked by `npm run lint`.
+  it('passes the code-execution rules on the real sources', async () => {
     const files = sourceFiles(SRC);
     expect(files.length > 10).toBe(true);
     for (const file of files) {
       const [result] = await eslint.lintText(readFileSync(file, 'utf8'), {
         filePath: file,
       });
-      const errors = result.messages.filter((m) => m.severity === 2);
+      const errors = result.messages.filter((m) => RULES.includes(m.ruleId));
       expect([file, errors]).toEqual([file, []]);
     }
   });
