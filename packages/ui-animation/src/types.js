@@ -119,6 +119,7 @@
 
 /**
  * @typedef {object} Player
+ * @property {(listener: (event: object) => void) => () => void} subscribe
  * @property {AnimationModel} model
  * @property {(source: string|AnimationModel) => AnimationModel} load
  * @property {(id: string, options?: PlayOptions) => object} play
