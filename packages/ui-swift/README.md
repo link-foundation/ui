@@ -129,15 +129,16 @@ and keeps them in `UiDiagnosticLog.shared.diagnostics`.
 
 ## Render-tree snapshots
 
-`RenderTree.dumpLino()` writes the tree as Links Notation, one node per line,
-with children indented by two spaces, so that the other ports (#32) can
-produce the same text:
+`RenderTree.dumpLino()` writes the tree as Links Notation in the nested form
+(#133): one node per line, without the parentheses around the node, with
+children indented by two spaces, so that the other ports (#32) can produce
+the same text:
 
-```
-(app: ScrollView
-  (body: VStack (spacing 16)
-    (greeting: Text 'Hello, links')
-    (ok: Button (label OK))))
+```lino
+app: ScrollView
+  body: VStack (spacing 16)
+    greeting: Text 'Hello, links'
+    ok: Button (label OK)
 ```
 
 Each line is a link written by the LinksNotation formatter, which quotes a

@@ -1,1 +1,1 @@
-(ok: Button (label OK) (variant text) (disabled true))
+ok: Button (label OK) (variant text) (disabled true)
