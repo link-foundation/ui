@@ -1,0 +1,8 @@
+(login-flow: diagram
+  (kind flowchart)
+  (direction down)
+  (start: node (label 'Start'))
+  (check: node (label 'Signed in?') (shape diamond))
+  (home: node (label 'Home'))
+  (edge (from start) (to check))
+  (edge (from check) (to home) (label 'yes')))

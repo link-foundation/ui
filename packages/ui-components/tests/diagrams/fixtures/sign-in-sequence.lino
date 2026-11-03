@@ -1,0 +1,9 @@
+(sign-in: diagram
+  (kind sequence)
+  (user: node (label 'User'))
+  (app: node (label 'App'))
+  (server: node (label 'Links server'))
+  (edge (from user) (to app) (label 'types a password'))
+  (edge (from app) (to server) (label 'POST /session'))
+  (edge (from server) (to app) (label 'token'))
+  (edge (from app) (to user) (label 'shows home')))
