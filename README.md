@@ -163,6 +163,20 @@ mountBehavior(
 // Enter, Space or a click switch aria-pressed on the button
 ```
 
+### Link view
+
+[`@link-foundation/ui-components`](packages/ui-components/README.md) draws one
+link from Links Notation with `link-view`, using the links-visuals geometry.
+The SVG and Canvas renderers share one set of marker shapes. Each element has
+its own zoom and pan and asks for no animation frame while idle. The gallery
+is `packages/ui-components/examples/link-view.html`:
+
+```html
+<link-view
+  lino="(simple: link-view (link (id 1) (source 1) (target 2)) (markers (source bar) (target arrow)))"
+></link-view>
+```
+
 ### Layout and windowing
 
 [`@link-foundation/ui-components/layout`](packages/ui-components/README.md#layout-and-windowing)
@@ -289,7 +303,7 @@ npm run example:desktop:package
 ├── scripts/              # Build and release scripts
 ├── packages/             # npm workspaces (see docs/monorepo.md)
 │   ├── ui-animation/     # @link-foundation/ui-animation (LiNo animations: tracks, springs, timelines, triggers, safety rules, WAAPI player)
-│   ├── ui-components/    # @link-foundation/ui-components (LiNo state machines, actions registry, a11y helpers, charts, diagrams with Dagre layout, SVG and Mermaid, layout and windowing, own CC0 icons, ui-icon)
+│   ├── ui-components/    # @link-foundation/ui-components (LiNo state machines, actions registry, a11y helpers, charts, diagrams with Dagre layout, SVG and Mermaid, layout and windowing, own CC0 icons, ui-icon, link-view)
 │   ├── ui-config/        # @link-foundation/ui-config (layered configuration, overrides patches)
 │   ├── ui-convert/       # @link-foundation/ui-convert (HTML/DOM, A2UI, Adaptive Cards, JSON Forms, Lottie <-> LiNo)
 │   ├── ui-core/          # @link-foundation/ui-core

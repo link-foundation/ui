@@ -2,10 +2,12 @@ import js from '@eslint/js';
 import prettierConfig from 'eslint-config-prettier';
 import prettierPlugin from 'eslint-plugin-prettier';
 import noChangelogCommentsRule from './eslint-rules/no-changelog-comments.js';
+import noModuleStateRule from './eslint-rules/no-module-state.js';
 
 const localPlugin = {
   rules: {
     'no-changelog-comments': noChangelogCommentsRule,
+    'no-module-state': noModuleStateRule,
   },
 };
 
@@ -110,7 +112,7 @@ export default [
     files: [
       'examples/ui-dom/**/*.js',
       'examples/animation/**/*.js',
-      'packages/*/examples/**/*.js',
+      'packages/*/examples/**/*.{js,mjs}',
     ],
     languageOptions: {
       globals: {
@@ -118,6 +120,14 @@ export default [
         window: 'readonly',
         URL: 'readonly',
       },
+    },
+  },
+  {
+    // The links-view modules keep no state of their own: every instance
+    // (element, zoom, animator) owns its state, so two views never share it.
+    files: ['packages/ui-components/src/links-view/**/*.js'],
+    rules: {
+      'local/no-module-state': 'error',
     },
   },
   {
