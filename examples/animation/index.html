@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ui-animation example</title>
+    <!--
+      No bundler: the workspace packages load as ES modules from their src/
+      folders. Serve the repository with `node scripts/serve-static.mjs` and
+      open http://127.0.0.1:4173/examples/animation/
+    -->
+    <script type="importmap">
+      {
+        "imports": {
+          "@link-foundation/ui-animation": "/packages/ui-animation/src/index.js",
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "@link-foundation/ui-store": "/packages/ui-store/src/index.js",
+          "@link-foundation/ui-style": "/packages/ui-style/src/index.js",
+          "@link-foundation/ui-tokens": "/packages/ui-tokens/src/index.js",
+          "@link-foundation/ui-dom": "/packages/ui-dom/src/index.js",
+          "links-notation": "/node_modules/links-notation/dist/index.js"
+        }
+      }
+    </script>
+    <style>
+      body {
+        margin: 0;
+        padding: 24px;
+        font-family: system-ui, sans-serif;
+        color: #1d1b20;
+        background: #fffbfe;
+      }
+      #app ui-stack#sidebar,
+      #app [data-link-id='sidebar'] {
+        padding: 16px;
+        border-radius: 12px;
+        background: #f3edf7;
+        max-width: 360px;
+      }
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        margin-top: 24px;
+        padding-top: 16px;
+        border-top: 1px solid #cac4d0;
+      }
+      dl {
+        margin-top: 16px;
+        display: grid;
+        grid-template-columns: max-content 1fr;
+        gap: 4px 12px;
+      }
+      dd {
+        margin: 0;
+        font-family: ui-monospace, monospace;
+        overflow-wrap: anywhere;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>ui-animation example</h1>
+      <p>
+        <code>animations.lino</code> played on
+        <code>document.lino</code> rendered by ui-dom. Press
+        <strong>OK</strong> to fire its <code>(on pressed)</code> trigger.
+      </p>
+      <div id="app"></div>
+      <div class="controls">
+        <button id="play" type="button">Play intro</button>
+        <label><input id="reduced" type="checkbox" /> Reduce motion</label>
+        <span
+          >Status: <output id="status" aria-live="polite">ready</output></span
+        >
+      </div>
+      <dl>
+        <dt>Safety</dt>
+        <dd id="safety"></dd>
+        <dt>bounce spring</dt>
+        <dd id="spring"></dd>
+      </dl>
+    </main>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
