@@ -86,5 +86,6 @@ jobs:
           path: |
             tests/ui/__screenshots__/**
             packages/*/e2e/__screenshots__/**
+            packages/*/tests/e2e/__screenshots__/**
           retention-days: 7
           if-no-files-found: error
