@@ -1,0 +1,27 @@
+(disclosure-machine: machine
+  (initial closed)
+  (context (disabled false))
+  (action focus-content (focus content))
+  (action restore-focus (focus trigger))
+  (state closed
+    (on toggle (target open) (when not-disabled))
+    (on open (target open) (when not-disabled)))
+  (state open
+    (entry focus-content)
+    (exit restore-focus)
+    (on toggle (target closing))
+    (on close (target closing)))
+  (state closing
+    (after 500ms (target closed))
+    (on toggle (target open) (when not-disabled))
+    (on open (target open) (when not-disabled)))
+  (part trigger
+    (attr aria-expanded (in open))
+    (attr data-state (state))
+    (key Enter toggle)
+    (key Space toggle)
+    (on press toggle))
+  (part content
+    (attr hidden (present (in closed)))
+    (attr data-state (state))
+    (key Escape close)))

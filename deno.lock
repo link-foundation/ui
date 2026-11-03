@@ -2394,6 +2394,8 @@
         "packageJson": {
           "dependencies": [
             "npm:@dagrejs/dagre@3.1.3",
+            "npm:@link-foundation/ui-core@^0.0.0",
+            "npm:@link-foundation/ui-dom@^0.0.0",
             "npm:jsdom@^30.1.3",
             "npm:links-notation@~0.27.1",
             "npm:mermaid@11.17.2",

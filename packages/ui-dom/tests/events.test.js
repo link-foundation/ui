@@ -121,6 +121,28 @@ describe('events', () => {
     expect(container.querySelector('script')).toBeNull();
   });
 
+  it('dispatches the actions an isAction option knows, and no others', () => {
+    const { container } = createDom();
+    const actions = [];
+    const diagnostics = [];
+    const { handle } = mountDocument(
+      container,
+      "(b: button 'B' (on press (save draft) (launch x) (navigate home)))",
+      {
+        isAction: (name) => name === 'save',
+        onAction: (detail) => actions.push(detail.action),
+        onDiagnostic: (d) => diagnostics.push(d),
+      }
+    );
+    handle.nodeFor('b').querySelector('button').click();
+    expect(actions).toEqual([['save', 'draft']]);
+    expect(
+      diagnostics
+        .filter((d) => d.code === 'unknown-action' && d.at.action)
+        .map((d) => d.at.action)
+    ).toEqual(['launch', 'navigate']);
+  });
+
   it('reports an event the renderer does not map', () => {
     const { codes } = mountWithActions("(b: button 'B' (on swipe (emit x)))");
     expect(codes).toContain('unknown-event');

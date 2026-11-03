@@ -52,6 +52,33 @@ Bindings are **reserved** in v0 with the shape
 projection keeps the link as a property; its runtime meaning is defined by a
 later version (#33 owns the behaviour runtime).
 
+## State machines
+
+Behaviour beyond a single handler is a **state machine**: an element of kind
+`machine`, written in LiNo and run by `@link-foundation/ui-components`
+([README](../../packages/ui-components/README.md)). Any element refers to
+one with the common property `machine`, which can map machine parts to other
+elements:
+
+```lino
+(toggle-machine: machine
+  (initial off)
+  (context (pressed false))
+  (state off (on toggle (target on) (do (set pressed true))))
+  (state on (on toggle (target off) (do (set pressed false))))
+  (part root (attr aria-pressed (context pressed)) (key Enter toggle)))
+
+(bold: button (label Bold) (machine toggle-machine))
+(more: button (label Details) (machine disclosure-machine (content panel)))
+```
+
+States are flat in v0. A transition is `(on EVENT (target S) (do ACTION...)
+(when GUARD...))`, `(entry ...)` and `(exit ...)` run on state changes, and
+`(after 500ms ...)` is a delayed transition. Actions follow the handler rules
+above: they are data, looked up by name, and an unknown name is the warning
+`unknown-action`. `when` takes guard **names** only, because expressions
+are deferred. Nested, parallel and history states are future work.
+
 ## Conditions and expressions
 
 Conditional rendering (`when`), computed expressions and their relation to the
