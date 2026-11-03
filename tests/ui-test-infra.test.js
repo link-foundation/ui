@@ -116,8 +116,8 @@ describe('shared static server', () => {
         'node_modules/d3-scale/src/index.js',
       ],
       [
-        '/node_modules/d3-shape/dist/d3-shape.mjs',
-        'node_modules/d3-shape/dist/d3-shape.mjs',
+        '/node_modules/d3-shape/src/index.js',
+        'node_modules/d3-shape/src/index.js',
       ],
       [
         '/node_modules/echarts/dist/echarts.esm.min.mjs',

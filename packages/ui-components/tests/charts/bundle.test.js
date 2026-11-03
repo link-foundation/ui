@@ -12,10 +12,18 @@
 
 import { describe, it, expect } from 'test-anywhere';
 import { readFileSync, readdirSync } from 'node:fs';
-import { registerHooks } from 'node:module';
+import * as nodeModule from 'node:module';
 import { URL, fileURLToPath } from 'node:url';
 import { JSDOM } from 'jsdom';
+import { itUnless } from '../../../../tests/helpers/skip.js';
 import { chartFixtures, fixture } from './helpers.js';
+
+// Module resolve hooks (Node.js 22.15+, Deno); Bun has none.
+const { registerHooks } = nodeModule;
+const noHooks =
+  typeof registerHooks === 'function'
+    ? null
+    : 'this runtime has no node:module registerHooks';
 
 const SRC = new URL('../../src/', import.meta.url);
 const ADAPTER = new URL('charts/echarts-adapter.js', SRC).href;
@@ -95,7 +103,7 @@ describe('the modules loaded at run time', () => {
   const fake = `export function init() {
     return { setOption() {}, dispatchAction() {} };
   }`;
-  registerHooks({
+  registerHooks?.({
     resolve(specifier, context, nextResolve) {
       if (specifier === 'echarts') {
         loaded.add('echarts');
@@ -115,34 +123,37 @@ describe('the modules loaded at run time', () => {
       .map((name) => fixture(name))
       .filter((text) => text.includes(': chart'));
 
-  it('loads no echarts for SVG charts, and loads it for (renderer echarts)', async () => {
-    const { defineChartElements } = await import(new URL('index.js', SRC));
-    const win = new JSDOM('<!doctype html><body></body>').window;
-    defineChartElements(win);
-    for (const text of chartTexts()) {
+  itUnless(noHooks)(
+    'loads no echarts for SVG charts, and loads it for (renderer echarts)',
+    async () => {
+      const { defineChartElements } = await import(new URL('index.js', SRC));
+      const win = new JSDOM('<!doctype html><body></body>').window;
+      defineChartElements(win);
+      for (const text of chartTexts()) {
+        const chart = win.document.createElement('ui-chart');
+        chart.lino = text;
+        win.document.body.append(chart);
+        await chart.ready;
+      }
+      expect(
+        win.document.querySelectorAll('ui-chart svg[role="img"]').length
+      ).toBe(chartTexts().length);
+      expect(loaded.has('echarts')).toBe(false);
+      expect(loaded.has(ADAPTER)).toBe(false);
+      expect([...loaded].some((url) => url.includes('d3-scale'))).toBe(true);
+
       const chart = win.document.createElement('ui-chart');
-      chart.lino = text;
+      chart.lino = fixture('sales-line.lino').replace(
+        '(sales: chart',
+        '(sales: chart (renderer echarts)'
+      );
       win.document.body.append(chart);
       await chart.ready;
+      expect(loaded.has(ADAPTER)).toBe(true);
+      expect(loaded.has('echarts')).toBe(true);
+      expect(chart.getAttribute('data-renderer')).toBe('echarts');
     }
-    expect(
-      win.document.querySelectorAll('ui-chart svg[role="img"]').length
-    ).toBe(chartTexts().length);
-    expect(loaded.has('echarts')).toBe(false);
-    expect(loaded.has(ADAPTER)).toBe(false);
-    expect([...loaded].some((url) => url.includes('d3-scale'))).toBe(true);
-
-    const chart = win.document.createElement('ui-chart');
-    chart.lino = fixture('sales-line.lino').replace(
-      '(sales: chart',
-      '(sales: chart (renderer echarts)'
-    );
-    win.document.body.append(chart);
-    await chart.ready;
-    expect(loaded.has(ADAPTER)).toBe(true);
-    expect(loaded.has('echarts')).toBe(true);
-    expect(chart.getAttribute('data-renderer')).toBe('echarts');
-  });
+  );
 
   it('records modules by file URL', () => {
     expect(fileURLToPath(ADAPTER).endsWith('echarts-adapter.js')).toBe(true);

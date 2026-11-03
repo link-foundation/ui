@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect } from 'test-anywhere';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { URL } from 'node:url';
 import { JSDOM } from 'jsdom';
 import {
@@ -51,6 +51,19 @@ describe('the chart gallery', () => {
       const element = document.querySelector(tag);
       expect(element === null).toBe(false);
       expect(element.getAttribute('label').length > 0).toBe(true);
+    }
+  });
+
+  it('maps every import to a file in the repository', () => {
+    const map = JSON.parse(
+      document.querySelector('script[type="importmap"]').textContent
+    );
+    const root = new URL('../../../../', import.meta.url);
+    for (const [name, path] of Object.entries(map.imports)) {
+      expect([name, existsSync(new URL(`.${path}`, root))]).toEqual([
+        name,
+        true,
+      ]);
     }
   });
 
