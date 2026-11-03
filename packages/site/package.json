@@ -1,5 +1,6 @@
 {
   "name": "@link-foundation/ui-site",
+  "version": "0.0.0",
   "private": true,
   "license": "Unlicense",
   "type": "module",

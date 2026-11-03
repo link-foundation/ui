@@ -6,6 +6,7 @@ import { render } from '@link-foundation/ui-dom';
 import { mountDevMode } from '@link-foundation/ui-devmode';
 import themes from 'virtual:site-themes';
 import { registerSiteKinds, siteVocabulary } from './kinds.js';
+import { languageHref } from './routes.js';
 
 registerSiteKinds();
 const data = JSON.parse(document.getElementById('site-document').textContent);
@@ -45,10 +46,7 @@ root.addEventListener('ui-change', ({ detail }) => {
   const { source, value } = detail;
   if (source === 'language' && data.languages.includes(value)) {
     config.set('user', 'site', 'locale', [value]);
-    const prefix = data.page === 'index' ? '../' : '../../';
-    window.location.assign(
-      `${prefix}${value}/${data.page === 'index' ? '' : `${data.page}/`}`
-    );
+    window.location.assign(languageHref(data.page, value));
   }
   const prop =
     source === 'theme-choice'
