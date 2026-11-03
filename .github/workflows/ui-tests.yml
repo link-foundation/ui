@@ -62,6 +62,15 @@ jobs:
       - name: Build icon sets
         run: npm run build:icons
 
+      - name: Install Expo example dependencies
+        run: npm ci --prefix examples/react-native --no-audit --no-fund
+
+      - name: Export Expo example through React Native Web
+        run: npm --prefix examples/react-native run build
+
+      - name: Test native web keyboard actions and accessibility
+        run: npx playwright test --config examples/react-native/playwright.config.mjs
+
       - name: Run Playwright tests
         if: env.UPDATE_SNAPSHOTS != 'true'
         run: npx playwright test
@@ -78,6 +87,7 @@ jobs:
           path: |
             playwright-report/
             test-results/
+            examples/react-native/test-results/
           retention-days: 7
           if-no-files-found: error
 

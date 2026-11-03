@@ -25,6 +25,7 @@ publishable artefact is a workspace package under `packages/`.
 │   │                       # project, not an npm workspace (no package.json)
 │   ├── ui-links/           # @link-foundation/ui-links (associative links storages,
 │   │                       # permissions, links server, synced client)
+│   ├── ui-react-native/    # @link-foundation/ui-react-native (native primitives)
 │   ├── ui-react/           # @link-foundation/ui-react (React adapter of ui-dom)
 │   ├── ui-settings/        # @link-foundation/ui-settings (settings schemas)
 │   ├── ui-style/           # @link-foundation/ui-style (style rules)
