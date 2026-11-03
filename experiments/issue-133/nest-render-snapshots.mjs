@@ -5,7 +5,7 @@
  * children; it becomes `indent head`. The head is
  * found with a quote-aware scan, and every result is checked with the
  * official parser: the nested text must read as the same links as the
- * original one once the original's path links are folded.
+ * original one with the original's path links folded.
  *   node experiments/issue-133/nest-render-snapshots.mjs <file>...
  */
 import { readFileSync, writeFileSync } from 'node:fs';
