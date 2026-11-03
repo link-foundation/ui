@@ -114,6 +114,39 @@ test('syntax errors and unresolved references show diagnostic positions', async 
   ).toContainText('warning: 1:10');
 });
 
+test('the sample chooser loads only the bundled case-study files', async ({
+  page,
+}) => {
+  await open(page);
+  for (const sample of [
+    'tokens',
+    'animation',
+    'assets',
+    'indented',
+    'overrides',
+    'styles',
+    'document',
+  ]) {
+    await page.getByLabel('Sample').selectOption(`${sample}.lino`);
+    await view(page).evaluate((el) => el.ready);
+    expect(
+      await view(page).evaluate((el) => el.network.links.size)
+    ).toBeGreaterThan(0);
+    expect(
+      await view(page).evaluate((el) =>
+        el.diagnostics.some((d) => d.severity === 'error')
+      )
+    ).toBe(false);
+  }
+  const source = await view(page).getAttribute('src');
+  await page.getByLabel('Sample').evaluate((select) => {
+    select.append(new globalThis.Option('Unknown', 'unknown.lino'));
+  });
+  await page.getByLabel('Sample').selectOption('unknown.lino');
+  await view(page).evaluate((el) => el.ready);
+  expect(await view(page).getAttribute('src')).toBe(source);
+});
+
 test('src failures clear stale views and newer loads win', async ({ page }) => {
   await open(page);
   await page.route('**/missing.lino', (route) =>
