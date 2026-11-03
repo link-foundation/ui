@@ -67,8 +67,20 @@ All times are UTC on 2026-11-03.
 | 12:40       | `c8e99de`: AGENTS.md, the agent guide, the conventions and the projection spec state the default.                                                                                                                                                                                                                                                                                       |
 | 12:42       | `0d47a1c`: the formatter and `parseGroups` are probed on `links-notation` 0.30.0, the latest release. Three problems remain there, and links-notation [#379](https://github.com/link-foundation/links-notation/issues/379), [#380](https://github.com/link-foundation/links-notation/issues/380) and [#381](https://github.com/link-foundation/links-notation/issues/381) are reported. |
 
-In total, 358 files changed: 166 `.lino` files, 26 Markdown files, 133
-JavaScript files, 5 Swift/Kotlin files and 3 example pages.
+| 12:47 | `c6f3951`: this case study. `main` is merged in (`ui-react`, `ui-links`, the React example); its new `.lino` files and docs already pass the nested-form test. |
+| 12:51–12:52 | `6c18b30`, `2eaf325`: the usage examples (`examples/*.mjs`, the React example, the dev mode example page) are converted; `find-paren-literals.mjs` lists what is left, and every remaining literal is an exception below. |
+
+In total, against `main` (`git diff --shortstat origin/main...HEAD`), 335 files
+changed with 8715 insertions and 4069 deletions in 38 commits. Of these:
+
+- 166 `.lino` files
+- 26 Markdown files
+- 120 JavaScript files
+- 5 Swift and Kotlin files
+- 2 example pages
+
+The packages with the most changes are ui-convert (42), ui-components (41),
+ui-swift (40), ui-kotlin (39) and ui-core (17).
 
 ## Requirements
 
@@ -188,16 +200,21 @@ snapshots.
 
 ### Exceptions kept on purpose
 
-| Where                                                                      | Why                                                                       |
-| -------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Markdown table cells                                                       | A cell is one line.                                                       |
-| devmode `formatValues`, ui-config `describeValues`                         | A one-line field or diagnostic message.                                   |
-| ui-settings share URL (`style: 'inline'`)                                  | A URL is one line.                                                        |
-| Source edits of ui-core                                                    | They keep the layout the author wrote.                                    |
-| `docs/spec/fixtures/shapes/`, ui-core reader fixtures, inline test inputs  | They prove that the one-line and parenthesized forms still read the same. |
-| `docs/spec/projection.md`, the "Three forms" section of the ui-core README | They show the forms side by side.                                         |
-| Swift/Kotlin `*.render.lino` snapshots                                     | One-line dumps compared by the snapshot tests.                            |
-| `docs/case-studies/issue-1/`, `experiments/`                               | History: the texts as they were written and probed.                       |
+| Where                                                                                            | Why                                                                                          |
+| ------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
+| Markdown table cells                                                                             | A cell is one line.                                                                          |
+| devmode `formatValues`, ui-config `describeValues`                                               | A one-line field or diagnostic message.                                                      |
+| ui-settings share URL (`style: 'inline'`)                                                        | A URL is one line.                                                                           |
+| Source edits of ui-core                                                                          | They keep the layout the author wrote.                                                       |
+| `docs/spec/fixtures/shapes/`, ui-core reader fixtures, inline test inputs                        | They prove that the one-line and parenthesized forms still read the same.                    |
+| `docs/spec/projection.md`, the "Three forms" section of the ui-core README                       | They show the forms side by side.                                                            |
+| Swift/Kotlin `*.render.lino` snapshots                                                           | One-line dumps compared by the snapshot tests.                                               |
+| `docs/case-studies/issue-1/`, `experiments/`                                                     | History: the texts as they were written and probed.                                          |
+| ui-links (`formatLino`, `(id: source target)` lines, `(auth: token)` requests)                   | It speaks link-cli's protocol (`clink --serve`), whose canonical text has one link per line. |
+| `lino="…"` attributes of `packages/ui-components/examples/link-view.html`                        | An HTML attribute value is written on one line.                                              |
+| One-line messages and media queries (`(field NAME)` diagnostics, `(prefers-color-scheme: dark)`) | They are not Links Notation documents.                                                       |
+| The bad input of `examples/ui-style-basics.mjs` (`(state :hover …)`)                             | It shows CSS syntax as a user would type it, and the diagnostic it gets.                     |
+| Tests of the Kotlin links-notation port (`native/kotlin/links-notation`)                         | They check the upstream formatter behaviour that the port mirrors.                           |
 
 ### Issue templates
 
@@ -275,3 +292,10 @@ duplicates found among the 378 existing issues and pull requests:
   the allowlisted files.
 - `node --test tests/lino-nested-form.test.js` fails when a parenthesized
   multi-line link is added to any other `.lino` file or ` ```lino ` block.
+- `node experiments/issue-133/find-paren-literals.mjs $(git ls-files 'examples/*.js' 'examples/*.mjs' 'packages/*/src/*.js')`
+  lists the JavaScript literals that `nestLino` would change. All that are
+  left are exceptions from the table above: messages, media queries,
+  protocol lines and the bad input of the style example.
+- `node experiments/issue-133/check-example-readers.mjs` checks that the
+  converted example documents read like the old ones, and the converted
+  `examples/*.mjs` print the same output as before.
