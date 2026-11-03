@@ -47,6 +47,14 @@
         padding-top: 16px;
         border-top: 1px solid #cac4d0;
       }
+      pre {
+        max-height: 320px;
+        overflow: auto;
+        padding: 12px;
+        background: #f3edf7;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
       dl {
         margin-top: 16px;
         display: grid;
@@ -76,6 +84,16 @@
           >Status: <output id="status" aria-live="polite">ready</output></span
         >
       </div>
+      <div class="controls" aria-label="Recording controls">
+        <button id="record" type="button">Record</button>
+        <button id="stop" type="button" disabled>Stop</button>
+        <button id="replay" type="button" disabled>Replay</button>
+        <label for="scrubber">Recording time (ms)</label>
+        <input id="scrubber" type="range" min="0" max="0" value="0" disabled />
+      </div>
+      <pre id="recording" tabindex="0" aria-label="LiNo recording">
+Record a session to see its Links Notation.</pre
+      >
       <dl>
         <dt>Safety</dt>
         <dd id="safety"></dd>

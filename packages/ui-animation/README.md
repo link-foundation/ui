@@ -337,3 +337,108 @@ toggle, the `pressed` trigger, and the accessibility of the example.
 ## License
 
 [Unlicense](LICENSE) (public domain).
+
+## Recording format
+
+The recorder stores the clock, inputs, store operations and animation starts,
+not pixels. The initial `snapshot` is the store's LiNo operation log, inserting
+all roots with their stable IDs and exact property lists. `set` is the readable
+form of `setProp`; structural events use the merged store's operation syntax.
+Other updates (`removeProp`, positional edits, duplicate properties and rename)
+use `set` with an `operation` child carrying the original operation. No store
+methods are patched and no fake snapshot/restore API is required.
+
+```js
+import {
+  createRecorder,
+  replay,
+  stateAt,
+  animationsAt,
+  verifyReplay,
+  toPlaywright,
+} from '@link-foundation/ui-animation';
+
+const recorder = createRecorder({ store, player, root, handle, seed: 42 });
+recorder.start();
+recorder.mark('saved once');
+const text = recorder.stop(); // detaches store, player and DOM listeners
+const playback = replay(text, { store, player });
+playback.seek(990);
+playback.seek(0); // restores the initial snapshot, then applies due diffs
+await playback.play();
+const spec = toPlaywright(text, { url: '/examples/animation/' });
+```
+
+```lino
+session-7: recording
+  started '2026-11-01T12:00:00Z'
+  seed 42
+  viewport 1280 800
+  document app
+  redacted true
+  event 0ms
+    set ok label OK
+  event 840ms
+    input pointer down ok
+      at 12 8
+  event 841ms
+    play press-feedback
+      target ok
+  event 990ms
+    set ok label Saved
+```
+
+`parseRecording` accepts the official parser's nested and parenthesized forms;
+`serializeRecording` writes the canonical nested form and preserves header and
+event order. Event times are nonnegative integer milliseconds relative to
+`start()`, with file order breaking ties. `started` is the wall-clock origin;
+set `started` explicitly alongside an injected monotonic `clock` for fixtures.
+Viewport and document ID are inferred from the root, or supplied explicitly.
+`stateAt(text, ms)` returns a pure LiNo snapshot. `animationsAt(text, ms)` lists
+uncancelled plays with local time and seed; pass `{ model, resolveToken }` to
+filter completed animations and timelines before sampling them.
+
+DOM listeners are passive and capture-phase. The render handle maps targets to
+stable IDs, and pointer coordinates are relative to the target box. Pointer
+moves retain at most one event per 1/60-second bucket for the session. Adjacent
+text edits to the same field merge into the final value; intervening diffs or
+other events preserve causal order. Password and `(sensitive true)` values are
+redacted as `***` in the initial snapshot, insertions, updates and input events
+by default. `redact: false` explicitly opts out. A DOM password target is also
+remembered for subsequent store updates. `maxEvents` defaults to 100,000;
+overflow retains the latest events in a ring and adds `truncated true`. Such
+recordings can be inspected, but replay, verification and export reject them
+because their missing prefix cannot be reproduced faithfully.
+
+The shared `createManualClock()` runs timers at their exact due times, preserving
+insertion order for ties. `advance(ms)` drives replay and player frames without
+real time. `replay` applies recorded diffs and seeded animations; it does not
+redispatch inputs. `pause()` resolves the pending `play()` call, and `seek()`
+pauses playback. Store-triggered animations ignore operations with origin
+`replay`, so recorded play events are not fired twice.
+
+`verifyReplay(text, { createApp })` builds a fresh app with `createApp(seed,
+clock)`. Return `{ store, dispatchInput(event), dispose?() }`: the verifier
+restores the initial snapshot, dispatches only recorded inputs at their recorded
+times, then compares resulting store diffs (including timestamps and order).
+The injected clock must drive the app's timers too. The asynchronous result
+contains `ok` and `{ time, expected, actual }` mismatches. Redacted recordings
+can only verify handlers whose observable output is independent of the removed
+secret values; a mismatch is reported rather than assuming those values.
+
+Keyboard events use Playwright’s native keyboard API, including default button
+activation. Text events skip a fill when the preceding key already produced the
+recorded value, avoiding duplicate input notifications. Redacted keys remain
+synthetic because their original character is unavailable.
+
+`toPlaywright(text, { url })` exports a Playwright spec with a controlled clock,
+viewport, stable `data-link-id` selectors, pointer/key/wheel/text/focus inputs,
+property assertions and named `test.step` markers. DOM properties such as labels
+and values are asserted directly. For store-only properties such as `pressed`, the page
+exposes `window.uiRecordingState(id, name)` returning the property's raw values
+(the animation example demonstrates the hook). The exported test includes no
+runtime recorder dependency. Redacted text remains `***`; it cannot reconstruct
+secrets. No rrweb code or dependency ships in this package.
+
+Run the example at `/examples/animation/`: Record, interact with OK, Stop, then
+Replay or move the labelled time scrubber. The `<pre>` shows the sharable LiNo.

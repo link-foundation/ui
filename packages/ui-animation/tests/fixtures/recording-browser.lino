@@ -1,0 +1,15 @@
+browser-session: recording
+  seed 42
+  viewport 1280 800
+  event 0ms
+    mark 'press OK'
+  event 10ms
+    input pointer down ok
+      at 12 8
+  event 10ms
+    set ok pressed true
+  event 30ms
+    input pointer up ok
+      at 12 8
+  event 30ms
+    set ok pressed false

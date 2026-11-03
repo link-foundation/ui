@@ -10,6 +10,8 @@ import { mountDocument } from '@link-foundation/ui-dom';
 import { readTokens, resolveTokens } from '@link-foundation/ui-tokens';
 import {
   createPlayer,
+  createRecorder,
+  replay,
   loadAnimations,
   spring,
   springEasing,
@@ -42,7 +44,11 @@ const resolveToken = tokenResolver(
   resolveTokens(readTokens(tokens).sets, 'material3')
 );
 const model = loadAnimations(animationsText);
-const player = createPlayer(handle, { animations: model, resolveToken });
+const player = createPlayer(handle, {
+  animations: model,
+  resolveToken,
+  seed: 42,
+});
 player.bindTriggers(store);
 
 // The safety rules of every animation (fill, flashes, reduced motion).
@@ -91,18 +97,79 @@ document.getElementById('play').addEventListener('click', () => play('intro'));
 
 // The `pressed` state of OK lives in the store; `(on pressed)` plays
 // press-feedback when it turns on.
-const ok = handle.nodeFor('ok').querySelector('button');
 const press = () => store.setProp('ok', 'pressed', ['true']);
 const release = () => store.setProp('ok', 'pressed', ['false']);
-ok.addEventListener('pointerdown', press);
-ok.addEventListener('keydown', (event) => {
-  if (event.key === ' ' || event.key === 'Enter') {
+// Delegate on the stable root: seeking rebuilds the rendered nodes.
+app.addEventListener('pointerdown', (event) => {
+  if (handle.idFor(event.target) === 'ok') {
     press();
   }
 });
-for (const name of ['pointerup', 'pointerleave', 'keyup', 'blur']) {
-  ok.addEventListener(name, release);
+app.addEventListener('keydown', (event) => {
+  if (
+    handle.idFor(event.target) === 'ok' &&
+    (event.key === ' ' || event.key === 'Enter')
+  ) {
+    press();
+  }
+});
+for (const name of ['pointerup', 'pointerleave', 'keyup', 'focusout']) {
+  app.addEventListener(
+    name,
+    (event) => {
+      if (handle.idFor(event.target) === 'ok') {
+        release();
+      }
+    },
+    true
+  );
 }
 
 window.animationExample = { player, store, handle, play };
 document.body.dataset.ready = 'true';
+
+// Record the rendered document only; recorder controls stay outside its root.
+const recorder = createRecorder({ store, player, root: app, handle, seed: 42 });
+let recording = '';
+let playback = null;
+const source = document.getElementById('recording');
+const scrubber = document.getElementById('scrubber');
+const recordButton = document.getElementById('record');
+const stopButton = document.getElementById('stop');
+const replayButton = document.getElementById('replay');
+recordButton.addEventListener('click', () => {
+  playback?.pause();
+  recorder.start();
+  recordButton.disabled = true;
+  stopButton.disabled = false;
+  replayButton.disabled = true;
+  scrubber.disabled = true;
+  status.textContent = 'recording';
+});
+stopButton.addEventListener('click', () => {
+  recording = recorder.stop();
+  source.textContent = recording;
+  playback = replay(recording, { store, player });
+  scrubber.max = String(playback.duration);
+  scrubber.value = '0';
+  scrubber.disabled = false;
+  recordButton.disabled = false;
+  stopButton.disabled = true;
+  replayButton.disabled = false;
+  status.textContent = 'recording stopped';
+});
+replayButton.addEventListener('click', async () => {
+  playback.seek(0);
+  status.textContent = 'replaying';
+  await playback.play();
+  scrubber.value = String(playback.time);
+  status.textContent = 'replay finished';
+});
+scrubber.addEventListener('input', () => {
+  playback.seek(Number(scrubber.value));
+  status.textContent = `seek ${playback.time}ms`;
+});
+// Generated specs use this hook for store-only properties with no DOM attribute.
+window.uiRecordingState = (id, name) =>
+  store.get(id)?.properties.findLast((p) => p.name === name)?.values;
+window.animationExample.recording = () => recording;

@@ -361,7 +361,11 @@ export interface Clock {
   requestFrame(callback: (time: number) => void): unknown;
   cancelFrame(id: unknown): void;
 }
-export interface ManualClock extends Clock {
+export interface TimerClock extends Clock {
+  setTimeout(callback: () => void, ms: number): unknown;
+  clearTimeout(id: unknown): void;
+}
+export interface ManualClock extends TimerClock {
   /** Move the time forward by `ms`, one frame (`step` ms) at a time. */
   advance(ms: number, step?: number): void;
   readonly pending: number;
@@ -369,7 +373,7 @@ export interface ManualClock extends Clock {
 /** One frame at 60 Hz (ms). */
 export const FRAME_MS: number;
 export function createManualClock(start?: number): ManualClock;
-export function systemClock(): Clock;
+export function systemClock(): TimerClock;
 export type Motion = 'full' | 'reduced';
 export function defaultMotion(element: Element | null): Motion;
 
@@ -433,7 +437,14 @@ export interface StoreLike {
   subscribe(listener: (events: object[]) => void): () => void;
 }
 
+export interface PlayerEvent {
+  kind: 'play' | 'cancel';
+  id: string;
+  run: number;
+  options: PlayOptions;
+}
 export interface Player {
+  subscribe(listener: (event: PlayerEvent) => void): () => void;
   model: AnimationModel;
   load(source: string | AnimationModel): AnimationModel;
   play(id: string, options?: PlayOptions): PlayControl;
@@ -454,3 +465,117 @@ export function createPlayer(
   handle: ElementSource,
   options?: PlayerOptions
 ): Player;
+
+// Recording and replay
+export interface RecordingEvent {
+  time: number;
+  kind:
+    | 'set'
+    | 'insert'
+    | 'remove'
+    | 'move'
+    | 'input'
+    | 'play'
+    | 'cancel'
+    | 'mark';
+  args: import('@link-foundation/ui-core').RawValue[];
+}
+export interface Recording {
+  id: string;
+  started?: string;
+  seed?: number;
+  viewport?: [number, number];
+  document?: string;
+  /** Initial store operations in Links Notation, including stable IDs. */
+  snapshot?: string;
+  redacted?: boolean;
+  truncated?: boolean;
+  events: RecordingEvent[];
+  headers?: string[];
+}
+export type RecordingSource = string | Recording;
+export function parseRecording(text: string): Recording;
+export function serializeRecording(recording: Recording): string;
+export interface RecorderOptions {
+  store: import('@link-foundation/ui-store').Store;
+  player?: Player;
+  root?: Element;
+  handle?: { idFor(node: Node): string | null };
+  clock?: { now(): number };
+  seed?: number;
+  redact?: boolean;
+  maxEvents?: number;
+  /** Wall-clock origin, separate from the monotonic relative event clock. */
+  started?: number | string;
+  viewport?: [number, number];
+  document?: string;
+}
+export function createRecorder(options: RecorderOptions): {
+  start(): void;
+  stop(): string;
+  mark(label: string): void;
+  size(): number;
+};
+/** Pure: a store operation snapshot in Links Notation. */
+export function stateAt(recording: RecordingSource, tMs: number): string;
+export function animationsAt(
+  recording: RecordingSource,
+  tMs: number,
+  options?: {
+    model?: AnimationModel;
+    resolveToken?: ResolveToken;
+  }
+): {
+  id: string;
+  time: number;
+  started: number;
+  target?: string;
+  input?: string;
+  seed?: number | string;
+  run?: string;
+}[];
+export interface ReplayControl {
+  play(): Promise<void>;
+  pause(): void;
+  seek(ms: number): void;
+  readonly time: number;
+  readonly duration: number;
+}
+export function replay(
+  recording: RecordingSource,
+  options: {
+    store: import('@link-foundation/ui-store').Store;
+    player?: Player;
+    clock?: TimerClock;
+  }
+): ReplayControl;
+export function verifyReplay(
+  recording: RecordingSource,
+  options: {
+    createApp(
+      seed: number | undefined,
+      clock: ManualClock
+    ):
+      | {
+          store: import('@link-foundation/ui-store').Store;
+          dispatchInput(event: RecordingEvent): void | Promise<void>;
+          dispose?(): void;
+        }
+      | Promise<{
+          store: import('@link-foundation/ui-store').Store;
+          dispatchInput(event: RecordingEvent): void | Promise<void>;
+          dispose?(): void;
+        }>;
+  }
+): Promise<{
+  ok: boolean;
+  mismatches: {
+    time: number;
+    expected: RecordingEvent | null;
+    actual: RecordingEvent | null;
+  }[];
+}>;
+export function toPlaywright(
+  recording: RecordingSource,
+  options?: { url?: string }
+): string;

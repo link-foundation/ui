@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Native recorder export fixture</title>
+  </head>
+  <body>
+    <button data-link-id="ok">OK</button>
+    <input data-link-id="field" aria-label="Text" />
+    <output data-link-id="count">0</output>
+    <script type="module">
+      const button = document.querySelector('button');
+      const input = document.querySelector('input');
+      const count = document.querySelector('output');
+      let changes = 0;
+      button.addEventListener('click', () => {
+        button.textContent = 'Saved';
+      });
+      input.addEventListener('input', () => {
+        count.textContent = String(++changes);
+      });
+    </script>
+  </body>
+</html>
