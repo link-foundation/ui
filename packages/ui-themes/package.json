@@ -36,5 +36,9 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "devDependencies": {
+    "links-notation": "^0.27.1",
+    "prettier": "^3.6.2"
   }
 }

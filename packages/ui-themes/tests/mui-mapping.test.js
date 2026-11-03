@@ -3,7 +3,7 @@ import { it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { defaultVocabulary } from '@link-foundation/ui-core';
-import { registeredKinds } from '@link-foundation/ui-dom';
+import { getKind } from '@link-foundation/ui-dom';
 import { registerControls } from '../../ui-components/src/controls/index.js';
 import '../../ui-components/src/layout/index.js';
 import '../../ui-components/src/overlays/index.js';
@@ -12,7 +12,8 @@ import { getMuiMapping } from '../src/index.js';
 import { mappingMarkdown } from '../scripts/mapping-to-md.mjs';
 
 it('covers every requested MUI component with real registered kinds and explicit statuses', async () => {
-  registerControls();
+  const kinds = new Map();
+  registerControls(kinds);
   const rows = await getMuiMapping();
   const required =
     'Button IconButton TextField Checkbox Radio RadioGroup Switch Slider Select Dialog Menu Tooltip Snackbar Drawer AppBar Tabs Card List Table Chip Avatar Badge Box Stack Grid Typography CircularProgress'.split(
@@ -28,10 +29,7 @@ it('covers every requested MUI component with real registered kinds and explicit
   for (const row of rows) {
     assert.ok(['mapped', 'partial', 'none'].includes(row.status));
     if (row.status !== 'none') {
-      assert.ok(
-        registeredKinds().includes(row.kind),
-        `${row.component}: ${row.kind}`
-      );
+      assert.ok(getKind(row.kind, kinds), `${row.component}: ${row.kind}`);
       for (const prop of row.props) {
         assert.ok(
           defaultVocabulary()

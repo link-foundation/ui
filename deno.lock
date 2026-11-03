@@ -3266,7 +3266,9 @@
           "dependencies": [
             "npm:@link-foundation/ui-core@^0.0.0",
             "npm:@link-foundation/ui-tokens@^0.0.0",
-            "npm:@material/material-color-utilities@0.3.0"
+            "npm:@material/material-color-utilities@0.3.0",
+            "npm:links-notation@^0.27.1",
+            "npm:prettier@^3.6.2"
           ]
         }
       },
