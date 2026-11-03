@@ -109,6 +109,20 @@ const { store } = mountDocument(app, text, { tokens, styles, onAction });
 store.setProp('greeting', 'value', ['Hello again']); // one patch
 ```
 
+### Vue
+
+[`@link-foundation/ui-vue`](packages/ui-vue/README.md) mounts ui-dom in a Vue 3
+`UiView` component, gives the store to Vue through composables
+(`useUiProp`, `useUiElement`, `useUiStore`, `useUiAction`) and draws custom
+kinds with Vue components ([example app](examples/vue/)):
+
+```js
+import { UiView, createUiPlugin } from '@link-foundation/ui-vue';
+
+app.use(createUiPlugin({ store, actions: { save } })); // (on press (emit save))
+// <UiView :components="{ chart: SalesChart }" @action="log" />
+```
+
 ### SwiftUI
 
 [`ui-swift`](packages/ui-swift/README.md) draws a LiNo document with native
