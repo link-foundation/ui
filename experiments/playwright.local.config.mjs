@@ -1,22 +1,15 @@
-/**
- * Local runs only: the repository config with the full Chromium build
- * (channel 'chromium', new headless mode), for machines that have it but
- * not chrome-headless-shell. CI uses playwright.config.mjs as is.
- *
- *   npx playwright test -c experiments/playwright.local.config.mjs \
- *     packages/ui-components/tests/e2e/diagrams.spec.js
- */
+// Local run with the installed browsers (the pinned headless shell build is
+// missing here): CHROME=<path to chrome-headless-shell> npx playwright test
+// -c experiments/playwright.local.config.mjs <file>
 import base from '../playwright.config.mjs';
 
+const launchOptions = process.env.CHROME
+  ? { executablePath: process.env.CHROME }
+  : {};
 export default {
   ...base,
   testDir: '..',
-  outputDir: '../test-results',
-  webServer: { ...base.webServer, cwd: '..' },
-  projects: [
-    {
-      name: 'chromium',
-      use: { ...base.projects[0].use, channel: 'chromium' },
-    },
-  ],
+  projects: base.projects.map((p) =>
+    p.name === 'chromium' ? { ...p, use: { ...p.use, launchOptions } } : p
+  ),
 };

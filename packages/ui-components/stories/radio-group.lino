@@ -1,0 +1,10 @@
+(radio-group-stories: stories
+  (component radio-group)
+  (story vertical (radio-group 'Plan' (value pro)
+    (free: radio 'Free' (value free))
+    (pro: radio 'Pro' (value pro))
+    (team: radio 'Team' (value team))))
+  (story horizontal (radio-group 'Size' (orientation horizontal) (value s)
+    (s: radio 'S' (value s))
+    (m: radio 'M' (value m))
+    (l: radio 'L' (value l) (disabled true)))))

@@ -1,0 +1,4 @@
+(color-field-stories: stories
+  (component color-field)
+  (story default (color-field 'Accent' (value '#6750a4')))
+  (story disabled (color-field 'Background' (value '#ffffff') (disabled true))))

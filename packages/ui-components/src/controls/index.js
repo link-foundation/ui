@@ -48,6 +48,12 @@ export { formatNumber, readNumber } from './number-field.js';
 export { fractionOf, valueText } from './slider.js';
 export { filterOptions } from './combobox.js';
 export { BADGE_TONES } from './badge.js';
+export {
+  parseCatalog,
+  parseStories,
+  storiesDocument,
+  storyId,
+} from './stories.js';
 
 /** The kind renderer of every basic control, by kind name. */
 export const CONTROL_KIND_SPECS = Object.freeze({

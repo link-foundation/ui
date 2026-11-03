@@ -81,6 +81,29 @@
         gap: 16px 24px;
         align-items: start;
       }
+      #submit {
+        min-block-size: 40px;
+        padding: 0 24px;
+        border: 0;
+        border-radius: 20px;
+        background: var(--color-primary);
+        color: var(--color-on-primary);
+        font: inherit;
+      }
+      #submit:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+      }
+      h2 {
+        margin: 32px 0 16px;
+        font-size: 1.25rem;
+      }
+      #stories > ui-document {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px 24px;
+        align-items: start;
+      }
       output {
         font-family: ui-monospace, monospace;
       }
@@ -107,10 +130,17 @@
         <span data-i18n="diagnostics">Diagnostics</span>:
         <output id="diagnostics">none</output>
       </p>
+      <h2 data-i18n="stories">Stories</h2>
+      <div id="stories"></div>
     </main>
     <script type="module">
       import '@link-foundation/ui-components/icons';
-      import { mountControls } from '@link-foundation/ui-components/controls';
+      import {
+        mountControls,
+        parseCatalog,
+        parseStories,
+        storiesDocument,
+      } from '@link-foundation/ui-components/controls';
       import { bindKeys } from '@link-foundation/ui-components/a11y';
 
       const MESSAGES = {
@@ -120,6 +150,7 @@
           changes: 'Changes',
           shortcuts: 'Shortcuts',
           diagnostics: 'Diagnostics',
+          stories: 'Stories',
           save: 'Save',
           close: 'Close',
           name: 'Name',
@@ -152,6 +183,7 @@
           changes: 'Изменения',
           shortcuts: 'Сочетания клавиш',
           diagnostics: 'Диагностика',
+          stories: 'Истории',
           save: 'Сохранить',
           close: 'Закрыть',
           name: 'Имя',
@@ -212,6 +244,23 @@
   (ada: avatar 'Ada Lovelace')
   (grace: avatar 'Grace Hopper' (size large)))`;
 
+      // The gallery: every story of every control in the catalog.
+      const read = (url) => fetch(url).then((response) => response.text());
+      const catalog = parseCatalog(
+        await read('/packages/ui-components/src/controls/catalog.lino')
+      );
+      const storySets = await Promise.all(
+        [...catalog.keys()].map(async (kind) =>
+          parseStories(
+            await read(`/packages/ui-components/stories/${kind}.lino`)
+          )
+        )
+      );
+      const gallery = mountControls(
+        document.getElementById('stories'),
+        storiesDocument(storySets)
+      );
+
       const app = document.getElementById('app');
       const changes = [];
       let mounted = null;
@@ -229,7 +278,9 @@
             changes.push(`${detail.source}:${detail.event}`),
         });
         window.controls = mounted;
-        const codes = mounted.diagnostics.map((d) => d.code);
+        const codes = [...mounted.diagnostics, ...gallery.diagnostics].map(
+          (d) => d.code
+        );
         document.getElementById('diagnostics').textContent =
           codes.length === 0 ? 'none' : codes.join(', ');
       }
@@ -264,6 +315,7 @@
         mount(locale);
       };
       window.changes = changes;
+      window.gallery = gallery;
       window.setUi({ theme: 'light', locale: 'en' });
       app.dataset.ready = 'true';
     </script>
