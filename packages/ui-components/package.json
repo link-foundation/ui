@@ -67,7 +67,12 @@
       "types": "./src/overlays/index.d.ts",
       "default": "./src/overlays/index.js"
     },
-    "./overlays.css": "./src/overlays/styles.css"
+    "./overlays.css": "./src/overlays/styles.css",
+    "./data": {
+      "types": "./src/data/index.d.ts",
+      "default": "./src/data/index.js"
+    },
+    "./data.css": "./src/data/data.css"
   },
   "types": "./src/index.d.ts",
   "files": [

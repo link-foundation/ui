@@ -1,0 +1,95 @@
+ui-list,
+ui-tree,
+ui-table {
+  display: block;
+  min-width: 0;
+  color: CanvasText;
+  background: Canvas;
+  border: 1px solid GrayText;
+  border-radius: 6px;
+  font: inherit;
+}
+.ui-data-scroll {
+  height: 320px;
+  overflow: auto;
+  position: relative;
+  overflow-anchor: none;
+  touch-action: pan-x pan-y;
+}
+.ui-data-body {
+  position: relative;
+}
+.ui-data-row {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 6px 8px;
+  overflow-wrap: anywhere;
+  background: Canvas;
+}
+.ui-data-row[aria-selected='true'] {
+  background: Highlight;
+  color: HighlightText;
+}
+.ui-data-row:focus,
+.ui-data-row [role='gridcell']:focus {
+  outline: 2px solid currentColor;
+  outline-offset: -3px;
+}
+.ui-data-row[role='treeitem'][aria-expanded]::before {
+  content: '▸ ';
+}
+.ui-data-row[role='treeitem'][aria-expanded='true']::before {
+  content: '▾ ';
+}
+.ui-data-header,
+.ui-data-row[role='row'] {
+  display: grid;
+  padding: 0;
+}
+.ui-data-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  min-width: max-content;
+  background: Canvas;
+  border-bottom: 1px solid GrayText;
+}
+.ui-data-header [role='columnheader'] {
+  position: relative;
+  display: flex;
+}
+.ui-data-header button {
+  background: Canvas;
+  color: CanvasText;
+  border: 0;
+  font: inherit;
+  font-weight: bold;
+  padding: 8px;
+  width: 100%;
+  text-align: start;
+}
+.ui-data-header button:disabled {
+  opacity: 1;
+}
+.ui-data-resize {
+  width: 8px;
+  flex: 0 0 8px;
+  cursor: col-resize;
+  touch-action: none;
+  border-inline-end: 1px solid GrayText;
+}
+.ui-data-row [role='gridcell'] {
+  padding: 6px 8px;
+  min-width: 0;
+}
+.ui-data-caption {
+  padding: 8px;
+  font-weight: bold;
+}
+.ui-data-status:not(:empty) {
+  padding: 16px;
+}
+.ui-data-scroll[hidden],
+.ui-data-caption[hidden] {
+  display: none;
+}

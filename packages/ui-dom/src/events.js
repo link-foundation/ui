@@ -19,11 +19,12 @@ import { vocabulary } from './model.js';
 export const DOM_EVENTS = Object.freeze({
   press: 'click',
   close: 'ui-close',
-  select: 'ui-select',
   focus: 'focusin',
   blur: 'focusout',
   hover: 'pointerenter',
   change: 'ui-change',
+  select: 'ui-select',
+  activate: 'ui-activate',
 });
 
 /** Whether a name is a vocabulary action (`navigate`, `emit`...). */
@@ -90,7 +91,8 @@ export function handlersOf(element, report, isAction = isVocabularyAction) {
  * @param {EventTarget} target  the element the DOM events come from
  * @param {ReturnType<typeof handlersOf>} handlers
  * @param {{idFor: (node: Node) => string|null,
- *   onAction?: (detail: object, event: Event) => void}} host
+ *   onAction?: (detail: object, event: Event) => void,
+ *   diagnostic?: Function}} host
  * @returns {() => void} remove the listeners
  */
 export function bindHandlers(node, target, handlers, host) {
@@ -98,11 +100,16 @@ export function bindHandlers(node, target, handlers, host) {
   const listeners = handlers.map(({ event, domEvent, actions }) => {
     const listener = (domEventObject) => {
       for (const action of actions) {
+        const resolved = resolveItemAction(action, domEventObject.detail?.item);
+        if (resolved[0] === 'navigate' && isUnsafeUrl(resolved[1])) {
+          host.diagnostic?.('unsafe-url', 'error', { property: 'on' });
+          continue;
+        }
         // The ID at dispatch time: a rename after binding is honoured.
         const detail = Object.freeze({
           source: host.idFor(node),
           event,
-          action,
+          action: resolved,
           ...(domEventObject.detail?.target === undefined
             ? {}
             : {
@@ -128,4 +135,40 @@ export function bindHandlers(node, target, handlers, host) {
       target.removeEventListener(domEvent, listener);
     }
   };
+}
+
+/** Resolve item references from data-kind events by own-property traversal only. */
+function resolveItemAction(action, item) {
+  if (item === undefined) {
+    return action;
+  }
+  const resolve = (value) => {
+    const reference =
+      Array.isArray(value) &&
+      value[0] === 'param' &&
+      typeof value[1] === 'string' &&
+      value[1].startsWith('item.')
+        ? value[1].slice(5)
+        : null;
+    if (Array.isArray(value) && reference === null) {
+      return Object.freeze(value.map(resolve));
+    }
+    if (reference === null) {
+      return value;
+    }
+    let current = item;
+    for (const name of reference.split('.')) {
+      if (
+        ['__proto__', 'prototype', 'constructor'].includes(name) ||
+        current === null ||
+        typeof current !== 'object' ||
+        !Object.hasOwn(current, name)
+      ) {
+        return undefined;
+      }
+      current = current[name];
+    }
+    return current;
+  };
+  return resolve(action);
 }
