@@ -1,9 +1,11 @@
-(stack-0: stack
-  (direction vertical)
-  (gap (token space.2))
-  (text-field-0-0: text-field
-    (label Email))
-  (button-0-1: button
-    (label 'Sign in')
-    (variant filled)
-    (on press (action signIn))))
+stack-0: stack
+  direction vertical
+  gap
+    token space.2
+  text-field-0-0: text-field
+    label Email
+  button-0-1: button
+    label 'Sign in'
+    variant filled
+    on press
+      action signIn

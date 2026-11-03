@@ -131,7 +131,7 @@ describe('JSON Forms rules', () => {
       fixture('json-forms', 'categorization.json')
     );
     expect(lino).toContain(
-      '(rule (disable (when (bind diet) (one-of vegan pescatarian))))'
+      '\n      rule\n        disable\n          when\n            bind diet\n            one-of vegan pescatarian\n'
     );
   });
 });
@@ -153,7 +153,7 @@ describe('JSON Forms scopes', () => {
       uischema: { type: 'Control', scope: '#/properties/a', future: [1] },
     };
     const { lino } = importJsonForms(input);
-    expect(lino).toContain('(extra json-forms');
+    expect(lino).toContain('\n    extra json-forms ');
     expect(normalizeJsonForms(exportJsonForms(lino).json)).toEqual(
       normalizeJsonForms(input)
     );
@@ -178,7 +178,7 @@ describe('JSON Forms scopes', () => {
       'unbound-schema',
     ]);
     expect(diagnostics[0].at.path).toBe('/uischema/elements/0/scope');
-    expect(lino).toContain(`(bind '#/properties/__proto__')`);
+    expect(lino).toContain(`\n      bind '#/properties/__proto__'\n`);
     const out = exportJsonForms(lino);
     expect(errors(out.diagnostics)).toEqual([]);
     // Compared as text, because toEqual skips an own "__proto__" key.

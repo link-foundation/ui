@@ -1,33 +1,37 @@
-(json-forms: mapping
-  (description 'JSON Forms (schema + uischema) <-> ui-dialect forms.')
-  (source 'https://jsonforms.io/docs/uischema/'))
+json-forms: mapping
+  description 'JSON Forms (schema + uischema) <-> ui-dialect forms.'
+  source 'https://jsonforms.io/docs/uischema/'
 
-(element VerticalLayout stack)
-(element HorizontalLayout stack)
-(element Group section)
-(element Categorization tabs)
-(element Category tab)
-(element Label text)
-(element Control field)
+element VerticalLayout stack
+element HorizontalLayout stack
+element Group section
+element Categorization tabs
+element Category tab
+element Label text
+element Control field
 
-(group layout VerticalLayout HorizontalLayout Group Categorization Category)
-(group ui VerticalLayout HorizontalLayout Group Categorization Category Label Control)
+group layout VerticalLayout HorizontalLayout Group Categorization Category
+group ui VerticalLayout HorizontalLayout Group Categorization Category Label Control
 
-(property Group label title)
-(property Category label title)
-(property Categorization label title)
-(property Control label label)
-(property ui options options)
+property Group label title
+property Category label title
+property Categorization label title
+property Control label label
+property ui options options
 
-(property schema type type)
-(property schema title title)
-(property schema description description)
-(property schema default default)
-(property schema minimum min)
-(property schema maximum max)
-(property schema minLength min-length)
-(property schema maxLength max-length)
-(property schema pattern pattern)
-(property schema format format)
+property schema type type
+property schema title title
+property schema description description
+property schema default default
+property schema minimum min
+property schema maximum max
+property schema minLength min-length
+property schema maxLength max-length
+property schema pattern pattern
+property schema format format
 
-(values effect (HIDE hide) (SHOW show) (ENABLE enable) (DISABLE disable))
+values effect
+  HIDE hide
+  SHOW show
+  ENABLE enable
+  DISABLE disable

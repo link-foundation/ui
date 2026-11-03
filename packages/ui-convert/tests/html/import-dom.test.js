@@ -44,7 +44,7 @@ describe('importDom', () => {
       '<body><nav id="menu"><a href="/">Home</a></nav><p>Other</p></body>'
     ).window;
     const { text, nodeMap } = importDom(document.getElementById('menu'));
-    expect(text.startsWith('(menu: html\n  (tag nav)')).toBe(true);
+    expect(text.startsWith('menu: html\n  tag nav\n')).toBe(true);
     expect(text.includes('Other')).toBe(false);
     expect(nodeMap.get('menu')).toBe(document.getElementById('menu'));
   });
@@ -53,7 +53,7 @@ describe('importDom', () => {
     const { document } = new JSDOM('<template id="t"><p>Inside</p></template>')
       .window;
     const { text } = importDom(document.querySelector('template'));
-    expect(text.includes('(p-0-0: text Inside')).toBe(true);
+    expect(text.includes('\n  p-0-0: text Inside\n')).toBe(true);
   });
 
   it('reads spans through options.location (jsdom nodeLocation)', () => {

@@ -83,7 +83,7 @@ describe('A2UI messages', () => {
       ]),
     ];
     const { lino } = importA2ui(messages);
-    expect(lino).toContain('(extra a2ui');
+    expect(lino).toContain('\n    extra a2ui ');
     expect(exportA2ui(lino).json).toEqual(messages);
   });
 

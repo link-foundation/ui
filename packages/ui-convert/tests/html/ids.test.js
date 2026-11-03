@@ -55,14 +55,14 @@ describe('ids', () => {
     );
     expect(text).toBe(
       [
-        '(x: text 1',
-        '  (tag p))',
-        '(x-2: text 2',
-        '  (tag p)',
-        '  (attr id x))',
-        '(x-3: text 3',
-        '  (tag p)',
-        '  (attr id x))',
+        'x: text 1',
+        '  tag p',
+        'x-2: text 2',
+        '  tag p',
+        '  attr id x',
+        'x-3: text 3',
+        '  tag p',
+        '  attr id x',
         '',
       ].join('\n')
     );
