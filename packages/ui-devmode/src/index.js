@@ -188,3 +188,13 @@ export function mountDevMode(options) {
   });
   return controller;
 }
+
+export { exportOverrides } from './export.js';
+export {
+  encodeShareHash,
+  decodeShareHash,
+  shareUrl,
+  URL_BUDGET,
+} from './share.js';
+export { validateOverrides } from './validate.js';
+export { applySharedOverrides, BACKUP_KEY } from './apply-shared.js';
