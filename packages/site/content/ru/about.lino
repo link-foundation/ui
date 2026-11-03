@@ -1,0 +1,21 @@
+page: document
+  title 'О Links UI'
+  page-title: heading
+    level 1
+    text 'О Links UI'
+  page-lead: paragraph
+    text 'Links UI — ассоциативный UI-фреймворк link-foundation. Документы, конфигурация, токены дизайна, стили и анимации используют Links Notation.'
+  section-title: heading
+    level 2
+    text 'Открытый проект'
+  block-0: paragraph
+    text 'Код передан в общественное достояние по Unlicense. Собственные ресурсы, кроме кода, используют CC0-1.0. Сторонние зависимости сохраняют свои разрешительные лицензии и атрибуцию.'
+  block-1: link
+    label 'Репозиторий фреймворка'
+    href 'https://github.com/link-foundation/ui'
+  block-2: link
+    label 'Links Notation'
+    href 'https://github.com/link-foundation/links-notation'
+  block-3: link
+    label 'Лицензии ресурсов и зависимостей'
+    href 'https://github.com/link-foundation/ui/blob/main/docs/licensing.md'

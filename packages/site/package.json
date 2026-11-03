@@ -1,0 +1,26 @@
+{
+  "name": "@link-foundation/ui-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "node --test --test-timeout=30000 tests/*.test.js"
+  },
+  "dependencies": {
+    "@link-foundation/ui-core": "*",
+    "@link-foundation/ui-dom": "*",
+    "@link-foundation/ui-store": "*",
+    "@link-foundation/ui-config": "*",
+    "@link-foundation/ui-components": "*",
+    "@link-foundation/ui-i18n": "*",
+    "@link-foundation/ui-themes": "*",
+    "@link-foundation/ui-tokens": "*",
+    "@link-foundation/ui-devmode": "*"
+  },
+  "devDependencies": {
+    "vite": "^7.3.1",
+    "jsdom": "^30.1.3"
+  }
+}

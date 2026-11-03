@@ -50,12 +50,6 @@ jobs:
     concurrency:
       group: check-${{ github.workflow }}-${{ github.ref }}-web-build
       cancel-in-progress: true
-    # check-pages.sh and configure-pages read the Pages API, which answers
-    # a request it does not authorise with the same 404 as a disabled site,
-    # so the read is granted explicitly.
-    permissions:
-      contents: read
-      pages: read
     steps:
       - uses: actions/checkout@v7
         with:
@@ -67,19 +61,6 @@ jobs:
           node-version: '24.x'
           cache: npm
           cache-dependency-path: examples/universal-app/package-lock.json
-
-      # Pull requests never deploy, so they only warn; main fails with the
-      # setting a maintainer has to change.
-      - name: Check GitHub Pages source
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REPOSITORY: ${{ github.repository }}
-          PAGES_MODE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'require' || 'warn' }}
-        run: bash scripts/check-pages.sh
-
-      - name: Configure GitHub Pages
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: actions/configure-pages@v6
 
       - name: Install app dependencies
         run: npm ci --prefix examples/universal-app --no-audit --no-fund
@@ -96,14 +77,6 @@ jobs:
           name: universal-example-web
           path: examples/universal-app/dist
           if-no-files-found: error
-
-      - name: Upload GitHub Pages artifact
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: ./.github/actions/artifact-transport
-        with:
-          name: github-pages
-          pages: 'true'
-          path: examples/universal-app/dist
 
   # examples/react: the Vite + React app of @link-foundation/ui-react.
   react-example:
@@ -130,32 +103,6 @@ jobs:
 
       - name: Build app
         run: npm --prefix examples/react run build
-
-  # Requires Settings → Pages → Source = GitHub Actions to be set once
-  # in the repository before this job can succeed. See README → "Deploying
-  # the example app". The Pages source cannot be configured from a workflow.
-  pages-deploy:
-    name: Deploy GitHub Pages
-    needs: [web-build]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    concurrency:
-      group: main-writer-${{ github.repository }}-main
-      cancel-in-progress: false
-      queue: max
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy Pages artifact
-        id: deployment
-        uses: actions/deploy-pages@v5
-        env:
-          NODE_OPTIONS: --disable-warning=DEP0040
 
   desktop-package:
     name: Package desktop app (${{ matrix.os }})
@@ -469,7 +416,6 @@ jobs:
     needs:
       - web-build
       - react-example
-      - pages-deploy
       - desktop-package
       - android-build
       - ios-build

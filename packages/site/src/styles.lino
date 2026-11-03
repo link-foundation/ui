@@ -1,0 +1,52 @@
+site-colours: style
+  selector
+    type document
+  background
+    token color.surface
+  color
+    token color.on-surface
+site-links: style
+  selector
+    type link
+  color
+    token color.primary
+site-brand: style
+  selector
+    data-link-id brand
+  font-size 1.7rem
+  font-weight 750
+site-header: style
+  selector
+    type header
+  padding 1.5rem 2rem
+  media
+    max-width 600px
+    padding 1.25rem
+site-main: style
+  selector
+    type main
+  padding 2.5rem 2rem 3rem
+  media
+    max-width 600px
+    padding 1.25rem
+site-footer: style
+  selector
+    type footer
+  padding 1.5rem 2rem
+  font-size 0.9rem
+  media
+    max-width 600px
+    padding 1.25rem
+site-code: style
+  selector
+    type code-block
+  padding 1.25rem
+  radius 0.75rem
+site-preferences: style
+  selector
+    data-link-id preferences
+  gap 1rem
+site-language-links: style
+  selector
+    data-link-id language-fallback
+  gap 1rem

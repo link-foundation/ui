@@ -1,0 +1,73 @@
+site: document
+  title 'Links UI'
+  theme base
+  scheme system
+  locale en
+  site-header: header
+    brand: link
+      label 'Links UI'
+      href './'
+    site-nav: navigation
+      nav-start: link
+        label
+          t nav.start
+        href 'getting-started/'
+      nav-dialect: link
+        label
+          t nav.dialect
+        href 'dialect/'
+      nav-components: link
+        label
+          t nav.components
+        href 'components/'
+      nav-themes: link
+        label
+          t nav.themes
+        href 'themes/'
+      nav-about: link
+        label
+          t nav.about
+        href 'about/'
+    preferences: stack
+      direction horizontal
+      language: select
+        label
+          t language
+        value en
+        en: option 'English'
+        ru: option 'Русский'
+      theme-choice: select
+        label
+          t theme
+        value base
+        base: option 'Base'
+        material3: option 'Material 3'
+      scheme-choice: select
+        label
+          t scheme
+        value system
+        system: option
+          label
+            t system
+        light: option
+          label
+            t light
+        dark: option
+          label
+            t dark
+    language-fallback: stack
+      direction horizontal
+      english: link
+        label 'English'
+        href './'
+      russian: link
+        label 'Русский'
+        href './'
+  content: main
+  site-footer: footer
+    footer-description: paragraph
+      text
+        t footer
+    repository: link
+      label 'GitHub · link-foundation/ui'
+      href 'https://github.com/link-foundation/ui'

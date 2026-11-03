@@ -1,0 +1,18 @@
+page: document
+  title 'Themes and colour schemes'
+  page-title: heading
+    level 1
+    text 'Themes and colour schemes'
+  page-lead: paragraph
+    text 'Choose Base, Material 3 or HIG (including iOS and macOS) in the header. Light, dark and system schemes use the theme engine. Your preference is saved in the user configuration layer.'
+  section-title: heading
+    level 2
+    text 'Follow your preferences'
+  block-0: paragraph
+    text 'System follows prefers-color-scheme. Themes also respect high contrast and reduced motion preferences. Theme boundaries can be nested without replacing controls.'
+  block-1: link
+    label 'Theme contract'
+    href 'https://github.com/link-foundation/ui/blob/main/docs/spec/themes.md'
+  block-2: link
+    label 'Material 3'
+    href 'https://github.com/link-foundation/ui/blob/main/docs/themes/material3.md'

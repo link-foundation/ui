@@ -33,10 +33,10 @@ history is kept in
 
 ## Quick Start
 
-The example app is deployed with GitHub Pages to
-<https://link-foundation.github.io/ui/>. The site goes live after a maintainer
-sets **Settings → Pages → Build and deployment → Source** to **GitHub Actions**
-(see [#5](https://github.com/link-foundation/ui/issues/5)).
+The documentation and demo site is built from LiNo with our own framework and
+published at <https://link-foundation.github.io/ui/>. It includes English and
+Russian pages, theme preferences and development mode. See
+[the site workspace](packages/site/README.md) for local development.
 
 ### Using the Package
 
@@ -505,17 +505,14 @@ The CI/CD pipeline is designed to handle concurrent PRs gracefully:
 
 This design decouples PR validation from the need to pull changes from the default branch, reducing conflicts and ensuring that even if CI/CD fails, all unpublished changesets will still get published when the error is resolved.
 
-### Deploying the example app
+### Deploying the documentation site
 
-The `example-app.yml` workflow deploys the universal example app to GitHub
-Pages on every push to `main`. Before the first run on `main` in a new
-repository created from this template, open **Settings → Pages** and set
-**Source = GitHub Actions**. This is a one-time manual step and cannot be
-configured from a workflow because the Pages source defaults to
-_Deploy from a branch_. Without it, the `pages-deploy` job fails on
-`actions/deploy-pages` with `Get Pages site failed` /
-`Failed to create deployment`. After flipping the source, the workflow
-provisions the Pages site on its first run.
+The `site.yml` workflow builds and deploys `packages/site` to GitHub Pages on
+pushes to `main`. Set **Settings → Pages → Build and deployment → Source** to
+**GitHub Actions** before deployment. Pull requests validate the build without
+deploying; a missing Pages setting warns on PRs and fails on main with the
+maintainer action required. The `example-app.yml` workflow continues to produce
+the universal example build artifact and desktop/mobile packages.
 
 ### Auto-regenerated preview screenshots
 
