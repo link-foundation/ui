@@ -53,6 +53,16 @@ describe('parseLinks / formatLinks', () => {
     expect(parseLinks(nested)).toEqual(values);
   });
 
+  it('writes links-notation links the same as their raw values', () => {
+    const [link] = parseNested(
+      '(shell: dock (persist main) (left: region (panels a b)))'
+    );
+    expect(formatLinks([link])).toBe(
+      'shell: dock\n  persist main\n  left: region\n    panels a b\n'
+    );
+    expect(formatLinks([link])).toBe(formatLinks(parseLinks(link.format())));
+  });
+
   it('reads the nested form and the one-line form as the same values', () => {
     const nested =
       'tx 4\n  origin devmode\n  setProp ok label\n    text Cancel\n';

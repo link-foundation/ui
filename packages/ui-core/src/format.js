@@ -165,7 +165,11 @@ function rootLinkLines(link, style, indent) {
 }
 
 const rootValueLines = (value, style, indent) =>
-  rootLinkLines(valueLink(value), style, indent);
+  rootLinkLines(
+    value instanceof Link ? value : valueLink(value),
+    style,
+    indent
+  );
 
 /**
  * Check a `style` option.
@@ -180,15 +184,15 @@ function checkStyle(style) {
 }
 
 /**
- * Write raw values (docs/spec/values.md) as Links Notation text, with
- * `links-notation` doing all quoting. By default each top-level value is
+ * Write raw values (docs/spec/values.md) or `links-notation` `Link`s as
+ * Links Notation text, with `links-notation` doing all quoting. By default each top-level value is
  * written in the nested `indented` form (#133); `style: 'inline'` (or
  * `'multiline'`, the same for raw values) writes one top-level link per
  * line. The inverse of `parseLinks`: `parseLinks(formatLinks(values))`
  * deep-equals `values` for every value that has no empty link `()` and no
  * link with an id but no values (`(name:)`, read back as the atom `name`)
  * nested inside.
- * @param {import('./types.js').RawValue[]} values
+ * @param {(import('./types.js').RawValue | Link)[]} values
  * @param {import('./types.js').FormatOptions} [options]
  * @returns {string}
  */

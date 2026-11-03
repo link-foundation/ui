@@ -144,11 +144,11 @@ export function parseNested(
 ): Link[];
 
 /**
- * Write raw values as Links Notation text: nested by default, or one
- * top-level link per line with `style: 'inline'`.
+ * Write raw values or `links-notation` links as Links Notation text: nested
+ * by default, or one top-level link per line with `style: 'inline'`.
  */
 export function formatLinks(
-  values: RawValue[],
+  values: readonly (RawValue | Link)[],
   options?: FormatOptions
 ): string;
 
