@@ -175,6 +175,23 @@ export const PROPERTIES = Object.freeze({
     check: nonNegative,
   },
   'border-color': { css: 'border-color', type: 'color', tokens: ['color'] },
+  'outline-width': {
+    css: 'outline-width',
+    type: 'dimension',
+    tokens: ['dimension'],
+    check: nonNegative,
+  },
+  'outline-offset': {
+    css: 'outline-offset',
+    type: 'dimension',
+    tokens: ['dimension'],
+  },
+  'outline-color': { css: 'outline-color', type: 'color', tokens: ['color'] },
+  'outline-style': {
+    css: 'outline-style',
+    type: ['enum', 'none', 'solid', 'dashed', 'dotted', 'double'],
+    tokens: [],
+  },
   direction: {
     css: 'flex-direction',
     type: ['enum', 'horizontal', 'vertical'],

@@ -1,0 +1,31 @@
+fluent2: theme
+  extends fluent2-colors fluent2-shape fluent2-spacing fluent2-type fluent2-shadow fluent2-motion fluent2-colors-dark fluent2-shape-dark fluent2-spacing-dark fluent2-type-dark fluent2-shadow-dark fluent2-motion-dark fluent2-colors-high-contrast fluent2-shape-high-contrast fluent2-spacing-high-contrast fluent2-type-high-contrast fluent2-shadow-high-contrast fluent2-motion-high-contrast fluent2-styles fluent2-templates
+  token font.body system-ui sans-serif
+    type fontFamily
+  token focus.ring.width 2px
+  token focus.ring.color
+    token color.on-surface
+  token elevation.0
+    shadow
+      offset-x 0px
+      offset-y 0px
+      blur 0px
+      spread 0px
+      color '#00000000'
+  token ui.control.hover '#00000000'
+  token ui.control.pressed '#00000000'
+  token ui.control.corner 4px
+  token opacity.disabled 1
+  token opacity.hover 0
+  token opacity.pressed 0
+  pair color.on-surface color.surface
+  pair color.on-surface-variant color.surface
+  pair color.on-primary color.primary
+  pair color.on-primary fluent.color-brand-background-hover
+  pair color.on-primary fluent.color-brand-background-pressed
+  pair color.outline color.surface
+    min 3
+  pair fluent.color-compound-brand-background color.surface
+    min 3
+  pair fluent.color-neutral-foreground-inverted fluent.color-compound-brand-background
+    min 3

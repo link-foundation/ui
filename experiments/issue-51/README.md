@@ -43,3 +43,16 @@ checks pass after merging main. Screenshot evidence is in
 windows, nested axes and all 35 frames). `update-frame-snapshots.mjs` regenerates
 the frame fixture. Remaining release review uses the four repository gates and
 same-revision CI, recorded in PR #160.
+
+## Fluent 2 merge verification
+
+Merge the latest `origin/main` while retaining Fluent 2, Material 3, HIG and all
+classic themes. Preserve both asset attribution sets, forced-colour metadata and
+the classic radial-menu default. The shared loader registers Fluent fragments in
+its cached source registry and keeps the Fluent brand and mapping exports.
+The shipped-theme test checks all six standard IDs before the classic collection.
+
+Verification: run the focused theme/style/token suites and the classic/Fluent
+Chromium browser checks, then the four required repository gates on the merge
+commit. Review the whole PR diff and collect all CI checks for the pushed SHA
+before updating PR #160's acceptance evidence and ready status.

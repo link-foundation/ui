@@ -217,3 +217,9 @@ path = "assets/classic-themes/*.png"
 precedence = "aggregate"
 SPDX-FileCopyrightText = "deep-foundation contributors"
 SPDX-License-Identifier = "Unlicense"
+
+[[annotations]]
+path = "assets/fluent2/LICENSE.txt"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Microsoft Corporation"
+SPDX-License-Identifier = "MIT"

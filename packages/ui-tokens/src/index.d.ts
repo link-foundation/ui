@@ -67,6 +67,8 @@ export interface Token {
   value: TokenValue;
   description?: string;
   m3?: string;
+  fluent?: string;
+  sourceValue?: string;
   mode?: string;
 }
 
@@ -88,6 +90,8 @@ export interface ResolvedToken {
   alias?: string;
   description?: string;
   m3?: string;
+  fluent?: string;
+  sourceValue?: string;
   /** The set that defines the token. */
   set: string;
   /** The mode whose override defines the token. */

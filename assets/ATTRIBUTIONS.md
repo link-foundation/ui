@@ -116,3 +116,10 @@
 - [classic-deepcase-references](https://github.com/deep-foundation/deepcase-app/issues/76) (image): `assets/classic-themes/*.png`
   - Copyright: deep-foundation contributors
   - Licence: [Unlicense](https://github.com/deep-foundation/deepcase-app/blob/main/LICENSE)
+
+## MIT
+
+- [fluent2-token-notice](https://github.com/microsoft/fluentui/tree/master/packages/tokens) (data): `assets/fluent2/LICENSE.txt`
+  - Copyright: Microsoft Corporation
+  - Licence: [MIT](https://github.com/microsoft/fluentui/blob/master/LICENSE)
+  - Attribution: Fluent UI token data: Copyright (c) Microsoft Corporation. MIT licensed. Generated theme data retains the source token names and values.

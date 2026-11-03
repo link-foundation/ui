@@ -1,5 +1,8 @@
 /** Shipped themes remain LiNo data, loaded in browsers or Node without a build. */
-import { readThemeFile } from './material3/mapping.js';
+import { readThemeFile } from './mapping.js';
+import { FLUENT_FILES } from './fluent2/names.js';
+export { fluentThemeFromBrand, fluentBrandRamp } from './fluent2/brand.js';
+export { loadMapping, mappingMarkdown } from './mapping.js';
 export { readMapping } from './mapping.js';
 export { getMuiMapping } from './material3/mapping.js';
 export { materialThemeFromSeed } from './material3/seed.js';
@@ -11,6 +14,7 @@ export function listThemes() {
   return [
     'base',
     'material3',
+    'fluent2',
     'hig',
     'hig-ios',
     'hig-macos',
@@ -23,6 +27,7 @@ let registryPromise;
 async function registry() {
   const paths = [
     'base/theme.lino',
+    ...FLUENT_FILES.map((name) => `fluent2/${name}.lino`),
     ...[
       'colors',
       'type',

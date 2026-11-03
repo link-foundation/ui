@@ -1,0 +1,50 @@
+fluent2-shadow-high-contrast: theme
+  mode high-contrast
+    token fluent.shadow2
+      (shadow (offset-x 0) (offset-y 0) (blur 2px) (spread 0px) (color (rgb 0 0 0 0.24))) (shadow (offset-x 0) (offset-y 1px) (blur 2px) (spread 0px) (color (rgb 0 0 0 0.28)))
+      fluent shadow2
+      source-value '0 0 2px rgba(0,0,0,0.24), 0 1px 2px rgba(0,0,0,0.28)'
+    token fluent.shadow4
+      (shadow (offset-x 0) (offset-y 0) (blur 2px) (spread 0px) (color (rgb 0 0 0 0.24))) (shadow (offset-x 0) (offset-y 2px) (blur 4px) (spread 0px) (color (rgb 0 0 0 0.28)))
+      fluent shadow4
+      source-value '0 0 2px rgba(0,0,0,0.24), 0 2px 4px rgba(0,0,0,0.28)'
+    token fluent.shadow8
+      (shadow (offset-x 0) (offset-y 0) (blur 2px) (spread 0px) (color (rgb 0 0 0 0.24))) (shadow (offset-x 0) (offset-y 4px) (blur 8px) (spread 0px) (color (rgb 0 0 0 0.28)))
+      fluent shadow8
+      source-value '0 0 2px rgba(0,0,0,0.24), 0 4px 8px rgba(0,0,0,0.28)'
+    token fluent.shadow16
+      (shadow (offset-x 0) (offset-y 0) (blur 2px) (spread 0px) (color (rgb 0 0 0 0.24))) (shadow (offset-x 0) (offset-y 8px) (blur 16px) (spread 0px) (color (rgb 0 0 0 0.28)))
+      fluent shadow16
+      source-value '0 0 2px rgba(0,0,0,0.24), 0 8px 16px rgba(0,0,0,0.28)'
+    token fluent.shadow28
+      (shadow (offset-x 0) (offset-y 0) (blur 8px) (spread 0px) (color (rgb 0 0 0 0.24))) (shadow (offset-x 0) (offset-y 14px) (blur 28px) (spread 0px) (color (rgb 0 0 0 0.28)))
+      fluent shadow28
+      source-value '0 0 8px rgba(0,0,0,0.24), 0 14px 28px rgba(0,0,0,0.28)'
+    token fluent.shadow64
+      (shadow (offset-x 0) (offset-y 0) (blur 8px) (spread 0px) (color (rgb 0 0 0 0.24))) (shadow (offset-x 0) (offset-y 32px) (blur 64px) (spread 0px) (color (rgb 0 0 0 0.28)))
+      fluent shadow64
+      source-value '0 0 8px rgba(0,0,0,0.24), 0 32px 64px rgba(0,0,0,0.28)'
+    token fluent.shadow2-brand
+      (shadow (offset-x 0) (offset-y 0) (blur 2px) (spread 0px) (color (rgb 0 0 0 0.30))) (shadow (offset-x 0) (offset-y 1px) (blur 2px) (spread 0px) (color (rgb 0 0 0 0.25)))
+      fluent shadow2Brand
+      source-value '0 0 2px rgba(0,0,0,0.30), 0 1px 2px rgba(0,0,0,0.25)'
+    token fluent.shadow4-brand
+      (shadow (offset-x 0) (offset-y 0) (blur 2px) (spread 0px) (color (rgb 0 0 0 0.30))) (shadow (offset-x 0) (offset-y 2px) (blur 4px) (spread 0px) (color (rgb 0 0 0 0.25)))
+      fluent shadow4Brand
+      source-value '0 0 2px rgba(0,0,0,0.30), 0 2px 4px rgba(0,0,0,0.25)'
+    token fluent.shadow8-brand
+      (shadow (offset-x 0) (offset-y 0) (blur 2px) (spread 0px) (color (rgb 0 0 0 0.30))) (shadow (offset-x 0) (offset-y 4px) (blur 8px) (spread 0px) (color (rgb 0 0 0 0.25)))
+      fluent shadow8Brand
+      source-value '0 0 2px rgba(0,0,0,0.30), 0 4px 8px rgba(0,0,0,0.25)'
+    token fluent.shadow16-brand
+      (shadow (offset-x 0) (offset-y 0) (blur 2px) (spread 0px) (color (rgb 0 0 0 0.30))) (shadow (offset-x 0) (offset-y 8px) (blur 16px) (spread 0px) (color (rgb 0 0 0 0.25)))
+      fluent shadow16Brand
+      source-value '0 0 2px rgba(0,0,0,0.30), 0 8px 16px rgba(0,0,0,0.25)'
+    token fluent.shadow28-brand
+      (shadow (offset-x 0) (offset-y 0) (blur 8px) (spread 0px) (color (rgb 0 0 0 0.30))) (shadow (offset-x 0) (offset-y 14px) (blur 28px) (spread 0px) (color (rgb 0 0 0 0.25)))
+      fluent shadow28Brand
+      source-value '0 0 8px rgba(0,0,0,0.30), 0 14px 28px rgba(0,0,0,0.25)'
+    token fluent.shadow64-brand
+      (shadow (offset-x 0) (offset-y 0) (blur 8px) (spread 0px) (color (rgb 0 0 0 0.30))) (shadow (offset-x 0) (offset-y 32px) (blur 64px) (spread 0px) (color (rgb 0 0 0 0.25)))
+      fluent shadow64Brand
+      source-value '0 0 8px rgba(0,0,0,0.30), 0 32px 64px rgba(0,0,0,0.25)'

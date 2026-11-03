@@ -1,0 +1,511 @@
+fluent2-styles: theme
+  style
+    selector
+      type button
+      part root
+    color
+      token color.on-primary
+    background
+      token color.primary
+    state hover
+      background
+        token fluent.color-brand-background-hover
+      color
+        token color.on-primary
+    state pressed
+      background
+        token fluent.color-brand-background-pressed
+      color
+        token color.on-primary
+    state disabled
+      background
+        token fluent.color-neutral-background-disabled
+      color
+        token fluent.color-neutral-foreground-disabled
+      opacity 1
+    radius
+      token shape.corner.small
+    padding 6px 12px
+    border-width 1px
+    elevation 0
+    state hover
+      elevation 0
+    state pressed
+      elevation 0
+  style
+    selector
+      type button
+      part root
+      variant filled
+    color
+      token color.on-primary
+    background
+      token color.primary
+    state hover
+      background
+        token fluent.color-brand-background-hover
+      color
+        token color.on-primary
+    state pressed
+      background
+        token fluent.color-brand-background-pressed
+      color
+        token color.on-primary
+    state disabled
+      background
+        token fluent.color-neutral-background-disabled
+      color
+        token fluent.color-neutral-foreground-disabled
+      opacity 1
+    radius
+      token shape.corner.small
+    padding 6px 12px
+    border-width 1px
+    elevation 0
+    state hover
+      elevation 0
+    state pressed
+      elevation 0
+  style
+    selector
+      type button
+      part root
+      variant secondary
+    color
+      token color.on-surface
+    background
+      token color.surface
+    state hover
+      background
+        token fluent.color-neutral-background1-hover
+      color
+        token fluent.color-neutral-foreground1-hover
+    state pressed
+      background
+        token fluent.color-neutral-background1-pressed
+      color
+        token fluent.color-neutral-foreground1-pressed
+    state disabled
+      background
+        token fluent.color-neutral-background-disabled
+      color
+        token fluent.color-neutral-foreground-disabled
+      opacity 1
+    radius
+      token shape.corner.small
+    padding 6px 12px
+    border-width 1px
+    border-color
+      token fluent.color-neutral-stroke1
+    elevation 0
+    state hover
+      elevation 0
+    state pressed
+      elevation 0
+  style
+    selector
+      type button
+      part root
+      variant outlined
+    color
+      token color.on-surface
+    background
+      token fluent.color-transparent-background
+    state hover
+      background
+        token fluent.color-transparent-background-hover
+      color
+        token fluent.color-neutral-foreground1-hover
+    state pressed
+      background
+        token fluent.color-transparent-background-pressed
+      color
+        token fluent.color-neutral-foreground1-pressed
+    state disabled
+      background
+        token fluent.color-neutral-background-disabled
+      color
+        token fluent.color-neutral-foreground-disabled
+      opacity 1
+    radius
+      token shape.corner.small
+    padding 6px 12px
+    border-width 1px
+    border-color
+      token fluent.color-neutral-stroke1
+    elevation 0
+    state hover
+      elevation 0
+    state pressed
+      elevation 0
+  style
+    selector
+      type button
+      part root
+      variant text
+    color
+      token color.on-surface
+    background
+      token fluent.color-subtle-background
+    state hover
+      background
+        token fluent.color-subtle-background-hover
+      color
+        token fluent.color-neutral-foreground1-hover
+    state pressed
+      background
+        token fluent.color-subtle-background-pressed
+      color
+        token fluent.color-neutral-foreground1-pressed
+    state disabled
+      background
+        token fluent.color-neutral-background-disabled
+      color
+        token fluent.color-neutral-foreground-disabled
+      opacity 1
+    radius
+      token shape.corner.small
+    padding 6px 12px
+    border-width 1px
+    elevation 0
+    state hover
+      elevation 0
+    state pressed
+      elevation 0
+  style
+    selector
+      type button
+      part root
+      variant transparent
+    color
+      token fluent.color-brand-foreground1
+    background
+      token fluent.color-transparent-background
+    state hover
+      background
+        token fluent.color-transparent-background-hover
+      color
+        token fluent.color-brand-foreground1-hover
+    state pressed
+      background
+        token fluent.color-transparent-background-pressed
+      color
+        token fluent.color-brand-foreground1-pressed
+    state disabled
+      background
+        token fluent.color-neutral-background-disabled
+      color
+        token fluent.color-neutral-foreground-disabled
+      opacity 1
+    radius
+      token shape.corner.small
+    padding 6px 12px
+    border-width 1px
+    elevation 0
+    state hover
+      elevation 0
+    state pressed
+      elevation 0
+  style
+    selector
+      type text-field
+      part input
+    background
+      token color.surface
+    color
+      token color.on-surface
+    radius
+      token shape.corner.small
+    border-color
+      token color.outline
+    state hover
+      border-color
+        token fluent.color-neutral-stroke-accessible-hover
+    state pressed
+      border-color
+        token fluent.color-neutral-stroke-accessible-pressed
+    state disabled
+      color
+        token fluent.color-neutral-foreground-disabled
+      background
+        token fluent.color-neutral-background-disabled
+      opacity 1
+  style
+    selector
+      type checkbox
+    color
+      token color.on-surface
+    state hover
+      color
+        token fluent.color-neutral-foreground1-hover
+    state pressed
+      color
+        token fluent.color-neutral-foreground1-pressed
+    state disabled
+      color
+        token fluent.color-neutral-foreground-disabled
+      opacity 1
+  style
+    selector
+      type radio
+    color
+      token color.on-surface
+    state hover
+      color
+        token fluent.color-neutral-foreground1-hover
+    state pressed
+      color
+        token fluent.color-neutral-foreground1-pressed
+    state disabled
+      color
+        token fluent.color-neutral-foreground-disabled
+      opacity 1
+  style
+    selector
+      type switch
+    color
+      token color.on-surface
+    state hover
+      color
+        token fluent.color-neutral-foreground1-hover
+    state pressed
+      color
+        token fluent.color-neutral-foreground1-pressed
+    state disabled
+      color
+        token fluent.color-neutral-foreground-disabled
+      opacity 1
+  style
+    selector
+      type slider
+    color
+      token color.on-surface
+    state hover
+      color
+        token fluent.color-neutral-foreground1-hover
+    state pressed
+      color
+        token fluent.color-neutral-foreground1-pressed
+    state disabled
+      color
+        token fluent.color-neutral-foreground-disabled
+      opacity 1
+  style
+    selector
+      type checkbox
+      part indicator
+    state checked
+      background
+        token fluent.color-compound-brand-background
+      border-color
+        token fluent.color-compound-brand-background
+      color
+        token fluent.color-neutral-foreground-inverted
+      state disabled
+        background
+          token fluent.color-neutral-background-disabled
+        border-color
+          token fluent.color-neutral-stroke-disabled
+        color
+          token fluent.color-neutral-foreground-disabled
+      state hover
+        background
+          token fluent.color-compound-brand-background-hover
+      state pressed
+        background
+          token fluent.color-compound-brand-background-pressed
+  style
+    selector
+      type radio
+      part indicator
+    state checked
+      background
+        token fluent.color-compound-brand-background
+      border-color
+        token fluent.color-compound-brand-background
+      color
+        token fluent.color-neutral-foreground-inverted
+      state disabled
+        background
+          token fluent.color-neutral-background-disabled
+        border-color
+          token fluent.color-neutral-stroke-disabled
+        color
+          token fluent.color-neutral-foreground-disabled
+      state hover
+        background
+          token fluent.color-compound-brand-background-hover
+      state pressed
+        background
+          token fluent.color-compound-brand-background-pressed
+  style
+    selector
+      type switch
+      part track
+    state checked
+      background
+        token fluent.color-compound-brand-background
+      border-color
+        token fluent.color-compound-brand-background
+      color
+        token fluent.color-neutral-foreground-inverted
+      state disabled
+        background
+          token fluent.color-neutral-background-disabled
+        border-color
+          token fluent.color-neutral-stroke-disabled
+        color
+          token fluent.color-neutral-foreground-disabled
+      state hover
+        background
+          token fluent.color-compound-brand-background-hover
+      state pressed
+        background
+          token fluent.color-compound-brand-background-pressed
+  style
+    selector
+      type switch
+      part thumb
+    state checked
+      background
+        token fluent.color-neutral-foreground-inverted
+  style
+    selector
+      type slider
+      part thumb
+    background
+      token fluent.color-compound-brand-background
+  style
+    selector
+      type slider
+      part indicator
+    background
+      token fluent.color-compound-brand-background
+  style
+    selector
+      type checkbox
+      part indicator
+    state hover
+      border-color
+        token fluent.color-neutral-stroke-accessible-hover
+    state pressed
+      border-color
+        token fluent.color-neutral-stroke-accessible-pressed
+    state disabled
+      background
+        token fluent.color-neutral-background-disabled
+      border-color
+        token fluent.color-neutral-stroke-disabled
+      color
+        token fluent.color-neutral-foreground-disabled
+  style
+    selector
+      type radio
+      part indicator
+    state hover
+      border-color
+        token fluent.color-neutral-stroke-accessible-hover
+    state pressed
+      border-color
+        token fluent.color-neutral-stroke-accessible-pressed
+    state disabled
+      background
+        token fluent.color-neutral-background-disabled
+      border-color
+        token fluent.color-neutral-stroke-disabled
+      color
+        token fluent.color-neutral-foreground-disabled
+  style
+    selector
+      type switch
+      part track
+    state hover
+      border-color
+        token fluent.color-neutral-stroke-accessible-hover
+    state pressed
+      border-color
+        token fluent.color-neutral-stroke-accessible-pressed
+    state disabled
+      background
+        token fluent.color-neutral-background-disabled
+      border-color
+        token fluent.color-neutral-stroke-disabled
+      color
+        token fluent.color-neutral-foreground-disabled
+  style
+    selector
+      type slider
+      part thumb
+    state hover
+      background
+        token fluent.color-compound-brand-background-hover
+    state pressed
+      background
+        token fluent.color-compound-brand-background-pressed
+    state disabled
+      background
+        token fluent.color-neutral-background-disabled
+      border-color
+        token fluent.color-neutral-stroke-disabled
+      color
+        token fluent.color-neutral-foreground-disabled
+  style
+    selector
+      type button
+      part root
+    state focus
+      outline-width 2px
+      outline-style solid
+      outline-color
+        token color.on-surface
+      outline-offset 2px
+  style
+    selector
+      type text-field
+      part input
+    state focus
+      outline-width 2px
+      outline-style solid
+      outline-color
+        token color.on-surface
+      outline-offset 2px
+  style
+    selector
+      type checkbox
+      part input
+    state focus
+      outline-width 2px
+      outline-style solid
+      outline-color
+        token color.on-surface
+      outline-offset 2px
+  style
+    selector
+      type radio
+      part input
+    state focus
+      outline-width 2px
+      outline-style solid
+      outline-color
+        token color.on-surface
+      outline-offset 2px
+  style
+    selector
+      type switch
+      part input
+    state focus
+      outline-width 2px
+      outline-style solid
+      outline-color
+        token color.on-surface
+      outline-offset 2px
+  style
+    selector
+      type slider
+      part thumb
+    state focus
+      outline-width 2px
+      outline-style solid
+      outline-color
+        token color.on-surface
+      outline-offset 2px

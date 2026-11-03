@@ -214,3 +214,12 @@ classic-deepcase-references: asset
   source 'https://github.com/deep-foundation/deepcase-app/issues/76'
   notice 'https://github.com/deep-foundation/deepcase-app/blob/main/LICENSE'
   attribution none
+
+fluent2-token-notice: asset
+  kind data
+  files 'assets/fluent2/LICENSE.txt'
+  source 'https://github.com/microsoft/fluentui/tree/master/packages/tokens'
+  license MIT
+  copyright 'Microsoft Corporation'
+  notice 'https://github.com/microsoft/fluentui/blob/master/LICENSE'
+  attribution-text 'Fluent UI token data: Copyright (c) Microsoft Corporation. MIT licensed. Generated theme data retains the source token names and values.'
