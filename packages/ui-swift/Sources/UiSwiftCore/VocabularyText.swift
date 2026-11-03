@@ -12,6 +12,13 @@ ui-dialect: dialect
   reserved-property when
   common-property note string multi
   common-property machine any
+  common-property theme element-ref
+  common-property scheme any
+  common-property contrast any
+  common-property motion any
+  common-property sound any
+  common-property volume any
+  common-property transparency any
 
 document: kind
   description 'Root of a UI document.'
