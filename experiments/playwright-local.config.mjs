@@ -1,23 +1,23 @@
-// Local run of the Playwright tests with the Chromium headless shell that is
-// already installed (a newer build than the pinned @playwright/test expects),
-// to avoid a browser download: npx playwright test -c experiments/playwright-local.config.mjs
+// Local runs only: the shared config with the Chromium build installed on
+// this machine (its revision differs from the one @playwright/test expects).
+// Usage: npx playwright test -c experiments/playwright-local.config.mjs \
+//          packages/ui-dom/e2e --project=chromium
+import { homedir } from 'node:os';
+import { join } from 'node:path';
 import base from '../playwright.config.mjs';
+
+const executablePath = join(
+  homedir(),
+  '.cache/ms-playwright/chromium_headless_shell-1248/chrome-headless-shell-linux64/chrome-headless-shell'
+);
 
 export default {
   ...base,
   testDir: '..',
   webServer: { ...base.webServer, cwd: '..' },
-  projects: base.projects
-    .filter((p) => p.name === 'chromium')
-    .map((p) => ({
-      ...p,
-      use: {
-        ...p.use,
-        launchOptions: {
-          executablePath:
-            process.env.CHROMIUM_PATH ??
-            `${process.env.HOME}/.cache/ms-playwright/chromium_headless_shell-1248/chrome-headless-shell-linux64/chrome-headless-shell`,
-        },
-      },
-    })),
+  outputDir: '../test-results',
+  projects: base.projects.map((project) => ({
+    ...project,
+    use: { ...project.use, launchOptions: { executablePath } },
+  })),
 };
