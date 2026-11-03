@@ -32,7 +32,7 @@ const [text, styles, tokens, animations] = await Promise.all([
   read('animation.lino'),
 ]);
 
-const params = new URLSearchParams(location.search);
+const params = new globalThis.URLSearchParams(globalThis.location.search);
 const locked = params.get('lock') ?? 'payment-form';
 const policy =
   params.get('policy') === 'disabled'

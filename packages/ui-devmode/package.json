@@ -7,6 +7,10 @@
     ".": {
       "types": "./src/index.d.ts",
       "default": "./src/index.js"
+    },
+    "./model": {
+      "types": "./src/model.d.ts",
+      "default": "./src/model.js"
     }
   },
   "types": "./src/index.d.ts",

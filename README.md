@@ -273,6 +273,7 @@ npm run example:desktop:package
 │   ├── ui-components/    # @link-foundation/ui-components (LiNo state machines, actions registry, a11y helpers, charts, diagrams with Dagre layout, SVG and Mermaid, layout and windowing)
 │   ├── ui-config/        # @link-foundation/ui-config (layered configuration, overrides patches)
 │   ├── ui-convert/       # @link-foundation/ui-convert (HTML/DOM, A2UI, Adaptive Cards, JSON Forms, Lottie <-> LiNo)
+│   ├── ui-devmode/       # @link-foundation/ui-devmode (dev mode inspector overlay, session and user edits)
 │   ├── ui-core/          # @link-foundation/ui-core
 │   ├── ui-dom/           # @link-foundation/ui-dom (DOM renderer, plain custom elements)
 │   ├── ui-i18n/          # @link-foundation/ui-i18n (localisation with lino-i18n, (t KEY) messages)
