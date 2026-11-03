@@ -4,7 +4,8 @@
  *
  * Test files use the `.e2e.mjs` suffix so `node --test`, `bun test` and
  * `deno test` never pick them up. Cross-package browser tests live in
- * `tests/e2e/*.spec.js`; bunfig.toml keeps them out of `bun test`.
+ * `tests/e2e/*.spec.js` and package browser tests in each package's
+ * `tests/e2e/` folder; bunfig.toml keeps them out of `bun test`.
  */
 import { defineConfig, devices } from '@playwright/test';
 
@@ -17,6 +18,7 @@ export default defineConfig({
     'tests/ui/**/*.e2e.mjs',
     'packages/*/e2e/**/*.e2e.mjs',
     'tests/e2e/**/*.spec.js',
+    'packages/*/tests/e2e/**/*.spec.js',
   ],
   testIgnore: ['**/node_modules/**'],
   // Baselines live next to the tests that own them:
