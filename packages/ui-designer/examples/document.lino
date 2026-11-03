@@ -1,0 +1,17 @@
+# The designer preserves this document comment.
+app: document
+  title 'Links UI demo'
+  body: stack
+    direction vertical
+    gap 16px
+    # Greeting stays with its element during a move.
+    greeting: text 'Hello, links'
+    ok: button
+      label OK
+      width 120px
+      height 40px
+      on press
+        navigate home
+    details: stack
+      gap 8px
+      hint: text 'Build with the toolbox, or edit the source below.'

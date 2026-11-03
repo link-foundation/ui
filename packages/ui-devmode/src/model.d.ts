@@ -3,7 +3,8 @@
  * of the inspector (outline, property rows, edits).
  */
 
-import type { DevModePolicy, WritableLayer } from './index.js';
+// Resolve declarations through package exports in TypeScript and Deno alike.
+import type { DevModePolicy, WritableLayer } from '@link-foundation/ui-devmode';
 
 export const READ_ONLY_LAYERS: readonly ['defaults', 'theme', 'site'];
 

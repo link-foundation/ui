@@ -1,0 +1,98 @@
+designer: document
+  title 'Links UI designer'
+  toolbar: stack
+    direction horizontal
+    gap 4px
+    mode: button
+      label Run
+      on press
+        designer mode
+    undo: button
+      label Undo
+      on press
+        designer undo
+    redo: button
+      label Redo
+      on press
+        designer redo
+    duplicate: button
+      label Duplicate
+      on press
+        designer duplicate
+    delete: button
+      label Delete
+      on press
+        designer delete
+    copy: button
+      label Copy
+      on press
+        designer copy
+    cut: button
+      label Cut
+      on press
+        designer cut
+    paste: button
+      label Paste
+      on press
+        designer paste
+    open: button
+      label Open
+      on press
+        designer open
+    save: button
+      label Save
+      on press
+        designer save
+    copy-source: button
+      label 'Copy source'
+      on press
+        designer copy-source
+  workspace: split
+    direction column
+    label Workspace
+    sizes 72 28
+    min 35 12
+    max 88 65
+    remember-size workspace
+    horizontal: split
+      direction row
+      label Panels
+      sizes 22 48 30
+      min 12 20 18
+      max 45 70 50
+      remember-size horizontal
+      left-dock: dock
+        label 'Toolbox and Outline'
+        persist left-dock
+        left-region: region
+          side center
+          panels toolbox outline
+        toolbox: panel
+          title Toolbox
+        outline: panel
+          title Outline
+      center-dock: dock
+        label Canvas
+        persist center-dock
+        center-region: region
+          side center
+          panels canvas
+        canvas: panel
+          title Canvas
+          closable false
+      right-dock: dock
+        label Properties
+        persist right-dock
+        right-region: region
+          side center
+          panels properties
+        properties: panel
+          title Properties
+    bottom-dock: dock
+      label Source
+      persist bottom-dock
+      bottom-region: region
+        side center
+        panels source
+      source: panel
+        title Source

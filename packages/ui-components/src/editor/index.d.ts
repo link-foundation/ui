@@ -52,6 +52,7 @@ export interface EditorEngine {
     document: Pick<EditorDocument, 'id' | 'text' | 'language'>
   ): void | Promise<void>;
   setDiagnostics(diagnostics: EditorDiagnostic[]): void;
+  setReadOnly(readOnly: boolean): void;
   focus(offset?: number): void;
   destroy(): void;
 }
