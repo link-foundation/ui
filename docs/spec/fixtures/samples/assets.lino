@@ -1,10 +1,10 @@
-(lucide-check: asset
-  (kind icon)
-  (source 'https://lucide.dev/icons/check')
-  (license ISC)
-  (copyright 'Lucide Contributors')
-  (notice 'https://github.com/lucide-icons/lucide/blob/main/LICENSE'))
-(links-ui-logo: asset
-  (kind image)
-  (license CC0-1.0)
-  (copyright none))
+lucide-check: asset
+  kind icon
+  source 'https://lucide.dev/icons/check'
+  license ISC
+  copyright 'Lucide Contributors'
+  notice 'https://github.com/lucide-icons/lucide/blob/main/LICENSE'
+links-ui-logo: asset
+  kind image
+  license CC0-1.0
+  copyright none

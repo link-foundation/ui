@@ -150,6 +150,19 @@ describe('layout of new text', () => {
     );
   });
 
+  it('moves the last line of an indented element up to an ancestor (#133)', () => {
+    // In the nested form nothing closes `b`: its lines end with `c`'s own
+    // line, so the place after `b` falls inside the lines that move.
+    const text = 'a: stack\n  b: stack\n    c: text C\n';
+    expect(moveNode(text, 'c', 'a', 1).text).toBe(
+      'a: stack\n  b: stack\n  c: text C\n'
+    );
+    expect(moveNode(text, 'c', null, 1).text).toBe(
+      'a: stack\n  b: stack\nc: text C\n'
+    );
+    expect(moveNode(text, 'a', 'b', 0).ok).toBe(false);
+  });
+
   it('quotes a new value that needs it', () => {
     const result = setProp('(ok: button (label OK))', 'ok', 'label', [
       'Say hi (now)',
