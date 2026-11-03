@@ -175,10 +175,10 @@ export function compileThemeCss(theme, options = {}) {
   // @scope's lower boundary stops an outer theme's style rules at nested themes.
   const style = compileCss(theme.styles, {
     prefix: options.prefix,
-    scope: `:where(${root})`,
+    scope: ':scope',
   });
   if (style) {
-    css.push(`@scope (${root}) to (:scope [data-theme]) {\n${style}\n}`);
+    css.push(`@scope (${root}) to ([data-theme]) {\n${style}\n}`);
   }
   return css.join('\n');
 }

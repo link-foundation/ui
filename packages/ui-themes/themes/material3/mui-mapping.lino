@@ -1,0 +1,146 @@
+map Button
+  kind button
+  prop variant contained
+    variant filled
+  prop variant outlined
+    variant outlined
+  prop variant text
+    variant text
+  prop disabled *
+    disabled *
+  status partial
+map IconButton
+  kind icon-button
+  prop disabled *
+    disabled *
+  prop aria-label *
+    label *
+  status partial
+map TextField
+  kind text-field
+  prop variant filled
+    variant filled
+  prop variant outlined
+    variant outlined
+  prop label *
+    label *
+  prop value *
+    value *
+  prop disabled *
+    disabled *
+  prop required *
+    required *
+  prop name *
+    name *
+  prop placeholder *
+    placeholder *
+  status partial
+map Checkbox
+  kind checkbox
+  prop checked *
+    checked *
+  prop disabled *
+    disabled *
+  prop name *
+    name *
+  prop value *
+    value *
+  status partial
+map Radio
+  kind radio
+  prop value *
+    value *
+  prop disabled *
+    disabled *
+  status partial
+map RadioGroup
+  kind radio-group
+  prop value *
+    value *
+  prop name *
+    name *
+  status partial
+map Switch
+  kind switch
+  prop checked *
+    checked *
+  prop disabled *
+    disabled *
+  status partial
+map Slider
+  kind slider
+  prop value *
+    value *
+  prop min *
+    min *
+  prop max *
+    max *
+  prop step *
+    step *
+  prop disabled *
+    disabled *
+  status partial
+map Select
+  kind select
+  status partial
+map Dialog
+  kind dialog
+  status partial
+map Menu
+  kind menu
+  status partial
+map Tooltip
+  kind tooltip
+  status partial
+map Snackbar
+  kind toast
+  status partial
+map Drawer
+  kind drawer
+  status partial
+map AppBar
+  status none
+map Tabs
+  kind tabs
+  status partial
+map Card
+  status none
+map List
+  kind list
+  status partial
+map Table
+  kind table
+  status partial
+map Chip
+  status none
+map Avatar
+  kind avatar
+  prop src *
+    source *
+  status partial
+map Badge
+  kind badge
+  prop badgeContent *
+    value *
+  status partial
+map Box
+  kind stack
+  status partial
+map Stack
+  kind stack
+  prop direction row
+    direction horizontal
+  prop direction column
+    direction vertical
+  status partial
+map Grid
+  kind grid
+  status partial
+map Typography
+  kind text
+  status partial
+map CircularProgress
+  kind progress
+  prop value *
+    value *
+  status partial

@@ -119,6 +119,18 @@ describe('compileCss: options and safety', () => {
     );
   });
 
+  it('allows a within ancestor to be the CSS scope root', () => {
+    const scoped = compileCss(fixtureStyles('card.lino').rules, {
+      scope: ':scope',
+    });
+    expect(scoped).toContain(
+      'ui-dialog ui-card, :where(:scope):is(ui-dialog) ui-card {'
+    );
+    expect(compileCss(rules, { scope: ':scope' })).toContain(
+      'ui-button, :where(:scope):is(ui-button) {'
+    );
+  });
+
   it('uses tagFor for element kinds', () => {
     expect(
       compileCss(rules, { tagFor: (kind) => `[data-kind='${kind}']` })

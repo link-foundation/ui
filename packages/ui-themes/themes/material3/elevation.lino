@@ -1,0 +1,110 @@
+material3-elevation: theme
+  source 'https://m3.material.io/styles/elevation/tokens'
+  token elevation.level0
+    shadow
+      color '#0000004d'
+      offset-x 0px
+      offset-y 0px
+      blur 0px
+      spread 0px
+    shadow
+      color '#00000026'
+      offset-x 0px
+      offset-y 0px
+      blur 0px
+      spread 0px
+    m3 md.sys.elevation.level0
+  token elevation.0
+    token elevation.level0
+  token elevation.level0.height 0px
+    m3 md.sys.elevation.level0
+  token elevation.level1
+    shadow
+      color '#0000004d'
+      offset-x 0px
+      offset-y 1px
+      blur 2px
+      spread 0px
+    shadow
+      color '#00000026'
+      offset-x 0px
+      offset-y 1px
+      blur 3px
+      spread 1px
+    m3 md.sys.elevation.level1
+  token elevation.1
+    token elevation.level1
+  token elevation.level1.height 1px
+    m3 md.sys.elevation.level1
+  token elevation.level2
+    shadow
+      color '#0000004d'
+      offset-x 0px
+      offset-y 1px
+      blur 2px
+      spread 0px
+    shadow
+      color '#00000026'
+      offset-x 0px
+      offset-y 2px
+      blur 6px
+      spread 2px
+    m3 md.sys.elevation.level2
+  token elevation.2
+    token elevation.level2
+  token elevation.level2.height 3px
+    m3 md.sys.elevation.level2
+  token elevation.level3
+    shadow
+      color '#0000004d'
+      offset-x 0px
+      offset-y 1px
+      blur 3px
+      spread 0px
+    shadow
+      color '#00000026'
+      offset-x 0px
+      offset-y 4px
+      blur 8px
+      spread 3px
+    m3 md.sys.elevation.level3
+  token elevation.3
+    token elevation.level3
+  token elevation.level3.height 6px
+    m3 md.sys.elevation.level3
+  token elevation.level4
+    shadow
+      color '#0000004d'
+      offset-x 0px
+      offset-y 2px
+      blur 3px
+      spread 0px
+    shadow
+      color '#00000026'
+      offset-x 0px
+      offset-y 6px
+      blur 10px
+      spread 4px
+    m3 md.sys.elevation.level4
+  token elevation.4
+    token elevation.level4
+  token elevation.level4.height 8px
+    m3 md.sys.elevation.level4
+  token elevation.level5
+    shadow
+      color '#0000004d'
+      offset-x 0px
+      offset-y 4px
+      blur 4px
+      spread 0px
+    shadow
+      color '#00000026'
+      offset-x 0px
+      offset-y 8px
+      blur 12px
+      spread 6px
+    m3 md.sys.elevation.level5
+  token elevation.5
+    token elevation.level5
+  token elevation.level5.height 12px
+    m3 md.sys.elevation.level5
