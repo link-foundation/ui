@@ -107,7 +107,7 @@ export default [
   },
   {
     // The ui-dom example page runs in the browser only.
-    files: ['examples/ui-dom/**/*.js'],
+    files: ['examples/ui-dom/**/*.js', 'packages/*/examples/**/*.js'],
     languageOptions: {
       globals: {
         document: 'readonly',
@@ -119,7 +119,11 @@ export default [
   {
     // Playwright UI tests: callbacks passed to page.evaluate run in the
     // browser, so browser globals are available there.
-    files: ['**/*.e2e.mjs', 'tests/e2e/**/*.spec.js'],
+    files: [
+      '**/*.e2e.mjs',
+      'tests/e2e/**/*.spec.js',
+      'packages/*/tests/e2e/**/*.spec.js',
+    ],
     languageOptions: {
       globals: {
         document: 'readonly',

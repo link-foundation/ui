@@ -7,6 +7,7 @@
  *   /packages/<name>/e2e/pages/ -> packages/<name>/e2e/pages/ (when present)
  *   /example-app/             -> examples/universal-app/dist/
  *   /examples/ui-dom/         -> examples/ui-dom/ (the ui-dom example page)
+ *   /packages/<name>/examples/ -> packages/<name>/examples/ (gallery pages)
  *   /packages/<name>/src/     -> packages/<name>/src/ (ES modules of the
  *                                import map of the example pages)
  *   /node_modules/links-notation/dist/ -> the browser build of links-notation
@@ -53,7 +54,7 @@ export function defaultMounts(root) {
   const packagesDir = path.join(root, 'packages');
   if (existsSync(packagesDir)) {
     for (const name of readdirSync(packagesDir).sort()) {
-      for (const sub of [['e2e', 'pages'], ['src']]) {
+      for (const sub of [['e2e', 'pages'], ['examples'], ['src']]) {
         const dir = path.join(packagesDir, name, ...sub);
         if (existsSync(dir)) {
           mounts.push({ prefix: `/packages/${name}/${sub.join('/')}/`, dir });

@@ -102,6 +102,10 @@ describe('shared static server', () => {
     for (const [url, file] of [
       ['/examples/ui-dom/', 'examples/ui-dom/index.html'],
       ['/packages/ui-dom/src/index.js', 'packages/ui-dom/src/index.js'],
+      [
+        '/packages/ui-components/examples/layout.html',
+        'packages/ui-components/examples/layout.html',
+      ],
       ['/packages/ui-core/src/index.js', 'packages/ui-core/src/index.js'],
       [
         '/node_modules/links-notation/dist/index.js',
@@ -163,6 +167,7 @@ describe('Playwright e2e files stay out of unit test runners', () => {
       "'tests/ui/**/*.e2e.mjs'",
       "'packages/*/e2e/**/*.e2e.mjs'",
       "'tests/e2e/**/*.spec.js'",
+      "'packages/*/tests/e2e/**/*.spec.js'",
     ]) {
       expect(config).toContain(pattern);
     }
@@ -171,6 +176,7 @@ describe('Playwright e2e files stay out of unit test runners', () => {
   it('keeps tests/e2e specs out of bun test', () => {
     const bunfig = readFileSync(path.join(repoRoot, 'bunfig.toml'), 'utf8');
     expect(bunfig).toContain('"tests/e2e/**"');
+    expect(bunfig).toContain('"packages/*/tests/e2e/**"');
   });
 
   it('uses a suffix that node, bun and deno default patterns do not match', () => {
