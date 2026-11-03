@@ -19,12 +19,24 @@ const LAZY_MODULES = [
   'editors.js',
 ];
 
+/**
+ * Wait for the first render and, when `?ui-dev` opens dev mode, for its
+ * global handle: the inspector is loaded with a dynamic `import()` after the
+ * page is ready.
+ */
+async function waitForPage(page, query) {
+  await page.waitForSelector('#app[data-ready="true"]');
+  if (query.includes('ui-dev') && !query.includes('policy=disabled')) {
+    await page.waitForFunction(() => 'linkUiDevMode' in globalThis);
+  }
+}
+
 /** Open the example and wait for the first render. */
 async function openExample(page, query = '') {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto(`${PAGE}${query}`);
-  await page.waitForSelector('#app[data-ready="true"]');
+  await waitForPage(page, query);
   return errors;
 }
 
@@ -166,7 +178,7 @@ test('a label edit is live, saved to user, kept on reload and reset to site', as
   await expect(label).toHaveAttribute('data-layer', 'user');
 
   await page.reload();
-  await page.waitForSelector('#app[data-ready="true"]');
+  await waitForPage(page, '?ui-dev');
   await expect(okButton(page)).toHaveText('Okay');
   await page.evaluate(() => globalThis.linkUiDevMode.select('ok'));
   await inspector(page).getByRole('tab', { name: 'Properties' }).click();
