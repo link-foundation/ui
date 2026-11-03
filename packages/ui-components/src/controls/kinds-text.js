@@ -10,7 +10,7 @@ export const CONTROL_KINDS_TEXT = `button: kind
   positional label
   property label string
   property variant
-    enum filled tonal outlined text
+    enum filled tonal outlined text secondary transparent
   property icon string
   property type
     enum button submit reset

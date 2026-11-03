@@ -1,7 +1,7 @@
 /** Theme packages are data. Token inheritance and aliases use the token resolver. */
 import { parseNested, formatLinks } from '@link-foundation/ui-core';
 import { readStyles } from '@link-foundation/ui-style';
-import { readTokens } from '../model.js';
+import { readTokens, isTokenPath } from '../model.js';
 import { resolveTokens, chainOf } from '../resolve.js';
 import { readTemplate } from './templates.js';
 
@@ -16,6 +16,15 @@ const raw = (link) =>
   link.values.length === 0 ? link.id : link.values.map(raw);
 const values = (tokens) =>
   new Map([...tokens].map(([path, token]) => [path, token.value]));
+const systemColors = new Set([
+  'Canvas',
+  'CanvasText',
+  'Highlight',
+  'HighlightText',
+  'GrayText',
+  'ButtonText',
+  'ButtonFace',
+]);
 const defaults = new Set(['motion', 'sound', 'volume', 'transparency']);
 
 /** Inspect every value, including nested template/style links, before interpreting it. */
@@ -44,6 +53,40 @@ function safe(link, diagnostics, id) {
   return ok;
 }
 
+function readForcedColor(args, theme, diagnostics) {
+  if (args.length === 2 && isTokenPath(args[0]) && systemColors.has(args[1])) {
+    theme.forcedColors.set(args[0], args[1]);
+  } else {
+    diagnostics.push(
+      themeDiagnostic(
+        'invalid-forced-color',
+        'error',
+        'Expected a token path and CSS system color'
+      )
+    );
+  }
+}
+
+function readPair(args, theme, diagnostics) {
+  const [on, fill, limit] = args;
+  const min =
+    limit?.[0] === 'min' && limit.length === 2 ? Number(limit[1]) : NaN;
+  if (args.length === 2) {
+    theme.pairs.push([on, fill]);
+  } else if (
+    args.length === 3 &&
+    Number.isFinite(min) &&
+    min >= 1 &&
+    min <= 21
+  ) {
+    theme.pairs.push([on, fill, min]);
+  } else {
+    diagnostics.push(
+      themeDiagnostic('invalid-pair', 'error', 'Invalid pair contrast minimum')
+    );
+  }
+}
+
 function readThemeChild(child, theme, tokenLinks, diagnostics) {
   const [name, ...args] = raw(child);
   if (name === 'token' || name === 'extends' || name === 'mode') {
@@ -55,8 +98,11 @@ function readThemeChild(child, theme, tokenLinks, diagnostics) {
   if (defaults.has(name) && args.length === 1) {
     theme.defaults[name] = args[0];
   }
-  if (name === 'pair' && args.length === 2) {
-    theme.pairs.push(args);
+  if (name === 'forced-color') {
+    readForcedColor(args, theme, diagnostics);
+  }
+  if (name === 'pair') {
+    readPair(args, theme, diagnostics);
   }
   if (name === 'template') {
     const template = readTemplate(args.slice(1), diagnostics);
@@ -102,6 +148,7 @@ export function loadThemes(linoText) {
       modes: Object.create(null),
       styles: [],
       templates: new Map(),
+      forcedColors: new Map(),
       pairs: [],
       defaults: {},
       diagnostics: [],
@@ -146,6 +193,7 @@ export function resolveTheme(registry, id) {
     modes: Object.create(null),
     styles: [],
     templates: new Map(),
+    forcedColors: new Map(),
     pairs: [],
     defaults: {},
     diagnostics,
@@ -162,6 +210,9 @@ export function resolveTheme(registry, id) {
       if (!theme.pairs.some((p) => p.join('\0') === pair.join('\0'))) {
         theme.pairs.push(pair);
       }
+    }
+    for (const [path, value] of parent.forcedColors ?? []) {
+      theme.forcedColors.set(path, value);
     }
     Object.assign(theme.defaults, parent.defaults);
   }

@@ -22,9 +22,33 @@ it('matches the base CSS snapshot with every preference, scoped styles and no im
     'Highlight',
     'data-motion="reduced"',
     'prefers-reduced-motion: reduce',
-    ':where([data-theme="base"])',
+    ':scope ui-button',
   ]) {
     assert.ok(css.includes(text), text);
   }
   assert.ok(!css.includes('!important'));
+});
+it('inherits validated system-color mappings for namespaced aliases', async () => {
+  const { loadThemes, resolveTheme } = await import('../src/themes/model.js');
+  const { themes, diagnostics } = loadThemes(`parent: theme
+  token custom.foreground '#ffffff'
+  forced-color custom.foreground CanvasText
+child: theme
+  extends parent
+  forced-color custom.foreground HighlightText`);
+  assert.deepEqual(diagnostics, []);
+  const theme = resolveTheme(new Map(themes.map((t) => [t.id, t])), 'child');
+  assert.equal(theme.forcedColors.get('custom.foreground'), 'HighlightText');
+  assert.ok(
+    compileThemeCss(theme).includes('--custom-foreground: HighlightText;')
+  );
+  assert.ok(
+    loadThemes(
+      "invalid: theme\n  forced-color 'x;}body{color:red' CanvasText"
+    ).diagnostics.some((d) => d.code === 'invalid-forced-color')
+  );
+  assert.equal(
+    loadThemes('invalid: theme\n  forced-color x url(bad)').diagnostics[0].code,
+    'invalid-forced-color'
+  );
 });

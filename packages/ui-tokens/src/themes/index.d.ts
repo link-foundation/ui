@@ -22,7 +22,8 @@ export interface Theme {
   modes: Record<string, Map<string, TokenValue>>;
   styles: StyleRule[];
   templates: Map<string, TemplateNode>;
-  pairs: [string, string][];
+  forcedColors: Map<string, string>;
+  pairs: [string, string, number?][];
   defaults: Partial<
     Record<'motion' | 'sound' | 'volume' | 'transparency', string>
   >;

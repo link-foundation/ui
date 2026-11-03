@@ -36,12 +36,15 @@ normal/more contrast and full/reduced motion, including their system media
 queries. Simultaneous modes apply in scheme, contrast, motion order, and
 aliases resolve after the overrides. Every declared pair is checked in every
 combination. Failing fills move in OKLCH lightness to reach 4.5:1 by default.
-Adjustment emits `contrast-adjusted` (warning, or error with `strict: true`).
+A non-text UI pair can declare `(pair color.outline color.surface (min 3))`;
+the explicit minimum overrides the compilation default. Adjustment emits `contrast-adjusted` (warning, or error with `strict: true`).
 An unreachable target emits an error. Collect diagnostics with
 `{ diagnostics: [] }` or `onDiagnostic`; strict mode reports rather than throws.
-Forced colors map semantic tokens to system colors. Theme styles have a
-`:where([data-theme="id"])` prefix and an `@scope` lower boundary at nested
-themes. CSS nesting scopes require a browser supporting `@scope`.
+Forced colors map semantic tokens to system colors. A theme can add inherited
+`(forced-color token.path CanvasText)` rows for namespaced aliases. Values are
+restricted to Canvas, CanvasText, Highlight, HighlightText, GrayText, ButtonText
+and ButtonFace. Theme styles use an explicit `:scope` prefix inside an
+`@scope` boundary that stops at nested themes. CSS nesting scopes require a browser supporting `@scope`.
 
 Any UI element may carry `theme`, `scheme`, `contrast` or `motion` properties:
 
@@ -72,7 +75,8 @@ supplies reduced-mode tokens without selecting reduced motion by itself.
 
 `resolveTemplate(themeChain, kind)` returns the last applicable template or
 `null`. Button templates require `root` and `label`, and may contain `icon`
-and `indicator`. Parts have `kind box`, `text` or `icon`; unknown/duplicate
+and `indicator`. Other controls can describe their existing `input`, `track`
+and `thumb` anatomy. Parts have `kind box`, `text` or `icon`; unknown/duplicate
 parts produce diagnostics. The native button keeps its keyboard, focus,
 label and event semantics while its visual children follow the template.
 
@@ -86,3 +90,9 @@ choices is the host application's responsibility.
 Its `mode` modifier has eight complete contexts for the combined scheme,
 contrast and motion states, so overlapping token overrides stay deterministic.
 The test validates against a vendored copy of the official current schema.
+
+A style selector can target a native part with `(selector (type button)
+(part root))`. Hover, pressed and disabled states apply to the host. Checked follows
+the native checked input or ARIA checked input inside the host. Focus and
+selected states apply to the part. This lets non-interactive
+indicators follow the control while native inputs retain focus semantics.

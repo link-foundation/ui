@@ -48,7 +48,7 @@ function tokensVocabulary() {
   return vocabulary;
 }
 
-const META = new Set(['description', 'type']);
+const META = new Set(['description', 'type', 'fluent', 'source-value']);
 const isMeta = (raw) =>
   Array.isArray(raw) &&
   META.has(raw[0]) &&
@@ -112,6 +112,12 @@ function readToken(values, at, diagnostics) {
   };
   if (meta.description !== undefined) {
     token.description = meta.description;
+  }
+  if (meta['source-value'] !== undefined) {
+    token.sourceValue = meta['source-value'];
+  }
+  if (meta.fluent !== undefined) {
+    token.fluent = meta.fluent;
   }
   if (at.mode !== undefined) {
     token.mode = at.mode;

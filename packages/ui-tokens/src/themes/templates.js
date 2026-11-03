@@ -1,5 +1,13 @@
 /** Open UI anatomy for the first template consumer. No executable templates. */
-const PARTS = new Set(['root', 'label', 'icon', 'indicator']);
+const PARTS = new Set([
+  'root',
+  'label',
+  'icon',
+  'indicator',
+  'input',
+  'track',
+  'thumb',
+]);
 const KINDS = new Set(['box', 'text', 'icon']);
 
 export function readTemplate(links, diagnostics) {

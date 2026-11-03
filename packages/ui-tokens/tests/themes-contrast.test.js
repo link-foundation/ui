@@ -96,3 +96,21 @@ it('writes adjustments to compiled output and strict error diagnostics', () => {
     );
   }
 });
+
+it('honors explicit non-text pair minimums and rejects invalid limits', () => {
+  const { themes, diagnostics } = loadThemes(`x: theme
+  token color.border '#888888'
+  token color.surface '#FFFFFF'
+  pair color.border color.surface
+    min 3`);
+  assert.deepEqual(diagnostics, []);
+  const theme = resolveTheme(new Map(themes.map((t) => [t.id, t])), 'x');
+  assert.deepEqual(theme.pairs, [['color.border', 'color.surface', 3]]);
+  const reports = [];
+  compileThemeCss(theme, { strict: true, diagnostics: reports });
+  assert.deepEqual(reports, []);
+  for (const limit of ['0', '22', 'NaN']) {
+    const result = loadThemes(`x: theme\n  pair a b\n    min ${limit}`);
+    assert.ok(result.diagnostics.some((d) => d.code === 'invalid-pair'));
+  }
+});

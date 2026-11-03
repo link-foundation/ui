@@ -101,6 +101,8 @@ describe('property rows', () => {
       'tonal',
       'outlined',
       'text',
+      'secondary',
+      'transparent',
     ]);
     expect(rows.every((r) => !r.changed && !r.locked)).toBe(true);
     expect(rows.find((r) => r.name === 'on').writable).toBe(false);
