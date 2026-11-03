@@ -1267,10 +1267,14 @@ the document model. A failed engine import renders an alert and rejects
 All new engine packages are MIT licensed: CodeMirror's state, view, language,
 commands, lint and four language packages, plus the Lezer highlighter and their
 transitive editor dependencies. Their installed npm manifests and licence
-files contain the notices; none is vendored. Monaco 0.57.0 is MIT and remains
+files contain the notices; none is vendored. Monaco 0.58.0-dev-20261103 is MIT and remains
 an optional peer (a development dependency for the browser adapter tests).
+The pinned development build includes patched DOMPurify 3.4.17. Stable Monaco
+0.57.0 bundles vulnerable DOMPurify even when its npm dependency is overridden;
+see [the upstream report](https://github.com/microsoft/monaco-editor/issues/5517).
+The peer range accepts the corresponding stable 0.58 release when available.
 See the [CodeMirror licence](https://github.com/codemirror/dev/blob/main/LICENSE)
-and [Monaco licence](https://github.com/microsoft/monaco-editor/blob/v0.57.0/LICENSE.txt).
+and [Monaco licence](https://github.com/microsoft/monaco-editor/blob/main/LICENSE.txt).
 
 ## Settings panel
 

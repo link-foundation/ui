@@ -22,7 +22,8 @@ sequential required gates with logs outside the repository and CI's full matrix.
 
 Evidence before final CI:
 
-- `node --test packages/ui-components/tests/editor/*.test.js`: 23 passing;
+- `node --test packages/ui-components/tests/editor/*.test.js` plus the public
+  entry-point collision tests: 23 passing;
   language tests pin all seven samples, EOF 3:1 and the full parser message.
 - `npx playwright test packages/ui-components/tests/e2e/editor.spec.js`:
   18 passing in Chromium/WebKit, including both engines, all four additional
@@ -31,3 +32,14 @@ Evidence before final CI:
 - Six reviewed screenshot baselines cover tabs, unclosed input and conflicts.
 - Current main (62f872f) merged; settings-panel exports and entry-point checks
   retained. Final four gates and same-revision hosted CI remain pending.
+
+CI investigation for 2b2ff87:
+
+- Preserve all non-passing workflow logs after completion; check run timestamps
+  and head SHA, then collect every failure before pushing another revision.
+- Security audit job 126086197383, log lines 187–199: Monaco 0.57.0 pins
+  vulnerable DOMPurify 3.4.15. Its sanitizer is also bundled, so an override would only silence the audit.
+  Use the pinned 0.58.0-dev-20261103 build, which includes 3.4.17, and
+  regenerate both runtime locks; upstream report microsoft/monaco-editor#5517.
+- Swift core job 126086198132, log lines 288 and 1351: the embedded vocabulary
+  must match the updated shared spec byte for byte. Refresh that data copy.
