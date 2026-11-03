@@ -70,7 +70,7 @@ cut frames; Quiet selects monochrome and solid plain panels. Glow and scanlines
 are static, with no flashing or flicker animation; reduced motion sets all
 effect strengths to zero. No `steps(1)` animation is present.
 
-See [the gallery](../../../../../examples/themes/classic.html). Run
+See [the gallery](../../../../examples/themes/classic.html). Run
 `node --test packages/ui-themes/tests/classic-*.test.js` and
 `npx playwright test tests/e2e/theme-classic.spec.js --project=chromium`.
 
