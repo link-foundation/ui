@@ -91,6 +91,24 @@ export const PROPERTIES = Object.freeze({
     type: ['enum', 'none', 'triangle'],
     tokens: [],
   },
+  'min-width': {
+    css: 'min-width',
+    type: 'dimension',
+    tokens: ['dimension'],
+    check: nonNegative,
+  },
+  'min-height': {
+    css: 'min-height',
+    type: 'dimension',
+    tokens: ['dimension'],
+    check: nonNegative,
+  },
+  material: {
+    css: 'background-color',
+    type: ['enum', 'regular', 'thin', 'thick'],
+    tokens: [],
+    write: (_v, ctx) => ctx.variable('color.surface'),
+  },
   background: { css: 'background-color', type: 'color', tokens: ['color'] },
   color: { css: 'color', type: 'color', tokens: ['color'] },
   radius: {

@@ -1,0 +1,13 @@
+hig-motion: theme
+  token motion.duration.short 180ms
+  token motion.duration.medium 350ms
+  token motion.duration.fade 120ms
+  token motion.switch.travel 20px
+  token motion.spring.default
+    spring
+      response 0.35s
+      damping 0.85
+  motion reduced
+    token motion.duration.short 120ms
+    token motion.duration.medium 120ms
+    token motion.switch.travel 0px

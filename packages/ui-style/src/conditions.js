@@ -75,8 +75,10 @@ function readCondition(kind, raw) {
  * declaration or a block (`(padding ...)`, `(state ...)`), so an unknown
  * feature such as `(min-height 10px)` is reported, not read as a property.
  */
-const looksLikeCondition = (raw, isBodyItem) =>
-  Array.isArray(raw) && typeof raw[0] === 'string' && !isBodyItem(raw[0]);
+const looksLikeCondition = (kind, raw, isBodyItem) =>
+  Array.isArray(raw) &&
+  typeof raw[0] === 'string' &&
+  (Object.hasOwn(FEATURES[kind], raw[0]) || !isBodyItem(raw[0]));
 
 /**
  * Split the values of a `media` or `container` block into its leading
@@ -92,7 +94,7 @@ export function readConditions(kind, raws, at, diagnostics, isBodyItem) {
   const conditions = [];
   let i = 0;
   for (; i < raws.length; i += 1) {
-    if (!looksLikeCondition(raws[i], isBodyItem)) {
+    if (!looksLikeCondition(kind, raws[i], isBodyItem)) {
       break;
     }
     const condition = readCondition(kind, raws[i]);

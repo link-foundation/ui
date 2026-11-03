@@ -1,5 +1,6 @@
 /** Shipped themes remain LiNo data, loaded in browsers or Node without a build. */
 import { readThemeFile } from './material3/mapping.js';
+export { readMapping } from './mapping.js';
 export { getMuiMapping } from './material3/mapping.js';
 export { materialThemeFromSeed } from './material3/seed.js';
 export { muiThemeToLino } from './material3/mui.js';
@@ -7,7 +8,14 @@ import { classicThemes } from './classic/catalog.js';
 import { loadThemes, resolveTheme } from '@link-foundation/ui-tokens/themes';
 
 export function listThemes() {
-  return ['base', 'material3', ...classicThemes.map((t) => t.id)];
+  return [
+    'base',
+    'material3',
+    'hig',
+    'hig-ios',
+    'hig-macos',
+    ...classicThemes.map((t) => t.id),
+  ];
 }
 
 // Share source reads within one runtime, while resolving a fresh theme per caller.
@@ -25,6 +33,19 @@ async function registry() {
       'templates',
       'theme',
     ].map((name) => `material3/${name}.lino`),
+    ...[
+      'colors',
+      'type',
+      'shape',
+      'spacing',
+      'motion',
+      'materials',
+      'styles',
+      'templates',
+      'theme',
+    ].map((name) => `hig/${name}.lino`),
+    'hig-ios/theme.lino',
+    'hig-macos/theme.lino',
     ...new Set(classicThemes.map((t) => t.path)),
   ];
   const texts = await Promise.all(paths.map(readThemeFile));
@@ -44,4 +65,10 @@ export async function loadTheme(id) {
     throw error;
   });
   return resolveTheme(await registryPromise, id);
+}
+
+/** SwiftUI view/modifier rows in the shared mapping format. */
+export async function getSwiftuiMapping() {
+  const { readMapping } = await import('./mapping.js');
+  return readMapping(await readThemeFile('hig/swiftui-mapping.lino'));
 }

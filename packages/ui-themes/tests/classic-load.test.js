@@ -5,6 +5,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import { parseNested } from '@link-foundation/ui-core';
 import { loadThemes, compileThemeCss } from '@link-foundation/ui-tokens/themes';
 import { listThemes, loadTheme } from '../src/index.js';
+import { classicThemes } from '../src/classic/catalog.js';
 
 it('every classic LiNo file parses and every registered theme compiles strictly in every mode combination', async () => {
   const root = new URL('../themes/classic/', import.meta.url);
@@ -16,9 +17,7 @@ it('every classic LiNo file parses and every registered theme compiles strictly 
     assert.deepEqual(loadThemes(text).diagnostics, [], file);
   }
   assert.ok(listThemes().includes('deepcase-classic'));
-  for (const id of listThemes().filter(
-    (id) => !['base', 'material3'].includes(id)
-  )) {
+  for (const { id } of classicThemes) {
     const theme = await loadTheme(id);
     assert.deepEqual(theme.diagnostics, [], id);
     const diagnostics = [];

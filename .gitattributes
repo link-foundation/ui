@@ -55,3 +55,4 @@ tests/e2e/fixtures/recorder-native-generated.mjs text eol=lf
 
 # Generated Markdown is compared byte for byte with the LF writer output.
 docs/themes/material3.md text eol=lf
+docs/themes/hig.md text eol=lf

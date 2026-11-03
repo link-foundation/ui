@@ -1,0 +1,80 @@
+map Button
+  kind button
+  prop buttonStyle bordered
+    variant bordered
+  prop buttonStyle borderless
+    variant borderless
+  prop buttonStyle borderedProminent
+    variant prominent
+  status mapped
+map Toggle
+  kind switch
+  status mapped
+map TextField
+  kind text-field
+  status mapped
+map SecureField
+  kind text-field
+  prop secure true
+    type password
+  status mapped
+map Slider
+  kind slider
+  status mapped
+map Stepper
+  kind number-field
+  status partial
+map Picker
+  kind select
+  prop pickerStyle segmented
+    appearance segmented
+  status partial
+map List
+  kind list
+  status partial
+map Form
+  kind form
+  status none
+map Section
+  kind stack
+  status partial
+map VStack
+  kind stack
+  prop axis vertical
+    direction vertical
+  status mapped
+map HStack
+  kind stack
+  prop axis horizontal
+    direction horizontal
+  status mapped
+map ZStack
+  kind stack
+  status partial
+map ScrollView
+  kind scroll-area
+  status none
+map TabView
+  kind tabs
+  status partial
+map NavigationStack
+  kind navigation
+  status none
+map Sheet
+  kind dialog
+  status partial
+map Alert
+  kind alert-dialog
+  status partial
+map Menu
+  kind menu
+  status mapped
+map ProgressView
+  kind progress
+  status mapped
+map Label
+  kind label
+  status partial
+map Image
+  kind image
+  status mapped
