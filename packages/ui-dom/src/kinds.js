@@ -14,6 +14,9 @@
  * @property {(code: string, severity: 'error'|'warning'|'info',
  *   at?: Record<string, unknown>) => void} diagnostic  report a problem of
  *   the current element
+ * @property {() => Element[]} children  the element models of the current
+ *   element's children in the store (a kind without a children slot reads
+ *   sublinks that the projection made child elements, such as `(label ...)`)
  *
  * @typedef {object} KindSpec
  * @property {string} tag  a valid custom element name (`ui-button`)

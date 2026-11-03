@@ -13,6 +13,8 @@
  *   /packages/<name>/examples/ -> packages/<name>/examples/ (when present;
  *                                the ui-components chart, diagram and icon
  *                                galleries)
+ *   /packages/<name>/stories/ -> packages/<name>/stories/ (when present; the
+ *                                story files of the controls gallery)
  *   /packages/<name>/dist/    -> packages/<name>/dist/ (build output, such
  *                                as the icon modules of build-icons.mjs)
  *   /node_modules/links-notation/dist/ -> the browser build of links-notation
@@ -84,7 +86,13 @@ export function defaultMounts(root) {
   const packagesDir = path.join(root, 'packages');
   if (existsSync(packagesDir)) {
     for (const name of readdirSync(packagesDir).sort()) {
-      for (const sub of [['e2e', 'pages'], ['src'], ['examples'], ['dist']]) {
+      for (const sub of [
+        ['e2e', 'pages'],
+        ['src'],
+        ['examples'],
+        ['stories'],
+        ['dist'],
+      ]) {
         const dir = path.join(packagesDir, name, ...sub);
         if (existsSync(dir)) {
           mounts.push({ prefix: `/packages/${name}/${sub.join('/')}/`, dir });

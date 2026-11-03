@@ -83,19 +83,26 @@ export async function expectAccessible(page, opts = {}) {
 
 /**
  * Take one screenshot per theme × locale cell, named
- * `<name>-<locale>-<theme>.png`.
+ * `<name>-<locale>-<theme>.png`. `screenshot` is the options of
+ * `toHaveScreenshot`, or a function of the page and the cell that returns
+ * them (read after `apply`, e.g. a clip measured on the page).
  *
  * @param {import('@playwright/test').Page} page
  * @param {string} name
- * @param {{themes?: string[], locales?: string[], apply: (page: import('@playwright/test').Page, cell: {theme: string, locale: string}) => Promise<void>, screenshot?: import('@playwright/test').PageAssertionsToHaveScreenshotOptions}} opts
+ * @param {{themes?: string[], locales?: string[], apply: (page: import('@playwright/test').Page, cell: {theme: string, locale: string}) => Promise<void>, screenshot?: import('@playwright/test').PageAssertionsToHaveScreenshotOptions | ((page: import('@playwright/test').Page, cell: {theme: string, locale: string}) => Promise<import('@playwright/test').PageAssertionsToHaveScreenshotOptions>)}} opts
  */
 export async function screenshotMatrix(page, name, opts) {
   for (const locale of opts.locales ?? DEFAULT_LOCALES) {
     for (const theme of opts.themes ?? DEFAULT_THEMES) {
-      await opts.apply(page, { theme, locale });
+      const cell = { theme, locale };
+      await opts.apply(page, cell);
+      const options =
+        typeof opts.screenshot === 'function'
+          ? await opts.screenshot(page, cell)
+          : opts.screenshot;
       await expect(page).toHaveScreenshot(
         `${name}-${locale}-${theme}.png`,
-        opts.screenshot
+        options
       );
     }
   }

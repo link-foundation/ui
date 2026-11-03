@@ -1,0 +1,23 @@
+text-field-stories: stories
+  component text-field
+  story default
+    text-field 'Name'
+      name name
+      value 'Ada'
+  story placeholder
+    text-field 'Search'
+      type search
+      placeholder 'Type to search'
+  story required
+    text-field 'Email'
+      type email
+      required true
+  story invalid
+    text-field 'Email'
+      type email
+      value 'ada@'
+      invalid true
+  story disabled
+    text-field 'Account'
+      value 'ada'
+      disabled true
