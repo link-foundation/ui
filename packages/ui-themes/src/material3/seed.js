@@ -36,6 +36,7 @@ const roles = [
   'onBackground',
   'surface',
   'onSurface',
+  'surfaceTint',
   'surfaceVariant',
   'onSurfaceVariant',
   'surfaceDim',

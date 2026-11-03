@@ -41,6 +41,8 @@ material3-colors: theme
     m3 md.sys.color.surface
   token color.on-surface '#1d1b20'
     m3 md.sys.color.on-surface
+  token color.surface-tint '#65558f'
+    m3 md.sys.color.surface-tint
   token color.surface-variant '#e7e0eb'
     m3 md.sys.color.surface-variant
   token color.on-surface-variant '#49454e'
@@ -161,6 +163,8 @@ material3-colors: theme
       m3 md.sys.color.surface
     token color.on-surface '#e6e0e9'
       m3 md.sys.color.on-surface
+    token color.surface-tint '#cfbdfe'
+      m3 md.sys.color.surface-tint
     token color.surface-variant '#49454e'
       m3 md.sys.color.surface-variant
     token color.on-surface-variant '#cac4cf'
@@ -258,6 +262,8 @@ material3-colors: theme
       m3 md.sys.color.surface
     token color.on-surface '#000000'
       m3 md.sys.color.on-surface
+    token color.surface-tint '#65558f'
+      m3 md.sys.color.surface-tint
     token color.surface-variant '#e7e0eb'
       m3 md.sys.color.surface-variant
     token color.on-surface-variant '#000000'

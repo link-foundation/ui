@@ -33,6 +33,9 @@ material3-motion: theme
     m3 md.sys.motion.duration.extra-long3
   token motion.duration.extra-long4 1000ms
     m3 md.sys.motion.duration.extra-long4
+  token motion.easing.linear
+    cubic-bezier 0 0 1 1
+    m3 md.sys.motion.easing.linear
   token motion.easing.standard
     cubic-bezier 0.2 0 0 1
     m3 md.sys.motion.easing.standard

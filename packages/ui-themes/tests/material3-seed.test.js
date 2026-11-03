@@ -24,6 +24,10 @@ it('matches MCU baseline primary and supplies three complete schemes', () => {
     values.toCss(theme.tokens.get('color.primary')).toLowerCase(),
     hexFromArgb(scheme.primary)
   );
+  assert.equal(
+    values.toCss(theme.tokens.get('color.surface-tint')).toLowerCase(),
+    hexFromArgb(scheme.surfaceTint)
+  );
   assert.ok(theme.modes.dark.size >= 40);
   assert.ok(theme.modes['high-contrast'].size >= 40);
 });
