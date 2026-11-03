@@ -7,6 +7,7 @@
 Add a LiNo WYSIWYG designer with docked panels, transactional visual editing,
 snapping, keyboard paths and source-preserving two-way synchronization.
 Expose the devmode property grid and overlay for reuse by the designer.
+Resolve devmode model policy declarations through package exports for Deno.
 Patch positional store edits in place so defaults and source/property edits
 appear immediately on the canvas, preserving explicit properties and DOM
 identity through undo/redo.
