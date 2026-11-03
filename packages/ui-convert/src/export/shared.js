@@ -11,6 +11,7 @@ export const quote = (value) =>
   JSON.stringify(String(value)).replaceAll('<', '\\u003c');
 export const commentText = (value) =>
   String(value)
+    .replaceAll('<', '\\u003c')
     .replaceAll('*/', '* /')
     .replaceAll('--', '- -')
     .replaceAll(/[\r\n\u2028\u2029]/g, ' ');

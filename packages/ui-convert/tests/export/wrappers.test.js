@@ -128,7 +128,7 @@ for (const target of ['react', 'vue']) {
 
 test('compiled wrappers preserve hostile template characters byte for byte', async () => {
   const source =
-    "app: document\n  t: text '` ${globalThis.noSuchValue} \\\\ </script> & < > { }'\n";
+    "app: document\n  t: text '` ${globalThis.noSuchValue} \\\\ </script> & < > { }'\n    magic '</script> */ --'\n";
   for (const target of ['react', 'vue']) {
     await compiled(target, source, async (module) => {
       const container = host();
