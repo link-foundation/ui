@@ -30,11 +30,15 @@ npx playwright test tests/ui/negative.e2e.mjs --project chromium
 
 Test files end in `.e2e.mjs` so that `npm test` (`node --test`), `bun test`
 and `deno test` never pick them up. Playwright discovers
-`tests/ui/**/*.e2e.mjs`, `packages/*/e2e/**/*.e2e.mjs` and
-`tests/e2e/**/*.spec.js`. The `tests/e2e` specs test packages together
-(for example `interop-lottie.spec.js` plays a ui-convert export in
-lottie-web); `bunfig.toml` keeps them out of `bun test`, and `node --test`
-and `deno test` do not match `.spec.js`.
+`tests/ui/**/*.e2e.mjs`, `packages/*/e2e/**/*.e2e.mjs`,
+`tests/e2e/**/*.spec.js` and `packages/*/tests/e2e/**/*.spec.js`. The
+`tests/e2e` specs test packages together. For example,
+`interop-lottie.spec.js` plays a ui-convert export in lottie-web. A package's
+`tests/e2e` specs test that package's example pages. For example,
+`packages/ui-components/tests/e2e/icons.spec.js` tests the icon gallery
+`packages/ui-components/examples/icons.html`, which needs
+`npm run build:icons` first. `bunfig.toml` keeps these specs out of
+`bun test`, and `node --test` and `deno test` do not match `.spec.js`.
 
 The configuration fixes the viewport (1280×800, scale 1), `locale: 'en-US'`,
 `timezoneId: 'UTC'`, `colorScheme: 'light'` and reduced motion. Screenshots

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'test-anywhere';
 import { spawnSync } from 'node:child_process';
 import {
+  existsSync,
   mkdtempSync,
   mkdirSync,
   readFileSync,
@@ -119,8 +120,35 @@ describe('shared static server', () => {
     }
     // Only src/ of a package is served, not its tests or package.json.
     expect(
+      resolveRequestPath(
+        served,
+        '/packages/ui-components/tests/icons/helpers.js'
+      ).status
+    ).toBe(404);
+    expect(
       resolveRequestPath(served, '/packages/ui-dom/package.json').status
     ).toBe(404);
+  });
+
+  it('serves package examples and build output (the icon gallery)', () => {
+    const mounted = defaultMounts(repoRoot).map((mount) => mount.prefix);
+    expect(mounted).toContain('/packages/ui-components/examples/');
+    const served = normaliseMounts(defaultMounts(repoRoot));
+    expect(
+      resolveRequestPath(served, '/packages/ui-components/examples/icons.html')
+    ).toEqual({
+      status: 200,
+      file: path.resolve(
+        repoRoot,
+        'packages/ui-components/examples/icons.html'
+      ),
+    });
+    // dist/ (the output of `node scripts/build-icons.mjs`) is mounted
+    // when it exists.
+    const dist = path.join(repoRoot, 'packages/ui-components/dist');
+    expect(mounted.includes('/packages/ui-components/dist/')).toBe(
+      existsSync(dist)
+    );
   });
 
   it('refuses paths that escape a mount', () => {
@@ -158,19 +186,21 @@ describe('Playwright e2e files stay out of unit test runners', () => {
     'utf8'
   );
 
-  it('discovers *.e2e.mjs in tests/ui and packages/*/e2e, *.spec.js in tests/e2e', () => {
+  it('discovers *.e2e.mjs in tests/ui and packages/*/e2e, *.spec.js in tests/e2e and packages/*/tests/e2e', () => {
     for (const pattern of [
       "'tests/ui/**/*.e2e.mjs'",
       "'packages/*/e2e/**/*.e2e.mjs'",
       "'tests/e2e/**/*.spec.js'",
+      "'packages/*/tests/e2e/**/*.spec.js'",
     ]) {
       expect(config).toContain(pattern);
     }
   });
 
-  it('keeps tests/e2e specs out of bun test', () => {
+  it('keeps tests/e2e and packages/*/tests/e2e specs out of bun test', () => {
     const bunfig = readFileSync(path.join(repoRoot, 'bunfig.toml'), 'utf8');
     expect(bunfig).toContain('"tests/e2e/**"');
+    expect(bunfig).toContain('"packages/*/tests/e2e/**"');
   });
 
   it('uses a suffix that node, bun and deno default patterns do not match', () => {
