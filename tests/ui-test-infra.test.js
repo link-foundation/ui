@@ -123,6 +123,40 @@ describe('shared static server', () => {
     ).toBe(404);
   });
 
+  it('serves the diagrams example with Dagre and the lazily loaded Mermaid', () => {
+    const served = normaliseMounts(defaultMounts(repoRoot));
+    for (const [url, file] of [
+      [
+        '/packages/ui-components/examples/diagrams.html',
+        'packages/ui-components/examples/diagrams.html',
+      ],
+      [
+        '/packages/ui-components/src/index.js',
+        'packages/ui-components/src/index.js',
+      ],
+      [
+        '/node_modules/@dagrejs/dagre/dist/dagre.esm.js',
+        'node_modules/@dagrejs/dagre/dist/dagre.esm.js',
+      ],
+      [
+        '/node_modules/mermaid/dist/mermaid.esm.min.mjs',
+        'node_modules/mermaid/dist/mermaid.esm.min.mjs',
+      ],
+    ]) {
+      expect(resolveRequestPath(served, url)).toEqual({
+        status: 200,
+        file: path.resolve(repoRoot, file),
+      });
+    }
+    // The tests and fixtures of a package stay unserved.
+    expect(
+      resolveRequestPath(
+        served,
+        '/packages/ui-components/tests/diagrams/fixtures/login-flow.lino'
+      ).status
+    ).toBe(404);
+  });
+
   it('refuses paths that escape a mount', () => {
     expect(resolveRequestPath(mounts, '/app/../../etc/passwd').status).toBe(
       403
@@ -158,11 +192,12 @@ describe('Playwright e2e files stay out of unit test runners', () => {
     'utf8'
   );
 
-  it('discovers *.e2e.mjs in tests/ui and packages/*/e2e, *.spec.js in tests/e2e', () => {
+  it('discovers *.e2e.mjs in tests/ui and packages/*/e2e, *.spec.js in tests/e2e and packages/*/tests/e2e', () => {
     for (const pattern of [
       "'tests/ui/**/*.e2e.mjs'",
       "'packages/*/e2e/**/*.e2e.mjs'",
       "'tests/e2e/**/*.spec.js'",
+      "'packages/*/tests/e2e/**/*.spec.js'",
     ]) {
       expect(config).toContain(pattern);
     }
@@ -171,6 +206,7 @@ describe('Playwright e2e files stay out of unit test runners', () => {
   it('keeps tests/e2e specs out of bun test', () => {
     const bunfig = readFileSync(path.join(repoRoot, 'bunfig.toml'), 'utf8');
     expect(bunfig).toContain('"tests/e2e/**"');
+    expect(bunfig).toContain('"packages/*/tests/e2e/**"');
   });
 
   it('uses a suffix that node, bun and deno default patterns do not match', () => {
