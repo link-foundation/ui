@@ -9,17 +9,16 @@ await page.waitForSelector('ui-devmode-inspector');
 await page.waitForTimeout(300);
 console.log(
   await page.evaluate(() => {
-    const shadow = document.querySelector('ui-devmode-inspector').shadowRoot;
+    const shadow = globalThis.document.querySelector(
+      'ui-devmode-inspector'
+    ).shadowRoot;
     const tab = shadow.querySelector('#devmode-tab-outline');
     return [
       tab.outerHTML,
       tab.parentElement.outerHTML.slice(0, 300),
       tab.parentElement.parentElement.tagName,
       [...tab.parentElement.parentElement.children]
-        .map(
-          (c) =>
-            c.tagName + '.' + c.className + '[' + c.getAttribute('role') + ']'
-        )
+        .map((c) => `${c.tagName}.${c.className}[${c.getAttribute('role')}]`)
         .join(' '),
     ].join('\n---\n');
   })
