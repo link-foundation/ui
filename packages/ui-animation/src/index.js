@@ -65,3 +65,10 @@ export {
 export { tokenResolver } from './tokens.js';
 export { createPlayer, defaultMotion, triggersFor } from './player.js';
 export { createManualClock, systemClock, FRAME_MS } from './clock.js';
+
+export { parseRecording, serializeRecording } from './recorder/format.js';
+export { createRecorder } from './recorder/recorder.js';
+export { stateAt, animationsAt } from './recorder/state-at.js';
+export { replay } from './recorder/replay.js';
+export { verifyReplay } from './recorder/verify.js';
+export { toPlaywright } from './recorder/to-playwright.js';

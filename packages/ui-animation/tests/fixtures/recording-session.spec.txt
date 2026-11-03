@@ -1,0 +1,20 @@
+import { test, expect } from '@playwright/test';
+
+// prettier-ignore
+test('recorded session', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.clock.install();
+  await page.goto("/examples/animation/");
+  const target = (id) => { const host = page.locator(`[data-link-id=${JSON.stringify(id)}]`); return host.locator("button, input, textarea, select").or(host).last(); };
+  await expect(page.locator("[data-link-id=\"ok\"]")).toHaveText("OK");
+  await page.clock.runFor(840);
+  { const box = await target("ok").boundingBox(); await page.mouse.move(box.x + 12, box.y + 8); }
+  await page.mouse.down({ button: "left" });
+  await page.clock.runFor(1);
+  await page.clock.runFor(149);
+  await expect(page.locator("[data-link-id=\"ok\"]")).toHaveText("Saved");
+  await page.clock.runFor(510);
+  await target("ok").dispatchEvent("keydown", { key: "Enter" });
+  await page.clock.runFor(600);
+  await test.step("saved once", async () => {});
+});

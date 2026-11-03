@@ -98,7 +98,23 @@ function playId(context, id, playOptions = {}) {
     const element = targetOf(entry, animation);
     return startRun(context, animation, element, entry.start, playOptions);
   });
-  return createControl(context, runs);
+  const control = createControl(context, runs);
+  const run = ++context.nextRun;
+  const recordedOptions = {
+    ...playOptions,
+    seed: playOptions.seed ?? context.seed ?? 0,
+  };
+  context.emit({ kind: 'play', id, run, options: recordedOptions });
+  const cancel = control.cancel;
+  let cancelled = false;
+  control.cancel = () => {
+    if (!cancelled) {
+      cancelled = true;
+      context.emit({ kind: 'cancel', id, run, options: recordedOptions });
+    }
+    cancel();
+  };
+  return control;
 }
 
 const isOn = (values) =>
@@ -157,6 +173,7 @@ export function triggersFor(model, store, id, state) {
 /** The state of an update event that just turned on, or `null`. */
 function enteredState(event) {
   const entered =
+    event.origin !== 'replay' &&
     event.type === 'update' &&
     ANIMATION_STATES.includes(event.prop) &&
     isOn(event.after) &&
@@ -202,7 +219,14 @@ function bindStore(context, store) {
 export function createPlayer(handle, options = {}) {
   const model = emptyModel();
   const motion = options.motion ?? defaultMotion;
+  const listeners = new Set();
   const context = {
+    nextRun: 0,
+    emit: (event) => {
+      for (const listener of listeners) {
+        listener(event);
+      }
+    },
     model,
     clock: options.clock ?? systemClock(),
     animate:
@@ -221,6 +245,10 @@ export function createPlayer(handle, options = {}) {
   }
   return {
     model,
+    subscribe(listener) {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    },
     /** Merge animations (Links Notation text or a loaded model). */
     load: (source) => loadInto(model, source),
     /** Play an animation or a timeline. */
