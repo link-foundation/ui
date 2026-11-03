@@ -139,6 +139,40 @@ describe('shared static server', () => {
     ).toBe(404);
   });
 
+  it('serves the diagrams example with Dagre and the lazily loaded Mermaid', () => {
+    const served = normaliseMounts(defaultMounts(repoRoot));
+    for (const [url, file] of [
+      [
+        '/packages/ui-components/examples/diagrams.html',
+        'packages/ui-components/examples/diagrams.html',
+      ],
+      [
+        '/packages/ui-components/src/index.js',
+        'packages/ui-components/src/index.js',
+      ],
+      [
+        '/node_modules/@dagrejs/dagre/dist/dagre.esm.js',
+        'node_modules/@dagrejs/dagre/dist/dagre.esm.js',
+      ],
+      [
+        '/node_modules/mermaid/dist/mermaid.esm.min.mjs',
+        'node_modules/mermaid/dist/mermaid.esm.min.mjs',
+      ],
+    ]) {
+      expect(resolveRequestPath(served, url)).toEqual({
+        status: 200,
+        file: path.resolve(repoRoot, file),
+      });
+    }
+    // The tests and fixtures of a package stay unserved.
+    expect(
+      resolveRequestPath(
+        served,
+        '/packages/ui-components/tests/diagrams/fixtures/login-flow.lino'
+      ).status
+    ).toBe(404);
+  });
+
   it('refuses paths that escape a mount', () => {
     expect(resolveRequestPath(mounts, '/app/../../etc/passwd').status).toBe(
       403

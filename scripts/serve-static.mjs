@@ -15,6 +15,9 @@
  *   /node_modules/<d3 package>/ -> the ES modules of d3-scale, d3-shape and
  *                                their dependencies (the chart gallery)
  *   /node_modules/echarts/dist/ -> the optional ECharts build
+ *   /node_modules/@dagrejs/dagre/dist/ -> the browser build of Dagre
+ *   /node_modules/mermaid/dist/ -> the browser build of Mermaid (the optional
+ *                                peer of ui-components, loaded on demand)
  *   /docs/case-studies/issue-1/samples/ -> the sample documents
  *
  * Usage: node scripts/serve-static.mjs [--port 4173] [--host 127.0.0.1]
@@ -64,6 +67,8 @@ export function defaultMounts(root) {
     ['node_modules', 'links-notation', 'dist'],
     ...BROWSER_MODULES.map((name) => ['node_modules', name]),
     ['node_modules', 'echarts', 'dist'],
+    ['node_modules', '@dagrejs', 'dagre', 'dist'],
+    ['node_modules', 'mermaid', 'dist'],
     ['docs', 'case-studies', 'issue-1', 'samples'],
   ]) {
     mounts.push({
@@ -74,7 +79,7 @@ export function defaultMounts(root) {
   const packagesDir = path.join(root, 'packages');
   if (existsSync(packagesDir)) {
     for (const name of readdirSync(packagesDir).sort()) {
-      for (const sub of [['e2e', 'pages'], ['examples'], ['src']]) {
+      for (const sub of [['e2e', 'pages'], ['src'], ['examples']]) {
         const dir = path.join(packagesDir, name, ...sub);
         if (existsSync(dir)) {
           mounts.push({ prefix: `/packages/${name}/${sub.join('/')}/`, dir });
