@@ -541,6 +541,11 @@
   box-shadow: var(--elevation-level2, 0 2px 6px -2px currentColor);
 }
 
+:where(ui-select) > [data-part='listbox'][popover] {
+  margin: 0;
+  inset: auto;
+}
+
 :where(ui-option) {
   display: flex;
   align-items: center;

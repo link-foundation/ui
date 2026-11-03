@@ -11,6 +11,7 @@
  */
 
 import { recordChosen } from './choices.js';
+import { connectListPopover } from '../overlays/list-popover.js';
 import {
   atomOf,
   changesOf,
@@ -114,10 +115,12 @@ export const SELECT_KIND = Object.freeze({
     if (control.live) {
       const disconnect = connectListbox(list, control, () => render(control));
       const untype = typeaheadKeys(control, list, input);
+      const unpopover = connectListPopover(control);
       const stop = control.stop;
       control.stop = () => {
         disconnect();
         untype();
+        unpopover();
         stop();
       };
     }

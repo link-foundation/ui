@@ -41,8 +41,9 @@ selecting a docked non-modal dialog. `side` accepts left, right, top and bottom.
 
 Popovers use `popover auto`, tooltips use `popover manual`. `positionFloating`
 wraps Floating UI's offset, flip, shift and autoUpdate, accepts virtual anchors,
-and returns observer cleanup. It is exported for select (#34), which has not
-landed yet. CSS anchor positioning is not required. Tooltips open after 500 ms,
+and returns observer cleanup. Select (#34) uses the same module for its
+native listbox popover, retaining its list machine and CSS fallback. CSS anchor
+positioning is not required. Tooltips open after 500 ms,
 allow moving the pointer into their content, and close with Escape or after
 hover and focus leave. All tooltip timers use `options.overlays.clock` when
 provided, with the same clock interface as the behavior interpreter.

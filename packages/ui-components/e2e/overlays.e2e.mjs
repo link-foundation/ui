@@ -143,6 +143,59 @@ test('popover light dismiss and dialog action content', async ({ page }) => {
   await expect(byId(page, 'confirm')).toHaveJSProperty('open', true);
 });
 
+test('select shares top-layer placement, flips at the edge and preserves its machine', async ({
+  page,
+}) => {
+  await page.addStyleTag({
+    url: '/packages/ui-components/src/controls/styles.css',
+  });
+  await page.evaluate(async () => {
+    const { mountControls } = await import('../../src/controls/index.js');
+    const container = document.createElement('div');
+    container.style.cssText = 'position:fixed;bottom:8px;right:8px;width:200px';
+    document.body.append(container);
+    window.selectFixture = mountControls(
+      container,
+      `fruit: select
+  label Fruit
+  apple: option
+    label Apple
+    value apple
+  pear: option
+    label Pear
+    value pear
+`
+    );
+  });
+  const input = byId(page, 'fruit').locator('[data-part="input"]');
+  const listbox = byId(page, 'fruit').locator('[role="listbox"]');
+  await input.focus();
+  await page.keyboard.press('ArrowDown');
+  await expect(listbox).toBeVisible();
+  await expect(listbox).toHaveAttribute('popover', 'auto');
+  await expect
+    .poll(() => listbox.evaluate((node) => node.matches(':popover-open')))
+    .toBe(true);
+  await expect
+    .poll(() => listbox.evaluate((node) => node.style.position))
+    .toBe('fixed');
+  const box = await listbox.boundingBox();
+  const anchor = await input.boundingBox();
+  expect(box.y + box.height).toBeLessThanOrEqual(anchor.y);
+  expect(box.x + box.width).toBeLessThanOrEqual(1280);
+  await expect(input).toBeFocused();
+  await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('Enter');
+  await expect(listbox).toBeHidden();
+  await expect(input).toHaveText('Pear');
+  await input.click();
+  await expect(listbox).toBeVisible();
+  await page.locator('#outside-target').click();
+  await expect(listbox).toBeHidden();
+  await expect(input).toHaveAttribute('aria-expanded', 'false');
+  await page.evaluate(() => window.selectFixture.destroy());
+});
+
 test('context keys, arrows and target separate from multi-selection', async ({
   page,
 }) => {
