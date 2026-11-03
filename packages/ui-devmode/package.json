@@ -11,6 +11,10 @@
     "./model": {
       "types": "./src/model.d.ts",
       "default": "./src/model.js"
+    },
+    "./agent-instruction": {
+      "types": "./src/agent-instruction.d.ts",
+      "default": "./src/agent-instruction.js"
     }
   },
   "types": "./src/index.d.ts",

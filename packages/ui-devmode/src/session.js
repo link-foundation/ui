@@ -28,6 +28,7 @@ import {
   saveSession,
   topWritableLayer,
 } from './model.js';
+import { openDefaultsDialog } from './defaults-dialog.js';
 import { createOverlay } from './overlay.js';
 import {
   renderAnimations,
@@ -418,6 +419,16 @@ async function createContext(options) {
 function commandsOf(ctx, close) {
   const { config, policy, inspector, t } = ctx;
   return {
+    defaults() {
+      ctx.setPicking(false);
+      ctx.defaultsDialog?.close();
+      ctx.defaultsDialog = openDefaultsDialog({
+        window: ctx.window,
+        config,
+        policy,
+        t,
+      });
+    },
     pick: () => ctx.setPicking(!ctx.state.picking),
     save() {
       const count = saveSession(config, { policy });
@@ -501,6 +512,7 @@ export async function openSession(options) {
       return;
     }
     state.closed = true;
+    ctx.defaultsDialog?.close();
     cleanups.splice(0).forEach((cleanup) => cleanup());
     inspector.destroy();
     overlay.destroy();
@@ -522,7 +534,11 @@ export async function openSession(options) {
     window,
     'keydown',
     (event) => {
-      if (event.key === 'Escape' && !event.defaultPrevented) {
+      if (
+        event.key === 'Escape' &&
+        !event.defaultPrevented &&
+        !ctx.defaultsDialog?.host.isConnected
+      ) {
         event.preventDefault();
         if (state.picking) {
           ctx.setPicking(false);
