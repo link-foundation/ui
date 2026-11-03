@@ -31,8 +31,9 @@ npm run check:duplication
   stub the blocked API as the issue says; never fake it in tests.
 - Parse LiNo with the official `links-notation` package, never with regular
   expressions.
-- Do only what the issue asks; open a new issue for anything else
-  ([Bug or Feature form](https://github.com/link-foundation/ui/issues/new/choose)).
+- Do only what the issue asks; open a
+  [new issue](https://github.com/link-foundation/ui/issues/new) (type Bug or
+  Feature, see `docs/agents/writing-issues.md`) for anything else.
 - Work in bulk. Workers may edit and test; exactly one coordinator owns
   `git push`. Never let two workers push the same branch.
 - Run the required checks on the exact revision you push and review the whole

@@ -117,9 +117,10 @@ and libraries, References). The sections below follow that template.
 
 ## When stuck
 
-- Do not widen the scope of the pull request. Open a new issue with the
-  [Bug or Feature form](https://github.com/link-foundation/ui/issues/new/choose)
-  and link it from the pull request.
+- Do not widen the scope of the pull request. Open a
+  [new issue](https://github.com/link-foundation/ui/issues/new) of type Bug or
+  Feature, written as [writing-issues.md](writing-issues.md) describes, and
+  link it from the pull request.
 - If a blocker turns out to be missing, say so in the pull request and in the
   new issue, with the evidence (logs, failing command, CI run URL).
 - If the issue itself is unclear, write down the assumption you chose in the

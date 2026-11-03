@@ -2,9 +2,10 @@
 
 Most issues in this repository are solved by AI coding agents, many of them
 less capable than the agent or person who wrote the issue. An issue is ready
-when such an agent can deliver it without asking a question. Use the
-[Feature or Bug form](https://github.com/link-foundation/ui/issues/new/choose);
-the forms ask for the sections below.
+when such an agent can deliver it without asking a question. Open a
+[new issue](https://github.com/link-foundation/ui/issues/new) of type Feature
+or Bug and write the sections below yourself; this repository has no issue
+templates.
 
 **Model issue:** [#14 — ui-core: parse Links Notation into the UI element tree](https://github.com/link-foundation/ui/issues/14).
 Its source file is

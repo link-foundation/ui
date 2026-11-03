@@ -28,11 +28,13 @@ people working the same way) start here:
   accessibility, scope, "done means").
 - [`docs/agents/writing-issues.md`](agents/writing-issues.md): how to write an
   issue that a less capable agent can solve.
-- New issues use the Feature and Bug
-  [issue forms](https://github.com/link-foundation/ui/issues/new/choose)
-  (`.github/ISSUE_TEMPLATE/`), and pull requests use
-  `.github/pull_request_template.md`. `tests/issue-templates.test.js` keeps the
-  Feature form in the same section order as the roadmap issue template.
+- New issues are plain
+  [GitHub issues](https://github.com/link-foundation/ui/issues/new) (type Bug
+  or Feature) written as `docs/agents/writing-issues.md` describes; this
+  repository has no issue templates (`.github/ISSUE_TEMPLATE/` was removed in
+  [#133](https://github.com/link-foundation/ui/issues/133)). Pull requests use
+  `.github/pull_request_template.md`, and `tests/contributor-guide.test.js`
+  checks it and the agent guide.
 
 ### Case study folders
 
