@@ -1255,6 +1255,89 @@ runtime download. Consumers must preserve the relative
 `dist/network-layout.worker.mjs` asset when bundling the package, or inject a
 `createWorker` factory for their bundler's worker handling.
 
+## Code and LiNo source editor
+
+Import `@link-foundation/ui-components/editor` to register `<ui-code-editor>`
+and the `code-editor` ui-dom kind. Load `@link-foundation/ui-components/editor.css`
+and `@link-foundation/ui-components/controls.css` in the host page. The editor
+uses the existing basic buttons, light DOM, theme tokens and APG document tabs.
+Run `node scripts/serve-static.mjs` and open
+`/packages/ui-components/examples/editor.html` for the two sample files.
+
+```js
+import '@link-foundation/ui-components/editor';
+const editor = document.createElement('ui-code-editor');
+editor.setAttribute('label', 'Document source');
+editor.editorOptions = { storage: localStorage };
+editor.openDocument({ id: 'document.lino', text: 'app: document' });
+document.body.append(editor);
+await editor.ready;
+editor.externalUpdate('document.lino', 'app: document\n  title Updated');
+editor.addEventListener('ui-save', ({ detail: { id, text } }) => {
+  // Commit to the application's source repository; text may be ''.
+  console.log(id, text);
+});
+```
+
+Configure `editorOptions` before accessing `model` or connecting the element.
+`createDocumentsModel({storage, clock, key})` is DOM-free. Storage has synchronous
+`getItem`/`setItem` methods; the optional clock has `setTimeout`/`clearTimeout`.
+The default storage key is `editor-tabs`; document drafts use
+`editor-tabs:draft:<encoded-document-id>`. Both tabs and drafts are nested LiNo,
+read by `links-notation` and written with ui-core `formatLinks`. Use distinct
+keys for independent workspaces. An edit writes its draft after 500 ms; save,
+conflict resolution and disconnect flush immediately. `save(id)` returns text
+and marks it clean; external persistence is the host's responsibility. Failed
+storage writes throw so the host can report them. Reopening an already-open id
+selects its draft; send new source through `externalUpdate`, which preserves a
+dirty draft until `resolve(id, 'mine'|'theirs')`. Save is disabled during a
+conflict. `close(id)` returns `unsaved` until confirmed; the element prompts,
+or accepts a synchronous `confirmClose(document)` callback.
+
+```lino
+source: code-editor
+  label 'Document source'
+  document-id document.lino
+  title document.lino
+  language lino
+  value 'app: document'
+```
+
+`mountCodeEditor(host, options)` supports imperative mounting and explicit
+teardown. Engine adapters implement `setDocument`, `setDiagnostics`, `focus`
+and `destroy`; `createEditorEngine` loads only the selected engine. CodeMirror
+is the default. Its JavaScript, CSS, JSON and Markdown support loads from the
+corresponding language package when selected. Sessions retain selection and
+undo history across tab switches. LiNo validation uses the official parser,
+with its exact one-based error positions, a 64-level depth bound and a 1 MiB
+input bound. Syntax diagnostics appear inline and in a polite live list;
+selecting a diagnostic moves the cursor. Quoted strings, comments, ids and
+references are coloured lexically; only parser-confirmed links can fold.
+Escape followed by Tab leaves the engine. Opening or comparing source never
+executes it, and the editor never reformats source or removes comments.
+
+For Monaco, install the optional `monaco-editor` peer and set `engine="monaco"`
+before connection. The default adapter dynamically imports that package; your
+bundler must configure its CSS and worker URLs as Monaco documents. A host can
+instead supply `engineOptions.loadMonaco: () => Promise<MonacoAPI>`. The example
+uses the installed peer's AMD loader only after **Load optional Monaco** is
+selected, so both adapters can be exercised without a bundler. Disconnect
+tears down editor views, listeners, timers and Monaco models; reconnect keeps
+the document model. A failed engine import renders an alert and rejects
+`ready`.
+
+All new engine packages are MIT licensed: CodeMirror's state, view, language,
+commands, lint and four language packages, plus the Lezer highlighter and their
+transitive editor dependencies. Their installed npm manifests and licence
+files contain the notices; none is vendored. Monaco 0.58.0-dev-20261103 is MIT and remains
+an optional peer (a development dependency for the browser adapter tests).
+The pinned development build includes patched DOMPurify 3.4.17. Stable Monaco
+0.57.0 bundles vulnerable DOMPurify even when its npm dependency is overridden;
+see [the upstream report](https://github.com/microsoft/monaco-editor/issues/5517).
+The peer range accepts the corresponding stable 0.58 release when available.
+See the [CodeMirror licence](https://github.com/codemirror/dev/blob/main/LICENSE)
+and [Monaco licence](https://github.com/microsoft/monaco-editor/blob/main/LICENSE.txt).
+
 ## Chat kit
 
 The provider-neutral [chat kit](src/chat/README.md) supplies a chat list,

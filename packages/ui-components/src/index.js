@@ -34,5 +34,6 @@ export * from './icons/index.js';
 export * from './overlays/index.js';
 export * from './controls/index.js';
 export * from './data/index.js';
+export * from './editor/index.js';
 export * from './chat/index.js';
 export * from './settings/index.js';
