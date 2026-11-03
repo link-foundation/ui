@@ -14,6 +14,7 @@
     "npm:@tabler/icons@^3.50.0": "3.50.0",
     "npm:@vue/compiler-dom@^3.5.44": "3.5.44",
     "npm:@vue/test-utils@^2.5.1": "2.5.1_@vue+compiler-dom@3.5.44_vue@3.5.44",
+    "npm:ajv@^6.15.0": "6.15.0",
     "npm:ajv@^8.17.1": "8.20.0",
     "npm:axe-core@4.14.0": "4.14.0",
     "npm:command-stream@2.4.0": "2.4.0",
@@ -2878,10 +2879,19 @@
           ]
         }
       },
+      "packages/ui-themes": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@link-foundation/ui-tokens@^0.0.0"
+          ]
+        }
+      },
       "packages/ui-tokens": {
         "packageJson": {
           "dependencies": [
             "npm:@link-foundation/ui-core@^0.0.0",
+            "npm:@link-foundation/ui-style@^0.0.0",
+            "npm:ajv@^6.15.0",
             "npm:test-anywhere@~0.8.48"
           ]
         }

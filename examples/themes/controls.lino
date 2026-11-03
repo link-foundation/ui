@@ -1,0 +1,10 @@
+controls: stack
+  greeting: text 'The same controls, themed as data.'
+  name: text-field
+    label Name
+    value Ada
+  agree: checkbox
+    label 'Keep my preferences'
+    checked true
+  save: button 'Save changes'
+    variant filled

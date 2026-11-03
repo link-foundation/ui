@@ -10,6 +10,7 @@
  * them is destroyed.
  */
 
+import { compileThemeCss } from '@link-foundation/ui-tokens/themes';
 import { compileCss, readStyles } from '@link-foundation/ui-style';
 import {
   readTokens,
@@ -96,6 +97,9 @@ export function buildCss(options = {}, theme = undefined, report = () => {}) {
   return [
     options.baseCss === false ? '' : BASE_CSS,
     themeCss(options, theme, report),
+    ...[...(options.themeRegistry?.values() ?? [])].map((theme) =>
+      compileThemeCss(theme, { prefix: options.prefix, onDiagnostic: report })
+    ),
     rulesCss(options, report),
     typeof options.css === 'string' ? options.css : '',
   ]

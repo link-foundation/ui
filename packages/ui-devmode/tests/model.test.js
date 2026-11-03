@@ -93,6 +93,7 @@ describe('property rows', () => {
       ['type', 'enum', '', 'defaults'],
       ['disabled', 'boolean', '', 'defaults'],
       ['style', 'string', '', 'defaults'],
+      ['theme', 'string', '', 'defaults'],
       ['on', 'readonly', 'press (navigate home)', 'site'],
     ]);
     expect(rows.find((r) => r.name === 'variant').options).toEqual([

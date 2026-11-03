@@ -1,0 +1,83 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #1b1b1f;
+  background: #f1f3f8;
+}
+body {
+  margin: 0;
+  padding: 32px;
+}
+main {
+  max-width: 1180px;
+  margin: auto;
+}
+h1 {
+  margin: 0 0 8px;
+  font-size: 32px;
+}
+h2 {
+  font-size: 18px;
+  margin: 24px 0 12px;
+}
+p {
+  margin: 8px 0 24px;
+}
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+select {
+  padding: 8px;
+  font: inherit;
+}
+.panels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+ui-document {
+  border: 1px solid var(--color-outline);
+  border-radius: 16px;
+  padding: 20px;
+}
+[data-theme] {
+  color: var(--color-on-surface);
+  background: var(--color-surface);
+}
+ui-stack {
+  gap: 12px;
+  align-items: stretch;
+}
+ui-stack[data-scheme] {
+  padding: 12px;
+  border-radius: 12px;
+}
+ui-button {
+  width: fit-content;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+ui-button [data-part='root'] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+ui-button [data-part='indicator'] {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+ui-text-field {
+  min-width: 0;
+}
+@media (max-width: 640px) {
+  .panels {
+    grid-template-columns: 1fr;
+  }
+  body {
+    padding: 16px;
+  }
+}
