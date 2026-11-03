@@ -2,6 +2,7 @@ import { URL, fileURLToPath } from 'node:url';
 import { it } from 'test-anywhere';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
+import { basename } from 'node:path';
 import { moduleGraph } from '../../ui-react/tests/module-graph.js';
 it('native entry and its hooks graph import no DOM renderer or code evaluator', () => {
   const { files, unresolved } = moduleGraph(
@@ -31,7 +32,7 @@ it('the memory store entry excludes optional persistence adapters', () => {
     fileURLToPath(import.meta.url)
   );
   assert.equal(
-    files.some((file) => file.endsWith('/store.js')),
+    files.some((file) => basename(file) === 'store.js'),
     true
   );
   assert.deepEqual(
