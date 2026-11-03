@@ -30,3 +30,26 @@ export {
   updateRegion,
 } from './dock-model.js';
 export { LAYOUT_VOCABULARY_TEXT, layoutVocabulary } from './vocabulary.js';
+
+import './stack.js';
+import './grid.js';
+import './split.js';
+import './panel.js';
+import './tab-group.js';
+import './window.js';
+import './dock.js';
+import './app-shell.js';
+
+export { updateFlex } from './stack.js';
+export { areaList, isTrackAtom, trackList } from './grid.js';
+export { sizesFromLino, sizesToLino, splitSizes } from './split.js';
+export { activeTab } from './tab-group.js';
+export { clampRect, viewportOf } from './window-frame.js';
+export { windowController } from './window.js';
+export { dockLayout } from './dock.js';
+export {
+  appShellMode,
+  SHELL_BREAKPOINTS,
+  SHELL_MODES,
+  shellMode,
+} from './app-shell.js';
