@@ -1,0 +1,6 @@
+saved: dialog
+  title 'Profile saved'
+  body 'Your changes are available on this device.'
+  open true
+  on close
+    emit dialog-closed

@@ -1,0 +1,13 @@
+buttons: stack
+  direction horizontal
+  gap 8px
+  save: button
+    label Save
+    variant filled
+    on press
+      emit save-document
+  cancel: button
+    label Cancel
+    variant text
+    on press
+      emit cancel
