@@ -56,7 +56,7 @@ document.getElementById('safety').textContent =
     : problems.map((d) => `${d.severity} ${d.code}`).join(', ');
 
 // The spring of `bounce` as a CSS linear() easing.
-const bounce = spring({ stiffness: 300, damping: 20, mass: 1 });
+const bounce = spring(model.animations.get('bounce').easing);
 document.getElementById('spring').textContent = `${Math.round(
   bounce.settleTime
 )} ms, ${toCssLinear(springEasing(bounce), 10)}`;
