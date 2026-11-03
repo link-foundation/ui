@@ -32,7 +32,10 @@ const note = (doc, text) => el(doc, 'p', { class: 'note' }, text);
 export function renderOutline(panel, outline, { t, onSelect }) {
   const doc = panel.ownerDocument;
   panel.replaceChildren();
-  const tree = el(doc, 'ul', { role: 'tree', 'aria-label': t('outline.label') });
+  const tree = el(doc, 'ul', {
+    role: 'tree',
+    'aria-label': t('outline.label'),
+  });
   const items = new Map();
   const build = (node, level, into) => {
     const item = el(doc, 'li', {
@@ -158,7 +161,9 @@ export function renderProperties(panel, data, { t, onEdit, onReset }) {
     panel.append(note(doc, t('properties.readOnly')));
   }
   const table = el(doc, 'table', { 'data-element': data.id });
-  table.append(el(doc, 'caption', {}, t('properties.caption', { id: data.id })));
+  table.append(
+    el(doc, 'caption', {}, t('properties.caption', { id: data.id }))
+  );
   const head = el(doc, 'tr');
   for (const key of ['name', 'editor', 'value', 'layer', 'reset']) {
     head.append(el(doc, 'th', { scope: 'col' }, t(`properties.${key}`)));
@@ -178,10 +183,15 @@ export function renderProperties(panel, data, { t, onEdit, onReset }) {
     });
     const resolved = el(doc, 'td', { class: 'resolved' });
     const layer = el(doc, 'span', { class: 'layer' });
-    const reset = el(doc, 'button', {
-      type: 'button',
-      'aria-label': t('properties.resetLabel', { name: row.label }),
-    }, t('properties.reset'));
+    const reset = el(
+      doc,
+      'button',
+      {
+        type: 'button',
+        'aria-label': t('properties.resetLabel', { name: row.label }),
+      },
+      t('properties.reset')
+    );
     reset.addEventListener('click', () => onReset(row));
     const editorCell = el(doc, 'td');
     editorCell.append(editor.node);
@@ -235,7 +245,10 @@ export function renderStyles(panel, { id, styles }, { t }) {
     );
     const list = el(doc, 'dl');
     for (const decl of style.declarations) {
-      list.append(el(doc, 'dt', {}, decl.property), el(doc, 'dd', {}, decl.text));
+      list.append(
+        el(doc, 'dt', {}, decl.property),
+        el(doc, 'dd', {}, decl.text)
+      );
     }
     panel.append(list);
   }
@@ -261,7 +274,10 @@ export function renderTokens(panel, { id, tokens }, { t }) {
   for (const token of tokens) {
     const value = el(doc, 'td', { class: 'resolved' });
     if (token.css) {
-      const swatch = el(doc, 'span', { class: 'swatch', 'aria-hidden': 'true' });
+      const swatch = el(doc, 'span', {
+        class: 'swatch',
+        'aria-hidden': 'true',
+      });
       swatch.style.background = token.css;
       value.append(swatch);
     }

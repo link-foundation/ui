@@ -149,7 +149,7 @@ export const LAYOUT_KINDS = Object.freeze({
  * @returns {Promise<string>}
  */
 export async function loadLayout() {
-  const url = new URL('./inspector.lino', import.meta.url);
+  const url = new globalThis.URL('./inspector.lino', import.meta.url);
   if (url.protocol === 'file:') {
     const { readFile } = await import('node:fs/promises');
     return readFile(url, 'utf8');

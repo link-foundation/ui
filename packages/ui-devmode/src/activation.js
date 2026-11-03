@@ -143,7 +143,8 @@ export function shouldActivate({ url, policy, hasElement = false }) {
   if (!policy.entry.has('url-parameter')) {
     return false;
   }
-  const params = new URL(String(url), 'http://localhost/').searchParams;
+  const params = new globalThis.URL(String(url), 'http://localhost/')
+    .searchParams;
   return (
     params.has(URL_PARAMETER) &&
     !OFF_VALUES.has(params.get(URL_PARAMETER).toLowerCase())
@@ -151,8 +152,8 @@ export function shouldActivate({ url, policy, hasElement = false }) {
 }
 
 /**
- * Define `<ui-dev-mode>` once per window. Returns `false` when it was
- * defined already (an element in the page is then not upgraded again).
+ * Define `<ui-dev-mode>` in a window. Returns `false` when the window
+ * has the definition (an element in the page is then not upgraded again).
  */
 function defineElement(window) {
   const registry = window.customElements;

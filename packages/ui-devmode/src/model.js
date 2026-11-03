@@ -183,6 +183,22 @@ function kindInfo(vocabulary, kind) {
 }
 
 /**
+ * The row of the positional values of an element: they stand for the
+ * first positional property (`(greeting: text 'Hello')` is the `value` of
+ * the text). `null` without positional values.
+ */
+function positionalTarget(element, info) {
+  if ((element.positional ?? []).length === 0) {
+    return null;
+  }
+  const first = info.positional[0];
+  return {
+    label: first ?? element.kind,
+    type: info.properties.get(first)?.type ?? 'string',
+  };
+}
+
+/**
  * The properties an element shows in the grid, in order: its positional
  * values (named by its kind, as ui-config addresses them), then the
  * single-valued properties of its kind, then any other property it has.
@@ -197,20 +213,12 @@ function rowTargets(element, info, keyedProps) {
       targets.push({ name, key, type, label });
     }
   };
-  // The positional values stand for the first positional property
-  // (`(greeting: text 'Hello')` is the `value` of the text).
-  const hasPositional = (element.positional ?? []).length > 0;
-  const first = hasPositional ? info.positional[0] : undefined;
-  if (hasPositional) {
-    add(
-      element.kind,
-      null,
-      info.properties.get(first)?.type ?? 'string',
-      first ?? element.kind
-    );
+  const first = positionalTarget(element, info);
+  if (first) {
+    add(element.kind, null, first.type, first.label);
   }
   for (const [name, prop] of info.properties) {
-    if (name !== first && !prop.multi && !HIDDEN_TYPES.has(prop.type)) {
+    if (name !== first?.label && !prop.multi && !HIDDEN_TYPES.has(prop.type)) {
       add(name, null, prop.type);
     }
   }
@@ -235,7 +243,7 @@ function rowTargets(element, info, keyedProps) {
  * @property {string} text  the resolved values as Links Notation
  * @property {string} layer  the layer the value comes from (`defaults` when
  *   no layer sets it)
- * @property {boolean} changed  the value comes from `user` or `session`
+ * @property {boolean} changed  true for a value of the `user` or `session` layer
  * @property {boolean} locked  the policy locks the element
  * @property {boolean} writable  the row can be edited and reset
  */

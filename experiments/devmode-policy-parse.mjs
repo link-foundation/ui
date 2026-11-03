@@ -1,4 +1,4 @@
-// How ui-core parses the dev-mode policy link of issue #54.
+// Dev mode experiment: how ui-core parses the dev-mode policy link.
 import { parse } from '@link-foundation/ui-core';
 const text = `(site-dev-mode: dev-mode
   (enabled true)

@@ -3,7 +3,14 @@ import { readFileSync } from 'node:fs';
 import { readStyles, flatten, matches } from '@link-foundation/ui-style';
 import { readTokens, resolveTokens } from '@link-foundation/ui-tokens';
 import { parse, values } from '@link-foundation/ui-core';
-const s = (n) => readFileSync(new URL(`../docs/case-studies/issue-1/samples/${n}.lino`, import.meta.url), 'utf8');
+const s = (n) =>
+  readFileSync(
+    new globalThis.URL(
+      `../docs/case-studies/issue-1/samples/${n}.lino`,
+      import.meta.url
+    ),
+    'utf8'
+  );
 const { rules } = readStyles(s('styles'));
 const e = flatten(rules);
 console.log(JSON.stringify(e, null, 1).slice(0, 2500));

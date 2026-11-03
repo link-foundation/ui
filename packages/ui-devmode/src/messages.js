@@ -1,6 +1,6 @@
 /**
  * Every text the dev mode UI shows, by key. A page passes its own table
- * (`mountDevMode({ messages })`) to translate dev mode (see issue #21); the
+ * (`mountDevMode({ messages })`) to translate dev mode; the
  * keys it leaves out fall back to these English texts.
  */
 
