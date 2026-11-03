@@ -6,7 +6,7 @@ Private workspace: not published to npm or a browser store. Run:
 npm run build --workspace @link-foundation/ui-devmode-extension
 ```
 
-Requires `zip` on PATH. The script builds the shared dev mode bundle, writes
+The script builds the shared dev mode bundle, writes
 `dist/unpacked/{manifest.json,background.js,devmode.js}` and
 `dist/ui-devmode-extension.zip`. In Chromium, open `chrome://extensions`, enable
 Developer mode, click Load unpacked and choose `dist/unpacked`.

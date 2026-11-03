@@ -6,5 +6,8 @@
   "license": "Unlicense",
   "scripts": {
     "build": "node scripts/package.mjs"
+  },
+  "devDependencies": {
+    "fflate": "^0.8.2"
   }
 }
