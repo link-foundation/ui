@@ -120,6 +120,11 @@ export interface RenderOptions extends StyleOptions {
   kinds?: Kinds;
   /** Called for every `ui-action`, after the event is dispatched. */
   onAction?(detail: ActionDetail, event: Event): void;
+  /**
+   * Which action names handlers may use (default: the vocabulary
+   * actions); others are reported as `unknown-action` and never dispatched.
+   */
+  isAction?(name: string): boolean;
   onDiagnostic?(diagnostic: Diagnostic): void;
   /** Called once per applied patch with its store events. */
   onPatch?(events: readonly object[]): void;

@@ -1,12 +1,24 @@
 {
   "name": "@link-foundation/ui-components",
   "version": "0.0.0",
-  "description": "Components of the associative UI framework written in Links Notation: link-view, one link drawn from links-visuals geometry with shared SVG and Canvas markers, per-instance zoom and pan, and an idle-free animator",
+  "description": "Components of the associative UI framework written in Links Notation: behaviour state machines in LiNo with a DOM-free interpreter and an actions registry that never evaluates code, DOM accessibility helpers (focus trap, roving tabindex, typeahead, key bindings, live region), and link-view, one link drawn from links-visuals geometry with shared SVG and Canvas markers, per-instance zoom and pan, and an idle-free animator",
   "type": "module",
   "exports": {
     ".": {
       "types": "./src/index.d.ts",
       "default": "./src/index.js"
+    },
+    "./behavior": {
+      "types": "./src/behavior/index.d.ts",
+      "default": "./src/behavior/index.js"
+    },
+    "./behavior/dom": {
+      "types": "./src/behavior/dom.d.ts",
+      "default": "./src/behavior/dom.js"
+    },
+    "./a11y": {
+      "types": "./src/a11y/index.d.ts",
+      "default": "./src/a11y/index.js"
     },
     "./links-view": {
       "types": "./src/links-view/index.d.ts",
@@ -22,6 +34,11 @@
   "keywords": [
     "ui",
     "links-notation",
+    "state-machine",
+    "accessibility",
+    "a11y",
+    "aria",
+    "keyboard",
     "links",
     "visualisation",
     "svg",

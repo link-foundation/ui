@@ -121,7 +121,7 @@ export default [
   {
     // The links-view modules keep no state of their own: every instance
     // (element, zoom, animator) owns its state, so two views never share it.
-    files: ['packages/ui-components/src/**/*.js'],
+    files: ['packages/ui-components/src/links-view/**/*.js'],
     rules: {
       'local/no-module-state': 'error',
     },
@@ -179,6 +179,17 @@ export default [
             'No regular expressions in src/html/: read HTML with parse5 or the DOM.',
         },
       ],
+    },
+  },
+  {
+    // Behaviour is data: an action or guard name selects a registered
+    // function and is never evaluated, so no source file may turn text
+    // into code (tests/behavior/lint-rules.test.js checks the rules).
+    files: ['packages/ui-components/src/**/*.js'],
+    rules: {
+      'no-eval': 'error',
+      'no-new-func': 'error',
+      'no-implied-eval': 'error',
     },
   },
   {

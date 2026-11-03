@@ -9,7 +9,8 @@ export const VOCABULARY_TEXT = `(ui-dialect: dialect
   (reserved-sigil at-sign dollar-sign)
   (reserved-property bind)
   (reserved-property when)
-  (common-property note string multi))
+  (common-property note string multi)
+  (common-property machine any))
 
 (document: kind
   (description 'Root of a UI document.')
@@ -106,6 +107,15 @@ export const VOCABULARY_TEXT = `(ui-dialect: dialect
   (property license string)
   (property copyright string)
   (property notice url)
+  (children none))
+
+(machine: kind
+  (description 'A behaviour state machine; see behaviour.md.')
+  (property initial string)
+  (property context any multi)
+  (property action any multi)
+  (property state any multi)
+  (property part any multi)
   (children none))
 
 (navigate: action
