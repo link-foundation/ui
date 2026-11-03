@@ -1,6 +1,10 @@
 /** Pure measured virtualization, shared with timelines and other renderers. */
 
-/** Cumulative row tops (plus the total height). Invalid measurements use the estimate. */
+/**
+ * Cumulative row tops plus total height; invalid measurements use the estimate.
+ * @param {{count: number, estimate: number, measured?: Map<number, number>}} input
+ * @returns {Float64Array} offsets of length count + 1
+ */
 export function listOffsets({ count, estimate, measured = new Map() }) {
   if (
     !Number.isSafeInteger(count) ||
@@ -21,7 +25,12 @@ export function listOffsets({ count, estimate, measured = new Map() }) {
   return offsets;
 }
 
-/** Index containing y; -1 for an empty list. Clamps before/after the collection. */
+/**
+ * Index containing y; -1 for an empty list. Clamps before/after the collection.
+ * @param {Float64Array} offsets
+ * @param {number} y
+ * @returns {number}
+ */
 export function indexAt(offsets, y) {
   let low = 0;
   let high = offsets.length - 1;
@@ -39,7 +48,14 @@ export function indexAt(offsets, y) {
   return Math.min(low, offsets.length - 2);
 }
 
-/** Half-open rendered range, with overscan measured in viewport heights. */
+/**
+ * Half-open rendered range, with overscan measured in viewport heights.
+ * @param {Float64Array} offsets
+ * @param {number} scrollTop
+ * @param {number} viewportHeight
+ * @param {number} [overscan]
+ * @returns {{start: number, end: number}}
+ */
 export function listRange(offsets, scrollTop, viewportHeight, overscan = 1) {
   const count = offsets.length - 1;
   if (!count) {
@@ -62,6 +78,10 @@ export function listRange(offsets, scrollTop, viewportHeight, overscan = 1) {
  * Keep a keyed row at its previous screen position, including intra-row offset.
  * before: {keys, offsets, scrollTop}; after: {keys, offsets}.
  * A missing anchor leaves the previous scroll position alone.
+ * @param {{keys: string[], offsets: Float64Array, scrollTop: number}} before
+ * @param {{keys: string[], offsets: Float64Array}} after
+ * @param {string} anchorKey
+ * @returns {number}
  */
 export function anchorScrollTop(before, after, anchorKey) {
   const from = before.keys.indexOf(anchorKey);

@@ -8,6 +8,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { URL, fileURLToPath } from 'node:url';
 import { mountDocument } from '@link-foundation/ui-dom';
+import { bindHandlers } from '../src/events.js';
 import { createDom, sample } from './setup-dom.js';
 
 const EXPECTED = { source: 'ok', event: 'press', action: ['navigate', 'home'] };
@@ -168,4 +169,83 @@ describe('events', () => {
       expect(/eval\(|new Function/.test(text)).toBe(false);
     }
   });
+});
+
+it('resolves data-event item parameters using only safe own properties', () => {
+  const { document, window, container } = createDom();
+  const node = document.createElement('div');
+  container.append(node);
+  const actions = [];
+  const unbind = bindHandlers(
+    node,
+    node,
+    [
+      {
+        event: 'select',
+        domEvent: 'ui-select',
+        actions: [
+          [
+            'emit',
+            'chosen',
+            ...[
+              'id',
+              'profile.name',
+              '__proto__',
+              'constructor',
+              'inherited',
+            ].map((path) => ['param', `item.${path}`]),
+          ],
+        ],
+      },
+    ],
+    { idFor: () => 'rows', onAction: (detail) => actions.push(detail) }
+  );
+  const item = Object.assign(Object.create({ inherited: 'hidden' }), {
+    id: 'row-1',
+    profile: { name: 'Alice' },
+  });
+  node.dispatchEvent(new window.CustomEvent('ui-select', { detail: { item } }));
+  expect(actions[0].event).toBe('select');
+  expect(actions[0].action).toEqual([
+    'emit',
+    'chosen',
+    'row-1',
+    'Alice',
+    undefined,
+    undefined,
+    undefined,
+  ]);
+  expect(Object.isFrozen(actions[0].action)).toBe(true);
+  unbind();
+});
+
+it('rejects unsafe navigation after resolving an item parameter', () => {
+  const { document, window } = createDom();
+  const node = document.createElement('div');
+  const actions = [];
+  const codes = [];
+  const unbind = bindHandlers(
+    node,
+    node,
+    [
+      {
+        event: 'activate',
+        domEvent: 'ui-activate',
+        actions: [['navigate', ['param', 'item.url']]],
+      },
+    ],
+    {
+      idFor: () => 'rows',
+      onAction: (detail) => actions.push(detail),
+      diagnostic: (code) => codes.push(code),
+    }
+  );
+  node.dispatchEvent(
+    new window.CustomEvent('ui-activate', {
+      detail: { item: { url: 'javascript:alert(1)' } },
+    })
+  );
+  expect(actions).toEqual([]);
+  expect(codes).toEqual(['unsafe-url']);
+  unbind();
 });

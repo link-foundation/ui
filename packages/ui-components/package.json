@@ -57,7 +57,12 @@
       "types": "./src/icons/adapters/material-symbols.d.ts",
       "default": "./src/icons/adapters/material-symbols.js"
     },
-    "./dist/icons/*": "./dist/icons/*"
+    "./dist/icons/*": "./dist/icons/*",
+    "./data": {
+      "types": "./src/data/index.d.ts",
+      "default": "./src/data/index.js"
+    },
+    "./data.css": "./src/data/data.css"
   },
   "types": "./src/index.d.ts",
   "files": [

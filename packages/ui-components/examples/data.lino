@@ -1,0 +1,43 @@
+rows: list
+  label 'All items'
+  items
+    param rows
+  template row
+  virtualized true
+  item-height 32
+  selection multi
+  on select
+    emit selected
+      param item.id
+  on activate
+    emit activated
+      param item.label
+
+outline: tree
+  label 'Project outline'
+  items
+    param nodes
+  virtualized true
+  item-height 32
+
+people: table
+  caption People
+  items
+    param people
+  selection multi
+  virtualized true
+  item-height 32
+  columns
+    name: column
+      label Name
+      sortable true
+      width 240
+    age: column
+      label Age
+      align end
+      sortable true
+      width 120
+    team: column
+      label Team
+      sortable true
+      width 240
