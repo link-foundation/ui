@@ -10,6 +10,8 @@
  *   `./charts/echarts`);
  * - `./diagrams`: a diagram written in Links Notation, laid out by Dagre,
  *   drawn as accessible SVG or by a lazily loaded Mermaid adapter;
+ * - `./layout`: the layout elements rendered by ui-dom (it registers its
+ *   kinds when imported);
  * - `./links-view`: `link-view`, one link drawn from links-visuals geometry.
  *
  * See README.md.
@@ -19,4 +21,5 @@ export * from './behavior/index.js';
 export * from './a11y/index.js';
 export * from './charts/index.js';
 export * from './diagrams/index.js';
+export * from './layout/index.js';
 export * from './links-view/index.js';

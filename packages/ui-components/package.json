@@ -1,7 +1,7 @@
 {
   "name": "@link-foundation/ui-components",
   "version": "0.0.0",
-  "description": "Components of the associative UI framework written in Links Notation: behaviour state machines in LiNo with a DOM-free interpreter, an actions registry that never evaluates code, DOM accessibility helpers (focus trap, roving tabindex, typeahead, key bindings, live region), charts described with the grammar of Vega-Lite (data, mark, encoding), rendered as deterministic SVG with d3-scale and d3-shape, with an accessible table twin and an optional lazy ECharts adapter, and diagrams described in LiNo (flowchart, state, sequence, class), laid out by Dagre or a layout plugin, rendered as accessible SVG, exported to Mermaid text or rendered by a lazily loaded Mermaid adapter, and link-view, one link drawn from links-visuals geometry with shared SVG and Canvas markers, per-instance zoom and pan, and an idle-free animator",
+  "description": "Components of the associative UI framework written in Links Notation: behaviour state machines in LiNo with a DOM-free interpreter, an actions registry that never evaluates code, DOM accessibility helpers (focus trap, roving tabindex, typeahead, key bindings, live region), charts described with the grammar of Vega-Lite (data, mark, encoding), rendered as deterministic SVG with d3-scale and d3-shape, with an accessible table twin and an optional lazy ECharts adapter, diagrams described in LiNo (flowchart, state, sequence, class), laid out by Dagre or a layout plugin, rendered as accessible SVG, exported to Mermaid text or rendered by a lazily loaded Mermaid adapter, layout elements (stack, grid, split, tab-group, dock, window, app-shell) rendered by ui-dom with a layer manager and dock layouts saved as Links Notation, and link-view, one link drawn from links-visuals geometry with shared SVG and Canvas markers, per-instance zoom and pan, and an idle-free animator",
   "type": "module",
   "exports": {
     ".": {
@@ -32,6 +32,11 @@
       "types": "./src/diagrams/index.d.ts",
       "default": "./src/diagrams/index.js"
     },
+    "./layout": {
+      "types": "./src/layout/index.d.ts",
+      "default": "./src/layout/index.js"
+    },
+    "./layout.css": "./src/layout/layout.css",
     "./links-view": {
       "types": "./src/links-view/index.d.ts",
       "default": "./src/links-view/index.js"
@@ -62,6 +67,11 @@
     "links",
     "visualisation",
     "canvas",
+    "layout",
+    "split",
+    "dock",
+    "tabs",
+    "window",
     "custom-elements"
   ],
   "license": "Unlicense",
@@ -81,6 +91,7 @@
     "@dagrejs/dagre": "3.1.3",
     "@link-foundation/ui-core": "^0.0.0",
     "@link-foundation/ui-dom": "^0.0.0",
+    "@link-foundation/ui-style": "^0.0.0",
     "@link-foundation/ui-tokens": "^0.0.0",
     "d3-scale": "4.0.2",
     "d3-shape": "3.2.0",

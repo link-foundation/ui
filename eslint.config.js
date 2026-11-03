@@ -108,8 +108,8 @@ export default [
     },
   },
   {
-    // The ui-dom example page runs in the browser only.
-    files: ['examples/ui-dom/**/*.js'],
+    // The ui-dom and package example pages run in the browser only.
+    files: ['examples/ui-dom/**/*.js', 'packages/*/examples/**/*.{js,mjs}'],
     languageOptions: {
       globals: {
         document: 'readonly',
@@ -124,17 +124,6 @@ export default [
     files: ['packages/ui-components/src/links-view/**/*.js'],
     rules: {
       'local/no-module-state': 'error',
-    },
-  },
-  {
-    // Package example pages run in the browser only.
-    files: ['packages/*/examples/**/*.{js,mjs}'],
-    languageOptions: {
-      globals: {
-        document: 'readonly',
-        window: 'readonly',
-        URL: 'readonly',
-      },
     },
   },
   {

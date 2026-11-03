@@ -30,14 +30,15 @@ npx playwright test tests/ui/negative.e2e.mjs --project chromium
 
 Test files end in `.e2e.mjs` so that `npm test` (`node --test`), `bun test`
 and `deno test` never pick them up. Playwright discovers
-`tests/ui/**/*.e2e.mjs`, `packages/*/e2e/**/*.e2e.mjs` and
+`tests/ui/**/*.e2e.mjs`, `packages/*/e2e/**/*.e2e.mjs`,
 `tests/e2e/**/*.spec.js` and `packages/*/tests/e2e/**/*.spec.js`. The
 `tests/e2e` specs test packages together (for example
 `interop-lottie.spec.js` plays a ui-convert export in lottie-web), and a
-package's own browser specs (for example
-`packages/ui-components/tests/e2e/charts.spec.js`) live in that package;
-`bunfig.toml` keeps them out of `bun test`, and `node --test`
-and `deno test` do not match `.spec.js`.
+package's own specs test its gallery pages (for example
+`packages/ui-components/tests/e2e/charts.spec.js` and `layout.spec.js`, which
+opens `/packages/ui-components/examples/layout.html`); `bunfig.toml` keeps
+them out of `bun test`, and `node --test` and `deno test` do not match
+`.spec.js`.
 
 The configuration fixes the viewport (1280×800, scale 1), `locale: 'en-US'`,
 `timezoneId: 'UTC'`, `colorScheme: 'light'` and reduced motion. Screenshots
@@ -77,9 +78,9 @@ fail when more than 0.1 % of the pixels differ by more than the per-pixel
 3. Generate the baselines in the container (below) and commit them. They are
    stored next to the test:
    `packages/<name>/e2e/__screenshots__/<project>/<file>/<name>-<locale>-<theme>.png`
-   (for this folder: `tests/ui/__screenshots__/…`). A package spec under
-   `packages/<name>/tests/e2e/*.spec.js` keeps its baselines in
-   `packages/<name>/tests/e2e/__screenshots__/…` the same way.
+   (for this folder: `tests/ui/__screenshots__/…`; for a `.spec.js` file in
+   `packages/<name>/tests/e2e/`:
+   `packages/<name>/tests/e2e/__screenshots__/<project>/<file>/<name>.png`).
 
 ## Updating baselines
 

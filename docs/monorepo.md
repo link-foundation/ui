@@ -12,6 +12,7 @@ publishable artefact is a workspace package under `packages/`.
 │   ├── ui-components/      # @link-foundation/ui-components (behaviour state
 │   │                       # machines, actions registry, a11y helpers, charts,
 │   │                       # diagrams: Dagre layout, SVG, Mermaid,
+│   │                       # layout and windowing,
 │   │                       # link-view: one link as SVG or Canvas)
 │   ├── ui-config/          # @link-foundation/ui-config (configuration layers)
 │   ├── ui-convert/         # @link-foundation/ui-convert (HTML/DOM import)
