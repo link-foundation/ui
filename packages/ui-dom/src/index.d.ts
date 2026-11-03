@@ -213,6 +213,7 @@ export const DOM_EVENTS: Readonly<{
   focus: 'focusin';
   blur: 'focusout';
   hover: 'pointerenter';
+  change: 'ui-change';
 }>;
 
 /** The base rules: layout of the basic kinds, focus ring, disabled state. */

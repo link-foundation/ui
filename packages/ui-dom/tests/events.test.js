@@ -143,6 +143,22 @@ describe('events', () => {
     ).toEqual(['launch', 'navigate']);
   });
 
+  it('maps change to the ui-change event a control dispatches', () => {
+    const { window, handle, actions, codes } = mountWithActions(
+      "(b: button 'B' (on change (emit changed)))"
+    );
+    expect(codes).not.toContain('unknown-event');
+    handle
+      .nodeFor('b')
+      .querySelector('button')
+      .dispatchEvent(
+        new window.CustomEvent('ui-change', { bubbles: true, detail: {} })
+      );
+    expect(actions.map((a) => [a.event, a.action])).toEqual([
+      ['change', ['emit', 'changed']],
+    ]);
+  });
+
   it('reports an event the renderer does not map', () => {
     const { codes } = mountWithActions("(b: button 'B' (on swipe (emit x)))");
     expect(codes).toContain('unknown-event');
