@@ -17,6 +17,7 @@ export default defineConfig({
     'tests/ui/**/*.e2e.mjs',
     'packages/*/e2e/**/*.e2e.mjs',
     'tests/e2e/**/*.spec.js',
+    'packages/*/tests/e2e/**/*.spec.js',
   ],
   testIgnore: ['**/node_modules/**'],
   // Baselines live next to the tests that own them:

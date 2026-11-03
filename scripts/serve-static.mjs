@@ -53,7 +53,7 @@ export function defaultMounts(root) {
   const packagesDir = path.join(root, 'packages');
   if (existsSync(packagesDir)) {
     for (const name of readdirSync(packagesDir).sort()) {
-      for (const sub of [['e2e', 'pages'], ['src']]) {
+      for (const sub of [['e2e', 'pages'], ['examples'], ['src']]) {
         const dir = path.join(packagesDir, name, ...sub);
         if (existsSync(dir)) {
           mounts.push({ prefix: `/packages/${name}/${sub.join('/')}/`, dir });

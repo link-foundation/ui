@@ -111,13 +111,22 @@ describe('shared static server', () => {
         '/docs/case-studies/issue-1/samples/document.lino',
         'docs/case-studies/issue-1/samples/document.lino',
       ],
+      [
+        '/packages/ui-components/examples/link-view.html',
+        'packages/ui-components/examples/link-view.html',
+      ],
+      [
+        '/packages/ui-components/src/index.js',
+        'packages/ui-components/src/index.js',
+      ],
     ]) {
       expect(resolveRequestPath(served, url)).toEqual({
         status: 200,
         file: path.resolve(repoRoot, file),
       });
     }
-    // Only src/ of a package is served, not its tests or package.json.
+    // Only src/ and examples/ of a package are served, not its tests or
+    // package.json.
     expect(
       resolveRequestPath(served, '/packages/ui-dom/package.json').status
     ).toBe(404);
@@ -158,11 +167,12 @@ describe('Playwright e2e files stay out of unit test runners', () => {
     'utf8'
   );
 
-  it('discovers *.e2e.mjs in tests/ui and packages/*/e2e, *.spec.js in tests/e2e', () => {
+  it('discovers *.e2e.mjs in tests/ui and packages/*/e2e, *.spec.js in tests/e2e and packages/*/tests/e2e', () => {
     for (const pattern of [
       "'tests/ui/**/*.e2e.mjs'",
       "'packages/*/e2e/**/*.e2e.mjs'",
       "'tests/e2e/**/*.spec.js'",
+      "'packages/*/tests/e2e/**/*.spec.js'",
     ]) {
       expect(config).toContain(pattern);
     }
@@ -171,6 +181,7 @@ describe('Playwright e2e files stay out of unit test runners', () => {
   it('keeps tests/e2e specs out of bun test', () => {
     const bunfig = readFileSync(path.join(repoRoot, 'bunfig.toml'), 'utf8');
     expect(bunfig).toContain('"tests/e2e/**"');
+    expect(bunfig).toContain('"packages/*/tests/e2e/**"');
   });
 
   it('uses a suffix that node, bun and deno default patterns do not match', () => {

@@ -218,6 +218,7 @@ npm run example:desktop:package
 │   └── universal-app/    # React + GitHub Pages + Electron + Capacitor app
 ├── scripts/              # Build and release scripts
 ├── packages/             # npm workspaces (see docs/monorepo.md)
+│   ├── ui-components/    # @link-foundation/ui-components (link-view: one link from links-visuals, SVG and Canvas)
 │   ├── ui-config/        # @link-foundation/ui-config (layered configuration, overrides patches)
 │   ├── ui-convert/       # @link-foundation/ui-convert (HTML/DOM, A2UI, Adaptive Cards, JSON Forms, Lottie <-> LiNo)
 │   ├── ui-core/          # @link-foundation/ui-core
