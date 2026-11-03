@@ -73,6 +73,12 @@
       "default": "./src/data/index.js"
     },
     "./data.css": "./src/data/data.css",
+    "./chat": {
+      "types": "./src/chat/index.d.ts",
+      "default": "./src/chat/index.js"
+    },
+    "./chat.css": "./src/chat/chat.css",
+    "./chat/skins/*": "./src/chat/skins/*",
     "./settings": {
       "types": "./src/settings/index.d.ts",
       "default": "./src/settings/index.js"
