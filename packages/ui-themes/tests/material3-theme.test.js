@@ -51,6 +51,32 @@ it('loads Material 3 without errors and every pair passes in every scheme', asyn
   assert.ok(css.includes('forced-colors'));
   assert.ok(css.includes(':focus-visible'));
 });
+it('retains the emphasized path endpoint and normalized segment controls', async () => {
+  const { tokens } = await loadTheme('material3');
+  const value = (name) => tokens.get(`motion.easing.emphasized.${name}`).value;
+  const x = value('join-x'),
+    y = value('join-y');
+  const [a, b, c, d] = value('first');
+  const [e, f, g, h] = value('second');
+  const controls = [
+    x * a,
+    y * b,
+    x * c,
+    y * d,
+    x,
+    y,
+    x + (1 - x) * e,
+    y + (1 - y) * f,
+    x + (1 - x) * g,
+    y + (1 - y) * h,
+    1,
+    1,
+  ];
+  const published = [
+    0.05, 0, 0.133333, 0.06, 0.166666, 0.4, 0.208333, 0.82, 0.25, 1, 1, 1,
+  ];
+  controls.forEach((n, i) => assert.ok(Math.abs(n - published[i]) < 1e-12));
+});
 it('does not install Material Web, MUI, Roboto or Material Symbols font packages', () => {
   const tree = JSON.parse(
     execFileSync(

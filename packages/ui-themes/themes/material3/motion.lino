@@ -1,5 +1,6 @@
 material3-motion: theme
   source 'https://m3.material.io/styles/motion/easing-and-duration/tokens-specs'
+  source 'https://github.com/material-components/material-components-android/blob/master/docs/theming/Motion.md'
   token motion.duration.short1 50ms
     m3 md.sys.motion.duration.short1
   token motion.duration.short2 100ms
@@ -47,11 +48,15 @@ material3-motion: theme
   token motion.easing.emphasized-decelerate
     cubic-bezier 0.05 0.7 0.1 1
     m3 md.sys.motion.easing.emphasized-decelerate
+  token motion.easing.emphasized.join-x 0.166666
+    m3 md.sys.motion.easing.emphasized
+  token motion.easing.emphasized.join-y 0.4
+    m3 md.sys.motion.easing.emphasized
   token motion.easing.emphasized.first
-    cubic-bezier 0.05 0 0.133333 0.06
+    cubic-bezier 0.3000012000048 0 0.8000012000048 0.15
     m3 md.sys.motion.easing.emphasized
   token motion.easing.emphasized.second
-    cubic-bezier 0.208333 0.82 0.25 1
+    cubic-bezier 0.050000359999711974 0.7 0.10000071999942399 1
     m3 md.sys.motion.easing.emphasized
   token motion.duration.short
     token motion.duration.short2

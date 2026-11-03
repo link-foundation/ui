@@ -29,7 +29,10 @@ three schemes. Source token names are recorded as `(m3 md.sys.*)` in each
 token's metadata. Elevation height tokens preserve the M3 dp scale;
 shadow tokens preserve the key and ambient layers (30% and 15%). The full corner token
 uses 9999px to render a capsule. Motion emphasized easing retains its two
-cubic segments; no single cubic approximation is presented as the M3 path.
+cubic segments normalized to their local coordinates, with the shared endpoint
+in emphasized.join-x and emphasized.join-y. Compose these pieces to recover
+the [published path](https://github.com/material-components/material-components-android/blob/master/docs/theming/Motion.md);
+no single cubic approximation is presented as the M3 path.
 
 | MUI component    | UI kind       | Status  | Prop translations                                                                                                                                                                                                                            |
 | ---------------- | ------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
