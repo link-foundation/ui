@@ -1,0 +1,92 @@
+{
+  "spec": "ui-dialect/0",
+  "elements": [
+    {
+      "id": "accept",
+      "kind": "checkbox",
+      "positional": ["Accept the terms"],
+      "properties": [
+        {
+          "name": "checked",
+          "values": ["mixed"]
+        },
+        {
+          "name": "required",
+          "values": ["true"]
+        }
+      ],
+      "children": [],
+      "unknown": []
+    },
+    {
+      "id": "docs",
+      "kind": "link",
+      "positional": ["Docs"],
+      "properties": [
+        {
+          "name": "href",
+          "values": ["/docs"]
+        }
+      ],
+      "children": [],
+      "unknown": []
+    },
+    {
+      "id": "back",
+      "kind": "link",
+      "positional": ["Back"],
+      "properties": [
+        {
+          "name": "href",
+          "values": ["accept"]
+        }
+      ],
+      "children": [],
+      "unknown": []
+    },
+    {
+      "id": "wifi",
+      "kind": "switch",
+      "positional": ["Wi-Fi"],
+      "properties": [
+        {
+          "name": "checked",
+          "values": ["maybe"]
+        }
+      ],
+      "children": [],
+      "unknown": []
+    },
+    {
+      "id": "evil",
+      "kind": "link",
+      "positional": ["Evil"],
+      "properties": [
+        {
+          "name": "href",
+          "values": ["javascript:alert(1)"]
+        }
+      ],
+      "children": [],
+      "unknown": []
+    }
+  ],
+  "diagnostics": [
+    {
+      "code": "invalid-value",
+      "severity": "error",
+      "at": {
+        "element": "wifi",
+        "property": "checked"
+      }
+    },
+    {
+      "code": "invalid-value",
+      "severity": "error",
+      "at": {
+        "element": "evil",
+        "property": "href"
+      }
+    }
+  ]
+}

@@ -154,6 +154,29 @@ export function readLinkView(raw, { name = null } = {}) {
 }
 
 /**
+ * The sub-links of an element as raw values: its unknown sub-links plus
+ * its children turned back into raw links. ui-core projects a sub-link
+ * whose head is a kind of the vocabulary (`(link ...)`, `(label ...)`) as
+ * a child element even inside a kind it does not know.
+ * @param {{unknown?: readonly RawValue[]}} element
+ * @param {ReadonlyArray<{kind: string|null, positional?: readonly RawValue[],
+ *   properties?: ReadonlyArray<{name: string, values: readonly RawValue[]}>,
+ *   unknown?: readonly RawValue[]}>} [children]
+ * @returns {RawValue[]}
+ */
+export function rawSublinks(element, children = []) {
+  return [
+    ...(element.unknown ?? []),
+    ...children.map((child) => [
+      child.kind,
+      ...(child.positional ?? []),
+      ...(child.properties ?? []).map((p) => [p.name, ...p.values]),
+      ...(child.unknown ?? []),
+    ]),
+  ];
+}
+
+/**
  * Read the first `link-view` element of a Links Notation text.
  * @param {string} text
  * @returns {{model: LinkViewModel, diagnostics: ModelDiagnostic[]}}
@@ -187,7 +210,9 @@ export function parseLinkView(text) {
       ],
     };
   }
-  const read = readLinkView(root.unknown, { name: root.id ?? null });
+  const read = readLinkView(rawSublinks(root, root.children), {
+    name: root.id ?? null,
+  });
   return { model: read.model, diagnostics: [...errors, ...read.diagnostics] };
 }
 

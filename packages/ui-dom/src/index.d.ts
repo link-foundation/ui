@@ -55,6 +55,12 @@ export interface KindContext {
   document: Document;
   /** The render options. */
   options: RenderOptions;
+  /**
+   * The element models of the current element's children in the store (a
+   * kind without a children slot reads sublinks that the projection made
+   * child elements, such as `(label ...)`).
+   */
+  children(): UiElement[];
   /** Report a problem of the current element. */
   diagnostic(
     code: string,

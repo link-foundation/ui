@@ -18,16 +18,14 @@
       (attr class menu)
       (li-0-0-1-0: html
         (tag li)
-        (a-0-0-1-0-0: html
-          (tag a)
-          (attr href /docs)
-          (text-0-0-1-0-0-0: text Docs)))
+        (a-0-0-1-0-0: link
+          (label Docs)
+          (href /docs)))
       (li-0-0-1-1: html
         (tag li)
-        (a-0-0-1-1-0: html
-          (tag a)
-          (attr href 'https://github.com/link-foundation/ui')
-          (text-0-0-1-1-0-0: text GitHub))))))
+        (a-0-0-1-1-0: link
+          (label GitHub)
+          (href 'https://github.com/link-foundation/ui'))))))
 (main-1: html
   (tag main)
   (section-1-0: html

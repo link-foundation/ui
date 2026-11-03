@@ -5,7 +5,8 @@
  * - kind `html`: the lossless fallback for every element without a dialect
  *   kind; it keeps the tag and every attribute;
  * - kind `comment`: HTML comments, kept only with `options.comments`;
- * - on `text`, `button` and `image`: `tag` (the HTML tag when it is not the
+ * - on `text`, `button`, `image`, `link`, `checkbox`, `text-field` and
+ *   `text-area`: `tag` (the HTML tag when it is not the
  *   kind's own), `attr` (every other attribute), an inline `style` (the
  *   declarations themselves, not a reference to a style element) and
  *   `raw-css` (the text of `<style>` children); `level` on `text` for
@@ -45,6 +46,30 @@ export const HTML_VOCABULARY_TEXT = `(html: kind
   (property raw-css string multi))
 
 (image: kind
+  (property tag string)
+  (property attr any multi)
+  (property style any)
+  (property raw-css string multi))
+
+(link: kind
+  (property tag string)
+  (property attr any multi)
+  (property style any)
+  (property raw-css string multi))
+
+(checkbox: kind
+  (property tag string)
+  (property attr any multi)
+  (property style any)
+  (property raw-css string multi))
+
+(text-field: kind
+  (property tag string)
+  (property attr any multi)
+  (property style any)
+  (property raw-css string multi))
+
+(text-area: kind
   (property tag string)
   (property attr any multi)
   (property style any)

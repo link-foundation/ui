@@ -31,18 +31,20 @@ only `reserved-sigil`.
 
 ## Types
 
-| Type          | Accepted forms                                                                                                                               | Examples                                          |
-| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| `string`      | any atom                                                                                                                                     | `'Links UI demo'`                                 |
-| `number`      | optional `-`, digits, optional fraction, optional exponent                                                                                   | `-1`, `0.5`, `1.5e3`                              |
-| `dimension`   | a number followed by one unit of `px`, `rem`, `em`, `%`, `vw`, `vh`; or `0`                                                                  | `16px`, `1.5rem`, `50%`, `40vh`                   |
-| `duration`    | a non-negative number followed by `ms` or `s`                                                                                                | `150ms`, `0.2s`                                   |
-| `color`       | a quoted hex `'#RGB'`, `'#RGBA'`, `'#RRGGBB'`, `'#RRGGBBAA'`; or `(oklch l c h)` / `(rgb r g b)`, each with an optional fourth alpha channel | `'#6750A4'`, `'#6750A4CC'`, `(oklch 0.6 0.2 300)` |
-| `enum`        | one of the listed atoms, `(enum filled outlined text)`                                                                                       | `filled`                                          |
-| `url`         | a quoted URL, or a relative path without `:`                                                                                                 | `'https://example.com/a.svg'`, `hero.png`         |
-| `token-ref`   | `(token <dotted.name>)`                                                                                                                      | `(token color.primary)`                           |
-| `element-ref` | a bare element id                                                                                                                            | `ok`                                              |
-| `action`      | see [behaviour.md](behaviour.md)                                                                                                             | `(navigate home)`                                 |
+| Type                 | Accepted forms                                                                                                                               | Examples                                          |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| `string`             | any atom                                                                                                                                     | `'Links UI demo'`                                 |
+| `number`             | optional `-`, digits, optional fraction, optional exponent                                                                                   | `-1`, `0.5`, `1.5e3`                              |
+| `dimension`          | a number followed by one unit of `px`, `rem`, `em`, `%`, `vw`, `vh`; or `0`                                                                  | `16px`, `1.5rem`, `50%`, `40vh`                   |
+| `duration`           | a non-negative number followed by `ms` or `s`                                                                                                | `150ms`, `0.2s`                                   |
+| `color`              | a quoted hex `'#RGB'`, `'#RGBA'`, `'#RRGGBB'`, `'#RRGGBBAA'`; or `(oklch l c h)` / `(rgb r g b)`, each with an optional fourth alpha channel | `'#6750A4'`, `'#6750A4CC'`, `(oklch 0.6 0.2 300)` |
+| `enum`               | one of the listed atoms, `(enum filled outlined text)`                                                                                       | `filled`                                          |
+| `url`                | a quoted URL, or a relative path without `:`                                                                                                 | `'https://example.com/a.svg'`, `hero.png`         |
+| `token-ref`          | `(token <dotted.name>)`                                                                                                                      | `(token color.primary)`                           |
+| `element-ref`        | a bare element id                                                                                                                            | `ok`                                              |
+| `boolean`            | `true` or `false`                                                                                                                            | `true`                                            |
+| `element-ref-or-url` | a `url` when the atom has a `:` or a `/`, otherwise an `element-ref`                                                                         | `home`, `/docs`, `'https://example.com'`          |
+| `action`             | see [behaviour.md](behaviour.md)                                                                                                             | `(navigate home)`                                 |
 
 A `token-ref`, a `param` reference and an `(or ...)` fallback MAY appear
 wherever a typed value is expected; their resolved value is then checked.

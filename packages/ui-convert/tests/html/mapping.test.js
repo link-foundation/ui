@@ -31,8 +31,10 @@ describe('HTML_MAPPING', () => {
     const vocabulary = defaultVocabulary();
     const div = { tag: 'div', attrs: [], children: [] };
     const a = { tag: 'a', attrs: [['href', '/']], children: [] };
+    const ul = { tag: 'ul', attrs: [], children: [] };
     expect(findRule(div, vocabulary)).toBe(undefined);
-    expect(findRule(a, vocabulary)).toBe(undefined);
+    expect(findRule(ul, vocabulary)).toBe(undefined);
+    expect(findRule(a, vocabulary).kind).toBe('link');
     const button = { tag: 'button', attrs: [], children: [] };
     expect(findRule(button, vocabulary).kind).toBe('button');
   });
@@ -84,24 +86,20 @@ describe('mapping', () => {
     expect(props(node)).toEqual({ attr: ['src', 'ftp://example.com/a.png'] });
   });
 
-  it('falls back to html for kinds missing in #11 (link, checkbox, list)', () => {
+  it('maps the control kinds of #34 and falls back to html for list', () => {
     const html =
       '<a href="/docs">Docs</a><input type="checkbox"><input type="text"><textarea>x</textarea><ul><li>1</li></ul>';
     const roots = importHtml(html).tree.roots;
     expect(roots.map((node) => node.kind)).toEqual([
-      'html',
-      'html',
-      'html',
-      'html',
+      'link',
+      'checkbox',
+      'text-field',
+      'text-area',
       'html',
     ]);
-    expect(roots.map((node) => props(node).tag[0])).toEqual([
-      'a',
-      'input',
-      'input',
-      'textarea',
-      'ul',
-    ]);
+    expect(props(roots[0])).toEqual({ label: ['Docs'], href: ['/docs'] });
+    expect(props(roots[3])).toEqual({ value: ['x'] });
+    expect(props(roots[4]).tag).toEqual(['ul']);
   });
 
   it('uses a table kind when the vocabulary has it', () => {

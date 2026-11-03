@@ -18,7 +18,12 @@
 import { defineKind } from '@link-foundation/ui-dom';
 import { createAnimator } from './animator.js';
 import { linkGeometry } from './geometry.js';
-import { accessibleName, parseLinkView, readLinkView } from './model.js';
+import {
+  accessibleName,
+  parseLinkView,
+  rawSublinks,
+  readLinkView,
+} from './model.js';
 import { drawLinkCanvas } from './render-canvas.js';
 import { drawnMarkers, renderLinkSvg } from './render-svg.js';
 import { GRID_SPACING, buildScene, fitView, sceneBounds } from './scene.js';
@@ -459,18 +464,21 @@ export function defineLinkView(win = globalThis.window, options = {}) {
  * @returns {import('@link-foundation/ui-dom').KindSpec}
  */
 export function linkViewKind({ tag = LINK_VIEW_TAG } = {}) {
-  const setLinks = (node, el) => {
-    node.links = { raw: el.unknown, name: el.name };
+  const setLinks = (node, el, ctx) => {
+    node.links = {
+      raw: rawSublinks(el, ctx.children?.() ?? []),
+      name: el.name,
+    };
   };
   return {
     tag,
     childrenSlot: null,
     create(el, ctx) {
       const node = ctx.document.createElement(tag);
-      setLinks(node, el);
+      setLinks(node, el, ctx);
       return node;
     },
-    update: (node, el) => setLinks(node, el),
+    update: (node, el, changed, ctx) => setLinks(node, el, ctx),
   };
 }
 

@@ -133,7 +133,8 @@
   (children none))
 
 (text-field: kind
-  (description 'A single or multi line text input.')
+  (description 'A single or multi line text input; (type) holds the data type of the format, not the HTML input type.')
+  (property type any)
   (property multiline any)
   (property text-input-style any)
   (property inline-action any))
