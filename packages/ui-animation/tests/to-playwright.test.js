@@ -8,10 +8,16 @@ test('generated literals escape script boundaries and Unicode line separators', 
   const value = '</script>\u2028\u2029';
   const spec = toPlaywright({
     id: 'hostile-values',
-    events: [{ time: 0, kind: 'set', args: ['ok', 'label', value] }],
+    events: [{ time: 0, kind: 'set', args: ['<ok>', 'label', value] }],
   });
   assert.ok(!spec.includes(value));
   assert.ok(spec.includes('\\u003c/script\\u003e\\u2028\\u2029'));
+  const expression = spec
+    .split('\n')
+    .find((line) => line.includes('toHaveText'))
+    .split('page.locator(')[1]
+    .split(')).toHaveText')[0];
+  assert.equal(JSON.parse(expression), '[data-link-id="<ok>"]');
 });
 
 test('generated Playwright spec matches the snapshot', () => {

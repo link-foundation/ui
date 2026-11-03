@@ -5,7 +5,7 @@ const quote = (value) =>
     /[<>\u2028\u2029]/g,
     (char) => `\\u${char.charCodeAt(0).toString(16).padStart(4, '0')}`
   );
-const selector = (id) => `[data-link-id=${quote(String(id))}]`;
+const selector = (id) => `[data-link-id=${JSON.stringify(String(id))}]`;
 const locator = (id) => `page.locator(${quote(selector(id))})`;
 const field = (args, name) =>
   args.find((v) => Array.isArray(v) && v[0] === name)?.slice(1) ?? [];
