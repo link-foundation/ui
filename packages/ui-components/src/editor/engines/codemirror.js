@@ -67,6 +67,22 @@ function syntaxColors(language, tags) {
   );
 }
 
+function createLinoPlugin(ViewPlugin, Decoration) {
+  return ViewPlugin.fromClass(
+    class {
+      constructor(view) {
+        Object.assign(this, linoDecorations(view, Decoration));
+      }
+      update(update) {
+        if (update.docChanged || update.selectionSet) {
+          Object.assign(this, linoDecorations(update.view, Decoration));
+        }
+      }
+    },
+    { decorations: (plugin) => plugin.decorations }
+  );
+}
+
 /** @returns {Promise<import('../editor-engine.js').EditorEngine>} */
 export async function createCodeMirrorEngine(
   parent,
@@ -91,19 +107,7 @@ export async function createCodeMirrorEngine(
   const access = new state.Compartment();
   // Keep the DOM focusable and copyable in Safari; the state facet blocks input.
   const accessExtensions = () => EditorState.readOnly.of(readOnly);
-  const lino = ViewPlugin.fromClass(
-    class {
-      constructor(view) {
-        Object.assign(this, linoDecorations(view, Decoration));
-      }
-      update(update) {
-        if (update.docChanged || update.selectionSet) {
-          Object.assign(this, linoDecorations(update.view, Decoration));
-        }
-      }
-    },
-    { decorations: (plugin) => plugin.decorations }
-  );
+  const lino = createLinoPlugin(ViewPlugin, Decoration);
   const base = [
     commands.history(),
     keymap.of([
