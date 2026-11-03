@@ -6,6 +6,8 @@
  *   DOM-free interpreter and an actions registry (the ui-dom integration is
  *   `./behavior/dom`);
  * - `./a11y`: DOM accessibility helpers;
+ * - `./charts`: charts drawn as deterministic SVG (the ECharts adapter is
+ *   `./charts/echarts`);
  * - `./diagrams`: a diagram written in Links Notation, laid out by Dagre,
  *   drawn as accessible SVG or by a lazily loaded Mermaid adapter;
  * - `./links-view`: `link-view`, one link drawn from links-visuals geometry.
@@ -15,5 +17,6 @@
 
 export * from './behavior/index.js';
 export * from './a11y/index.js';
+export * from './charts/index.js';
 export * from './diagrams/index.js';
 export * from './links-view/index.js';

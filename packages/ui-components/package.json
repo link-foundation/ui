@@ -1,7 +1,7 @@
 {
   "name": "@link-foundation/ui-components",
   "version": "0.0.0",
-  "description": "Components of the associative UI framework written in Links Notation: behaviour state machines in LiNo with a DOM-free interpreter, an actions registry that never evaluates code, DOM accessibility helpers (focus trap, roving tabindex, typeahead, key bindings, live region), diagrams described in LiNo (flowchart, state, sequence, class), laid out by Dagre or a layout plugin, rendered as accessible SVG, exported to Mermaid text or rendered by a lazily loaded Mermaid adapter, and link-view, one link drawn from links-visuals geometry with shared SVG and Canvas markers, per-instance zoom and pan, and an idle-free animator",
+  "description": "Components of the associative UI framework written in Links Notation: behaviour state machines in LiNo with a DOM-free interpreter, an actions registry that never evaluates code, DOM accessibility helpers (focus trap, roving tabindex, typeahead, key bindings, live region), charts described with the grammar of Vega-Lite (data, mark, encoding), rendered as deterministic SVG with d3-scale and d3-shape, with an accessible table twin and an optional lazy ECharts adapter, and diagrams described in LiNo (flowchart, state, sequence, class), laid out by Dagre or a layout plugin, rendered as accessible SVG, exported to Mermaid text or rendered by a lazily loaded Mermaid adapter, and link-view, one link drawn from links-visuals geometry with shared SVG and Canvas markers, per-instance zoom and pan, and an idle-free animator",
   "type": "module",
   "exports": {
     ".": {
@@ -19,6 +19,14 @@
     "./a11y": {
       "types": "./src/a11y/index.d.ts",
       "default": "./src/a11y/index.js"
+    },
+    "./charts": {
+      "types": "./src/charts/index.d.ts",
+      "default": "./src/charts/index.js"
+    },
+    "./charts/echarts": {
+      "types": "./src/charts/echarts-adapter.d.ts",
+      "default": "./src/charts/echarts-adapter.js"
     },
     "./diagrams": {
       "types": "./src/diagrams/index.d.ts",
@@ -43,6 +51,9 @@
     "a11y",
     "aria",
     "keyboard",
+    "components",
+    "charts",
+    "vega-lite",
     "diagram",
     "flowchart",
     "mermaid",
@@ -71,17 +82,25 @@
     "@link-foundation/ui-core": "^0.0.0",
     "@link-foundation/ui-dom": "^0.0.0",
     "@link-foundation/ui-tokens": "^0.0.0",
+    "d3-scale": "4.0.2",
+    "d3-shape": "3.2.0",
     "links-notation": "^0.27.1"
   },
   "peerDependencies": {
+    "echarts": "^6.1.0",
     "mermaid": "^11.0.0 || ^12.0.0"
   },
   "peerDependenciesMeta": {
+    "echarts": {
+      "optional": true
+    },
     "mermaid": {
       "optional": true
     }
   },
   "devDependencies": {
+    "@link-foundation/ui-tokens": "^0.0.0",
+    "echarts": "6.1.0",
     "jsdom": "^30.1.3",
     "mermaid": "11.17.2",
     "test-anywhere": "^0.8.48"

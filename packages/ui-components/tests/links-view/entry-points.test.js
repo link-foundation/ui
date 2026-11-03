@@ -1,7 +1,7 @@
 /**
  * Behaviour: the package root re-exports every entry point (`behavior`,
- * `a11y`, `diagrams` and `links-view`), so no two of them may export the
- * same name, either as a value or in their `.d.ts` declarations. TypeScript
+ * `a11y`, `charts`, `diagrams` and `links-view`), so no two of them may export
+ * the same name, either as a value or in their `.d.ts` declarations. TypeScript
  * reports a name declared by two `export *` sources as ambiguous (TS2308),
  * which is how `Point` of `diagrams` and `links-view` once clashed.
  */
@@ -10,7 +10,7 @@ import { describe, it, expect } from 'test-anywhere';
 import { readFileSync } from 'node:fs';
 import { URL } from 'node:url';
 
-const ENTRY_POINTS = ['behavior', 'a11y', 'diagrams', 'links-view'];
+const ENTRY_POINTS = ['behavior', 'a11y', 'charts', 'diagrams', 'links-view'];
 const SRC = new URL('../../src/', import.meta.url);
 
 /**

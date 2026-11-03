@@ -10,7 +10,7 @@ publishable artefact is a workspace package under `packages/`.
 ├── package-lock.json       # one lock file for the whole workspace
 ├── packages/
 │   ├── ui-components/      # @link-foundation/ui-components (behaviour state
-│   │                       # machines, actions registry, a11y helpers,
+│   │                       # machines, actions registry, a11y helpers, charts,
 │   │                       # diagrams: Dagre layout, SVG, Mermaid,
 │   │                       # link-view: one link as SVG or Canvas)
 │   ├── ui-config/          # @link-foundation/ui-config (configuration layers)

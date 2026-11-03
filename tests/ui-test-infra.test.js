@@ -108,6 +108,22 @@ describe('shared static server', () => {
         'node_modules/links-notation/dist/index.js',
       ],
       [
+        '/packages/ui-components/examples/charts.html',
+        'packages/ui-components/examples/charts.html',
+      ],
+      [
+        '/node_modules/d3-scale/src/index.js',
+        'node_modules/d3-scale/src/index.js',
+      ],
+      [
+        '/node_modules/d3-shape/src/index.js',
+        'node_modules/d3-shape/src/index.js',
+      ],
+      [
+        '/node_modules/echarts/dist/echarts.esm.min.mjs',
+        'node_modules/echarts/dist/echarts.esm.min.mjs',
+      ],
+      [
         '/docs/case-studies/issue-1/samples/document.lino',
         'docs/case-studies/issue-1/samples/document.lino',
       ],
