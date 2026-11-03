@@ -4,6 +4,7 @@ import { URL } from 'node:url';
 export default {
   ...base,
   testDir: '..',
+  snapshotPathTemplate: `${new URL('../', import.meta.url).pathname}${base.snapshotPathTemplate}`,
   outputDir: new URL('../test-results/', import.meta.url).pathname,
   reporter: [['list']],
   webServer: {
