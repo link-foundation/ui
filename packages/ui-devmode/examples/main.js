@@ -36,13 +36,14 @@ const params = new globalThis.URLSearchParams(globalThis.location.search);
 const locked = params.get('lock') ?? 'payment-form';
 const policy =
   params.get('policy') === 'disabled'
-    ? '(site-dev-mode: dev-mode (enabled false))'
-    : `(site-dev-mode: dev-mode
-        (enabled true)
-        (entry shortcut url-parameter element)
-        (shortcut 'Alt+Shift+D')
-        (write-layers session user)
-        (locked-elements ${locked}))`;
+    ? `site-dev-mode: dev-mode
+  enabled false`
+    : `site-dev-mode: dev-mode
+  enabled true
+  entry shortcut url-parameter element
+  shortcut 'Alt+Shift+D'
+  write-layers session user
+  locked-elements ${locked}`;
 
 const output = document.getElementById('action');
 const app = document.getElementById('app');
