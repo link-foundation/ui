@@ -129,7 +129,9 @@ describe('mountDevMode', () => {
     expect(dev.isOpen).toBe(false);
     dev.destroy();
   });
+});
 
+describe('mountDevMode edits', () => {
   it('applies a label edit at once, saves it to user and resets it to site', async () => {
     const { dev, row, $, okButton, config } = await openPage();
     const handle = globalThis[GLOBAL_NAME];
@@ -205,7 +207,9 @@ describe('mountDevMode', () => {
     ).toThrow();
     dev.destroy();
   });
+});
 
+describe('mountDevMode entry points', () => {
   it('toggles with the shortcut and opens with ?ui-dev', async () => {
     const { dev, window } = await openPage({ open: false });
     expect(dev.isOpen).toBe(false);
