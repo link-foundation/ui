@@ -1,7 +1,8 @@
 /**
  * Behaviour: `renderLinkSvg` is a pure function of its arguments. Two runs
  * give the same text, and the text matches the stored snapshot
- * (`UPDATE_SNAPSHOTS=1` rewrites it).
+ * (`UPDATE_SNAPSHOTS=1` rewrites it). The snapshot is checked out with LF
+ * on every platform, as the renderer writes it.
  */
 
 import { describe, it, expect } from 'test-anywhere';
@@ -12,6 +13,7 @@ import { linkColors } from '../../src/links-view/tokens.js';
 import { renderLinkSvg } from '../../src/links-view/render-svg.js';
 
 const SNAPSHOT = new URL('./__snapshots__/render-svg.svg', import.meta.url);
+const GITATTRIBUTES = new URL('../../../../.gitattributes', import.meta.url);
 
 const geometry = linkGeometry({
   source: { x: -80, y: 0 },
@@ -110,5 +112,15 @@ describe('renderLinkSvg', () => {
     const svg = renderLinkSvg(geometry, style({ colors }));
     expect(svg).not.toContain('" onload="');
     expect(svg).toContain('red&quot; onload=&quot;x');
+  });
+
+  it('keeps the snapshot in LF on every checkout', () => {
+    expect(readFileSync(SNAPSHOT, 'utf8').includes('\r')).toBe(false);
+    const rules = readFileSync(GITATTRIBUTES, 'utf8').split(/\r?\n/u);
+    expect(
+      rules.includes(
+        'packages/ui-components/tests/links-view/__snapshots__/** text eol=lf'
+      )
+    ).toBe(true);
   });
 });
