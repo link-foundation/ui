@@ -1,9 +1,11 @@
 /**
  * Shared helpers of the ui-react tests. Importing this module installs a
  * jsdom window as the globals React DOM needs and sets
- * `IS_REACT_ACT_ENVIRONMENT`, so every render runs inside `act`. Each test
- * file runs in its own process (`node --test`), so the globals never leak
- * into other packages' tests.
+ * `IS_REACT_ACT_ENVIRONMENT`, so every render runs inside `act`. Under
+ * `node --test` and `deno test` each test file runs in its own process or
+ * worker; `bun test` runs every file in one process, where the globals stay
+ * installed after this file is loaded (ssr.test.js hides them for its
+ * window-less test).
  */
 
 import { readFileSync } from 'node:fs';

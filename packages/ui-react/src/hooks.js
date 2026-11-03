@@ -1,3 +1,4 @@
+// @ts-self-types="./hooks.d.ts"
 /**
  * `@link-foundation/ui-react/hooks`: DOM-free React hooks over a ui-store
  * store. This entry imports only `react`, ui-store types and the ui-core

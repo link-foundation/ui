@@ -204,18 +204,19 @@ node --test packages/ui-react/tests/*.test.js
 ```
 
 The tests run React 19 in [jsdom](https://github.com/jsdom/jsdom) (MIT, a
-dev dependency) with `act`. jsdom needs Node.js 22.22, 24.15 or 26; the
-package itself runs on Node.js 20.
+dev dependency) with `act`, under Node.js, Bun (`bun test`) and Deno
+(`deno test -A`). jsdom needs Node.js 22.22, 24.15 or 26; the package
+itself runs on Node.js 20.
 
-| File                   | Checks                                                                                  |
-| ---------------------- | --------------------------------------------------------------------------------------- |
-| `document.test.js`     | `ui-button` with `data-link-id="ok"`; a store change patches the DOM with one render.   |
-| `hooks.test.js`        | `useUiProp` re-renders only for its property; the other hooks.                          |
-| `actions.test.js`      | `actions.save` once, `onAction` with the detail, unknown actions warn, nested views.    |
-| `components.test.js`   | A `chart` kind through a portal with updated props; insert, rename, remove, cleanup.    |
-| `strict-mode.test.js`  | One tree under `<StrictMode>`; no store or DOM listener left after unmount.             |
-| `ssr.test.js`          | `renderToString` without `window`; `ssr` output; hydration replaces the server markup.  |
-| `no-dom-hooks.test.js` | The hooks entry loads no `react-dom` or `ui-dom` module (a child process records them). |
+| File                   | Checks                                                                                                |
+| ---------------------- | ----------------------------------------------------------------------------------------------------- |
+| `document.test.js`     | `ui-button` with `data-link-id="ok"`; a store change patches the DOM with one render.                 |
+| `hooks.test.js`        | `useUiProp` re-renders only for its property; the other hooks.                                        |
+| `actions.test.js`      | `actions.save` once, `onAction` with the detail, unknown actions warn, nested views.                  |
+| `components.test.js`   | A `chart` kind through a portal with updated props; insert, rename, remove, cleanup.                  |
+| `strict-mode.test.js`  | One tree under `<StrictMode>`; no store or DOM listener left after unmount.                           |
+| `ssr.test.js`          | `renderToString` without `window`; `ssr` output; hydration replaces the server markup.                |
+| `no-dom-hooks.test.js` | The hooks entry's module graph has no `react-dom` or `ui-dom` module; it imports with no DOM globals. |
 
 ## License
 

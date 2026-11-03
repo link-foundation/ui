@@ -4,7 +4,9 @@
  * client replaces with live nodes on mount.
  *
  * This file imports the jsdom setup only after the server part, so the
- * server part runs with no `window` and no `document`.
+ * server part runs with no `window` and no `document`. Bun runs every test
+ * file in one process, where another file may have installed jsdom's
+ * globals already, so the first test hides them while it runs.
  */
 
 import { describe, it, expect } from 'test-anywhere';
@@ -21,15 +23,34 @@ import {
 const DOC =
   "(app: document (body: stack (greeting: text 'Hello <b>') (ok: button (label 'OK') (on press (emit save))) (c: chart (series 1 2))))";
 
+/** Run `fn` with `window` and `document` removed from `globalThis`. */
+function withoutDomGlobals(fn) {
+  const saved = ['window', 'document']
+    .map((name) => [name, Object.getOwnPropertyDescriptor(globalThis, name)])
+    .filter(([, descriptor]) => descriptor !== undefined);
+  for (const [name] of saved) {
+    delete globalThis[name];
+  }
+  try {
+    return fn();
+  } finally {
+    for (const [name, descriptor] of saved) {
+      Object.defineProperty(globalThis, name, descriptor);
+    }
+  }
+}
+
 function Greeting() {
   return h('p', null, useUiProp('greeting', 'value'));
 }
 
 describe('server rendering', () => {
   it('renders without window or document', () => {
-    expect(typeof globalThis.window).toBe('undefined');
-    expect(typeof globalThis.document).toBe('undefined');
-    const html = renderToString(h(UiView, { source: DOC, className: 'x' }));
+    const html = withoutDomGlobals(() => {
+      expect(typeof globalThis.window).toBe('undefined');
+      expect(typeof globalThis.document).toBe('undefined');
+      return renderToString(h(UiView, { source: DOC, className: 'x' }));
+    });
     expect(html).toBe('<div class="x" data-ui-root=""></div>');
   });
 

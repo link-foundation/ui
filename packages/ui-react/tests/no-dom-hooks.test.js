@@ -1,87 +1,89 @@
 /**
- * `@link-foundation/ui-react/hooks` is DOM-free: importing it, in a fresh
- * Node process with no DOM globals, loads no module of `react-dom` or
- * `ui-dom`. A module resolve hook records every module URL the import
- * loads; the main entry is the positive control (it does load both).
+ * `@link-foundation/ui-react/hooks` is DOM-free:
+ *
+ * - a static module graph walk from the entry (resolved through the
+ *   `exports` map of ui-react) reaches no module of `react-dom` or
+ *   `ui-dom`, under any export condition; the main entry is the positive
+ *   control (its graph has both);
+ * - importing the entry in a fresh process of the same runtime (Node.js,
+ *   Bun or Deno), with no DOM globals, works and installs none.
  */
 
 import { describe, it, expect } from 'test-anywhere';
 import { execFileSync } from 'node:child_process';
-import { URL, fileURLToPath } from 'node:url';
+import { URL, fileURLToPath, pathToFileURL } from 'node:url';
+import { moduleGraph } from './module-graph.js';
 
+const HERE = fileURLToPath(import.meta.url);
 const PACKAGE_DIR = fileURLToPath(new URL('..', import.meta.url));
+const HOOKS_URL = pathToFileURL(
+  fileURLToPath(new URL('../src/hooks.js', import.meta.url))
+).href;
 
-/**
- * The child script: record every resolved module URL with an in-thread
- * `registerHooks` (Node 22.15+), else an off-thread `register` hook.
- */
-const OFF_THREAD_HOOKS = `
-let port;
-export function initialize(data) { port = data.port; }
-export async function resolve(specifier, context, next) {
-  const result = await next(specifier, context);
-  port.postMessage(result.url);
-  return result;
-}`;
+const isReactDom = (name) => /(^|[/\\])react-dom([/\\]|$)/.test(name);
+const isUiDom = (name) => /(^|[/\\])ui-dom([/\\]|$)/.test(name);
+const isReact = (name) => /[/\\]react[/\\]/.test(name);
 
-const childScript = (entry) => `
-  import * as module from 'node:module';
-  import { MessageChannel } from 'node:worker_threads';
-  const urls = [];
-  let close = () => {};
-  if (typeof module.registerHooks === 'function') {
-    module.registerHooks({
-      resolve(specifier, context, next) {
-        const result = next(specifier, context);
-        urls.push(result.url);
-        return result;
-      },
-    });
-  } else {
-    const { port1, port2 } = new MessageChannel();
-    port1.on('message', (url) => urls.push(url));
-    module.register(
-      'data:text/javascript,' + encodeURIComponent(${JSON.stringify(OFF_THREAD_HOOKS)}),
-      { data: { port: port2 }, transferList: [port2] }
-    );
-    close = () => port1.close();
-  }
-  const globals = ['window', 'document', 'HTMLElement', 'customElements']
-    .filter((name) => typeof globalThis[name] !== 'undefined');
-  await import(${JSON.stringify(entry)});
-  await new Promise((resolve) => setTimeout(resolve, 50));
-  close();
-  process.stdout.write(JSON.stringify({ urls, globals }));
+/** The child script: import the entry with no DOM globals and use it. */
+const CHILD_SCRIPT = `
+const DOM = ['window', 'document', 'HTMLElement', 'customElements'];
+const present = () => DOM.filter((name) => typeof globalThis[name] !== 'undefined');
+const before = present();
+const hooks = await import(${JSON.stringify(HOOKS_URL)});
+const registry = hooks.createActionRegistry();
+let saved = null;
+registry.register('save', (detail) => (saved = detail.source));
+registry.dispatch({ source: 'ok', event: 'press', action: ['emit', 'save'] });
+console.log(JSON.stringify({
+  before,
+  after: present(),
+  saved,
+  exports: Object.keys(hooks).sort(),
+}));
 `;
 
-/** Every module URL that importing `entry` loads, in a fresh process. */
-function loadedModules(entry) {
-  const out = execFileSync(
-    process.execPath,
-    ['--input-type=module', '--eval', childScript(entry)],
-    { cwd: PACKAGE_DIR, encoding: 'utf8' }
-  );
-  return JSON.parse(out);
+/** The command line that evaluates an ES module script in this runtime. */
+function evalCommand(script) {
+  if (globalThis.Deno) {
+    return [globalThis.Deno.execPath(), ['eval', script]];
+  }
+  if (globalThis.Bun) {
+    return [process.execPath, ['--eval', script]];
+  }
+  return [process.execPath, ['--input-type=module', '--eval', script]];
 }
 
-const isReactDom = (url) => /[/\\]react-dom[/\\]/.test(url);
-const isUiDom = (url) => /[/\\]ui-dom[/\\]/.test(url);
-
 describe('the hooks entry', () => {
-  it('loads no react-dom or ui-dom module and needs no DOM', () => {
-    const { urls, globals } = loadedModules('@link-foundation/ui-react/hooks');
-    expect(globals).toEqual([]);
-    expect(urls.some((url) => url.endsWith('/ui-react/src/hooks.js'))).toBe(
-      true
+  it('reaches no react-dom or ui-dom module in its module graph', () => {
+    const { files, unresolved } = moduleGraph(
+      '@link-foundation/ui-react/hooks',
+      HERE
     );
-    expect(urls.some((url) => /[/\\]react[/\\]/.test(url))).toBe(true);
-    expect(urls.filter(isReactDom)).toEqual([]);
-    expect(urls.filter(isUiDom)).toEqual([]);
+    expect(files[0].endsWith('hooks.js')).toBe(true);
+    expect(files.some(isReact)).toBe(true);
+    expect(files.filter(isReactDom)).toEqual([]);
+    expect(files.filter(isUiDom)).toEqual([]);
+    expect(unresolved.filter(isReactDom)).toEqual([]);
+    expect(unresolved.filter(isUiDom)).toEqual([]);
   });
 
-  it('is told apart from the main entry, which loads both', () => {
-    const { urls } = loadedModules('@link-foundation/ui-react');
-    expect(urls.some(isReactDom)).toBe(true);
-    expect(urls.some(isUiDom)).toBe(true);
+  it('is told apart from the main entry, whose graph has both', () => {
+    const { files } = moduleGraph('@link-foundation/ui-react', HERE);
+    expect(files.some(isReactDom)).toBe(true);
+    expect(files.some(isUiDom)).toBe(true);
+  });
+
+  it('imports and runs in a fresh process with no DOM globals', () => {
+    const [command, args] = evalCommand(CHILD_SCRIPT);
+    const out = execFileSync(command, args, {
+      cwd: PACKAGE_DIR,
+      encoding: 'utf8',
+    });
+    const result = JSON.parse(out.trim().split('\n').at(-1));
+    expect(result.before).toEqual([]);
+    expect(result.after).toEqual([]);
+    expect(result.saved).toBe('ok');
+    expect(result.exports).toContain('useUiProp');
+    expect(result.exports).toContain('UiProvider');
   });
 });
