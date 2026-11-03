@@ -14,7 +14,13 @@ import { diagnostic } from './diagnostics.js';
 import { bindHandlers, handlersOf } from './events.js';
 import { UNKNOWN_KIND } from './kinds/basic.js';
 import { ensureTag, getKind } from './kinds.js';
-import { atom, elementOf, propNames, withProperties } from './model.js';
+import {
+  atom,
+  elementOf,
+  propNames,
+  vocabulary,
+  withProperties,
+} from './model.js';
 
 /**
  * @typedef {import('./model.js').Element} Element
@@ -131,6 +137,17 @@ const kindContext = (document, options, report, mounted) => (id, kind) => ({
       : store.children(id).map((child) => elementOf(store.get(child)));
   },
 });
+
+/** Positional events carry values, while explicit properties stay intact. */
+function updatePositional(state, refresh, id, positional) {
+  const entry = state.get(id);
+  if (entry === undefined) {
+    return false;
+  }
+  entry.el = elementOf({ ...entry.el, positional });
+  refresh(id, vocabulary().kinds.get(entry.el.kind)?.positional ?? []);
+  return true;
+}
 
 /**
  * @param {TreeOptions} tree
@@ -293,6 +310,8 @@ export function createTree({
     nodes,
     insert,
     update,
+    updatePositional: (id, values) =>
+      updatePositional(state, refresh, id, values),
     move,
     remove,
     rename,
