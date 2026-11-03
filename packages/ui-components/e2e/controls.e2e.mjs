@@ -124,15 +124,22 @@ test.describe('ui-components controls with the keyboard only', () => {
   test('buttons, the link and the text inputs work with the keyboard', async ({
     page,
   }) => {
+    // button and icon-button: Enter and Space press them (not submit).
     await tabTo(page, form(page).getByRole('button', { name: 'Save' }));
+    await page.keyboard.press('Enter');
+    await expect.poll(() => changesOf(page)).toContain('save:press');
     await page.keyboard.press('Tab');
     await expect(
       form(page).getByRole('button', { name: 'Close' })
     ).toBeFocused();
+    await page.keyboard.press('Space');
+    await expect.poll(() => changesOf(page)).toContain('close:press');
+    expect(await page.evaluate(() => window.submitted)).toBeUndefined();
+    // link: one tab stop, its target opens in a new tab.
     await page.keyboard.press('Tab');
-    await expect(
-      form(page).getByRole('link', { name: 'Documentation' })
-    ).toBeFocused();
+    const docs = form(page).getByRole('link', { name: 'Documentation' });
+    await expect(docs).toBeFocused();
+    await expect(docs).toHaveAttribute('target', '_blank');
 
     // text-field: typing commits on leaving the field, Escape restores.
     const name = form(page).getByRole('textbox', { name: 'Name' });

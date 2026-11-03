@@ -217,8 +217,8 @@
 
       /** The document of every basic control, its labels in a locale. */
       const page = (t) => `(page: document
-  (save: button '${t.save}')
-  (close: icon-button close (label '${t.close}') (variant outlined))
+  (save: button '${t.save}' (on press (emit saved)))
+  (close: icon-button close (label '${t.close}') (variant outlined) (on press (emit closed)))
   (docs: link '${t.docs}' (href 'https://example.com/docs') (external true))
   (legend: label '${t.required}' (for email) (required true))
   (email: text-field '${t.email}' (type email) (name email) (value 'ada@example.com') (required true))
