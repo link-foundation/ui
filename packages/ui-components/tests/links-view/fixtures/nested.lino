@@ -1,0 +1,6 @@
+a: first second third
+  b c
+  inner: x y
+empty:
+()
+solo
