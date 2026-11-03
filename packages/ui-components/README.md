@@ -1255,6 +1255,13 @@ runtime download. Consumers must preserve the relative
 `dist/network-layout.worker.mjs` asset when bundling the package, or inject a
 `createWorker` factory for their bundler's worker handling.
 
+## Chat kit
+
+The provider-neutral [chat kit](src/chat/README.md) supplies a chat list,
+virtual message stream, bubbles, reasoning traces, day separators and a floating
+composer. It uses one LiNo data contract, capability-driven actions, bounded
+history and four light/dark skins. Try [the 10,000-message example](examples/chat.html).
+
 ## Settings panel
 
 Import `createSettingsPanel`, `controlFor` and `buildPanelModel` from

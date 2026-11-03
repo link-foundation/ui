@@ -8,4 +8,5 @@ export * from '@link-foundation/ui-components/icons';
 export * from '@link-foundation/ui-components/overlays';
 export * from '@link-foundation/ui-components/controls';
 export * from '@link-foundation/ui-components/data';
+export * from '@link-foundation/ui-components/chat';
 export * from '@link-foundation/ui-components/settings';

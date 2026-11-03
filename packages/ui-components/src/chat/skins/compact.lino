@@ -1,0 +1,4 @@
+compact: theme
+  token chat.style.padding 4px
+  token chat.style.width 1
+  token chat.style.radius 2px
