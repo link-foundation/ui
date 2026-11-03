@@ -128,6 +128,22 @@ export const UiView = defineComponent({
       }
     };
 
+    /**
+     * Without an `onDiagnostic` option, an action head outside the dialect
+     * vocabulary (ui-dom ignores it) is a development warning: host actions
+     * are written `(emit NAME)`.
+     */
+    const onDiagnostic = (d) => {
+      const name = d.at?.action;
+      if (d.code !== 'unknown-action' || !isDevelopment() || warned.has(name)) {
+        return;
+      }
+      warned.add(name);
+      console.warn(
+        `[ui-vue] UiView: ${d.message}. Write host actions as (emit ${name}).`
+      );
+    };
+
     /** Follow renames: the components receive the current ID. */
     const onPatch = (events) => {
       if (handle === null || !events.some((e) => e.type === 'rename')) {
@@ -193,6 +209,7 @@ export const UiView = defineComponent({
           onPatch(events);
           options.onPatch?.(events);
         },
+        onDiagnostic: options.onDiagnostic ?? onDiagnostic,
       });
     };
 

@@ -105,6 +105,24 @@ describe('UiView actions', () => {
     expect(calls[0]).toContain('"save"');
   });
 
+  it('only warns for an action head outside the vocabulary', async () => {
+    const source =
+      "(app: document (ok: button (label 'OK') (on press (save) (emit save))))";
+    let saves = 0;
+    const calls = await warnings(() => {
+      const wrapper = mount(UiView, {
+        props: { source, actions: { save: () => (saves += 1) } },
+        attachTo: container(),
+      });
+      click(wrapper, 'ok');
+      wrapper.unmount();
+    });
+    // `(save)` is ignored with a warning; `(emit save)` still runs.
+    expect(saves).toBe(1);
+    expect(calls.length).toBe(1);
+    expect(calls[0]).toContain('(emit save)');
+  });
+
   it('calls the handlers of the plugin and of useUiAction', () => {
     const seen = [];
     const Child = defineComponent({
