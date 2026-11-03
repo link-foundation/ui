@@ -400,12 +400,11 @@ in a lazy chunk. `tests/charts/bundle.test.js` checks this.
 
 ## Diagrams
 
-Components of the associative UI framework written in Links Notation. The
-first component is **diagrams**: a flowchart, state, sequence or class
-diagram is a `diagram` link. [Dagre](https://github.com/dagrejs/dagre) (MIT)
-lays it out and our own SVG renderer draws it. It can also be written out as
-Mermaid text, or drawn by [Mermaid](https://mermaid.js.org) (MIT), which is
-loaded only when a page shows a Mermaid diagram.
+A flowchart, state, sequence or class diagram is a `diagram` link.
+[Dagre](https://github.com/dagrejs/dagre) (MIT) lays it out and our own SVG
+renderer draws it. It can also be written out as Mermaid text, or drawn by
+[Mermaid](https://mermaid.js.org) (MIT), which is loaded only when a page
+shows a Mermaid diagram.
 
 ```lino
 (login-flow: diagram
