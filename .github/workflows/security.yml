@@ -177,6 +177,7 @@ jobs:
             '.',
             examples/universal-app,
             examples/react,
+            examples/vue,
             .github/actions/artifact-transport,
           ]
     steps:

@@ -146,6 +146,20 @@ import { UiView } from '@link-foundation/ui-react';
 />;
 ```
 
+### Vue
+
+[`@link-foundation/ui-vue`](packages/ui-vue/README.md) mounts ui-dom in a Vue 3
+`UiView` component, gives the store to Vue through composables
+(`useUiProp`, `useUiElement`, `useUiStore`, `useUiAction`) and draws custom
+kinds with Vue components ([example app](examples/vue/)):
+
+```js
+import { UiView, createUiPlugin } from '@link-foundation/ui-vue';
+
+app.use(createUiPlugin({ store, actions: { save } })); // (on press (emit save))
+// <UiView :components="{ chart: SalesChart }" @action="log" />
+```
+
 ### Animations
 
 [`@link-foundation/ui-animation`](packages/ui-animation/README.md) reads
@@ -317,7 +331,8 @@ npm run example:desktop:package
 │   ├── kotlin/           # Compose Desktop window for ui-kotlin (Gradle build)
 │   ├── react/            # Vite + React app of ui-react (sample document, counter, chart kind)
 │   ├── ui-dom/           # ui-dom page served with an import map (scripts/serve-static.mjs)
-│   └── universal-app/    # React + GitHub Pages + Electron + Capacitor app
+│   ├── universal-app/    # React + GitHub Pages + Electron + Capacitor app
+│   └── vue/              # Vite + Vue 3 app for ui-vue (own package.json)
 ├── scripts/              # Build and release scripts
 ├── packages/             # npm workspaces (see docs/monorepo.md)
 │   ├── ui-animation/     # @link-foundation/ui-animation (LiNo animations: tracks, springs, timelines, triggers, safety rules, WAAPI player)
@@ -335,7 +350,8 @@ npm run example:desktop:package
 │   ├── ui-store/         # @link-foundation/ui-store
 │   ├── ui-style/         # @link-foundation/ui-style (style rules, states, media and container conditions)
 │   ├── ui-swift/         # SwiftUI renderer (Swift package, see Package.swift)
-│   └── ui-tokens/        # @link-foundation/ui-tokens (design tokens)
+│   ├── ui-tokens/        # @link-foundation/ui-tokens (design tokens)
+│   └── ui-vue/           # @link-foundation/ui-vue (Vue 3 adapter: UiView, composables, plugin)
 ├── tests/                # Repository and release-script tests
 ├── .eslintrc.js          # ESLint configuration
 ├── .prettierrc           # Prettier configuration
