@@ -12,7 +12,10 @@
     "npm:ajv@^8.17.1": "8.20.0",
     "npm:axe-core@4.14.0": "4.14.0",
     "npm:command-stream@2.4.0": "2.4.0",
+    "npm:d3-scale@4.0.2": "4.0.2",
+    "npm:d3-shape@3.2.0": "3.2.0",
     "npm:doublets-web@~0.1.3": "0.1.3",
+    "npm:echarts@6.1.0": "6.1.0",
     "npm:eslint-config-prettier@^10.1.8": "10.1.8_eslint@10.13.0",
     "npm:eslint-plugin-prettier@^5.5.4": "5.5.6_eslint@10.13.0_eslint-config-prettier@10.1.8_prettier@3.8.4",
     "npm:eslint@^10.13.0": "10.13.0",
@@ -781,6 +784,55 @@
         "source-map-js"
       ]
     },
+    "d3-array@3.2.4": {
+      "integrity": "sha512-tdQAmyA18i4J7wprpYq8ClcxZy3SC31QMeByyCFyRt7BVHdREQZ5lpzoe5mFEYZUWe+oq8HBvk9JjpibyEV4Jg==",
+      "dependencies": [
+        "internmap"
+      ]
+    },
+    "d3-color@3.1.0": {
+      "integrity": "sha512-zg/chbXyeBtMQ1LbD/WSoW2DpC3I0mpmPdW+ynRTj/x2DAWYrIY7qeZIHidozwV24m4iavr15lNwIwLxRmOxhA=="
+    },
+    "d3-format@3.1.2": {
+      "integrity": "sha512-AJDdYOdnyRDV5b6ArilzCPPwc1ejkHcoyFarqlPqT7zRYjhavcT3uSrqcMvsgh2CgoPbK3RCwyHaVyxYcP2Arg=="
+    },
+    "d3-interpolate@3.0.1": {
+      "integrity": "sha512-3bYs1rOD33uo8aqJfKP3JWPAibgw8Zm2+L9vBKEHJ2Rg+viTR7o5Mmv5mZcieN+FRYaAOWX5SJATX6k1PWz72g==",
+      "dependencies": [
+        "d3-color"
+      ]
+    },
+    "d3-path@3.1.0": {
+      "integrity": "sha512-p3KP5HCf/bvjBSSKuXid6Zqijx7wIfNW+J/maPs+iwR35at5JCbLUT0LzF1cnjbCHWhqzQTIN2Jpe8pRebIEFQ=="
+    },
+    "d3-scale@4.0.2": {
+      "integrity": "sha512-GZW464g1SH7ag3Y7hXjf8RoUuAFIqklOAq3MRl4OaWabTFJY9PN/E1YklhXLh+OQ3fM9yS2nOkCoS+WLZ6kvxQ==",
+      "dependencies": [
+        "d3-array",
+        "d3-format",
+        "d3-interpolate",
+        "d3-time",
+        "d3-time-format"
+      ]
+    },
+    "d3-shape@3.2.0": {
+      "integrity": "sha512-SaLBuwGm3MOViRq2ABk3eLoxwZELpH6zhl3FbAoJ7Vm1gofKx6El1Ib5z23NUEhF9AsGl7y+dzLe5Cw2AArGTA==",
+      "dependencies": [
+        "d3-path"
+      ]
+    },
+    "d3-time-format@4.1.0": {
+      "integrity": "sha512-dJxPBlzC7NugB2PDLwo9Q8JiTR3M3e4/XANkreKSUxF8vvXKqm1Yfq4Q5dl8budlunRVlUUaDUgFt7eA8D6NLg==",
+      "dependencies": [
+        "d3-time"
+      ]
+    },
+    "d3-time@3.1.0": {
+      "integrity": "sha512-VqKjzBLejbSMT4IgbmVgDjpkYrNWUYJnbCGo874u7MMKIWsILRX+OpX/gTk8MqjpT1A/c6HY2dCA77ZN0lkQ2Q==",
+      "dependencies": [
+        "d3-array"
+      ]
+    },
     "data-urls@8.0.0": {
       "integrity": "sha512-JQUCCK+/CAGbGGx618PlFZMXH81Jtj7t73CHv9dd/zVWvxgGT2zLFRjnKb+Ng46GIwcy+f7f88qd4duqllK+WQ==",
       "dependencies": [
@@ -802,6 +854,13 @@
     },
     "doublets-web@0.1.3": {
       "integrity": "sha512-8HVF+X/qSzacm947mKi5gw3aa2V0GOpbwMZXxFDROc4k1PVPOVwMR7b3PfiZND2E2k6lxXUk5BlIWHxLbsx/+A=="
+    },
+    "echarts@6.1.0": {
+      "integrity": "sha512-q0yaFPggC9FUdsWH4blavRWFmxdrIodbkoKNAjJudAI6CA9gNPxHtV2RcZNEepZVlk4yvBYkOkbk6HIVpIyHZA==",
+      "dependencies": [
+        "tslib",
+        "zrender"
+      ]
     },
     "emoji-regex@10.6.0": {
       "integrity": "sha512-toUI84YS5YmxW219erniWD0CIVOo46xGKColeNQRgOzDorgBi1v4D71/OFzgD9GO2UGKIv1C3Sp8DAn0+j5w7A=="
@@ -1083,6 +1142,9 @@
     },
     "imurmurhash@0.1.4": {
       "integrity": "sha512-JmXMZ6wuvDmLiHEml9ykzqO6lwFbof0GG4IkcGaENdCRDDmMVnny7s5HsIgHCbaq0w2MyPhDqkhTUgS2LU2PHA=="
+    },
+    "internmap@2.0.3": {
+      "integrity": "sha512-5Hh7Y1wQbvY5ooGgPbDaL5iYLAPzMTUrjMulskHLH6wnv/A+1q5rgEaiuqEjB+oxGXIVZs1FF+R/KPN3ZSQYYg=="
     },
     "intl-messageformat@12.1.4": {
       "integrity": "sha512-JUkmv3cAEyijN3oiRiV3ctel7yVMuUCgfh7Pu8pj1/z6L1DSEPRyhuMaLjVw3pGmGJ5RDH54WVFxfMHZWTwyHw==",
@@ -1639,6 +1701,9 @@
         "punycode"
       ]
     },
+    "tslib@2.3.0": {
+      "integrity": "sha512-N82ooyxVNm6h1riLCoyS9e3fuJ3AMG2zIZs2Gd1ATcSFjSA23Q0fzjjZeh0jbJvWVDZ0cJT8yaNNaaXHzueNjg=="
+    },
     "type-check@0.4.0": {
       "integrity": "sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==",
       "dependencies": [
@@ -1754,6 +1819,12 @@
     },
     "yoctocolors@2.2.0": {
       "integrity": "sha512-xYqdZFUK/VYazNl/oCDYN+3WloWQwMfZxBoiNt6qNyk+xfOdi598muWE42rNZFp1kNOiqW936q5RhUdnpqElSg=="
+    },
+    "zrender@6.1.0": {
+      "integrity": "sha512-oEGMDB6pOP2S6OwRR4PdVv610zrjnA3Bh+JnSG12fYJlBKjtNAoEb5fSUoCOOINlH96I2fU38/A2UpRKs67xYQ==",
+      "dependencies": [
+        "tslib"
+      ]
     }
   },
   "workspace": {
@@ -1779,6 +1850,19 @@
       ]
     },
     "members": {
+      "packages/ui-components": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@link-foundation/ui-tokens@^0.0.0",
+            "npm:d3-scale@4.0.2",
+            "npm:d3-shape@3.2.0",
+            "npm:echarts@6.1.0",
+            "npm:jsdom@^30.1.3",
+            "npm:links-notation@~0.27.1",
+            "npm:test-anywhere@~0.8.48"
+          ]
+        }
+      },
       "packages/ui-config": {
         "packageJson": {
           "dependencies": [
@@ -1812,22 +1896,24 @@
           ]
         }
       },
+      "packages/ui-dom": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@link-foundation/ui-core@^0.0.0",
+            "npm:@link-foundation/ui-store@^0.0.0",
+            "npm:@link-foundation/ui-style@^0.0.0",
+            "npm:@link-foundation/ui-tokens@^0.0.0",
+            "npm:jsdom@^30.1.3",
+            "npm:test-anywhere@~0.8.48"
+          ]
+        }
+      },
       "packages/ui-i18n": {
         "packageJson": {
           "dependencies": [
             "npm:@link-foundation/ui-config@^0.0.0",
             "npm:@link-foundation/ui-core@^0.0.0",
             "npm:lino-i18n@0.5.0",
-            "npm:test-anywhere@~0.8.48"
-          ]
-        }
-      },
-      "packages/ui-settings": {
-        "packageJson": {
-          "dependencies": [
-            "npm:@link-foundation/ui-config@^0.0.0",
-            "npm:@link-foundation/ui-core@^0.0.0",
-            "npm:jsdom@^30.1.3",
             "npm:test-anywhere@~0.8.48"
           ]
         }
@@ -1839,6 +1925,16 @@
             "npm:doublets-web@~0.1.3",
             "npm:fake-indexeddb@^6.2.7",
             "npm:links-notation@~0.27.1",
+            "npm:test-anywhere@~0.8.48"
+          ]
+        }
+      },
+      "packages/ui-settings": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@link-foundation/ui-config@^0.0.0",
+            "npm:@link-foundation/ui-core@^0.0.0",
+            "npm:jsdom@^30.1.3",
             "npm:test-anywhere@~0.8.48"
           ]
         }
