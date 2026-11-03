@@ -31,6 +31,7 @@
  */
 
 import { defineKind } from '@link-foundation/ui-dom';
+import { bindKeys } from '../a11y/keys.js';
 import {
   activatePanel,
   dockLayoutFromLinks,
@@ -184,19 +185,20 @@ function focusedIndex(dock, ids) {
   return ids.findIndex((id) => tab?.dataset.panel === id);
 }
 
-/** Ctrl+F6 and Ctrl+Shift+F6: the next and the previous open panel. */
-function onKeyDown(dock, event) {
+/**
+ * Focus the next (`step` 1) or the previous (-1) open panel; false when
+ * there is none, so the key is left alone.
+ */
+function cyclePanels(dock, step) {
   const { state } = dock;
-  if (event.key !== 'F6' || !event.ctrlKey || state.layout === null) {
-    return;
+  if (state.layout === null) {
+    return false;
   }
   const ids = openPanelIds(state.layout).filter((id) => state.panels.get(id));
   if (ids.length === 0) {
-    return;
+    return false;
   }
-  event.preventDefault();
   const at = focusedIndex(dock, ids);
-  const step = event.shiftKey ? -1 : 1;
   const next = ids[(at + step + ids.length) % ids.length] ?? ids[0];
   if (findPanel(state.layout, next).place === 'region') {
     change(dock, activatePanel(state.layout, next), next);
@@ -269,7 +271,11 @@ function createDock(node, ctx) {
   node.prepend(tools);
   node.append(dock.floatLayer);
   dock.observer = observe(dock);
-  node.addEventListener('keydown', (event) => onKeyDown(dock, event));
+  // Ctrl+F6 and Ctrl+Shift+F6: the next and the previous open panel.
+  bindKeys(node, {
+    'Ctrl+F6': () => cyclePanels(dock, 1),
+    'Ctrl+Shift+F6': () => cyclePanels(dock, -1),
+  });
   return {
     state: dock.state,
     schedule: () => schedule(dock),

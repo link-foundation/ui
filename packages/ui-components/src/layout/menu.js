@@ -9,6 +9,8 @@
  * the chosen action moved it.
  */
 
+import { bindKeys } from '../a11y/keys.js';
+import { createRovingTabindex } from '../a11y/roving.js';
 import { make } from './dom.js';
 
 const open = new WeakMap();
@@ -26,22 +28,6 @@ export function closeMenu(button, { restoreFocus = true } = {}) {
   if (restoreFocus) {
     button.focus();
   }
-}
-
-/** Move the focus among the enabled items. */
-function moveFocus(items, current, key) {
-  const enabled = items.filter((item) => !item.disabled);
-  if (enabled.length === 0) {
-    return;
-  }
-  const at = enabled.indexOf(current);
-  const next = {
-    ArrowDown: enabled[(at + 1) % enabled.length],
-    ArrowUp: enabled[(at - 1 + enabled.length) % enabled.length],
-    Home: enabled[0],
-    End: enabled[enabled.length - 1],
-  }[key];
-  next?.focus();
 }
 
 /**
@@ -72,14 +58,12 @@ export function menuButton(document, { label, text, className, items }) {
     }
   };
   button.addEventListener('click', () => toggle());
-  button.addEventListener('keydown', (event) => {
-    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-      event.preventDefault();
-      if (!open.has(button)) {
-        toggle(event.key === 'ArrowUp');
-      }
+  const openWith = (focusLast) => () => {
+    if (!open.has(button)) {
+      toggle(focusLast);
     }
-  });
+  };
+  bindKeys(button, { ArrowDown: openWith(false), ArrowUp: openWith(true) });
   return button;
 }
 
@@ -97,7 +81,7 @@ export function openMenu(button, items, options = {}) {
     role: 'menu',
     'aria-label': button.getAttribute('aria-label'),
   });
-  const focusables = items.map((item) => {
+  const nodes = items.map((item) => {
     const node = make(
       document,
       'button',
@@ -116,27 +100,26 @@ export function openMenu(button, items, options = {}) {
       closeMenu(button);
       item.run();
     });
-    return {
-      node,
-      disabled: item.disabled === true,
-      focus: () => node.focus(),
-    };
+    return node;
   });
-  element.append(...focusables.map((f) => f.node));
-  element.addEventListener('keydown', (event) => {
-    const current = focusables.find((f) => f.node === event.target);
-    if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
-      moveFocus(focusables, current, event.key);
-    } else if (event.key === 'Escape') {
+  element.append(...nodes);
+  // Up, Down, Home and End move among the enabled items (around the ends).
+  const roving = createRovingTabindex(nodes, { orientation: 'vertical' });
+  roving.attach(element);
+  // The keys of an open menu stay in it (a menu in a window keeps Escape).
+  bindKeys(element, {
+    Escape: (event) => {
+      event.stopPropagation();
       closeMenu(button);
-    } else if (event.key === 'Tab') {
+    },
+    Tab: () => {
       closeMenu(button, { restoreFocus: false });
-      return;
-    } else {
-      return;
-    }
-    event.preventDefault();
-    event.stopPropagation();
+      return false;
+    },
+    'Shift+Tab': () => {
+      closeMenu(button, { restoreFocus: false });
+      return false;
+    },
   });
   const onOutside = (event) => {
     if (!element.contains(event.target) && event.target !== button) {
@@ -150,7 +133,9 @@ export function openMenu(button, items, options = {}) {
     element,
     cleanup: () => document.removeEventListener('pointerdown', onOutside, true),
   });
-  const enabled = focusables.filter((f) => !f.disabled);
-  (options.focusLast ? enabled[enabled.length - 1] : enabled[0])?.focus();
+  const enabled = (node) => node.getAttribute('aria-disabled') !== 'true';
+  roving.focus(
+    options.focusLast ? nodes.findLastIndex(enabled) : nodes.findIndex(enabled)
+  );
   return element;
 }

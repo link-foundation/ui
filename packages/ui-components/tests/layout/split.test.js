@@ -54,6 +54,18 @@ describe('split kind', () => {
     page.close();
   });
 
+  it('leaves the arrows with Ctrl, Alt or Meta to the browser', async () => {
+    const page = await mountLayout(CHAT);
+    const split = page.node('chat');
+    const divider = dividerOf(split);
+    for (const modifier of ['ctrlKey', 'altKey', 'metaKey']) {
+      const event = press(divider, 'ArrowRight', { [modifier]: true });
+      expect(event.defaultPrevented).toBe(false);
+    }
+    expect(splitSizes(split)).toEqual([30, 70]);
+    page.close();
+  });
+
   it('keeps every pane within min and max, with a constant total', async () => {
     const page = await mountLayout(CHAT);
     const split = page.node('chat');

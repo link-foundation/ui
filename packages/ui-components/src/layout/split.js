@@ -23,6 +23,7 @@
 
 import { defineKind } from '@link-foundation/ui-dom';
 import { Link, Parser } from 'links-notation';
+import { bindKeys } from '../a11y/keys.js';
 import {
   atomOf,
   controllerOf,
@@ -205,33 +206,41 @@ function toggle(split, i) {
   }
 }
 
-/** The keys of divider `i` (WAI-ARIA window splitter). */
-function onKey(split, event, i) {
+/** Move divider `i` by `delta` percent. */
+function moveBy(split, i, delta) {
   const { sizes, limits } = split.state;
-  const step = event.shiftKey ? BIG_STEP : STEP;
-  const moves = {
-    ArrowLeft: -step,
-    ArrowUp: -step,
-    ArrowRight: step,
-    ArrowDown: step,
-    End: TOTAL,
+  setSizes(split, resizeSplit(sizes, i, delta, limits));
+}
+
+/** Give pane `i` its smallest size; a collapsible pane collapses. */
+function shrink(split, i) {
+  const { sizes, limits } = split.state;
+  const own = paneLimits(sizes, i, limits);
+  setSizes(
+    split,
+    own.collapsible
+      ? collapsePane(sizes, i, limits)
+      : resizeSplit(sizes, i, own.min - sizes[i], limits)
+  );
+}
+
+/** The keys of a divider (WAI-ARIA window splitter); `index()` is its index. */
+function dividerKeys(split, index) {
+  const keys = {
+    Home: () => shrink(split, index()),
+    End: () => moveBy(split, index(), TOTAL),
+    Enter: () => toggle(split, index()),
   };
-  if (Object.hasOwn(moves, event.key)) {
-    setSizes(split, resizeSplit(sizes, i, moves[event.key], limits));
-  } else if (event.key === 'Home') {
-    const own = paneLimits(sizes, i, limits);
-    setSizes(
-      split,
-      own.collapsible
-        ? collapsePane(sizes, i, limits)
-        : resizeSplit(sizes, i, own.min - sizes[i], limits)
-    );
-  } else if (event.key === 'Enter') {
-    toggle(split, i);
-  } else {
-    return;
+  for (const [key, sign] of [
+    ['ArrowLeft', -1],
+    ['ArrowUp', -1],
+    ['ArrowRight', 1],
+    ['ArrowDown', 1],
+  ]) {
+    keys[key] = () => moveBy(split, index(), sign * STEP);
+    keys[`Shift+${key}`] = () => moveBy(split, index(), sign * BIG_STEP);
   }
-  event.preventDefault();
+  return keys;
 }
 
 function onPointerDown(split, event, i) {
@@ -296,7 +305,7 @@ function makeDivider(split) {
   });
   const index = () => split.state.dividers.indexOf(divider);
   const up = (e) => onPointerUp(split, e);
-  divider.addEventListener('keydown', (e) => onKey(split, e, index()));
+  bindKeys(divider, dividerKeys(split, index));
   divider.addEventListener('pointerdown', (e) =>
     onPointerDown(split, e, index())
   );

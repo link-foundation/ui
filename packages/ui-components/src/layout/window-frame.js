@@ -13,6 +13,7 @@
  * - A pointer down or focus inside raises it above the other windows.
  */
 
+import { bindKeys } from '../a11y/keys.js';
 import { make, uid } from './dom.js';
 
 const STEP = 16;
@@ -166,23 +167,26 @@ export function createWindowFrame(root, spec) {
     height: r.height + dy,
   }));
 
-  root.addEventListener('keydown', (event) => {
-    const arrow = ARROWS[event.key];
-    if (arrow !== undefined && event.altKey) {
-      const [dx, dy] = arrow;
-      setRect(
-        event.shiftKey
-          ? { width: rect.width + dx * STEP, height: rect.height + dy * STEP }
-          : { x: rect.x + dx * STEP, y: rect.y + dy * STEP }
-      );
-    } else if (event.key === 'Escape' && closable) {
-      spec.onClose?.();
-    } else {
-      return;
-    }
-    event.preventDefault();
+  // The keys stay in this frame: a window inside a dock does not move it.
+  const own = (act) => (event) => {
     event.stopPropagation();
-  });
+    act();
+  };
+  const keys = {
+    Escape: (event) => closable && own(() => spec.onClose?.())(event),
+  };
+  for (const [key, [dx, dy]] of Object.entries(ARROWS)) {
+    keys[`Alt+${key}`] = own(() =>
+      setRect({ x: rect.x + dx * STEP, y: rect.y + dy * STEP })
+    );
+    keys[`Alt+Shift+${key}`] = own(() =>
+      setRect({
+        width: rect.width + dx * STEP,
+        height: rect.height + dy * STEP,
+      })
+    );
+  }
+  const unbindKeys = bindKeys(root, keys);
 
   const onResize = () => setRect({}, true);
   win.addEventListener('resize', onResize);
@@ -207,6 +211,7 @@ export function createWindowFrame(root, spec) {
     },
     disconnect() {
       win.removeEventListener('resize', onResize);
+      unbindKeys();
       unsubscribe();
       layers.unregister(layerId);
     },

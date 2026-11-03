@@ -254,6 +254,10 @@ Links Notation.
 | Window    | Alt+Arrow moves by 16px, Alt+Shift+Arrow resizes, Escape closes and gives the focus back to the opener.                                           |
 | Dock      | The "Panel actions" menu (⋮) moves, floats, closes or collapses the shown panel. Ctrl+F6 and Ctrl+Shift+F6 go to the next and previous panel.     |
 
+The keys are bound with `bindKeys` of [`./a11y`](#accessibility-helpers), so only
+these exact combinations act (a divider leaves Ctrl+Arrow to the browser),
+and the menus move their focus with `createRovingTabindex`.
+
 ### Events
 
 The elements change themselves and tell the application, which may write the

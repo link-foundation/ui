@@ -12,16 +12,12 @@
  * - An optional "Panel actions" menu acts on the selected tab.
  */
 
+import { bindKeys } from '../a11y/keys.js';
 import { make, uid } from './dom.js';
 import { menuButton } from './menu.js';
 
 /** The panel id of the tab dragged right now (shared by all strips). */
 let dragging = null;
-
-const KEY_MOVES = {
-  ArrowLeft: -1,
-  ArrowRight: 1,
-};
 
 /**
  * @typedef {object} Tab
@@ -55,26 +51,36 @@ function selectAndFocus(strip, id) {
   focusTab(strip, id);
 }
 
-/** The keys of a tab; true when the key was used. */
-function onKey(strip, event, tab) {
-  const { spec } = strip;
+/** Select the tab `move` places after tab `id` (around the ends). */
+function step(strip, id, move) {
   const ids = order(strip);
-  const at = ids.indexOf(tab.id);
-  const move = KEY_MOVES[event.key];
-  if (move !== undefined && event.ctrlKey && event.shiftKey) {
+  const at = ids.indexOf(id);
+  selectAndFocus(strip, ids[(at + move + ids.length) % ids.length]);
+}
+
+/** The keys of the tab of panel `id()`. */
+function tabKeys(strip, id) {
+  const { spec } = strip;
+  const move = (by) => () => {
     if (spec.reorderable !== false) {
-      reorder(strip, tab.id, at + move);
+      reorder(strip, id(), order(strip).indexOf(id()) + by);
     }
-  } else if (move !== undefined) {
-    selectAndFocus(strip, ids[(at + move + ids.length) % ids.length]);
-  } else if (event.key === 'Home' || event.key === 'End') {
-    selectAndFocus(strip, event.key === 'Home' ? ids[0] : ids.at(-1));
-  } else if (event.key === 'Delete' && tab.closable && spec.close) {
-    spec.close(tab.id);
-  } else {
-    return;
-  }
-  event.preventDefault();
+  };
+  return {
+    ArrowLeft: () => step(strip, id(), -1),
+    ArrowRight: () => step(strip, id(), 1),
+    Home: () => selectAndFocus(strip, order(strip)[0]),
+    End: () => selectAndFocus(strip, order(strip).at(-1)),
+    'Ctrl+Shift+ArrowLeft': move(-1),
+    'Ctrl+Shift+ArrowRight': move(1),
+    Delete: () => {
+      const tab = strip.tabs.find((t) => t.id === id());
+      if (!tab?.closable || !spec.close) {
+        return false;
+      }
+      spec.close(tab.id);
+    },
+  };
 }
 
 /** A dragged tab dropped before tab `before` (`null`: at the end). */
@@ -130,12 +136,9 @@ function makeTab(strip) {
     }
     strip.spec.select(button.dataset.panel);
   });
-  button.addEventListener('keydown', (event) =>
-    onKey(
-      strip,
-      event,
-      strip.tabs.find((t) => t.id === button.dataset.panel)
-    )
+  bindKeys(
+    button,
+    tabKeys(strip, () => button.dataset.panel)
   );
   listenDrag(strip, button);
   return button;
