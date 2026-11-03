@@ -39,16 +39,31 @@ test('scripted session captures exact relative times, inputs and player hooks', 
   assert.equal(recorder.size(), 4);
 });
 
-test('1000 pointer moves within one second yield at most 60 moves', () => {
-  const f = fixture();
-  const recorder = createRecorder(f);
-  recorder.start();
-  for (let i = 0; i < 1000; i++) {
-    f.fire('pointermove');
-    f.clock.advance(1);
-  }
-  assert.equal(parseRecording(recorder.stop()).events.length, 60);
-});
+for (const offset of [0, 7, 841]) {
+  test(`1000 pointer moves within one second at ${offset}ms yield at most 60 moves`, () => {
+    const f = fixture();
+    const recorder = createRecorder(f);
+    recorder.start();
+    f.clock.advance(offset);
+    for (let i = 0; i < 1000; i++) {
+      f.fire('pointermove');
+      f.clock.advance(1);
+    }
+    assert.equal(recorder.size(), 60);
+    for (let i = 0; i < 1000; i++) {
+      f.fire('pointermove');
+      f.clock.advance(1);
+    }
+    const events = parseRecording(recorder.stop()).events;
+    assert.equal(events.length, 120);
+    for (const { time } of events) {
+      assert.ok(
+        events.filter((e) => e.time >= time && e.time < time + 1000).length <=
+          60
+      );
+    }
+  });
+}
 
 test('text coalesces per field and bounded ring retains newest events', () => {
   const f = fixture();

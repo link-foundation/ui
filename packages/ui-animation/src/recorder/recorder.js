@@ -56,6 +56,7 @@ export function createRecorder(options) {
   let active = false;
   let cleanups = [];
   let lastPointerBucket = -1;
+  let pointerTimes = [];
   let sensitiveIds = new Set();
   const isSensitive = (id) => {
     for (
@@ -92,7 +93,14 @@ export function createRecorder(options) {
       if (lastPointerBucket === bucket) {
         return;
       }
+      while (pointerTimes.length && recorded.time - pointerTimes[0] >= 1000) {
+        pointerTimes.shift();
+      }
+      if (pointerTimes.length === 60) {
+        return;
+      }
       lastPointerBucket = bucket;
+      pointerTimes.push(recorded.time);
     }
     append(recorded);
   };
@@ -107,6 +115,7 @@ export function createRecorder(options) {
       origin = clock.now();
       buffer = createEventBuffer(maxEvents);
       lastPointerBucket = -1;
+      pointerTimes = [];
       sensitiveIds = new Set();
       for (const node of root?.querySelectorAll?.(
         '[type="password"], [sensitive="true"], [data-sensitive="true"]'
