@@ -13,7 +13,7 @@
       "default": "./src/charts/index.js"
     },
     "./charts/echarts": {
-      "types": "./src/index.d.ts",
+      "types": "./src/charts/echarts-adapter.d.ts",
       "default": "./src/charts/echarts-adapter.js"
     }
   },
