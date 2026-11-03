@@ -8,6 +8,8 @@
       "types": "./src/index.d.ts",
       "default": "./src/index.js"
     },
+    "./views": "./src/views.js",
+    "./overlay": "./src/overlay.js",
     "./model": {
       "types": "./src/model.d.ts",
       "default": "./src/model.js"

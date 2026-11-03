@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Links UI designer</title>
+    <!--
+      No bundler: the workspace packages load as ES modules from their src/
+      folders. Serve the repository with `node scripts/serve-static.mjs` and
+      open http://127.0.0.1:4173/packages/ui-designer/examples/index.html
+    -->
+    <script type="importmap">
+      {
+        "imports": {
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "@link-foundation/ui-store": "/packages/ui-store/src/index.js",
+          "@link-foundation/ui-style": "/packages/ui-style/src/index.js",
+          "@link-foundation/ui-tokens": "/packages/ui-tokens/src/index.js",
+          "@link-foundation/ui-dom": "/packages/ui-dom/src/index.js",
+          "@link-foundation/ui-components/layout": "/packages/ui-components/src/layout/index.js",
+          "@link-foundation/ui-core/source": "/packages/ui-core/src/source.js",
+          "@link-foundation/ui-config": "/packages/ui-config/src/index.js",
+          "@link-foundation/ui-devmode": "/packages/ui-devmode/src/index.js",
+          "@link-foundation/ui-devmode/model": "/packages/ui-devmode/src/model.js",
+          "@link-foundation/ui-devmode/views": "/packages/ui-devmode/src/views.js",
+          "@link-foundation/ui-devmode/overlay": "/packages/ui-devmode/src/overlay.js",
+          "@link-foundation/ui-components/controls": "/packages/ui-components/src/controls/index.js",
+          "@floating-ui/core": "/node_modules/@floating-ui/core/dist/floating-ui.core.browser.mjs",
+          "@floating-ui/dom": "/node_modules/@floating-ui/dom/dist/floating-ui.dom.browser.mjs",
+          "links-notation": "/node_modules/links-notation/dist/index.js"
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="../../ui-components/src/layout/layout.css" />
+    <link rel="stylesheet" href="../../ui-components/src/controls/styles.css" />
+    <link rel="stylesheet" href="../src/designer.css" />
+    <style>
+      body {
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <main id="app" aria-label="Links UI designer"></main>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

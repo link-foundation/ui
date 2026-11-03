@@ -1,0 +1,42 @@
+{
+  "name": "@link-foundation/ui-designer",
+  "version": "0.0.0",
+  "description": "LiNo WYSIWYG designer with docked panels, transactional editing and source-preserving two-way sync",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js",
+    "./commands": "./src/commands.js",
+    "./selection": "./src/selection.js",
+    "./snap": "./src/snap.js",
+    "./sync": "./src/sync.js",
+    "./designer.css": "./src/designer.css"
+  },
+  "files": [
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "license": "Unlicense",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/link-foundation/ui.git",
+    "directory": "packages/ui-designer"
+  },
+  "dependencies": {
+    "@link-foundation/ui-components": "^0.0.0",
+    "@link-foundation/ui-config": "^0.0.0",
+    "@link-foundation/ui-core": "^0.0.0",
+    "@link-foundation/ui-devmode": "^0.0.0",
+    "@link-foundation/ui-dom": "^0.0.0",
+    "@link-foundation/ui-store": "^0.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "jsdom": "^30.1.3"
+  }
+}
