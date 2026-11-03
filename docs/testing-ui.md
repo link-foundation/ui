@@ -78,7 +78,9 @@ fail when more than 0.1 % of the pixels differ by more than the per-pixel
 3. Generate the baselines in the container (below) and commit them. They are
    stored next to the test:
    `packages/<name>/e2e/__screenshots__/<project>/<file>/<name>-<locale>-<theme>.png`
-   (for this folder: `tests/ui/__screenshots__/…`).
+   (for this folder: `tests/ui/__screenshots__/…`; for a `.spec.js` file in
+   `packages/<name>/tests/e2e/`:
+   `packages/<name>/tests/e2e/__screenshots__/<project>/<file>/<name>.png`).
 
 ## Updating baselines
 

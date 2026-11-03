@@ -248,6 +248,12 @@ function renderFloat(dock, f) {
   panel.removeAttribute('tabindex');
 }
 
+/**
+ * The center column keeps a usable width (`--ui-dock-center-min-width`);
+ * when the regions do not fit, the dock scrolls (they never overlap).
+ */
+const CENTER_COLUMN = 'minmax(var(--ui-dock-center-min-width, 12rem), 1fr)';
+
 /** The size track of a side of the dock. */
 function track(layout, side, shown) {
   const region = layout.regions.find((r) => r.side === side && shown.has(r.id));
@@ -287,7 +293,7 @@ export function renderDock(dock) {
   dock.restore.hidden = !layout.closed.some((c) => panelNode(dock, c.panel));
   node.style.setProperty(
     'grid-template-columns',
-    `${track(layout, 'left', shown)} minmax(0, 1fr) ${track(layout, 'right', shown)}`
+    `${track(layout, 'left', shown)} ${CENTER_COLUMN} ${track(layout, 'right', shown)}`
   );
   node.style.setProperty(
     'grid-template-rows',

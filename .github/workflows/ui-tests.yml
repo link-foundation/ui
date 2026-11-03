@@ -85,6 +85,8 @@ jobs:
           name: ui-screenshots-${{ github.run_id }}
           path: |
             tests/ui/__screenshots__/**
+            tests/e2e/__screenshots__/**
             packages/*/e2e/__screenshots__/**
+            packages/*/tests/e2e/__screenshots__/**
           retention-days: 7
           if-no-files-found: error

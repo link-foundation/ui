@@ -13,6 +13,7 @@
   --ui-window-header-height: 2.25rem;
   --ui-rail-width: 5rem;
   --ui-drawer-width: 16rem;
+  --ui-dock-center-min-width: 12rem;
   --ui-focus-ring: 3px solid var(--color-primary, Highlight);
   --ui-layout-transition: var(--motion-duration-short, 150ms) ease;
 }
@@ -282,6 +283,7 @@
     'bottom bottom bottom';
   min-width: 0;
   min-height: 0;
+  overflow: auto;
   gap: 1px;
   background: var(--color-outline, GrayText);
 }
@@ -313,10 +315,15 @@
   display: contents;
 }
 
-/* app-shell: the navigation is a bottom bar, a rail or a drawer */
+/*
+ * app-shell: the navigation is a bottom bar, a rail or a drawer. The shell
+ * owns the axis of the navigation, so it wins over the inline direction of
+ * a navigation stack. The shell fills the viewport and its content
+ * scrolls, so the navigation stays in view.
+ */
 :where(ui-app-shell) {
   display: grid;
-  min-height: 100dvh;
+  height: 100dvh;
 }
 
 :where(ui-app-shell) > [data-slot='content'] {
@@ -339,10 +346,9 @@
 }
 
 :where(ui-app-shell[mode='bottom-bar']) > [role='navigation'] {
-  position: sticky;
-  bottom: 0;
-  flex-direction: row;
+  flex-direction: row !important;
   justify-content: space-around;
+  padding: var(--space-small, 0.5rem);
   border-top: 1px solid var(--color-outline, GrayText);
 }
 
@@ -354,8 +360,9 @@
 }
 
 :where(ui-app-shell[mode='rail']) > [role='navigation'] {
-  flex-direction: column;
+  flex-direction: column !important;
   align-items: center;
+  padding: var(--space-medium, 0.75rem) var(--space-small, 0.25rem);
   border-inline-end: 1px solid var(--color-outline, GrayText);
 }
 
@@ -367,7 +374,7 @@
 }
 
 :where(ui-app-shell[mode='drawer']) > [role='navigation'] {
-  flex-direction: column;
+  flex-direction: column !important;
   align-items: stretch;
   padding: var(--space-medium, 0.75rem);
   border-inline-end: 1px solid var(--color-outline, GrayText);

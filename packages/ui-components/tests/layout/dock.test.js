@@ -65,7 +65,9 @@ describe('dock kind', () => {
     const left = regionOf(dock, 'left');
     expect(left.getAttribute('role')).toBe('group');
     expect(left.getAttribute('aria-label')).toBe('Left panels');
-    expect(dock.style.gridTemplateColumns).toBe('14rem minmax(0, 1fr) 16rem');
+    expect(dock.style.gridTemplateColumns).toBe(
+      '14rem minmax(var(--ui-dock-center-min-width, 12rem), 1fr) 16rem'
+    );
     expect(page.node('toolbox').hidden).toBe(false);
     expect(page.node('outline').hidden).toBe(true);
     expect(dock.querySelector('.ui-dock-restore').hidden).toBe(true);
@@ -120,7 +122,9 @@ describe('dock kind', () => {
     const dock = page.node('designer');
     act(page, 'right', 'properties', 'Float');
     expect(regionOf(dock, 'right').hidden).toBe(true);
-    expect(dock.style.gridTemplateColumns).toBe('14rem minmax(0, 1fr) auto');
+    expect(dock.style.gridTemplateColumns).toBe(
+      '14rem minmax(var(--ui-dock-center-min-width, 12rem), 1fr) auto'
+    );
     const float = dock.querySelector('.ui-dock-float');
     expect(float.getAttribute('role')).toBe('dialog');
     expect(float.contains(page.node('properties'))).toBe(true);
@@ -193,7 +197,9 @@ describe('dock kind: closing, collapsing and keys', () => {
     act(page, 'left', 'toolbox', 'Collapse region');
     expect(regionOf(dock, 'left').hasAttribute('data-collapsed')).toBe(true);
     expect(page.node('toolbox').hidden).toBe(true);
-    expect(dock.style.gridTemplateColumns).toBe('auto minmax(0, 1fr) 16rem');
+    expect(dock.style.gridTemplateColumns).toBe(
+      'auto minmax(var(--ui-dock-center-min-width, 12rem), 1fr) 16rem'
+    );
     act(page, 'left', 'toolbox', 'Expand region');
     expect(page.node('toolbox').hidden).toBe(false);
     page.close();

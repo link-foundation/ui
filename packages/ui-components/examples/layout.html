@@ -45,8 +45,21 @@
         min-height: 8rem;
         border: 1px solid GrayText;
       }
-      [data-link-id='chat'] > ui-stack {
+      [data-link-id='chat'] > :not([role='separator']) {
         padding: 0.75rem;
+      }
+      ui-button > button {
+        padding: 0.5rem 1rem;
+        border: 1px solid ButtonBorder;
+        border-radius: 8px;
+        background: ButtonFace;
+        color: ButtonText;
+        font: inherit;
+        cursor: pointer;
+      }
+      [data-slot='rail'] ui-button > button {
+        padding-inline: 0.25rem;
+        font-size: 0.8125rem;
       }
     </style>
   </head>
