@@ -59,6 +59,34 @@ export const BROWSER_MODULES = [
   'internmap',
 ];
 
+/** ESM dependencies of the source editor example, plus its optional peer. */
+const EDITOR_BROWSER_MODULES = [
+  '@marijn/find-cluster-break',
+  '@codemirror/commands',
+  '@codemirror/language',
+  '@codemirror/state',
+  '@codemirror/streamparser',
+  '@codemirror/view',
+  'crelt',
+  'style-mod',
+  'w3c-keyname',
+  '@lezer/common',
+  '@lezer/highlight',
+  '@lezer/lr',
+  '@codemirror/lang-css',
+  '@codemirror/autocomplete',
+  '@lezer/css',
+  '@codemirror/lang-javascript',
+  '@codemirror/lint',
+  '@lezer/javascript',
+  '@codemirror/lang-json',
+  '@lezer/json',
+  '@codemirror/lang-markdown',
+  '@codemirror/lang-html',
+  '@lezer/html',
+  '@lezer/markdown',
+];
+
 /**
  * @param {string} root repository root
  * @returns {{prefix: string, dir: string}[]}
@@ -80,6 +108,11 @@ export function defaultMounts(root) {
     ['examples', 'themes'],
     ['node_modules', 'links-notation', 'dist'],
     ...BROWSER_MODULES.map((name) => ['node_modules', name]),
+    ...EDITOR_BROWSER_MODULES.map((name) => [
+      'node_modules',
+      ...name.split('/'),
+    ]),
+    ['node_modules', 'monaco-editor', 'min'],
     ['node_modules', 'echarts', 'dist'],
     ['node_modules', '@dagrejs', 'dagre', 'dist'],
     ...['dom', 'core', 'utils'].map((name) => [

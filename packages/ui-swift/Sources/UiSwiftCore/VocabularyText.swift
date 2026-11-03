@@ -537,4 +537,17 @@ drawer: kind
   property on action multi
   children any
 
+code-editor: kind
+  description 'A labelled multi-document source editor with persistent drafts.'
+  property label string
+  property document-id string
+  property title string
+  property value string
+  property language
+    enum lino javascript css json markdown
+  property engine
+    enum codemirror monaco
+  property on action multi
+  children none
+
 """#
