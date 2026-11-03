@@ -423,6 +423,71 @@ export function listAssetFiles(root) {
   return result.sort();
 }
 
+/**
+ * Quote a value for Links Notation output: plain words stay bare, anything
+ * else is single-quoted (double-quoted when it contains `'`).
+ *
+ * @param {string} value
+ * @returns {string}
+ */
+export function linoValue(value) {
+  const text = String(value);
+  if (/^[A-Za-z0-9._/-]+$/.test(text)) {
+    return text;
+  }
+  if (!text.includes("'")) {
+    return `'${text}'`;
+  }
+  if (!text.includes('"')) {
+    return `"${text}"`;
+  }
+  throw new Error(
+    `linoValue: cannot quote a value with both quote marks: ${text}`
+  );
+}
+
+/** Record fields in the order of assets/assets.lino. */
+const RECORD_FIELDS = [
+  ['kind', 'kind'],
+  ['files', 'files'],
+  ['license', 'license'],
+  ['copyright', 'copyright'],
+  ['source', 'source'],
+  ['notice', 'notice'],
+  ['attribution', 'attribution'],
+  ['attribution-text', 'attributionText'],
+  ['commercial-use', 'commercialUse'],
+  ['modified', 'modified'],
+];
+
+/**
+ * Write an asset record in the multi-line form of assets/assets.lino, so
+ * parseAssetRecords() reads it back. `(attribution none)` and an empty
+ * `files` list are left out.
+ *
+ * @param {Partial<AssetRecord> & {id: string}} record
+ * @returns {string}
+ */
+export function formatAssetRecord(record) {
+  const lines = [`(${record.id}: asset`];
+  for (const [field, key] of RECORD_FIELDS) {
+    const value = record[key];
+    if (
+      value === undefined ||
+      (key === 'attribution' && value === 'none') ||
+      (Array.isArray(value) && value.length === 0)
+    ) {
+      continue;
+    }
+    const values = Array.isArray(value) ? value : [value];
+    lines.push(`  (${field} ${values.map(linoValue).join(' ')})`);
+  }
+  if (record.optIn) {
+    lines.push('  (opt-in true)');
+  }
+  return `${lines.join('\n')})`;
+}
+
 const tomlString = (value) => JSON.stringify(value);
 
 /**
