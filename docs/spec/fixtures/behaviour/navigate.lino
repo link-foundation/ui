@@ -1,2 +1,6 @@
-(home-link: button 'Home' (on press (navigate home)))
-(docs-link: button 'Docs' (on press (navigate 'https://example.com/docs')))
+home-link: button 'Home'
+  on press
+    navigate home
+docs-link: button 'Docs'
+  on press
+    navigate 'https://example.com/docs'

@@ -1,2 +1,4 @@
-(home: document (title 'Home'))
-(about: document (title 'About'))
+home: document
+  title 'Home'
+about: document
+  title 'About'

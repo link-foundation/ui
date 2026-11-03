@@ -1,2 +1,10 @@
-(pop: animation (duration 150ms) (delay 0.2s) (track scale (key 0 1) (key 0.5 1.5e0) (key 1 -1)))
-(dim: style (opacity 0.5) (elevation 2))
+pop: animation
+  duration 150ms
+  delay 0.2s
+  track scale
+    key 0 1
+    key 0.5 1.5e0
+    key 1 -1
+dim: style
+  opacity 0.5
+  elevation 2

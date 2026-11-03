@@ -1,2 +1,3 @@
-(greeting: text 'Hello, links')
-(ok: button 'OK' (variant outlined))
+greeting: text 'Hello, links'
+ok: button 'OK'
+  variant outlined
