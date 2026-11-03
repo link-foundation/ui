@@ -17,7 +17,7 @@ export function checkedTokens(theme, modes, options = {}) {
     options.onDiagnostic?.(d);
   };
   tokens.diagnostics.forEach(report);
-  for (const [on, fill] of theme.pairs) {
+  for (const [on, fill, min = options.minContrast ?? 4.5] of theme.pairs) {
     const fg = tokens.get(on),
       bg = tokens.get(fill);
     if (!colorPair(fg, bg)) {
@@ -31,11 +31,7 @@ export function checkedTokens(theme, modes, options = {}) {
       );
       continue;
     }
-    const result = ensureContrast(
-      fg.value,
-      bg.value,
-      options.minContrast ?? 4.5
-    );
+    const result = ensureContrast(fg.value, bg.value, min);
     if (result.adjusted) {
       const value = values.parseColor(result.color);
       tokens.set(fill, { ...bg, raw: value, value });
@@ -70,14 +66,14 @@ export function checkedTokens(theme, modes, options = {}) {
   }
   // A later correction can affect an earlier pair through an alias. Check
   // the final output too, including conflicting pairs that cannot be met.
-  for (const [on, fill] of theme.pairs) {
+  for (const [on, fill, min = options.minContrast ?? 4.5] of theme.pairs) {
     const fg = tokens.get(on),
       bg = tokens.get(fill);
     if (!colorPair(fg, bg)) {
       continue;
     }
     const ratio = contrastRatio(fg.value, bg.value);
-    if (ratio < (options.minContrast ?? 4.5)) {
+    if (ratio < min) {
       report(
         themeDiagnostic(
           'contrast-unreachable',
@@ -167,8 +163,10 @@ export function compileThemeCss(theme, options = {}) {
     ['color.on-surface', 'CanvasText'],
     ['color.on-surface-variant', 'CanvasText'],
     ['color.primary', 'Highlight'],
+    ['color.outline', 'CanvasText'],
     ['color.on-primary', 'HighlightText'],
     ['color.button-text', 'ButtonText'],
+    ...(theme.forcedColors ?? []),
   ]);
   css.push(
     `@media (forced-colors: active) {\n${root} {\n${[...forced].map(([path, value]) => `  ${cssVariable(path, options.prefix)}: ${value};`).join('\n')}\n}\n}`

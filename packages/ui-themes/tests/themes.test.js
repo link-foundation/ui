@@ -6,6 +6,7 @@ it('loads every shipped theme as data with a dark mode', async () => {
   assert.deepEqual(listThemes(), [
     'base',
     'material3',
+    'fluent2',
     'hig',
     'hig-ios',
     'hig-macos',

@@ -1,0 +1,1124 @@
+fluent2-colors-dark: theme
+  mode dark
+    token color.on-surface '#ffffff'
+      fluent colorNeutralForeground1
+      source-value '#ffffff'
+    token fluent.color-neutral-foreground1-hover '#ffffff'
+      fluent colorNeutralForeground1Hover
+      source-value '#ffffff'
+    token fluent.color-neutral-foreground1-pressed '#ffffff'
+      fluent colorNeutralForeground1Pressed
+      source-value '#ffffff'
+    token fluent.color-neutral-foreground1-selected '#ffffff'
+      fluent colorNeutralForeground1Selected
+      source-value '#ffffff'
+    token color.on-surface-variant '#d6d6d6'
+      fluent colorNeutralForeground2
+      source-value '#d6d6d6'
+    token fluent.color-neutral-foreground2-hover '#ffffff'
+      fluent colorNeutralForeground2Hover
+      source-value '#ffffff'
+    token fluent.color-neutral-foreground2-pressed '#ffffff'
+      fluent colorNeutralForeground2Pressed
+      source-value '#ffffff'
+    token fluent.color-neutral-foreground2-selected '#ffffff'
+      fluent colorNeutralForeground2Selected
+      source-value '#ffffff'
+    token fluent.color-neutral-foreground2-brand-hover '#479ef5'
+      fluent colorNeutralForeground2BrandHover
+      source-value '#479ef5'
+    token fluent.color-neutral-foreground2-brand-pressed '#2886de'
+      fluent colorNeutralForeground2BrandPressed
+      source-value '#2886de'
+    token fluent.color-neutral-foreground2-brand-selected '#479ef5'
+      fluent colorNeutralForeground2BrandSelected
+      source-value '#479ef5'
+    token fluent.color-neutral-foreground3 '#adadad'
+      fluent colorNeutralForeground3
+      source-value '#adadad'
+    token fluent.color-neutral-foreground3-hover '#d6d6d6'
+      fluent colorNeutralForeground3Hover
+      source-value '#d6d6d6'
+    token fluent.color-neutral-foreground3-pressed '#d6d6d6'
+      fluent colorNeutralForeground3Pressed
+      source-value '#d6d6d6'
+    token fluent.color-neutral-foreground3-selected '#d6d6d6'
+      fluent colorNeutralForeground3Selected
+      source-value '#d6d6d6'
+    token fluent.color-neutral-foreground3-brand-hover '#479ef5'
+      fluent colorNeutralForeground3BrandHover
+      source-value '#479ef5'
+    token fluent.color-neutral-foreground3-brand-pressed '#2886de'
+      fluent colorNeutralForeground3BrandPressed
+      source-value '#2886de'
+    token fluent.color-neutral-foreground3-brand-selected '#479ef5'
+      fluent colorNeutralForeground3BrandSelected
+      source-value '#479ef5'
+    token fluent.color-neutral-foreground4 '#999999'
+      fluent colorNeutralForeground4
+      source-value '#999999'
+    token fluent.color-neutral-foreground5 '#adadad'
+      fluent colorNeutralForeground5
+      source-value '#adadad'
+    token fluent.color-neutral-foreground5-hover '#ffffff'
+      fluent colorNeutralForeground5Hover
+      source-value '#ffffff'
+    token fluent.color-neutral-foreground5-pressed '#ffffff'
+      fluent colorNeutralForeground5Pressed
+      source-value '#ffffff'
+    token fluent.color-neutral-foreground5-selected '#ffffff'
+      fluent colorNeutralForeground5Selected
+      source-value '#ffffff'
+    token fluent.color-neutral-foreground-disabled '#5c5c5c'
+      fluent colorNeutralForegroundDisabled
+      source-value '#5c5c5c'
+    token fluent.color-neutral-foreground-inverted-disabled
+      rgb 255 255 255 0.4
+      fluent colorNeutralForegroundInvertedDisabled
+      source-value 'rgba(255, 255, 255, 0.4)'
+    token fluent.color-brand-foreground-link '#479ef5'
+      fluent colorBrandForegroundLink
+      source-value '#479ef5'
+    token fluent.color-brand-foreground-link-hover '#62abf5'
+      fluent colorBrandForegroundLinkHover
+      source-value '#62abf5'
+    token fluent.color-brand-foreground-link-pressed '#2886de'
+      fluent colorBrandForegroundLinkPressed
+      source-value '#2886de'
+    token fluent.color-brand-foreground-link-selected '#479ef5'
+      fluent colorBrandForegroundLinkSelected
+      source-value '#479ef5'
+    token fluent.color-neutral-foreground2-link '#d6d6d6'
+      fluent colorNeutralForeground2Link
+      source-value '#d6d6d6'
+    token fluent.color-neutral-foreground2-link-hover '#ffffff'
+      fluent colorNeutralForeground2LinkHover
+      source-value '#ffffff'
+    token fluent.color-neutral-foreground2-link-pressed '#ffffff'
+      fluent colorNeutralForeground2LinkPressed
+      source-value '#ffffff'
+    token fluent.color-neutral-foreground2-link-selected '#ffffff'
+      fluent colorNeutralForeground2LinkSelected
+      source-value '#ffffff'
+    token fluent.color-compound-brand-foreground1 '#479ef5'
+      fluent colorCompoundBrandForeground1
+      source-value '#479ef5'
+    token fluent.color-compound-brand-foreground1-hover '#62abf5'
+      fluent colorCompoundBrandForeground1Hover
+      source-value '#62abf5'
+    token fluent.color-compound-brand-foreground1-pressed '#2886de'
+      fluent colorCompoundBrandForeground1Pressed
+      source-value '#2886de'
+    token fluent.color-brand-foreground1 '#479ef5'
+      fluent colorBrandForeground1
+      source-value '#479ef5'
+    token fluent.color-brand-foreground2 '#62abf5'
+      fluent colorBrandForeground2
+      source-value '#62abf5'
+    token fluent.color-brand-foreground2-hover '#96c6fa'
+      fluent colorBrandForeground2Hover
+      source-value '#96c6fa'
+    token fluent.color-brand-foreground2-pressed '#ebf3fc'
+      fluent colorBrandForeground2Pressed
+      source-value '#ebf3fc'
+    token fluent.color-neutral-foreground1-static '#242424'
+      fluent colorNeutralForeground1Static
+      source-value '#242424'
+    token fluent.color-neutral-foreground-static-inverted '#ffffff'
+      fluent colorNeutralForegroundStaticInverted
+      source-value '#ffffff'
+    token fluent.color-neutral-foreground-inverted '#242424'
+      fluent colorNeutralForegroundInverted
+      source-value '#242424'
+    token fluent.color-neutral-foreground-inverted-hover '#242424'
+      fluent colorNeutralForegroundInvertedHover
+      source-value '#242424'
+    token fluent.color-neutral-foreground-inverted-pressed '#242424'
+      fluent colorNeutralForegroundInvertedPressed
+      source-value '#242424'
+    token fluent.color-neutral-foreground-inverted-selected '#242424'
+      fluent colorNeutralForegroundInvertedSelected
+      source-value '#242424'
+    token fluent.color-neutral-foreground-inverted2 '#242424'
+      fluent colorNeutralForegroundInverted2
+      source-value '#242424'
+    token color.on-primary '#ffffff'
+      fluent colorNeutralForegroundOnBrand
+      source-value '#ffffff'
+    token fluent.color-neutral-foreground-inverted-link '#ffffff'
+      fluent colorNeutralForegroundInvertedLink
+      source-value '#ffffff'
+    token fluent.color-neutral-foreground-inverted-link-hover '#ffffff'
+      fluent colorNeutralForegroundInvertedLinkHover
+      source-value '#ffffff'
+    token fluent.color-neutral-foreground-inverted-link-pressed '#ffffff'
+      fluent colorNeutralForegroundInvertedLinkPressed
+      source-value '#ffffff'
+    token fluent.color-neutral-foreground-inverted-link-selected '#ffffff'
+      fluent colorNeutralForegroundInvertedLinkSelected
+      source-value '#ffffff'
+    token fluent.color-brand-foreground-inverted '#0f6cbd'
+      fluent colorBrandForegroundInverted
+      source-value '#0f6cbd'
+    token fluent.color-brand-foreground-inverted-hover '#115ea3'
+      fluent colorBrandForegroundInvertedHover
+      source-value '#115ea3'
+    token fluent.color-brand-foreground-inverted-pressed '#0f548c'
+      fluent colorBrandForegroundInvertedPressed
+      source-value '#0f548c'
+    token fluent.color-brand-foreground-on-light '#0f6cbd'
+      fluent colorBrandForegroundOnLight
+      source-value '#0f6cbd'
+    token fluent.color-brand-foreground-on-light-hover '#115ea3'
+      fluent colorBrandForegroundOnLightHover
+      source-value '#115ea3'
+    token fluent.color-brand-foreground-on-light-pressed '#0e4775'
+      fluent colorBrandForegroundOnLightPressed
+      source-value '#0e4775'
+    token fluent.color-brand-foreground-on-light-selected '#0f548c'
+      fluent colorBrandForegroundOnLightSelected
+      source-value '#0f548c'
+    token color.surface '#292929'
+      fluent colorNeutralBackground1
+      source-value '#292929'
+    token fluent.color-neutral-background1-hover '#3d3d3d'
+      fluent colorNeutralBackground1Hover
+      source-value '#3d3d3d'
+    token fluent.color-neutral-background1-pressed '#1f1f1f'
+      fluent colorNeutralBackground1Pressed
+      source-value '#1f1f1f'
+    token fluent.color-neutral-background1-selected '#383838'
+      fluent colorNeutralBackground1Selected
+      source-value '#383838'
+    token fluent.color-neutral-background2 '#1f1f1f'
+      fluent colorNeutralBackground2
+      source-value '#1f1f1f'
+    token fluent.color-neutral-background2-hover '#333333'
+      fluent colorNeutralBackground2Hover
+      source-value '#333333'
+    token fluent.color-neutral-background2-pressed '#141414'
+      fluent colorNeutralBackground2Pressed
+      source-value '#141414'
+    token fluent.color-neutral-background2-selected '#2e2e2e'
+      fluent colorNeutralBackground2Selected
+      source-value '#2e2e2e'
+    token fluent.color-neutral-background3 '#141414'
+      fluent colorNeutralBackground3
+      source-value '#141414'
+    token fluent.color-neutral-background3-hover '#292929'
+      fluent colorNeutralBackground3Hover
+      source-value '#292929'
+    token fluent.color-neutral-background3-pressed '#0a0a0a'
+      fluent colorNeutralBackground3Pressed
+      source-value '#0a0a0a'
+    token fluent.color-neutral-background3-selected '#242424'
+      fluent colorNeutralBackground3Selected
+      source-value '#242424'
+    token fluent.color-neutral-background4 '#0a0a0a'
+      fluent colorNeutralBackground4
+      source-value '#0a0a0a'
+    token fluent.color-neutral-background4-hover '#1f1f1f'
+      fluent colorNeutralBackground4Hover
+      source-value '#1f1f1f'
+    token fluent.color-neutral-background4-pressed '#000000'
+      fluent colorNeutralBackground4Pressed
+      source-value '#000000'
+    token fluent.color-neutral-background4-selected '#1a1a1a'
+      fluent colorNeutralBackground4Selected
+      source-value '#1a1a1a'
+    token fluent.color-neutral-background5 '#000000'
+      fluent colorNeutralBackground5
+      source-value '#000000'
+    token fluent.color-neutral-background5-hover '#141414'
+      fluent colorNeutralBackground5Hover
+      source-value '#141414'
+    token fluent.color-neutral-background5-pressed '#050505'
+      fluent colorNeutralBackground5Pressed
+      source-value '#050505'
+    token fluent.color-neutral-background5-selected '#0f0f0f'
+      fluent colorNeutralBackground5Selected
+      source-value '#0f0f0f'
+    token fluent.color-neutral-background6 '#333333'
+      fluent colorNeutralBackground6
+      source-value '#333333'
+    token fluent.color-neutral-background7 '#00000000'
+      fluent colorNeutralBackground7
+      source-value '#00000000'
+    token fluent.color-neutral-background7-hover '#1a1a1a'
+      fluent colorNeutralBackground7Hover
+      source-value '#1a1a1a'
+    token fluent.color-neutral-background7-pressed '#0a0a0a'
+      fluent colorNeutralBackground7Pressed
+      source-value '#0a0a0a'
+    token fluent.color-neutral-background7-selected '#00000000'
+      fluent colorNeutralBackground7Selected
+      source-value '#00000000'
+    token fluent.color-neutral-background8 '#292929'
+      fluent colorNeutralBackground8
+      source-value '#292929'
+    token fluent.color-neutral-background-inverted '#ffffff'
+      fluent colorNeutralBackgroundInverted
+      source-value '#ffffff'
+    token fluent.color-neutral-background-inverted-hover '#f5f5f5'
+      fluent colorNeutralBackgroundInvertedHover
+      source-value '#f5f5f5'
+    token fluent.color-neutral-background-inverted-pressed '#e0e0e0'
+      fluent colorNeutralBackgroundInvertedPressed
+      source-value '#e0e0e0'
+    token fluent.color-neutral-background-inverted-selected '#ebebeb'
+      fluent colorNeutralBackgroundInvertedSelected
+      source-value '#ebebeb'
+    token fluent.color-neutral-background-static '#3d3d3d'
+      fluent colorNeutralBackgroundStatic
+      source-value '#3d3d3d'
+    token fluent.color-neutral-background-alpha
+      rgb 26 26 26 0.5
+      fluent colorNeutralBackgroundAlpha
+      source-value 'rgba(26, 26, 26, 0.5)'
+    token fluent.color-neutral-background-alpha2
+      rgb 31 31 31 0.7
+      fluent colorNeutralBackgroundAlpha2
+      source-value 'rgba(31, 31, 31, 0.7)'
+    token fluent.color-subtle-background '#00000000'
+      fluent colorSubtleBackground
+      source-value transparent
+    token fluent.color-subtle-background-hover '#383838'
+      fluent colorSubtleBackgroundHover
+      source-value '#383838'
+    token fluent.color-subtle-background-pressed '#2e2e2e'
+      fluent colorSubtleBackgroundPressed
+      source-value '#2e2e2e'
+    token fluent.color-subtle-background-selected '#333333'
+      fluent colorSubtleBackgroundSelected
+      source-value '#333333'
+    token fluent.color-subtle-background-light-alpha-hover
+      rgb 36 36 36 0.8
+      fluent colorSubtleBackgroundLightAlphaHover
+      source-value 'rgba(36, 36, 36, 0.8)'
+    token fluent.color-subtle-background-light-alpha-pressed
+      rgb 36 36 36 0.5
+      fluent colorSubtleBackgroundLightAlphaPressed
+      source-value 'rgba(36, 36, 36, 0.5)'
+    token fluent.color-subtle-background-light-alpha-selected '#00000000'
+      fluent colorSubtleBackgroundLightAlphaSelected
+      source-value transparent
+    token fluent.color-subtle-background-inverted '#00000000'
+      fluent colorSubtleBackgroundInverted
+      source-value transparent
+    token fluent.color-subtle-background-inverted-hover
+      rgb 0 0 0 0.1
+      fluent colorSubtleBackgroundInvertedHover
+      source-value 'rgba(0, 0, 0, 0.1)'
+    token fluent.color-subtle-background-inverted-pressed
+      rgb 0 0 0 0.3
+      fluent colorSubtleBackgroundInvertedPressed
+      source-value 'rgba(0, 0, 0, 0.3)'
+    token fluent.color-subtle-background-inverted-selected
+      rgb 0 0 0 0.2
+      fluent colorSubtleBackgroundInvertedSelected
+      source-value 'rgba(0, 0, 0, 0.2)'
+    token fluent.color-transparent-background '#00000000'
+      fluent colorTransparentBackground
+      source-value transparent
+    token fluent.color-transparent-background-hover '#00000000'
+      fluent colorTransparentBackgroundHover
+      source-value transparent
+    token fluent.color-transparent-background-pressed '#00000000'
+      fluent colorTransparentBackgroundPressed
+      source-value transparent
+    token fluent.color-transparent-background-selected '#00000000'
+      fluent colorTransparentBackgroundSelected
+      source-value transparent
+    token fluent.color-neutral-background-disabled '#141414'
+      fluent colorNeutralBackgroundDisabled
+      source-value '#141414'
+    token fluent.color-neutral-background-disabled2 '#292929'
+      fluent colorNeutralBackgroundDisabled2
+      source-value '#292929'
+    token fluent.color-neutral-background-inverted-disabled
+      rgb 255 255 255 0.1
+      fluent colorNeutralBackgroundInvertedDisabled
+      source-value 'rgba(255, 255, 255, 0.1)'
+    token fluent.color-neutral-stencil1 '#575757'
+      fluent colorNeutralStencil1
+      source-value '#575757'
+    token fluent.color-neutral-stencil2 '#333333'
+      fluent colorNeutralStencil2
+      source-value '#333333'
+    token fluent.color-neutral-stencil1-alpha
+      rgb 255 255 255 0.1
+      fluent colorNeutralStencil1Alpha
+      source-value 'rgba(255, 255, 255, 0.1)'
+    token fluent.color-neutral-stencil2-alpha
+      rgb 255 255 255 0.05
+      fluent colorNeutralStencil2Alpha
+      source-value 'rgba(255, 255, 255, 0.05)'
+    token fluent.color-background-overlay
+      rgb 0 0 0 0.5
+      fluent colorBackgroundOverlay
+      source-value 'rgba(0, 0, 0, 0.5)'
+    token fluent.color-scrollbar-overlay
+      rgb 255 255 255 0.6
+      fluent colorScrollbarOverlay
+      source-value 'rgba(255, 255, 255, 0.6)'
+    token color.primary '#115ea3'
+      fluent colorBrandBackground
+      source-value '#115ea3'
+    token fluent.color-brand-background-hover '#0f6cbd'
+      fluent colorBrandBackgroundHover
+      source-value '#0f6cbd'
+    token fluent.color-brand-background-pressed '#0c3b5e'
+      fluent colorBrandBackgroundPressed
+      source-value '#0c3b5e'
+    token fluent.color-brand-background-selected '#0f548c'
+      fluent colorBrandBackgroundSelected
+      source-value '#0f548c'
+    token fluent.color-compound-brand-background '#479ef5'
+      fluent colorCompoundBrandBackground
+      source-value '#479ef5'
+    token fluent.color-compound-brand-background-hover '#62abf5'
+      fluent colorCompoundBrandBackgroundHover
+      source-value '#62abf5'
+    token fluent.color-compound-brand-background-pressed '#2886de'
+      fluent colorCompoundBrandBackgroundPressed
+      source-value '#2886de'
+    token fluent.color-brand-background-static '#0f6cbd'
+      fluent colorBrandBackgroundStatic
+      source-value '#0f6cbd'
+    token fluent.color-brand-background2 '#082338'
+      fluent colorBrandBackground2
+      source-value '#082338'
+    token fluent.color-brand-background2-hover '#0c3b5e'
+      fluent colorBrandBackground2Hover
+      source-value '#0c3b5e'
+    token fluent.color-brand-background2-pressed '#061724'
+      fluent colorBrandBackground2Pressed
+      source-value '#061724'
+    token fluent.color-brand-background3-static '#0f548c'
+      fluent colorBrandBackground3Static
+      source-value '#0f548c'
+    token fluent.color-brand-background4-static '#0c3b5e'
+      fluent colorBrandBackground4Static
+      source-value '#0c3b5e'
+    token fluent.color-brand-background-inverted '#ffffff'
+      fluent colorBrandBackgroundInverted
+      source-value '#ffffff'
+    token fluent.color-brand-background-inverted-hover '#ebf3fc'
+      fluent colorBrandBackgroundInvertedHover
+      source-value '#ebf3fc'
+    token fluent.color-brand-background-inverted-pressed '#b4d6fa'
+      fluent colorBrandBackgroundInvertedPressed
+      source-value '#b4d6fa'
+    token fluent.color-brand-background-inverted-selected '#cfe4fa'
+      fluent colorBrandBackgroundInvertedSelected
+      source-value '#cfe4fa'
+    token fluent.color-neutral-card-background '#333333'
+      fluent colorNeutralCardBackground
+      source-value '#333333'
+    token fluent.color-neutral-card-background-hover '#3d3d3d'
+      fluent colorNeutralCardBackgroundHover
+      source-value '#3d3d3d'
+    token fluent.color-neutral-card-background-pressed '#2e2e2e'
+      fluent colorNeutralCardBackgroundPressed
+      source-value '#2e2e2e'
+    token fluent.color-neutral-card-background-selected '#383838'
+      fluent colorNeutralCardBackgroundSelected
+      source-value '#383838'
+    token fluent.color-neutral-card-background-disabled '#141414'
+      fluent colorNeutralCardBackgroundDisabled
+      source-value '#141414'
+    token color.outline '#adadad'
+      fluent colorNeutralStrokeAccessible
+      source-value '#adadad'
+    token fluent.color-neutral-stroke-accessible-hover '#bdbdbd'
+      fluent colorNeutralStrokeAccessibleHover
+      source-value '#bdbdbd'
+    token fluent.color-neutral-stroke-accessible-pressed '#b3b3b3'
+      fluent colorNeutralStrokeAccessiblePressed
+      source-value '#b3b3b3'
+    token fluent.color-neutral-stroke-accessible-selected '#479ef5'
+      fluent colorNeutralStrokeAccessibleSelected
+      source-value '#479ef5'
+    token fluent.color-neutral-stroke1 '#666666'
+      fluent colorNeutralStroke1
+      source-value '#666666'
+    token fluent.color-neutral-stroke1-hover '#757575'
+      fluent colorNeutralStroke1Hover
+      source-value '#757575'
+    token fluent.color-neutral-stroke1-pressed '#6b6b6b'
+      fluent colorNeutralStroke1Pressed
+      source-value '#6b6b6b'
+    token fluent.color-neutral-stroke1-selected '#707070'
+      fluent colorNeutralStroke1Selected
+      source-value '#707070'
+    token fluent.color-neutral-stroke2 '#525252'
+      fluent colorNeutralStroke2
+      source-value '#525252'
+    token fluent.color-neutral-stroke3 '#3d3d3d'
+      fluent colorNeutralStroke3
+      source-value '#3d3d3d'
+    token fluent.color-neutral-stroke4 '#3d3d3d'
+      fluent colorNeutralStroke4
+      source-value '#3d3d3d'
+    token fluent.color-neutral-stroke4-hover '#2e2e2e'
+      fluent colorNeutralStroke4Hover
+      source-value '#2e2e2e'
+    token fluent.color-neutral-stroke4-pressed '#242424'
+      fluent colorNeutralStroke4Pressed
+      source-value '#242424'
+    token fluent.color-neutral-stroke4-selected '#3d3d3d'
+      fluent colorNeutralStroke4Selected
+      source-value '#3d3d3d'
+    token fluent.color-neutral-stroke-subtle '#0a0a0a'
+      fluent colorNeutralStrokeSubtle
+      source-value '#0a0a0a'
+    token fluent.color-neutral-stroke-on-brand '#292929'
+      fluent colorNeutralStrokeOnBrand
+      source-value '#292929'
+    token fluent.color-neutral-stroke-on-brand2 '#ffffff'
+      fluent colorNeutralStrokeOnBrand2
+      source-value '#ffffff'
+    token fluent.color-neutral-stroke-on-brand2-hover '#ffffff'
+      fluent colorNeutralStrokeOnBrand2Hover
+      source-value '#ffffff'
+    token fluent.color-neutral-stroke-on-brand2-pressed '#ffffff'
+      fluent colorNeutralStrokeOnBrand2Pressed
+      source-value '#ffffff'
+    token fluent.color-neutral-stroke-on-brand2-selected '#ffffff'
+      fluent colorNeutralStrokeOnBrand2Selected
+      source-value '#ffffff'
+    token fluent.color-brand-stroke1 '#479ef5'
+      fluent colorBrandStroke1
+      source-value '#479ef5'
+    token fluent.color-brand-stroke2 '#0e4775'
+      fluent colorBrandStroke2
+      source-value '#0e4775'
+    token fluent.color-brand-stroke2-hover '#0e4775'
+      fluent colorBrandStroke2Hover
+      source-value '#0e4775'
+    token fluent.color-brand-stroke2-pressed '#0a2e4a'
+      fluent colorBrandStroke2Pressed
+      source-value '#0a2e4a'
+    token fluent.color-brand-stroke2-contrast '#0e4775'
+      fluent colorBrandStroke2Contrast
+      source-value '#0e4775'
+    token fluent.color-compound-brand-stroke '#479ef5'
+      fluent colorCompoundBrandStroke
+      source-value '#479ef5'
+    token fluent.color-compound-brand-stroke-hover '#62abf5'
+      fluent colorCompoundBrandStrokeHover
+      source-value '#62abf5'
+    token fluent.color-compound-brand-stroke-pressed '#2886de'
+      fluent colorCompoundBrandStrokePressed
+      source-value '#2886de'
+    token fluent.color-neutral-stroke-disabled '#424242'
+      fluent colorNeutralStrokeDisabled
+      source-value '#424242'
+    token fluent.color-neutral-stroke-disabled2 '#3d3d3d'
+      fluent colorNeutralStrokeDisabled2
+      source-value '#3d3d3d'
+    token fluent.color-neutral-stroke-inverted-disabled
+      rgb 255 255 255 0.4
+      fluent colorNeutralStrokeInvertedDisabled
+      source-value 'rgba(255, 255, 255, 0.4)'
+    token fluent.color-transparent-stroke '#00000000'
+      fluent colorTransparentStroke
+      source-value transparent
+    token fluent.color-transparent-stroke-interactive '#00000000'
+      fluent colorTransparentStrokeInteractive
+      source-value transparent
+    token fluent.color-transparent-stroke-disabled '#00000000'
+      fluent colorTransparentStrokeDisabled
+      source-value transparent
+    token fluent.color-neutral-stroke-alpha
+      rgb 255 255 255 0.1
+      fluent colorNeutralStrokeAlpha
+      source-value 'rgba(255, 255, 255, 0.1)'
+    token fluent.color-neutral-stroke-alpha2
+      rgb 255 255 255 0.2
+      fluent colorNeutralStrokeAlpha2
+      source-value 'rgba(255, 255, 255, 0.2)'
+    token fluent.color-stroke-focus1 '#000000'
+      fluent colorStrokeFocus1
+      source-value '#000000'
+    token fluent.color-stroke-focus2 '#ffffff'
+      fluent colorStrokeFocus2
+      source-value '#ffffff'
+    token fluent.color-neutral-shadow-ambient
+      rgb 0 0 0 0.24
+      fluent colorNeutralShadowAmbient
+      source-value 'rgba(0,0,0,0.24)'
+    token fluent.color-neutral-shadow-key
+      rgb 0 0 0 0.28
+      fluent colorNeutralShadowKey
+      source-value 'rgba(0,0,0,0.28)'
+    token fluent.color-neutral-shadow-ambient-lighter
+      rgb 0 0 0 0.12
+      fluent colorNeutralShadowAmbientLighter
+      source-value 'rgba(0,0,0,0.12)'
+    token fluent.color-neutral-shadow-key-lighter
+      rgb 0 0 0 0.14
+      fluent colorNeutralShadowKeyLighter
+      source-value 'rgba(0,0,0,0.14)'
+    token fluent.color-neutral-shadow-ambient-darker
+      rgb 0 0 0 0.40
+      fluent colorNeutralShadowAmbientDarker
+      source-value 'rgba(0,0,0,0.40)'
+    token fluent.color-neutral-shadow-key-darker
+      rgb 0 0 0 0.48
+      fluent colorNeutralShadowKeyDarker
+      source-value 'rgba(0,0,0,0.48)'
+    token fluent.color-brand-shadow-ambient
+      rgb 0 0 0 0.30
+      fluent colorBrandShadowAmbient
+      source-value 'rgba(0,0,0,0.30)'
+    token fluent.color-brand-shadow-key
+      rgb 0 0 0 0.25
+      fluent colorBrandShadowKey
+      source-value 'rgba(0,0,0,0.25)'
+    token fluent.color-palette-red-background1 '#3f1011'
+      fluent colorPaletteRedBackground1
+      source-value '#3f1011'
+    token fluent.color-palette-red-background2 '#751d1f'
+      fluent colorPaletteRedBackground2
+      source-value '#751d1f'
+    token fluent.color-palette-red-background3 '#d13438'
+      fluent colorPaletteRedBackground3
+      source-value '#d13438'
+    token fluent.color-palette-red-foreground1 '#e37d80'
+      fluent colorPaletteRedForeground1
+      source-value '#e37d80'
+    token fluent.color-palette-red-foreground2 '#f1bbbc'
+      fluent colorPaletteRedForeground2
+      source-value '#f1bbbc'
+    token fluent.color-palette-red-foreground3 '#e37d80'
+      fluent colorPaletteRedForeground3
+      source-value '#e37d80'
+    token fluent.color-palette-red-border-active '#e37d80'
+      fluent colorPaletteRedBorderActive
+      source-value '#e37d80'
+    token fluent.color-palette-red-border1 '#d13438'
+      fluent colorPaletteRedBorder1
+      source-value '#d13438'
+    token fluent.color-palette-red-border2 '#e37d80'
+      fluent colorPaletteRedBorder2
+      source-value '#e37d80'
+    token fluent.color-palette-green-background1 '#052505'
+      fluent colorPaletteGreenBackground1
+      source-value '#052505'
+    token fluent.color-palette-green-background2 '#094509'
+      fluent colorPaletteGreenBackground2
+      source-value '#094509'
+    token fluent.color-palette-green-background3 '#107c10'
+      fluent colorPaletteGreenBackground3
+      source-value '#107c10'
+    token fluent.color-palette-green-foreground1 '#54b054'
+      fluent colorPaletteGreenForeground1
+      source-value '#54b054'
+    token fluent.color-palette-green-foreground2 '#9fd89f'
+      fluent colorPaletteGreenForeground2
+      source-value '#9fd89f'
+    token fluent.color-palette-green-foreground3 '#9fd89f'
+      fluent colorPaletteGreenForeground3
+      source-value '#9fd89f'
+    token fluent.color-palette-green-border-active '#54b054'
+      fluent colorPaletteGreenBorderActive
+      source-value '#54b054'
+    token fluent.color-palette-green-border1 '#107c10'
+      fluent colorPaletteGreenBorder1
+      source-value '#107c10'
+    token fluent.color-palette-green-border2 '#9fd89f'
+      fluent colorPaletteGreenBorder2
+      source-value '#9fd89f'
+    token fluent.color-palette-dark-orange-background1 '#411200'
+      fluent colorPaletteDarkOrangeBackground1
+      source-value '#411200'
+    token fluent.color-palette-dark-orange-background2 '#7a2101'
+      fluent colorPaletteDarkOrangeBackground2
+      source-value '#7a2101'
+    token fluent.color-palette-dark-orange-background3 '#da3b01'
+      fluent colorPaletteDarkOrangeBackground3
+      source-value '#da3b01'
+    token fluent.color-palette-dark-orange-foreground1 '#e9835e'
+      fluent colorPaletteDarkOrangeForeground1
+      source-value '#e9835e'
+    token fluent.color-palette-dark-orange-foreground2 '#f4bfab'
+      fluent colorPaletteDarkOrangeForeground2
+      source-value '#f4bfab'
+    token fluent.color-palette-dark-orange-foreground3 '#e9835e'
+      fluent colorPaletteDarkOrangeForeground3
+      source-value '#e9835e'
+    token fluent.color-palette-dark-orange-border-active '#e9835e'
+      fluent colorPaletteDarkOrangeBorderActive
+      source-value '#e9835e'
+    token fluent.color-palette-dark-orange-border1 '#da3b01'
+      fluent colorPaletteDarkOrangeBorder1
+      source-value '#da3b01'
+    token fluent.color-palette-dark-orange-border2 '#e9835e'
+      fluent colorPaletteDarkOrangeBorder2
+      source-value '#e9835e'
+    token fluent.color-palette-yellow-background1 '#4c4400'
+      fluent colorPaletteYellowBackground1
+      source-value '#4c4400'
+    token fluent.color-palette-yellow-background2 '#817400'
+      fluent colorPaletteYellowBackground2
+      source-value '#817400'
+    token fluent.color-palette-yellow-background3 '#fde300'
+      fluent colorPaletteYellowBackground3
+      source-value '#fde300'
+    token fluent.color-palette-yellow-foreground1 '#feee66'
+      fluent colorPaletteYellowForeground1
+      source-value '#feee66'
+    token fluent.color-palette-yellow-foreground2 '#fef7b2'
+      fluent colorPaletteYellowForeground2
+      source-value '#fef7b2'
+    token fluent.color-palette-yellow-foreground3 '#fdea3d'
+      fluent colorPaletteYellowForeground3
+      source-value '#fdea3d'
+    token fluent.color-palette-yellow-border-active '#feee66'
+      fluent colorPaletteYellowBorderActive
+      source-value '#feee66'
+    token fluent.color-palette-yellow-border1 '#fde300'
+      fluent colorPaletteYellowBorder1
+      source-value '#fde300'
+    token fluent.color-palette-yellow-border2 '#fdea3d'
+      fluent colorPaletteYellowBorder2
+      source-value '#fdea3d'
+    token fluent.color-palette-berry-background1 '#3a1136'
+      fluent colorPaletteBerryBackground1
+      source-value '#3a1136'
+    token fluent.color-palette-berry-background2 '#6d2064'
+      fluent colorPaletteBerryBackground2
+      source-value '#6d2064'
+    token fluent.color-palette-berry-background3 '#c239b3'
+      fluent colorPaletteBerryBackground3
+      source-value '#c239b3'
+    token fluent.color-palette-berry-foreground1 '#da7ed0'
+      fluent colorPaletteBerryForeground1
+      source-value '#da7ed0'
+    token fluent.color-palette-berry-foreground2 '#edbbe7'
+      fluent colorPaletteBerryForeground2
+      source-value '#edbbe7'
+    token fluent.color-palette-berry-foreground3 '#d161c4'
+      fluent colorPaletteBerryForeground3
+      source-value '#d161c4'
+    token fluent.color-palette-berry-border-active '#da7ed0'
+      fluent colorPaletteBerryBorderActive
+      source-value '#da7ed0'
+    token fluent.color-palette-berry-border1 '#c239b3'
+      fluent colorPaletteBerryBorder1
+      source-value '#c239b3'
+    token fluent.color-palette-berry-border2 '#d161c4'
+      fluent colorPaletteBerryBorder2
+      source-value '#d161c4'
+    token fluent.color-palette-light-green-background1 '#063004'
+      fluent colorPaletteLightGreenBackground1
+      source-value '#063004'
+    token fluent.color-palette-light-green-background2 '#0b5a08'
+      fluent colorPaletteLightGreenBackground2
+      source-value '#0b5a08'
+    token fluent.color-palette-light-green-background3 '#13a10e'
+      fluent colorPaletteLightGreenBackground3
+      source-value '#13a10e'
+    token fluent.color-palette-light-green-foreground1 '#5ec75a'
+      fluent colorPaletteLightGreenForeground1
+      source-value '#5ec75a'
+    token fluent.color-palette-light-green-foreground2 '#a7e3a5'
+      fluent colorPaletteLightGreenForeground2
+      source-value '#a7e3a5'
+    token fluent.color-palette-light-green-foreground3 '#3db838'
+      fluent colorPaletteLightGreenForeground3
+      source-value '#3db838'
+    token fluent.color-palette-light-green-border-active '#5ec75a'
+      fluent colorPaletteLightGreenBorderActive
+      source-value '#5ec75a'
+    token fluent.color-palette-light-green-border1 '#13a10e'
+      fluent colorPaletteLightGreenBorder1
+      source-value '#13a10e'
+    token fluent.color-palette-light-green-border2 '#3db838'
+      fluent colorPaletteLightGreenBorder2
+      source-value '#3db838'
+    token fluent.color-palette-marigold-background1 '#463100'
+      fluent colorPaletteMarigoldBackground1
+      source-value '#463100'
+    token fluent.color-palette-marigold-background2 '#835b00'
+      fluent colorPaletteMarigoldBackground2
+      source-value '#835b00'
+    token fluent.color-palette-marigold-background3 '#eaa300'
+      fluent colorPaletteMarigoldBackground3
+      source-value '#eaa300'
+    token fluent.color-palette-marigold-foreground1 '#f2c661'
+      fluent colorPaletteMarigoldForeground1
+      source-value '#f2c661'
+    token fluent.color-palette-marigold-foreground2 '#f9e2ae'
+      fluent colorPaletteMarigoldForeground2
+      source-value '#f9e2ae'
+    token fluent.color-palette-marigold-foreground3 '#efb839'
+      fluent colorPaletteMarigoldForeground3
+      source-value '#efb839'
+    token fluent.color-palette-marigold-border-active '#f2c661'
+      fluent colorPaletteMarigoldBorderActive
+      source-value '#f2c661'
+    token fluent.color-palette-marigold-border1 '#eaa300'
+      fluent colorPaletteMarigoldBorder1
+      source-value '#eaa300'
+    token fluent.color-palette-marigold-border2 '#efb839'
+      fluent colorPaletteMarigoldBorder2
+      source-value '#efb839'
+    token fluent.color-palette-red-foreground-inverted '#d13438'
+      fluent colorPaletteRedForegroundInverted
+      source-value '#d13438'
+    token fluent.color-palette-green-foreground-inverted '#107c10'
+      fluent colorPaletteGreenForegroundInverted
+      source-value '#107c10'
+    token fluent.color-palette-yellow-foreground-inverted '#817400'
+      fluent colorPaletteYellowForegroundInverted
+      source-value '#817400'
+    token fluent.color-palette-dark-red-background2 '#590815'
+      fluent colorPaletteDarkRedBackground2
+      source-value '#590815'
+    token fluent.color-palette-dark-red-foreground2 '#d69ca5'
+      fluent colorPaletteDarkRedForeground2
+      source-value '#d69ca5'
+    token fluent.color-palette-dark-red-border-active '#ac4f5e'
+      fluent colorPaletteDarkRedBorderActive
+      source-value '#ac4f5e'
+    token fluent.color-palette-cranberry-background2 '#6e0811'
+      fluent colorPaletteCranberryBackground2
+      source-value '#6e0811'
+    token fluent.color-palette-cranberry-foreground2 '#eeacb2'
+      fluent colorPaletteCranberryForeground2
+      source-value '#eeacb2'
+    token fluent.color-palette-cranberry-border-active '#dc626d'
+      fluent colorPaletteCranberryBorderActive
+      source-value '#dc626d'
+    token fluent.color-palette-pumpkin-background2 '#712d09'
+      fluent colorPalettePumpkinBackground2
+      source-value '#712d09'
+    token fluent.color-palette-pumpkin-foreground2 '#efc4ad'
+      fluent colorPalettePumpkinForeground2
+      source-value '#efc4ad'
+    token fluent.color-palette-pumpkin-border-active '#df8e64'
+      fluent colorPalettePumpkinBorderActive
+      source-value '#df8e64'
+    token fluent.color-palette-peach-background2 '#8f4e00'
+      fluent colorPalettePeachBackground2
+      source-value '#8f4e00'
+    token fluent.color-palette-peach-foreground2 '#ffddb3'
+      fluent colorPalettePeachForeground2
+      source-value '#ffddb3'
+    token fluent.color-palette-peach-border-active '#ffba66'
+      fluent colorPalettePeachBorderActive
+      source-value '#ffba66'
+    token fluent.color-palette-gold-background2 '#6c5700'
+      fluent colorPaletteGoldBackground2
+      source-value '#6c5700'
+    token fluent.color-palette-gold-foreground2 '#ecdfa5'
+      fluent colorPaletteGoldForeground2
+      source-value '#ecdfa5'
+    token fluent.color-palette-gold-border-active '#dac157'
+      fluent colorPaletteGoldBorderActive
+      source-value '#dac157'
+    token fluent.color-palette-brass-background2 '#553e06'
+      fluent colorPaletteBrassBackground2
+      source-value '#553e06'
+    token fluent.color-palette-brass-foreground2 '#e0cea2'
+      fluent colorPaletteBrassForeground2
+      source-value '#e0cea2'
+    token fluent.color-palette-brass-border-active '#c1a256'
+      fluent colorPaletteBrassBorderActive
+      source-value '#c1a256'
+    token fluent.color-palette-brown-background2 '#50301a'
+      fluent colorPaletteBrownBackground2
+      source-value '#50301a'
+    token fluent.color-palette-brown-foreground2 '#ddc3b0'
+      fluent colorPaletteBrownForeground2
+      source-value '#ddc3b0'
+    token fluent.color-palette-brown-border-active '#bb8f6f'
+      fluent colorPaletteBrownBorderActive
+      source-value '#bb8f6f'
+    token fluent.color-palette-forest-background2 '#294903'
+      fluent colorPaletteForestBackground2
+      source-value '#294903'
+    token fluent.color-palette-forest-foreground2 '#bdd99b'
+      fluent colorPaletteForestForeground2
+      source-value '#bdd99b'
+    token fluent.color-palette-forest-border-active '#85b44c'
+      fluent colorPaletteForestBorderActive
+      source-value '#85b44c'
+    token fluent.color-palette-seafoam-background2 '#00723b'
+      fluent colorPaletteSeafoamBackground2
+      source-value '#00723b'
+    token fluent.color-palette-seafoam-foreground2 '#a8f0cd'
+      fluent colorPaletteSeafoamForeground2
+      source-value '#a8f0cd'
+    token fluent.color-palette-seafoam-border-active '#5ae0a0'
+      fluent colorPaletteSeafoamBorderActive
+      source-value '#5ae0a0'
+    token fluent.color-palette-dark-green-background2 '#063b06'
+      fluent colorPaletteDarkGreenBackground2
+      source-value '#063b06'
+    token fluent.color-palette-dark-green-foreground2 '#9ad29a'
+      fluent colorPaletteDarkGreenForeground2
+      source-value '#9ad29a'
+    token fluent.color-palette-dark-green-border-active '#4da64d'
+      fluent colorPaletteDarkGreenBorderActive
+      source-value '#4da64d'
+    token fluent.color-palette-light-teal-background2 '#00666d'
+      fluent colorPaletteLightTealBackground2
+      source-value '#00666d'
+    token fluent.color-palette-light-teal-foreground2 '#a6e9ed'
+      fluent colorPaletteLightTealForeground2
+      source-value '#a6e9ed'
+    token fluent.color-palette-light-teal-border-active '#58d3db'
+      fluent colorPaletteLightTealBorderActive
+      source-value '#58d3db'
+    token fluent.color-palette-teal-background2 '#02494c'
+      fluent colorPaletteTealBackground2
+      source-value '#02494c'
+    token fluent.color-palette-teal-foreground2 '#9bd9db'
+      fluent colorPaletteTealForeground2
+      source-value '#9bd9db'
+    token fluent.color-palette-teal-border-active '#4cb4b7'
+      fluent colorPaletteTealBorderActive
+      source-value '#4cb4b7'
+    token fluent.color-palette-steel-background2 '#00333f'
+      fluent colorPaletteSteelBackground2
+      source-value '#00333f'
+    token fluent.color-palette-steel-foreground2 '#94c8d4'
+      fluent colorPaletteSteelForeground2
+      source-value '#94c8d4'
+    token fluent.color-palette-steel-border-active '#4496a9'
+      fluent colorPaletteSteelBorderActive
+      source-value '#4496a9'
+    token fluent.color-palette-blue-background2 '#004377'
+      fluent colorPaletteBlueBackground2
+      source-value '#004377'
+    token fluent.color-palette-blue-foreground2 '#a9d3f2'
+      fluent colorPaletteBlueForeground2
+      source-value '#a9d3f2'
+    token fluent.color-palette-blue-border-active '#5caae5'
+      fluent colorPaletteBlueBorderActive
+      source-value '#5caae5'
+    token fluent.color-palette-royal-blue-background2 '#002c4e'
+      fluent colorPaletteRoyalBlueBackground2
+      source-value '#002c4e'
+    token fluent.color-palette-royal-blue-foreground2 '#9abfdc'
+      fluent colorPaletteRoyalBlueForeground2
+      source-value '#9abfdc'
+    token fluent.color-palette-royal-blue-border-active '#4a89ba'
+      fluent colorPaletteRoyalBlueBorderActive
+      source-value '#4a89ba'
+    token fluent.color-palette-cornflower-background2 '#2c3c85'
+      fluent colorPaletteCornflowerBackground2
+      source-value '#2c3c85'
+    token fluent.color-palette-cornflower-foreground2 '#c8d1fa'
+      fluent colorPaletteCornflowerForeground2
+      source-value '#c8d1fa'
+    token fluent.color-palette-cornflower-border-active '#93a4f4'
+      fluent colorPaletteCornflowerBorderActive
+      source-value '#93a4f4'
+    token fluent.color-palette-navy-background2 '#001665'
+      fluent colorPaletteNavyBackground2
+      source-value '#001665'
+    token fluent.color-palette-navy-foreground2 '#a3b2e8'
+      fluent colorPaletteNavyForeground2
+      source-value '#a3b2e8'
+    token fluent.color-palette-navy-border-active '#546fd2'
+      fluent colorPaletteNavyBorderActive
+      source-value '#546fd2'
+    token fluent.color-palette-lavender-background2 '#3f3682'
+      fluent colorPaletteLavenderBackground2
+      source-value '#3f3682'
+    token fluent.color-palette-lavender-foreground2 '#d2ccf8'
+      fluent colorPaletteLavenderForeground2
+      source-value '#d2ccf8'
+    token fluent.color-palette-lavender-border-active '#a79cf1'
+      fluent colorPaletteLavenderBorderActive
+      source-value '#a79cf1'
+    token fluent.color-palette-purple-background2 '#341a51'
+      fluent colorPalettePurpleBackground2
+      source-value '#341a51'
+    token fluent.color-palette-purple-foreground2 '#c6b1de'
+      fluent colorPalettePurpleForeground2
+      source-value '#c6b1de'
+    token fluent.color-palette-purple-border-active '#9470bd'
+      fluent colorPalettePurpleBorderActive
+      source-value '#9470bd'
+    token fluent.color-palette-grape-background2 '#4c0d55'
+      fluent colorPaletteGrapeBackground2
+      source-value '#4c0d55'
+    token fluent.color-palette-grape-foreground2 '#d9a7e0'
+      fluent colorPaletteGrapeForeground2
+      source-value '#d9a7e0'
+    token fluent.color-palette-grape-border-active '#b55fc1'
+      fluent colorPaletteGrapeBorderActive
+      source-value '#b55fc1'
+    token fluent.color-palette-lilac-background2 '#63276d'
+      fluent colorPaletteLilacBackground2
+      source-value '#63276d'
+    token fluent.color-palette-lilac-foreground2 '#e6bfed'
+      fluent colorPaletteLilacForeground2
+      source-value '#e6bfed'
+    token fluent.color-palette-lilac-border-active '#cf87da'
+      fluent colorPaletteLilacBorderActive
+      source-value '#cf87da'
+    token fluent.color-palette-pink-background2 '#80215d'
+      fluent colorPalettePinkBackground2
+      source-value '#80215d'
+    token fluent.color-palette-pink-foreground2 '#f7c0e3'
+      fluent colorPalettePinkForeground2
+      source-value '#f7c0e3'
+    token fluent.color-palette-pink-border-active '#ef85c8'
+      fluent colorPalettePinkBorderActive
+      source-value '#ef85c8'
+    token fluent.color-palette-magenta-background2 '#6b0043'
+      fluent colorPaletteMagentaBackground2
+      source-value '#6b0043'
+    token fluent.color-palette-magenta-foreground2 '#eca5d1'
+      fluent colorPaletteMagentaForeground2
+      source-value '#eca5d1'
+    token fluent.color-palette-magenta-border-active '#d957a8'
+      fluent colorPaletteMagentaBorderActive
+      source-value '#d957a8'
+    token fluent.color-palette-plum-background2 '#5a003b'
+      fluent colorPalettePlumBackground2
+      source-value '#5a003b'
+    token fluent.color-palette-plum-foreground2 '#d696c0'
+      fluent colorPalettePlumForeground2
+      source-value '#d696c0'
+    token fluent.color-palette-plum-border-active '#ad4589'
+      fluent colorPalettePlumBorderActive
+      source-value '#ad4589'
+    token fluent.color-palette-beige-background2 '#444241'
+      fluent colorPaletteBeigeBackground2
+      source-value '#444241'
+    token fluent.color-palette-beige-foreground2 '#d7d4d4'
+      fluent colorPaletteBeigeForeground2
+      source-value '#d7d4d4'
+    token fluent.color-palette-beige-border-active '#afabaa'
+      fluent colorPaletteBeigeBorderActive
+      source-value '#afabaa'
+    token fluent.color-palette-mink-background2 '#343231'
+      fluent colorPaletteMinkBackground2
+      source-value '#343231'
+    token fluent.color-palette-mink-foreground2 '#cecccb'
+      fluent colorPaletteMinkForeground2
+      source-value '#cecccb'
+    token fluent.color-palette-mink-border-active '#9e9b99'
+      fluent colorPaletteMinkBorderActive
+      source-value '#9e9b99'
+    token fluent.color-palette-platinum-background2 '#3b4447'
+      fluent colorPalettePlatinumBackground2
+      source-value '#3b4447'
+    token fluent.color-palette-platinum-foreground2 '#cdd6d8'
+      fluent colorPalettePlatinumForeground2
+      source-value '#cdd6d8'
+    token fluent.color-palette-platinum-border-active '#a0adb2'
+      fluent colorPalettePlatinumBorderActive
+      source-value '#a0adb2'
+    token fluent.color-palette-anchor-background2 '#202427'
+      fluent colorPaletteAnchorBackground2
+      source-value '#202427'
+    token fluent.color-palette-anchor-foreground2 '#bcc3c7'
+      fluent colorPaletteAnchorForeground2
+      source-value '#bcc3c7'
+    token fluent.color-palette-anchor-border-active '#808a90'
+      fluent colorPaletteAnchorBorderActive
+      source-value '#808a90'
+    token fluent.color-status-success-background1 '#052505'
+      fluent colorStatusSuccessBackground1
+      source-value '#052505'
+    token fluent.color-status-success-background2 '#094509'
+      fluent colorStatusSuccessBackground2
+      source-value '#094509'
+    token fluent.color-status-success-background3 '#107c10'
+      fluent colorStatusSuccessBackground3
+      source-value '#107c10'
+    token fluent.color-status-success-foreground1 '#54b054'
+      fluent colorStatusSuccessForeground1
+      source-value '#54b054'
+    token fluent.color-status-success-foreground2 '#9fd89f'
+      fluent colorStatusSuccessForeground2
+      source-value '#9fd89f'
+    token fluent.color-status-success-foreground3 '#9fd89f'
+      fluent colorStatusSuccessForeground3
+      source-value '#9fd89f'
+    token fluent.color-status-success-border-active '#54b054'
+      fluent colorStatusSuccessBorderActive
+      source-value '#54b054'
+    token fluent.color-status-success-foreground-inverted '#0e700e'
+      fluent colorStatusSuccessForegroundInverted
+      source-value '#0e700e'
+    token fluent.color-status-success-border1 '#107c10'
+      fluent colorStatusSuccessBorder1
+      source-value '#107c10'
+    token fluent.color-status-success-border2 '#9fd89f'
+      fluent colorStatusSuccessBorder2
+      source-value '#9fd89f'
+    token fluent.color-status-warning-background1 '#4a1e04'
+      fluent colorStatusWarningBackground1
+      source-value '#4a1e04'
+    token fluent.color-status-warning-background2 '#8a3707'
+      fluent colorStatusWarningBackground2
+      source-value '#8a3707'
+    token fluent.color-status-warning-background3 '#f7630c'
+      fluent colorStatusWarningBackground3
+      source-value '#f7630c'
+    token fluent.color-status-warning-foreground1 '#faa06b'
+      fluent colorStatusWarningForeground1
+      source-value '#faa06b'
+    token fluent.color-status-warning-foreground2 '#fdcfb4'
+      fluent colorStatusWarningForeground2
+      source-value '#fdcfb4'
+    token fluent.color-status-warning-foreground3 '#f98845'
+      fluent colorStatusWarningForeground3
+      source-value '#f98845'
+    token fluent.color-status-warning-border-active '#faa06b'
+      fluent colorStatusWarningBorderActive
+      source-value '#faa06b'
+    token fluent.color-status-warning-foreground-inverted '#bc4b09'
+      fluent colorStatusWarningForegroundInverted
+      source-value '#bc4b09'
+    token fluent.color-status-warning-border1 '#f7630c'
+      fluent colorStatusWarningBorder1
+      source-value '#f7630c'
+    token fluent.color-status-warning-border2 '#f98845'
+      fluent colorStatusWarningBorder2
+      source-value '#f98845'
+    token fluent.color-status-danger-background1 '#3b0509'
+      fluent colorStatusDangerBackground1
+      source-value '#3b0509'
+    token fluent.color-status-danger-background2 '#6e0811'
+      fluent colorStatusDangerBackground2
+      source-value '#6e0811'
+    token fluent.color-status-danger-background3 '#c50f1f'
+      fluent colorStatusDangerBackground3
+      source-value '#c50f1f'
+    token fluent.color-status-danger-foreground1 '#dc626d'
+      fluent colorStatusDangerForeground1
+      source-value '#dc626d'
+    token fluent.color-status-danger-foreground2 '#eeacb2'
+      fluent colorStatusDangerForeground2
+      source-value '#eeacb2'
+    token fluent.color-status-danger-foreground3 '#eeacb2'
+      fluent colorStatusDangerForeground3
+      source-value '#eeacb2'
+    token fluent.color-status-danger-border-active '#dc626d'
+      fluent colorStatusDangerBorderActive
+      source-value '#dc626d'
+    token fluent.color-status-danger-foreground-inverted '#b10e1c'
+      fluent colorStatusDangerForegroundInverted
+      source-value '#b10e1c'
+    token fluent.color-status-danger-border1 '#c50f1f'
+      fluent colorStatusDangerBorder1
+      source-value '#c50f1f'
+    token fluent.color-status-danger-border2 '#dc626d'
+      fluent colorStatusDangerBorder2
+      source-value '#dc626d'
+    token fluent.color-status-danger-background3-hover '#b10e1c'
+      fluent colorStatusDangerBackground3Hover
+      source-value '#b10e1c'
+    token fluent.color-status-danger-background3-pressed '#960b18'
+      fluent colorStatusDangerBackground3Pressed
+      source-value '#960b18'

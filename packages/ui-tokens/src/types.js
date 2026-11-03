@@ -26,6 +26,8 @@
  * @property {string} type  the declared type, or the type read from the
  *   value; `null` for an alias without `(type ...)`
  * @property {TokenValue} value  as written; an alias is a `token-ref`
+ * @property {string} [sourceValue] original exchange value
+ * @property {string} [fluent] original Fluent alias name
  * @property {string} [description]
  * @property {string} [m3] original Material 3 token name
  * @property {string} [mode]  the mode of a `(mode NAME ...)` token
@@ -46,6 +48,8 @@
  * @property {TokenValue} value  fully resolved: no alias left
  * @property {TokenValue} raw  as written, aliases kept
  * @property {string} [alias]  the path a whole-token alias points to
+ * @property {string} [sourceValue] original exchange value
+ * @property {string} [fluent] original Fluent alias name
  * @property {string} [description]
  * @property {string} [m3] original Material 3 token name
  * @property {string} set  the set that defines the token

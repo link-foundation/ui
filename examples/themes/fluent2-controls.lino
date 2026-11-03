@@ -1,0 +1,43 @@
+controls: stack
+  name: text-field
+    label Name
+    value Ada
+  agree: checkbox
+    label 'Keep my preferences'
+    checked true
+  choices: radio-group
+    label Notifications
+    value all
+    all: radio
+      label All
+      value all
+    mentions: radio
+      label Mentions
+      value mentions
+  sync: switch
+    label 'Sync settings'
+    checked true
+  volume: slider
+    label Volume
+    min 0
+    max 100
+    value 40
+  primary: button
+    label 'Save changes'
+    variant filled
+  secondary: button
+    label Secondary
+    variant secondary
+  outline: button
+    label Outline
+    variant outlined
+  subtle: button
+    label Subtle
+    variant text
+  transparent: button
+    label Transparent
+    variant transparent
+  disabled: button
+    label Unavailable
+    variant filled
+    disabled true

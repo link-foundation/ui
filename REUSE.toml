@@ -211,3 +211,9 @@ path = "assets/data/dtcg-resolver/*.json"
 precedence = "aggregate"
 SPDX-FileCopyrightText = "W3C and Design Tokens Community Group Contributors"
 SPDX-License-Identifier = "BSD-3-Clause"
+
+[[annotations]]
+path = "assets/fluent2/LICENSE.txt"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Microsoft Corporation"
+SPDX-License-Identifier = "MIT"

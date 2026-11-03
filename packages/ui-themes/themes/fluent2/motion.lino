@@ -1,0 +1,70 @@
+fluent2-motion: theme
+  token fluent.duration-ultra-fast 50ms
+    fluent durationUltraFast
+    source-value 50ms
+  token fluent.duration-faster 100ms
+    fluent durationFaster
+    source-value 100ms
+  token motion.duration.short 150ms
+    fluent durationFast
+    source-value 150ms
+  token fluent.duration-normal 200ms
+    fluent durationNormal
+    source-value 200ms
+  token fluent.duration-gentle 250ms
+    fluent durationGentle
+    source-value 250ms
+  token fluent.duration-slow 300ms
+    fluent durationSlow
+    source-value 300ms
+  token fluent.duration-slower 400ms
+    fluent durationSlower
+    source-value 400ms
+  token fluent.duration-ultra-slow 500ms
+    fluent durationUltraSlow
+    source-value 500ms
+  token fluent.curve-accelerate-max
+    cubic-bezier 0.9 0.1 1 0.2
+    fluent curveAccelerateMax
+    source-value 'cubic-bezier(0.9,0.1,1,0.2)'
+  token fluent.curve-accelerate-mid
+    cubic-bezier 1 0 1 1
+    fluent curveAccelerateMid
+    source-value 'cubic-bezier(1,0,1,1)'
+  token fluent.curve-accelerate-min
+    cubic-bezier 0.8 0 0.78 1
+    fluent curveAccelerateMin
+    source-value 'cubic-bezier(0.8,0,0.78,1)'
+  token fluent.curve-decelerate-max
+    cubic-bezier 0.1 0.9 0.2 1
+    fluent curveDecelerateMax
+    source-value 'cubic-bezier(0.1,0.9,0.2,1)'
+  token fluent.curve-decelerate-mid
+    cubic-bezier 0 0 0 1
+    fluent curveDecelerateMid
+    source-value 'cubic-bezier(0,0,0,1)'
+  token fluent.curve-decelerate-min
+    cubic-bezier 0.33 0 0.1 1
+    fluent curveDecelerateMin
+    source-value 'cubic-bezier(0.33,0,0.1,1)'
+  token fluent.curve-easy-ease-max
+    cubic-bezier 0.8 0 0.2 1
+    fluent curveEasyEaseMax
+    source-value 'cubic-bezier(0.8,0,0.2,1)'
+  token motion.easing.standard
+    cubic-bezier 0.33 0 0.67 1
+    fluent curveEasyEase
+    source-value 'cubic-bezier(0.33,0,0.67,1)'
+  token fluent.curve-linear
+    cubic-bezier 0 0 1 1
+    fluent curveLinear
+    source-value 'cubic-bezier(0,0,1,1)'
+  motion reduced
+    token fluent.duration-ultra-fast 0ms
+    token fluent.duration-faster 0ms
+    token motion.duration.short 0ms
+    token fluent.duration-normal 0ms
+    token fluent.duration-gentle 0ms
+    token fluent.duration-slow 0ms
+    token fluent.duration-slower 0ms
+    token fluent.duration-ultra-slow 0ms
