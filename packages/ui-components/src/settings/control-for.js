@@ -1,0 +1,28 @@
+/** The basic control used by each schema kind. Custom vector/list types are
+ * registered with ui-settings by the application, using defineFieldType. */
+const CONTROLS = Object.freeze({
+  toggle: 'switch',
+  choice: 'select',
+  range: 'slider',
+  number: 'number-field',
+  color: 'color-field',
+  text: 'text-field',
+  vector: 'vector',
+  vector3: 'vector',
+  list: 'chips',
+});
+
+/** @param {import('@link-foundation/ui-settings').SettingField} field */
+export function controlFor(field) {
+  const element = CONTROLS[field.type];
+  if (!element) {
+    throw new TypeError(`Unsupported settings control: ${field.type}`);
+  }
+  const props = { label: field.label ?? field.key };
+  for (const key of ['min', 'max', 'step', 'unit', 'options']) {
+    if (field[key] !== undefined) {
+      props[key] = field[key];
+    }
+  }
+  return { element, props };
+}

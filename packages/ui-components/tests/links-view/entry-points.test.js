@@ -24,6 +24,7 @@ const ENTRY_POINTS = [
   'controls',
   'data',
   'editor',
+  'settings',
 ];
 const SRC = new URL('../../src/', import.meta.url);
 

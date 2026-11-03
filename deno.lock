@@ -2725,6 +2725,7 @@
             "npm:@floating-ui/dom@1.8.0",
             "npm:@link-foundation/ui-core@^0.0.0",
             "npm:@link-foundation/ui-dom@^0.0.0",
+            "npm:@link-foundation/ui-settings@^0.0.0",
             "npm:@link-foundation/ui-style@^0.0.0",
             "npm:@link-foundation/ui-tokens@^0.0.0",
             "npm:@material-symbols/svg-400@~0.48.2",
