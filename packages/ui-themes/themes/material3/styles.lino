@@ -1,0 +1,215 @@
+material3-styles: theme
+  source 'https://m3.material.io/components/buttons/specs'
+  style
+    selector
+      data-part root
+      within
+        type button
+        variant filled
+    background
+      token color.primary
+    color
+      token color.on-primary
+    radius
+      token shape.corner.full
+    font-size
+      token type.label.large.size
+    font-weight
+      token type.label.large.weight
+  style
+    selector
+      data-part root
+      within
+        type button
+        variant tonal
+    background
+      token color.secondary-container
+    color
+      token color.on-secondary-container
+    radius
+      token shape.corner.full
+    font-size
+      token type.label.large.size
+    font-weight
+      token type.label.large.weight
+  style
+    selector
+      data-part root
+      within
+        type button
+        variant outlined
+    background
+      token color.surface
+    color
+      token color.primary
+    radius
+      token shape.corner.full
+    font-size
+      token type.label.large.size
+    font-weight
+      token type.label.large.weight
+    border-width 1px
+    border-color
+      token color.outline
+  style
+    selector
+      data-part root
+      within
+        type button
+        variant text
+    background
+      token color.surface
+    color
+      token color.primary
+    radius
+      token shape.corner.full
+    font-size
+      token type.label.large.size
+    font-weight
+      token type.label.large.weight
+  style
+    selector
+      data-part root
+      within
+        type button
+        variant elevated
+    background
+      token color.surface-container-low
+    color
+      token color.primary
+    radius
+      token shape.corner.full
+    font-size
+      token type.label.large.size
+    font-weight
+      token type.label.large.weight
+    elevation 1
+  style
+    selector
+      data-part root
+      within
+        type button
+    state hover
+      elevation 101
+    state focus
+      elevation 102
+    state pressed
+      elevation 102
+  style
+    selector
+      data-part input
+      within
+        type text-field
+    state hover
+      elevation 101
+    state focus
+      elevation 102
+    state pressed
+      elevation 102
+  style
+    selector
+      data-part input
+      within
+        type checkbox
+    state hover
+      elevation 101
+    state focus
+      elevation 102
+    state pressed
+      elevation 102
+  style
+    selector
+      data-part input
+      within
+        type radio
+    state hover
+      elevation 101
+    state focus
+      elevation 102
+    state pressed
+      elevation 102
+  style
+    selector
+      data-part input
+      within
+        type switch
+    state hover
+      elevation 101
+    state focus
+      elevation 102
+    state pressed
+      elevation 102
+  style
+    selector
+      data-part thumb
+      within
+        type slider
+    state hover
+      elevation 101
+    state focus
+      elevation 102
+    state pressed
+      elevation 102
+  token elevation.101
+    shadow
+      color '#00000014'
+      offset-x 0px
+      offset-y 0px
+      blur 0px
+      spread 1000px
+      inset true
+  token elevation.102
+    shadow
+      color '#0000001f'
+      offset-x 0px
+      offset-y 0px
+      blur 0px
+      spread 1000px
+      inset true
+  style
+    selector
+      data-part input
+      within
+        type text-field
+        variant filled
+    background
+      token color.surface-container-highest
+    color
+      token color.on-surface
+    radius
+      token shape.corner.extra-small
+    border-width 0px
+    state focus
+      border-width 2px
+      border-color
+        token color.primary
+  style
+    selector
+      data-part input
+      within
+        type text-field
+        variant outlined
+    background
+      token color.surface
+    color
+      token color.on-surface
+    radius
+      token shape.corner.extra-small
+    border-width 1px
+  mode dark
+    token elevation.101
+      shadow
+        color '#ffffff14'
+        offset-x 0px
+        offset-y 0px
+        blur 0px
+        spread 1000px
+        inset true
+    token elevation.102
+      shadow
+        color '#ffffff1f'
+        offset-x 0px
+        offset-y 0px
+        blur 0px
+        spread 1000px
+        inset true

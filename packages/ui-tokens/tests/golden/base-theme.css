@@ -850,8 +850,8 @@
   --color-button-text: ButtonText;
 }
 }
-@scope ([data-theme="base"]) to (:scope [data-theme]) {
-:where([data-theme="base"]) ui-button:hover, :where(:scope):where([data-theme="base"]):is(ui-button:hover) {
+@scope ([data-theme="base"]) to ([data-theme]) {
+:scope ui-button:hover, :where(:scope):scope:is(ui-button:hover) {
   opacity: 0.92;
 }
 

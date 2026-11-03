@@ -1,0 +1,314 @@
+material3-colors: theme
+  token color.primary '#65558f'
+    m3 md.sys.color.primary
+  token color.on-primary '#ffffff'
+    m3 md.sys.color.on-primary
+  token color.primary-container '#e9ddff'
+    m3 md.sys.color.primary-container
+  token color.on-primary-container '#4d3d75'
+    m3 md.sys.color.on-primary-container
+  token color.inverse-primary '#cfbdfe'
+    m3 md.sys.color.inverse-primary
+  token color.secondary '#625b71'
+    m3 md.sys.color.secondary
+  token color.on-secondary '#ffffff'
+    m3 md.sys.color.on-secondary
+  token color.secondary-container '#e8def8'
+    m3 md.sys.color.secondary-container
+  token color.on-secondary-container '#4a4458'
+    m3 md.sys.color.on-secondary-container
+  token color.tertiary '#7e5260'
+    m3 md.sys.color.tertiary
+  token color.on-tertiary '#ffffff'
+    m3 md.sys.color.on-tertiary
+  token color.tertiary-container '#ffd9e3'
+    m3 md.sys.color.tertiary-container
+  token color.on-tertiary-container '#633b48'
+    m3 md.sys.color.on-tertiary-container
+  token color.error '#ba1a1a'
+    m3 md.sys.color.error
+  token color.on-error '#ffffff'
+    m3 md.sys.color.on-error
+  token color.error-container '#ffdad6'
+    m3 md.sys.color.error-container
+  token color.on-error-container '#93000a'
+    m3 md.sys.color.on-error-container
+  token color.background '#fdf7ff'
+    m3 md.sys.color.background
+  token color.on-background '#1d1b20'
+    m3 md.sys.color.on-background
+  token color.surface '#fdf7ff'
+    m3 md.sys.color.surface
+  token color.on-surface '#1d1b20'
+    m3 md.sys.color.on-surface
+  token color.surface-variant '#e7e0eb'
+    m3 md.sys.color.surface-variant
+  token color.on-surface-variant '#49454e'
+    m3 md.sys.color.on-surface-variant
+  token color.surface-dim '#ded8e0'
+    m3 md.sys.color.surface-dim
+  token color.surface-bright '#fdf7ff'
+    m3 md.sys.color.surface-bright
+  token color.surface-container-lowest '#ffffff'
+    m3 md.sys.color.surface-container-lowest
+  token color.surface-container-low '#f8f2fa'
+    m3 md.sys.color.surface-container-low
+  token color.surface-container '#f2ecf4'
+    m3 md.sys.color.surface-container
+  token color.surface-container-high '#ece6ee'
+    m3 md.sys.color.surface-container-high
+  token color.surface-container-highest '#e6e0e9'
+    m3 md.sys.color.surface-container-highest
+  token color.inverse-surface '#322f35'
+    m3 md.sys.color.inverse-surface
+  token color.inverse-on-surface '#f5eff7'
+    m3 md.sys.color.inverse-on-surface
+  token color.outline '#7a757f'
+    m3 md.sys.color.outline
+  token color.outline-variant '#cac4cf'
+    m3 md.sys.color.outline-variant
+  token color.shadow '#000000'
+    m3 md.sys.color.shadow
+  token color.scrim '#000000'
+    m3 md.sys.color.scrim
+  token color.primary-fixed '#e9ddff'
+    m3 md.sys.color.primary-fixed
+  token color.primary-fixed-dim '#cfbdfe'
+    m3 md.sys.color.primary-fixed-dim
+  token color.on-primary-fixed '#201047'
+    m3 md.sys.color.on-primary-fixed
+  token color.on-primary-fixed-variant '#4d3d75'
+    m3 md.sys.color.on-primary-fixed-variant
+  token color.secondary-fixed '#e8def8'
+    m3 md.sys.color.secondary-fixed
+  token color.secondary-fixed-dim '#cbc2db'
+    m3 md.sys.color.secondary-fixed-dim
+  token color.on-secondary-fixed '#1e192b'
+    m3 md.sys.color.on-secondary-fixed
+  token color.on-secondary-fixed-variant '#4a4458'
+    m3 md.sys.color.on-secondary-fixed-variant
+  token color.tertiary-fixed '#ffd9e3'
+    m3 md.sys.color.tertiary-fixed
+  token color.tertiary-fixed-dim '#efb8c8'
+    m3 md.sys.color.tertiary-fixed-dim
+  token color.on-tertiary-fixed '#31101d'
+    m3 md.sys.color.on-tertiary-fixed
+  token color.on-tertiary-fixed-variant '#633b48'
+    m3 md.sys.color.on-tertiary-fixed-variant
+  pair color.on-primary color.primary
+  pair color.on-primary-container color.primary-container
+  pair color.on-secondary color.secondary
+  pair color.on-secondary-container color.secondary-container
+  pair color.on-tertiary color.tertiary
+  pair color.on-tertiary-container color.tertiary-container
+  pair color.on-error color.error
+  pair color.on-error-container color.error-container
+  pair color.on-background color.background
+  pair color.on-surface color.surface
+  pair color.on-surface-variant color.surface-variant
+  pair color.inverse-on-surface color.inverse-surface
+  pair color.on-surface color.surface-container-lowest
+  pair color.on-surface color.surface-container-low
+  pair color.on-surface color.surface-container
+  pair color.on-surface color.surface-container-high
+  pair color.on-surface color.surface-container-highest
+  pair color.on-primary-fixed color.primary-fixed
+  pair color.on-primary-fixed-variant color.primary-fixed-dim
+  pair color.on-secondary-fixed color.secondary-fixed
+  pair color.on-secondary-fixed-variant color.secondary-fixed-dim
+  pair color.on-tertiary-fixed color.tertiary-fixed
+  pair color.on-tertiary-fixed-variant color.tertiary-fixed-dim
+  mode dark
+    token color.primary '#cfbdfe'
+      m3 md.sys.color.primary
+    token color.on-primary '#36275d'
+      m3 md.sys.color.on-primary
+    token color.primary-container '#4d3d75'
+      m3 md.sys.color.primary-container
+    token color.on-primary-container '#e9ddff'
+      m3 md.sys.color.on-primary-container
+    token color.inverse-primary '#65558f'
+      m3 md.sys.color.inverse-primary
+    token color.secondary '#cbc2db'
+      m3 md.sys.color.secondary
+    token color.on-secondary '#332d41'
+      m3 md.sys.color.on-secondary
+    token color.secondary-container '#4a4458'
+      m3 md.sys.color.secondary-container
+    token color.on-secondary-container '#e8def8'
+      m3 md.sys.color.on-secondary-container
+    token color.tertiary '#efb8c8'
+      m3 md.sys.color.tertiary
+    token color.on-tertiary '#4a2532'
+      m3 md.sys.color.on-tertiary
+    token color.tertiary-container '#633b48'
+      m3 md.sys.color.tertiary-container
+    token color.on-tertiary-container '#ffd9e3'
+      m3 md.sys.color.on-tertiary-container
+    token color.error '#ffb4ab'
+      m3 md.sys.color.error
+    token color.on-error '#690005'
+      m3 md.sys.color.on-error
+    token color.error-container '#93000a'
+      m3 md.sys.color.error-container
+    token color.on-error-container '#ffdad6'
+      m3 md.sys.color.on-error-container
+    token color.background '#141218'
+      m3 md.sys.color.background
+    token color.on-background '#e6e0e9'
+      m3 md.sys.color.on-background
+    token color.surface '#141218'
+      m3 md.sys.color.surface
+    token color.on-surface '#e6e0e9'
+      m3 md.sys.color.on-surface
+    token color.surface-variant '#49454e'
+      m3 md.sys.color.surface-variant
+    token color.on-surface-variant '#cac4cf'
+      m3 md.sys.color.on-surface-variant
+    token color.surface-dim '#141218'
+      m3 md.sys.color.surface-dim
+    token color.surface-bright '#3b383e'
+      m3 md.sys.color.surface-bright
+    token color.surface-container-lowest '#0f0d13'
+      m3 md.sys.color.surface-container-lowest
+    token color.surface-container-low '#1d1b20'
+      m3 md.sys.color.surface-container-low
+    token color.surface-container '#211f24'
+      m3 md.sys.color.surface-container
+    token color.surface-container-high '#2b292f'
+      m3 md.sys.color.surface-container-high
+    token color.surface-container-highest '#36343a'
+      m3 md.sys.color.surface-container-highest
+    token color.inverse-surface '#e6e0e9'
+      m3 md.sys.color.inverse-surface
+    token color.inverse-on-surface '#322f35'
+      m3 md.sys.color.inverse-on-surface
+    token color.outline '#948f99'
+      m3 md.sys.color.outline
+    token color.outline-variant '#49454e'
+      m3 md.sys.color.outline-variant
+    token color.shadow '#000000'
+      m3 md.sys.color.shadow
+    token color.scrim '#000000'
+      m3 md.sys.color.scrim
+    token color.primary-fixed '#e9ddff'
+      m3 md.sys.color.primary-fixed
+    token color.primary-fixed-dim '#cfbdfe'
+      m3 md.sys.color.primary-fixed-dim
+    token color.on-primary-fixed '#201047'
+      m3 md.sys.color.on-primary-fixed
+    token color.on-primary-fixed-variant '#4d3d75'
+      m3 md.sys.color.on-primary-fixed-variant
+    token color.secondary-fixed '#e8def8'
+      m3 md.sys.color.secondary-fixed
+    token color.secondary-fixed-dim '#cbc2db'
+      m3 md.sys.color.secondary-fixed-dim
+    token color.on-secondary-fixed '#1e192b'
+      m3 md.sys.color.on-secondary-fixed
+    token color.on-secondary-fixed-variant '#4a4458'
+      m3 md.sys.color.on-secondary-fixed-variant
+    token color.tertiary-fixed '#ffd9e3'
+      m3 md.sys.color.tertiary-fixed
+    token color.tertiary-fixed-dim '#efb8c8'
+      m3 md.sys.color.tertiary-fixed-dim
+    token color.on-tertiary-fixed '#31101d'
+      m3 md.sys.color.on-tertiary-fixed
+    token color.on-tertiary-fixed-variant '#633b48'
+      m3 md.sys.color.on-tertiary-fixed-variant
+  mode high-contrast
+    token color.primary '#312259'
+      m3 md.sys.color.primary
+    token color.on-primary '#ffffff'
+      m3 md.sys.color.on-primary
+    token color.primary-container '#4f4078'
+      m3 md.sys.color.primary-container
+    token color.on-primary-container '#ffffff'
+      m3 md.sys.color.on-primary-container
+    token color.inverse-primary '#cfbdfe'
+      m3 md.sys.color.inverse-primary
+    token color.secondary '#2f293c'
+      m3 md.sys.color.secondary
+    token color.on-secondary '#ffffff'
+      m3 md.sys.color.on-secondary
+    token color.secondary-container '#4c465b'
+      m3 md.sys.color.secondary-container
+    token color.on-secondary-container '#ffffff'
+      m3 md.sys.color.on-secondary-container
+    token color.tertiary '#45212e'
+      m3 md.sys.color.tertiary
+    token color.on-tertiary '#ffffff'
+      m3 md.sys.color.on-tertiary
+    token color.tertiary-container '#663d4b'
+      m3 md.sys.color.tertiary-container
+    token color.on-tertiary-container '#ffffff'
+      m3 md.sys.color.on-tertiary-container
+    token color.error '#600004'
+      m3 md.sys.color.error
+    token color.on-error '#ffffff'
+      m3 md.sys.color.on-error
+    token color.error-container '#98000a'
+      m3 md.sys.color.error-container
+    token color.on-error-container '#ffffff'
+      m3 md.sys.color.on-error-container
+    token color.background '#fdf7ff'
+      m3 md.sys.color.background
+    token color.on-background '#1d1b20'
+      m3 md.sys.color.on-background
+    token color.surface '#fdf7ff'
+      m3 md.sys.color.surface
+    token color.on-surface '#000000'
+      m3 md.sys.color.on-surface
+    token color.surface-variant '#e7e0eb'
+      m3 md.sys.color.surface-variant
+    token color.on-surface-variant '#000000'
+      m3 md.sys.color.on-surface-variant
+    token color.surface-dim '#bcb7bf'
+      m3 md.sys.color.surface-dim
+    token color.surface-bright '#fdf7ff'
+      m3 md.sys.color.surface-bright
+    token color.surface-container-lowest '#ffffff'
+      m3 md.sys.color.surface-container-lowest
+    token color.surface-container-low '#f5eff7'
+      m3 md.sys.color.surface-container-low
+    token color.surface-container '#e6e0e9'
+      m3 md.sys.color.surface-container
+    token color.surface-container-high '#d8d2da'
+      m3 md.sys.color.surface-container-high
+    token color.surface-container-highest '#cac5cc'
+      m3 md.sys.color.surface-container-highest
+    token color.inverse-surface '#322f35'
+      m3 md.sys.color.inverse-surface
+    token color.inverse-on-surface '#ffffff'
+      m3 md.sys.color.inverse-on-surface
+    token color.outline '#2e2b33'
+      m3 md.sys.color.outline
+    token color.outline-variant '#4b4851'
+      m3 md.sys.color.outline-variant
+    token color.shadow '#000000'
+      m3 md.sys.color.shadow
+    token color.scrim '#000000'
+      m3 md.sys.color.scrim
+    token color.primary-fixed '#4f4078'
+      m3 md.sys.color.primary-fixed
+    token color.primary-fixed-dim '#382960'
+      m3 md.sys.color.primary-fixed-dim
+    token color.on-primary-fixed '#ffffff'
+      m3 md.sys.color.on-primary-fixed
+    token color.on-primary-fixed-variant '#ffffff'
+      m3 md.sys.color.on-primary-fixed-variant
+    token color.secondary-fixed '#4c465b'
+      m3 md.sys.color.secondary-fixed
+    token color.secondary-fixed-dim '#353043'
+      m3 md.sys.color.secondary-fixed-dim
+    token color.on-secondary-fixed '#ffffff'
+      m3 md.sys.color.on-secondary-fixed
+    token color.on-secondary-fixed-variant '#ffffff'
+      m3 md.sys.color.on-secondary-fixed-variant
+    token color.tertiary-fixed '#663d4b'
+      m3 md.sys.color.tertiary-fixed
+    token color.tertiary-fixed-dim '#4c2734'
+      m3 md.sys.color.tertiary-fixed-dim
+    token color.on-tertiary-fixed '#ffffff'
+      m3 md.sys.color.on-tertiary-fixed
+    token color.on-tertiary-fixed-variant '#ffffff'
+      m3 md.sys.color.on-tertiary-fixed-variant

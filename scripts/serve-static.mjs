@@ -107,6 +107,7 @@ export function defaultMounts(root) {
     ['examples', 'animation'],
     ['examples', 'themes'],
     ['node_modules', 'links-notation', 'dist'],
+    ['node_modules', '@material', 'material-color-utilities'],
     ...BROWSER_MODULES.map((name) => ['node_modules', name]),
     ...EDITOR_BROWSER_MODULES.map((name) => [
       'node_modules',
@@ -127,15 +128,21 @@ export function defaultMounts(root) {
     mounts.push({
       prefix: `/${parts.join('/')}/`,
       dir:
-        parts.join('/') === 'node_modules/d3-force'
+        parts.join('/') === 'node_modules/@material/material-color-utilities'
           ? path.dirname(
-              path.dirname(
-                createRequire(
-                  path.join(root, 'packages/ui-components/package.json')
-                ).resolve('d3-force')
-              )
+              createRequire(
+                path.join(root, 'packages/ui-themes/package.json')
+              ).resolve('@material/material-color-utilities')
             )
-          : path.join(root, ...parts),
+          : parts.join('/') === 'node_modules/d3-force'
+            ? path.dirname(
+                path.dirname(
+                  createRequire(
+                    path.join(root, 'packages/ui-components/package.json')
+                  ).resolve('d3-force')
+                )
+              )
+            : path.join(root, ...parts),
     });
   }
   const packagesDir = path.join(root, 'packages');

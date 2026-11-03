@@ -1,0 +1,336 @@
+material3-type: theme
+  source 'https://m3.material.io/styles/typography/type-scale-tokens'
+  token type.font-family
+    Roboto Arial sans-serif
+    m3 md.ref.typeface.plain
+    type fontFamily
+  token type.display.large.size 57px
+    m3 md.sys.typescale.display-large.size
+  token type.display.large.line-height 1.1228070175438596
+    m3 md.sys.typescale.display-large.line-height
+  token type.display.large.weight 400
+    m3 md.sys.typescale.display-large.weight
+    type fontWeight
+  token type.display.large.letter-spacing -0.25px
+    m3 md.sys.typescale.display-large.letter-spacing
+  token type.display.large
+    typography
+      font-family
+        token type.font-family
+      font-size
+        token type.display.large.size
+      line-height
+        token type.display.large.line-height
+      font-weight
+        token type.display.large.weight
+      letter-spacing
+        token type.display.large.letter-spacing
+    m3 md.sys.typescale.display-large
+  token type.display.medium.size 45px
+    m3 md.sys.typescale.display-medium.size
+  token type.display.medium.line-height 1.1555555555555554
+    m3 md.sys.typescale.display-medium.line-height
+  token type.display.medium.weight 400
+    m3 md.sys.typescale.display-medium.weight
+    type fontWeight
+  token type.display.medium.letter-spacing 0px
+    m3 md.sys.typescale.display-medium.letter-spacing
+  token type.display.medium
+    typography
+      font-family
+        token type.font-family
+      font-size
+        token type.display.medium.size
+      line-height
+        token type.display.medium.line-height
+      font-weight
+        token type.display.medium.weight
+      letter-spacing
+        token type.display.medium.letter-spacing
+    m3 md.sys.typescale.display-medium
+  token type.display.small.size 36px
+    m3 md.sys.typescale.display-small.size
+  token type.display.small.line-height 1.2222222222222223
+    m3 md.sys.typescale.display-small.line-height
+  token type.display.small.weight 400
+    m3 md.sys.typescale.display-small.weight
+    type fontWeight
+  token type.display.small.letter-spacing 0px
+    m3 md.sys.typescale.display-small.letter-spacing
+  token type.display.small
+    typography
+      font-family
+        token type.font-family
+      font-size
+        token type.display.small.size
+      line-height
+        token type.display.small.line-height
+      font-weight
+        token type.display.small.weight
+      letter-spacing
+        token type.display.small.letter-spacing
+    m3 md.sys.typescale.display-small
+  token type.headline.large.size 32px
+    m3 md.sys.typescale.headline-large.size
+  token type.headline.large.line-height 1.25
+    m3 md.sys.typescale.headline-large.line-height
+  token type.headline.large.weight 400
+    m3 md.sys.typescale.headline-large.weight
+    type fontWeight
+  token type.headline.large.letter-spacing 0px
+    m3 md.sys.typescale.headline-large.letter-spacing
+  token type.headline.large
+    typography
+      font-family
+        token type.font-family
+      font-size
+        token type.headline.large.size
+      line-height
+        token type.headline.large.line-height
+      font-weight
+        token type.headline.large.weight
+      letter-spacing
+        token type.headline.large.letter-spacing
+    m3 md.sys.typescale.headline-large
+  token type.headline.medium.size 28px
+    m3 md.sys.typescale.headline-medium.size
+  token type.headline.medium.line-height 1.2857142857142858
+    m3 md.sys.typescale.headline-medium.line-height
+  token type.headline.medium.weight 400
+    m3 md.sys.typescale.headline-medium.weight
+    type fontWeight
+  token type.headline.medium.letter-spacing 0px
+    m3 md.sys.typescale.headline-medium.letter-spacing
+  token type.headline.medium
+    typography
+      font-family
+        token type.font-family
+      font-size
+        token type.headline.medium.size
+      line-height
+        token type.headline.medium.line-height
+      font-weight
+        token type.headline.medium.weight
+      letter-spacing
+        token type.headline.medium.letter-spacing
+    m3 md.sys.typescale.headline-medium
+  token type.headline.small.size 24px
+    m3 md.sys.typescale.headline-small.size
+  token type.headline.small.line-height 1.3333333333333333
+    m3 md.sys.typescale.headline-small.line-height
+  token type.headline.small.weight 400
+    m3 md.sys.typescale.headline-small.weight
+    type fontWeight
+  token type.headline.small.letter-spacing 0px
+    m3 md.sys.typescale.headline-small.letter-spacing
+  token type.headline.small
+    typography
+      font-family
+        token type.font-family
+      font-size
+        token type.headline.small.size
+      line-height
+        token type.headline.small.line-height
+      font-weight
+        token type.headline.small.weight
+      letter-spacing
+        token type.headline.small.letter-spacing
+    m3 md.sys.typescale.headline-small
+  token type.title.large.size 22px
+    m3 md.sys.typescale.title-large.size
+  token type.title.large.line-height 1.2727272727272727
+    m3 md.sys.typescale.title-large.line-height
+  token type.title.large.weight 400
+    m3 md.sys.typescale.title-large.weight
+    type fontWeight
+  token type.title.large.letter-spacing 0px
+    m3 md.sys.typescale.title-large.letter-spacing
+  token type.title.large
+    typography
+      font-family
+        token type.font-family
+      font-size
+        token type.title.large.size
+      line-height
+        token type.title.large.line-height
+      font-weight
+        token type.title.large.weight
+      letter-spacing
+        token type.title.large.letter-spacing
+    m3 md.sys.typescale.title-large
+  token type.title.medium.size 16px
+    m3 md.sys.typescale.title-medium.size
+  token type.title.medium.line-height 1.5
+    m3 md.sys.typescale.title-medium.line-height
+  token type.title.medium.weight 500
+    m3 md.sys.typescale.title-medium.weight
+    type fontWeight
+  token type.title.medium.letter-spacing 0.15px
+    m3 md.sys.typescale.title-medium.letter-spacing
+  token type.title.medium
+    typography
+      font-family
+        token type.font-family
+      font-size
+        token type.title.medium.size
+      line-height
+        token type.title.medium.line-height
+      font-weight
+        token type.title.medium.weight
+      letter-spacing
+        token type.title.medium.letter-spacing
+    m3 md.sys.typescale.title-medium
+  token type.title.small.size 14px
+    m3 md.sys.typescale.title-small.size
+  token type.title.small.line-height 1.4285714285714286
+    m3 md.sys.typescale.title-small.line-height
+  token type.title.small.weight 500
+    m3 md.sys.typescale.title-small.weight
+    type fontWeight
+  token type.title.small.letter-spacing 0.1px
+    m3 md.sys.typescale.title-small.letter-spacing
+  token type.title.small
+    typography
+      font-family
+        token type.font-family
+      font-size
+        token type.title.small.size
+      line-height
+        token type.title.small.line-height
+      font-weight
+        token type.title.small.weight
+      letter-spacing
+        token type.title.small.letter-spacing
+    m3 md.sys.typescale.title-small
+  token type.body.large.size 16px
+    m3 md.sys.typescale.body-large.size
+  token type.body.large.line-height 1.5
+    m3 md.sys.typescale.body-large.line-height
+  token type.body.large.weight 400
+    m3 md.sys.typescale.body-large.weight
+    type fontWeight
+  token type.body.large.letter-spacing 0.5px
+    m3 md.sys.typescale.body-large.letter-spacing
+  token type.body.large
+    typography
+      font-family
+        token type.font-family
+      font-size
+        token type.body.large.size
+      line-height
+        token type.body.large.line-height
+      font-weight
+        token type.body.large.weight
+      letter-spacing
+        token type.body.large.letter-spacing
+    m3 md.sys.typescale.body-large
+  token type.body.medium.size 14px
+    m3 md.sys.typescale.body-medium.size
+  token type.body.medium.line-height 1.4285714285714286
+    m3 md.sys.typescale.body-medium.line-height
+  token type.body.medium.weight 400
+    m3 md.sys.typescale.body-medium.weight
+    type fontWeight
+  token type.body.medium.letter-spacing 0.25px
+    m3 md.sys.typescale.body-medium.letter-spacing
+  token type.body.medium
+    typography
+      font-family
+        token type.font-family
+      font-size
+        token type.body.medium.size
+      line-height
+        token type.body.medium.line-height
+      font-weight
+        token type.body.medium.weight
+      letter-spacing
+        token type.body.medium.letter-spacing
+    m3 md.sys.typescale.body-medium
+  token type.body.small.size 12px
+    m3 md.sys.typescale.body-small.size
+  token type.body.small.line-height 1.3333333333333333
+    m3 md.sys.typescale.body-small.line-height
+  token type.body.small.weight 400
+    m3 md.sys.typescale.body-small.weight
+    type fontWeight
+  token type.body.small.letter-spacing 0.4px
+    m3 md.sys.typescale.body-small.letter-spacing
+  token type.body.small
+    typography
+      font-family
+        token type.font-family
+      font-size
+        token type.body.small.size
+      line-height
+        token type.body.small.line-height
+      font-weight
+        token type.body.small.weight
+      letter-spacing
+        token type.body.small.letter-spacing
+    m3 md.sys.typescale.body-small
+  token type.label.large.size 14px
+    m3 md.sys.typescale.label-large.size
+  token type.label.large.line-height 1.4285714285714286
+    m3 md.sys.typescale.label-large.line-height
+  token type.label.large.weight 500
+    m3 md.sys.typescale.label-large.weight
+    type fontWeight
+  token type.label.large.letter-spacing 0.1px
+    m3 md.sys.typescale.label-large.letter-spacing
+  token type.label.large
+    typography
+      font-family
+        token type.font-family
+      font-size
+        token type.label.large.size
+      line-height
+        token type.label.large.line-height
+      font-weight
+        token type.label.large.weight
+      letter-spacing
+        token type.label.large.letter-spacing
+    m3 md.sys.typescale.label-large
+  token type.label.medium.size 12px
+    m3 md.sys.typescale.label-medium.size
+  token type.label.medium.line-height 1.3333333333333333
+    m3 md.sys.typescale.label-medium.line-height
+  token type.label.medium.weight 500
+    m3 md.sys.typescale.label-medium.weight
+    type fontWeight
+  token type.label.medium.letter-spacing 0.5px
+    m3 md.sys.typescale.label-medium.letter-spacing
+  token type.label.medium
+    typography
+      font-family
+        token type.font-family
+      font-size
+        token type.label.medium.size
+      line-height
+        token type.label.medium.line-height
+      font-weight
+        token type.label.medium.weight
+      letter-spacing
+        token type.label.medium.letter-spacing
+    m3 md.sys.typescale.label-medium
+  token type.label.small.size 11px
+    m3 md.sys.typescale.label-small.size
+  token type.label.small.line-height 1.4545454545454546
+    m3 md.sys.typescale.label-small.line-height
+  token type.label.small.weight 500
+    m3 md.sys.typescale.label-small.weight
+    type fontWeight
+  token type.label.small.letter-spacing 0.5px
+    m3 md.sys.typescale.label-small.letter-spacing
+  token type.label.small
+    typography
+      font-family
+        token type.font-family
+      font-size
+        token type.label.small.size
+      line-height
+        token type.label.small.line-height
+      font-weight
+        token type.label.small.weight
+      letter-spacing
+        token type.label.small.letter-spacing
+    m3 md.sys.typescale.label-small
