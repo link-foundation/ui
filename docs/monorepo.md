@@ -18,6 +18,7 @@ publishable artefact is a workspace package under `packages/`.
 │   │                       # link-view: one link as SVG or Canvas)
 │   ├── ui-config/          # @link-foundation/ui-config (configuration layers)
 │   ├── ui-convert/         # @link-foundation/ui-convert (HTML/DOM import)
+│   ├── ui-devmode/         # @link-foundation/ui-devmode (dev mode inspector)
 │   ├── ui-dom/             # @link-foundation/ui-dom (DOM renderer)
 │   ├── ui-i18n/            # @link-foundation/ui-i18n (localisation, lino-i18n)
 │   ├── ui-kotlin/          # Jetpack Compose renderer: a Gradle Kotlin Multiplatform
