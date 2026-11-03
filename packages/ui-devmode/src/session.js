@@ -218,7 +218,7 @@ function gridRenderer(ctx) {
     const layer = resetProperty(
       config,
       { id: ctx.state.selected, name, key },
-      { policy }
+      { policy, parentOf: ctx.parentOf }
     );
     inspector.announce(
       layer

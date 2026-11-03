@@ -421,11 +421,20 @@ export function applyEdit(config, edit, options) {
 
 /**
  * Reset a property: remove it from the highest writable layer that holds
- * it, so the value of the layer below shows again.
+ * it, so the value of the layer below shows again. The element is locked
+ * when it or an ancestor (`parentOf`) is in `(locked-elements …)`.
+ * @param {object} config  a ui-config configuration
+ * @param {{ id: string, name: string, key?: string|null }} target
+ * @param {{ policy: import('./policy.js').DevModePolicy,
+ *   parentOf?: (id: string) => string|null }} options
  * @returns {string|null}  the layer the value was removed from
  */
-export function resetProperty(config, { id, name, key = null }, { policy }) {
-  if (isLocked(policy, id)) {
+export function resetProperty(
+  config,
+  { id, name, key = null },
+  { policy, parentOf }
+) {
+  if (isLocked(policy, id, parentOf)) {
     fail('locked-element', `"${id}" is locked by the site policy`);
   }
   for (const layer of [...policy.writeLayers].reverse()) {
