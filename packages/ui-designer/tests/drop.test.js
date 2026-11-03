@@ -42,3 +42,31 @@ for (const [direction, x, y, index] of [
     assert.equal(dropTarget(context, target, 60, 45, ['text']).valid, false);
   });
 }
+
+test('Outline container drops measure the row, excluding its expanded descendants', () => {
+  const store = createStore({
+    text: 'app: document\n  body: stack\n    details: stack\n      hint: text Hint\n',
+  });
+  const label = {
+    getBoundingClientRect: () => ({ left: 0, top: 20, width: 100, height: 28 }),
+  };
+  const row = {
+    dataset: { id: 'details' },
+    getBoundingClientRect: () => ({
+      left: 0,
+      top: 20,
+      width: 100,
+      height: 112,
+    }),
+    querySelector: () => label,
+  };
+  const context = {
+    store,
+    policy: { lockedElements: new Set() },
+    outline: { tree: { contains: () => true } },
+  };
+  const drop = dropTarget(context, { closest: () => row }, 50, 34, ['text']);
+  assert.equal(drop.parentId, 'details');
+  assert.equal(drop.edge, null);
+  assert.equal(drop.node, label);
+});

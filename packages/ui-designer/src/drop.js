@@ -6,7 +6,11 @@ import { property } from './geometry.js';
 function targetNode(context, target) {
   const row = target?.closest?.('[role=treeitem]');
   if (row && context.outline.tree.contains(row)) {
-    return { id: row.dataset.id, node: row, row: true };
+    return {
+      id: row.dataset.id,
+      node: row.querySelector('.outline-row') ?? row,
+      row: true,
+    };
   }
   if (!context.canvas.contains(target)) {
     return null;

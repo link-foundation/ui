@@ -72,8 +72,8 @@
 }
 .designer-toolbox button:hover,
 .designer-toolbox button:focus-visible {
-  background: Highlight;
-  color: HighlightText;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
 }
 .ui-designer [role='tree'],
 .ui-designer [role='group'] {
@@ -94,8 +94,8 @@
   white-space: nowrap;
 }
 .ui-designer [role='treeitem'][aria-selected='true'] > .outline-row {
-  background: Highlight;
-  color: HighlightText;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
 }
 .ui-designer [data-link-id='properties'] table {
   border-collapse: collapse;
@@ -210,6 +210,12 @@
   }
 }
 @media (forced-colors: active) {
+  .designer-toolbox button:hover,
+  .designer-toolbox button:focus-visible,
+  .ui-designer [role='treeitem'][aria-selected='true'] > .outline-row {
+    background: Highlight;
+    color: HighlightText;
+  }
   .designer-guide {
     background: Highlight;
   }
