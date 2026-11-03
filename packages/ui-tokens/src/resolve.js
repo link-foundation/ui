@@ -27,7 +27,7 @@ import { mapNestedAliases } from './values.js';
  */
 
 /** The sets of the `extends` chain of `setId`, parents first. */
-function chainOf(sets, setId, diagnostics) {
+export function chainOf(sets, setId, diagnostics) {
   const chain = [];
   const done = new Set();
   const visit = (id, stack, from) => {

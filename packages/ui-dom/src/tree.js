@@ -9,6 +9,7 @@
  * with children) stay detached.
  */
 
+import { themeFor } from './themes.js';
 import { GENERATED_ID_PREFIX } from '@link-foundation/ui-store';
 import { diagnostic } from './diagnostics.js';
 import { bindHandlers, handlersOf } from './events.js';
@@ -130,6 +131,8 @@ const kindContext = (document, options, report, mounted) => (id, kind) => ({
   diagnostic(code, severity, at = {}) {
     report(diagnostic(code, severity, { element: id, kind, ...at }));
   },
+  theme: () =>
+    mounted.store === null ? null : themeFor(mounted.store, id, options),
   children: () => {
     const { store } = mounted;
     return store === null

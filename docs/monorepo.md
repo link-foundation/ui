@@ -30,6 +30,7 @@ publishable artefact is a workspace package under `packages/`.
 │   ├── ui-react/           # @link-foundation/ui-react (React adapter of ui-dom)
 │   ├── ui-settings/        # @link-foundation/ui-settings (settings schemas)
 │   ├── ui-style/           # @link-foundation/ui-style (style rules)
+│   ├── ui-themes/          # @link-foundation/ui-themes (LiNo theme packages)
 │   ├── ui-tokens/          # @link-foundation/ui-tokens (design tokens)
 │   ├── ui-vue/             # @link-foundation/ui-vue (Vue 3 adapter)
 │   ├── ui-swift/           # SwiftUI renderer: a Swift package built from the

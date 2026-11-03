@@ -9,6 +9,7 @@
 import { parse } from '@link-foundation/ui-core';
 import { createStore } from '@link-foundation/ui-store';
 import { createTree } from './tree.js';
+import { applyThemes } from './themes.js';
 
 const VOID = new Set(['img', 'br', 'hr', 'input', 'meta', 'link', 'source']);
 
@@ -211,6 +212,7 @@ export function renderToHTML(source, options = {}) {
   const report = (d) => options.onDiagnostic?.(d);
   const document = createStaticDocument();
   const container = document.createElement('template');
+  const store = storeOf(source, report);
   const tree = createTree({
     document,
     container,
@@ -218,6 +220,7 @@ export function renderToHTML(source, options = {}) {
     interactive: false,
     report,
   });
-  tree.mount(storeOf(source, report));
+  tree.mount(store);
+  applyThemes(tree, store, options);
   return container.childNodes.map(serialize).join('');
 }

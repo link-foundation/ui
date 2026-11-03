@@ -105,6 +105,7 @@ export function defaultMounts(root) {
   for (const parts of [
     ['examples', 'ui-dom'],
     ['examples', 'animation'],
+    ['examples', 'themes'],
     ['node_modules', 'links-notation', 'dist'],
     ...BROWSER_MODULES.map((name) => ['node_modules', name]),
     ...EDITOR_BROWSER_MODULES.map((name) => [
@@ -144,6 +145,7 @@ export function defaultMounts(root) {
         ['e2e', 'pages'],
         ['src'],
         ['stories'],
+        ['themes'],
         ['examples'],
         ['dist'],
       ]) {

@@ -13,6 +13,10 @@ export default defineConfig({
     // from the app root.
     alias: [
       {
+        find: '@link-foundation/ui-tokens/themes',
+        replacement: `${packages}ui-tokens/src/themes/index.js`,
+      },
+      {
         find: '@link-foundation/ui-react/hooks',
         replacement: `${packages}ui-react/src/hooks.js`,
       },

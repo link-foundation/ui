@@ -195,3 +195,13 @@ icon-zoom-out: asset
   files 'assets/icons/own/zoom-out.svg'
   license CC0-1.0
   copyright none
+
+dtcg-resolver-schema: asset
+  kind data
+  files 'assets/data/dtcg-resolver/*.json'
+  source 'https://www.designtokens.org/schemas/2025.10/resolver.json'
+  license BSD-3-Clause
+  copyright 'W3C and Design Tokens Community Group Contributors'
+  notice 'https://www.w3.org/Consortium/Legal/2008/03-bsd-license.html'
+  attribution none
+  modified yes
