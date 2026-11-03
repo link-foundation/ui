@@ -18,7 +18,7 @@ export function openDefaultsDialog({ window, config, policy, t }) {
   host.dataset.uiDevmode = 'dialog';
   const shadow = host.attachShadow({ mode: 'open' });
   const style = document.createElement('style');
-  style.textContent = `:host { color-scheme: light dark; } dialog { background: Canvas; color: CanvasText; border: 1px solid; border-radius: 8px; width: min(640px, 85vw); max-height: 85vh; overflow: auto; font: 14px system-ui; } dialog::backdrop { background: #0008; } textarea { display: block; box-sizing: border-box; width: 100%; height: 100px; margin: 8px 0; background: Canvas; color: CanvasText; } button, a { margin: 4px 12px 12px 0; } label { display: block; font-weight: bold; }`;
+  style.textContent = `:host { color-scheme: light dark; } dialog { background: Canvas; color: CanvasText; border: 1px solid; border-radius: 8px; width: min(640px, 85vw); max-height: 85vh; overflow: auto; font: 14px system-ui; } dialog::backdrop { background: #0008; } textarea { display: block; box-sizing: border-box; width: 100%; height: 100px; margin: 8px 0; background: Canvas; color: CanvasText; } button { appearance: none; background: Canvas; color: CanvasText; border: 1px solid; border-radius: 4px; padding: 4px 8px; } button:disabled { opacity: .5; } a { color: LinkText; } button, a { margin: 4px 12px 12px 0; } label { display: block; font-weight: bold; }`;
   const dialog = document.createElement('dialog');
   dialog.setAttribute('aria-labelledby', 'defaults-title');
   const title = document.createElement('h2');

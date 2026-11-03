@@ -7,6 +7,10 @@ export default {
   ...config,
   testDir: fileURLToPath(new globalThis.URL('../', import.meta.url)),
   testMatch: 'packages/ui-devmode/e2e/*.e2e.mjs',
+  webServer: {
+    ...config.webServer,
+    cwd: fileURLToPath(new globalThis.URL('../', import.meta.url)),
+  },
   projects: [
     {
       ...config.projects[0],

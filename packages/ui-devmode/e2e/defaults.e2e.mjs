@@ -119,6 +119,14 @@ test('modal passes axe, traps focus, selects text on clipboard failure, and rest
   }
   await page.emulateMedia({ colorScheme: 'dark' });
   await expectAccessible(page, { include: 'ui-defaults-dialog' });
+  if (
+    process.env.UPDATE_DOCS_SCREENSHOTS === '1' &&
+    testInfo.project.name === 'chromium'
+  ) {
+    await page.screenshot({
+      path: 'docs/screenshots/ui-devmode-defaults-dark.png',
+    });
+  }
   await page.keyboard.press('Escape');
   await expect(modal).toHaveCount(0);
   await expect(
