@@ -35,6 +35,11 @@ export function dropTarget(context, target, x, y, types) {
   const rect = node.getBoundingClientRect();
   const parent = store.parentOf(id);
   const horizontal = isHorizontal(store, parent, row);
+  const reverse =
+    !row &&
+    ['row-reverse', 'column-reverse'].includes(
+      property(store, parent, 'direction')
+    );
   const fraction = horizontal
     ? (x - rect.left) / rect.width
     : (y - rect.top) / rect.height;
@@ -52,7 +57,7 @@ export function dropTarget(context, target, x, y, types) {
   return {
     parentId,
     index: around
-      ? store.indexOf(id) + (edge === 'after' ? 1 : 0)
+      ? store.indexOf(id) + ((edge === 'after') !== reverse ? 1 : 0)
       : store.children(id).length,
     valid,
     node,
