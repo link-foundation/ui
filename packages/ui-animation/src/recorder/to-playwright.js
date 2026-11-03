@@ -30,7 +30,7 @@ function pointerLines(args) {
 const INPUT = {
   pointer: pointerLines,
   text: ([, id, value]) => [
-    `  if (await target(${quote(id)}).evaluate(node => String(node.value ?? node.textContent ?? '')) !== ${quote(value)}) await target(${quote(id)}).fill(${quote(value)});`,
+    `  if (await target(${quote(id)}).evaluate(node => String(node.value ?? node.textContent ?? '')) !== ${quote(value)}) { await target(${quote(id)}).fill(${quote(value)}); }`,
   ],
   key: (args) => {
     const id = field(args, 'target')[0];

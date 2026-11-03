@@ -19,7 +19,7 @@ test('recorded session', async ({ page }) => {
   await page.clock.runFor(10);
   await target("field").focus();
   await page.keyboard.down("a");
-  if (await target("field").evaluate(node => String(node.value ?? node.textContent ?? '')) !== "a") {await target("field").fill("a");}
+  if (await target("field").evaluate(node => String(node.value ?? node.textContent ?? '')) !== "a") { await target("field").fill("a"); }
   await expect(page.locator("[data-link-id=\"count\"]")).toHaveText("1");
   await page.clock.runFor(10);
   await target("field").focus();
