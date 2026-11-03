@@ -1,0 +1,68 @@
+fluent2-spacing-high-contrast: theme
+  mode high-contrast
+    token fluent.spacing-horizontal-none 0
+      fluent spacingHorizontalNone
+      source-value 0
+    token fluent.spacing-horizontal-x-x-s 2px
+      fluent spacingHorizontalXXS
+      source-value 2px
+    token fluent.spacing-horizontal-x-s 4px
+      fluent spacingHorizontalXS
+      source-value 4px
+    token fluent.spacing-horizontal-s-nudge 6px
+      fluent spacingHorizontalSNudge
+      source-value 6px
+    token space.small 8px
+      fluent spacingHorizontalS
+      source-value 8px
+    token fluent.spacing-horizontal-m-nudge 10px
+      fluent spacingHorizontalMNudge
+      source-value 10px
+    token fluent.spacing-horizontal-m 12px
+      fluent spacingHorizontalM
+      source-value 12px
+    token space.medium 16px
+      fluent spacingHorizontalL
+      source-value 16px
+    token fluent.spacing-horizontal-x-l 20px
+      fluent spacingHorizontalXL
+      source-value 20px
+    token fluent.spacing-horizontal-x-x-l 24px
+      fluent spacingHorizontalXXL
+      source-value 24px
+    token fluent.spacing-horizontal-x-x-x-l 32px
+      fluent spacingHorizontalXXXL
+      source-value 32px
+    token fluent.spacing-vertical-none 0
+      fluent spacingVerticalNone
+      source-value 0
+    token fluent.spacing-vertical-x-x-s 2px
+      fluent spacingVerticalXXS
+      source-value 2px
+    token fluent.spacing-vertical-x-s 4px
+      fluent spacingVerticalXS
+      source-value 4px
+    token fluent.spacing-vertical-s-nudge 6px
+      fluent spacingVerticalSNudge
+      source-value 6px
+    token fluent.spacing-vertical-s 8px
+      fluent spacingVerticalS
+      source-value 8px
+    token fluent.spacing-vertical-m-nudge 10px
+      fluent spacingVerticalMNudge
+      source-value 10px
+    token fluent.spacing-vertical-m 12px
+      fluent spacingVerticalM
+      source-value 12px
+    token fluent.spacing-vertical-l 16px
+      fluent spacingVerticalL
+      source-value 16px
+    token fluent.spacing-vertical-x-l 20px
+      fluent spacingVerticalXL
+      source-value 20px
+    token fluent.spacing-vertical-x-x-l 24px
+      fluent spacingVerticalXXL
+      source-value 24px
+    token fluent.spacing-vertical-x-x-x-l 32px
+      fluent spacingVerticalXXXL
+      source-value 32px

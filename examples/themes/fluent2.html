@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="data:," />
+    <title>Fluent 2 theme</title>
+    <!-- prettier-ignore -->
+    <script>(function(){try{var v=JSON.parse(localStorage.getItem("ui-theme")||'{}'),e=document.documentElement;if(typeof v.theme==='string'&&/^[a-zA-Z0-9_-]{1,80}$/.test(v.theme))e.setAttribute('data-theme',v.theme);if(['light','dark','system'].indexOf(v.scheme)>=0)e.setAttribute('data-scheme',v.scheme)}catch(e){}})();</script>
+    <script type="importmap">
+      {
+        "imports": {
+          "@floating-ui/dom": "/node_modules/@floating-ui/dom/dist/floating-ui.dom.browser.mjs",
+          "@floating-ui/core": "/node_modules/@floating-ui/core/dist/floating-ui.core.browser.mjs",
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "@link-foundation/ui-store": "/packages/ui-store/src/index.js",
+          "@link-foundation/ui-style": "/packages/ui-style/src/index.js",
+          "@link-foundation/ui-tokens": "/packages/ui-tokens/src/index.js",
+          "@link-foundation/ui-tokens/themes": "/packages/ui-tokens/src/themes/index.js",
+          "@link-foundation/ui-themes": "/packages/ui-themes/src/index.js",
+          "@link-foundation/ui-dom": "/packages/ui-dom/src/index.js",
+          "links-notation": "/node_modules/links-notation/dist/index.js"
+        }
+      }
+    </script>
+    <link
+      rel="stylesheet"
+      href="../../packages/ui-components/src/controls/styles.css"
+    />
+    <link rel="stylesheet" href="./fluent2.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Fluent 2</h1>
+      <p>Native controls · LiNo tokens · five button appearances</p>
+      <div class="panels">
+        <section aria-labelledby="light-title">
+          <h2 id="light-title">Light</h2>
+          <div id="light"></div>
+        </section>
+        <section aria-labelledby="dark-title">
+          <h2 id="dark-title">Dark</h2>
+          <div id="dark"></div>
+        </section>
+        <section aria-labelledby="contrast-title">
+          <h2 id="contrast-title">High contrast</h2>
+          <div id="contrast"></div>
+        </section>
+      </div>
+    </main>
+    <script type="module" src="./fluent2.js"></script>
+  </body>
+</html>
