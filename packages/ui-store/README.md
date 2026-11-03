@@ -433,6 +433,12 @@ history of that tab.
 `createIdGenerator(usedIds?)` is the generator the store uses, exported for
 tools that need the same IDs.
 
+## In-memory entry for native bundlers
+
+`import { createStore } from '@link-foundation/ui-store/memory'` loads only the
+in-memory implementation. It has the same store API and avoids loading optional
+IndexedDB and WebAssembly adapters in React Native/Metro applications.
+
 ## License
 
 [Unlicense](LICENSE)
