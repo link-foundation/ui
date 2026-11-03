@@ -94,6 +94,9 @@ describe('property rows', () => {
       ['disabled', 'boolean', '', 'defaults'],
       ['style', 'string', '', 'defaults'],
       ['theme', 'string', '', 'defaults'],
+      ['material', 'enum', '', 'defaults'],
+      ['text-style', 'string', '', 'defaults'],
+      ['appearance', 'string', '', 'defaults'],
       ['on', 'readonly', 'press (navigate home)', 'site'],
     ]);
     expect(rows.find((r) => r.name === 'variant').options).toEqual([
@@ -102,6 +105,9 @@ describe('property rows', () => {
       'outlined',
       'text',
       'elevated',
+      'bordered',
+      'borderless',
+      'prominent',
     ]);
     expect(rows.every((r) => !r.changed && !r.locked)).toBe(true);
     expect(rows.find((r) => r.name === 'on').writable).toBe(false);

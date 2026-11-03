@@ -1,0 +1,7 @@
+hig-materials: theme
+  token material.regular.blur 20px
+  token material.regular.opacity 0.90
+  token material.thin.blur 12px
+  token material.thin.opacity 0.86
+  token material.thick.blur 30px
+  token material.thick.opacity 0.96

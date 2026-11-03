@@ -60,7 +60,11 @@ function valueCss(value, ref) {
     case 'number':
       return String(value.value);
     case 'fontFamily':
-      return [value.value].flat().map(fontName).join(', ');
+      return [value.value]
+        .flat()
+        .flatMap((name) => name.split(',').map((part) => part.trim()))
+        .map(fontName)
+        .join(', ');
     case 'fontWeight':
       return String(FONT_WEIGHTS[value.value] ?? value.value);
     case 'cubicBezier':
