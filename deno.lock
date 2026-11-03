@@ -1779,6 +1779,18 @@
       ]
     },
     "members": {
+      "packages/ui-components": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@link-foundation/ui-core@^0.0.0",
+            "npm:@link-foundation/ui-dom@^0.0.0",
+            "npm:@link-foundation/ui-tokens@^0.0.0",
+            "npm:jsdom@^30.1.3",
+            "npm:links-notation@~0.27.1",
+            "npm:test-anywhere@~0.8.48"
+          ]
+        }
+      },
       "packages/ui-config": {
         "packageJson": {
           "dependencies": [
@@ -1812,22 +1824,24 @@
           ]
         }
       },
+      "packages/ui-dom": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@link-foundation/ui-core@^0.0.0",
+            "npm:@link-foundation/ui-store@^0.0.0",
+            "npm:@link-foundation/ui-style@^0.0.0",
+            "npm:@link-foundation/ui-tokens@^0.0.0",
+            "npm:jsdom@^30.1.3",
+            "npm:test-anywhere@~0.8.48"
+          ]
+        }
+      },
       "packages/ui-i18n": {
         "packageJson": {
           "dependencies": [
             "npm:@link-foundation/ui-config@^0.0.0",
             "npm:@link-foundation/ui-core@^0.0.0",
             "npm:lino-i18n@0.5.0",
-            "npm:test-anywhere@~0.8.48"
-          ]
-        }
-      },
-      "packages/ui-settings": {
-        "packageJson": {
-          "dependencies": [
-            "npm:@link-foundation/ui-config@^0.0.0",
-            "npm:@link-foundation/ui-core@^0.0.0",
-            "npm:jsdom@^30.1.3",
             "npm:test-anywhere@~0.8.48"
           ]
         }
@@ -1839,6 +1853,16 @@
             "npm:doublets-web@~0.1.3",
             "npm:fake-indexeddb@^6.2.7",
             "npm:links-notation@~0.27.1",
+            "npm:test-anywhere@~0.8.48"
+          ]
+        }
+      },
+      "packages/ui-settings": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@link-foundation/ui-config@^0.0.0",
+            "npm:@link-foundation/ui-core@^0.0.0",
+            "npm:jsdom@^30.1.3",
             "npm:test-anywhere@~0.8.48"
           ]
         }
