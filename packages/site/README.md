@@ -19,7 +19,7 @@ to English, and provides language links when JavaScript is disabled. The URL is
 authoritative for the language. Shared layout labels use ui-i18n/lino-i18n;
 content pages are translated in `content/<lang>/<page>.lino`.
 
-The theme choices come from the registry: Base, Material 3 and HIG (including
+The theme choices come from the registry: Base, Material 3, Fluent 2 and HIG (including
 iOS and macOS variants). Light, dark and
 system schemes use the theme engine. Choices persist as LiNo overrides in the
 `user` configuration layer under `link-ui.site.user.v1`. If storage is disabled,

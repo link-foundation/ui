@@ -72,6 +72,7 @@ export async function loadPages({ contentDir, layout, languages }) {
           const labels = {
             base: 'Base',
             material3: 'Material 3',
+            fluent2: 'Fluent 2',
             hig: 'HIG',
             'hig-ios': 'HIG · iOS',
             'hig-macos': 'HIG · macOS',

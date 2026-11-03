@@ -4,7 +4,7 @@ page: document
     level 1
     text 'Themes and colour schemes'
   page-lead: paragraph
-    text 'Choose Base, Material 3 or HIG (including iOS and macOS) in the header. Light, dark and system schemes use the theme engine. Your preference is saved in the user configuration layer.'
+    text 'Choose Base, Material 3, Fluent 2 or HIG (including iOS and macOS) in the header. Light, dark and system schemes use the theme engine. Your preference is saved in the user configuration layer.'
   section-title: heading
     level 2
     text 'Follow your preferences'

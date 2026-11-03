@@ -96,6 +96,13 @@ test('site theme and scheme persist, system follows the OS, language keeps the p
     'data-theme',
     'hig-ios'
   );
+  await choose(page, 'Theme', 'Fluent 2');
+  await page.reload();
+  await ready(page);
+  await expect(page.locator('ui-document')).toHaveAttribute(
+    'data-theme',
+    'fluent2'
+  );
   await choose(page, 'Theme', 'Material 3');
   await choose(page, 'Colour scheme', 'Follow system');
   await page.emulateMedia({ colorScheme: 'light' });
