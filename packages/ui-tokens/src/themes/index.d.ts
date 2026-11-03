@@ -24,6 +24,7 @@ export interface Theme {
   templates: Map<string, TemplateNode>;
   forcedColors: Map<string, string>;
   pairs: [string, string, number?][];
+  springs?: Record<string, { response: number; damping: number }>;
   defaults: Partial<
     Record<'motion' | 'sound' | 'volume' | 'transparency', string>
   >;
@@ -51,6 +52,8 @@ export function ensureContrast(
   min?: number
 ): { color: string; adjusted: boolean; ratio: number };
 export interface ThemeCssOptions {
+  transparency?: 'on' | 'off';
+  reducedTransparency?: boolean;
   prefix?: string;
   strict?: boolean;
   minContrast?: number;

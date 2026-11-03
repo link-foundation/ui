@@ -1,0 +1,5 @@
+hig-shape: theme
+  token shape.corner.small 6px
+  token shape.corner.medium 10px
+  token shape.corner.large 16px
+  token shape.corner.full 999px

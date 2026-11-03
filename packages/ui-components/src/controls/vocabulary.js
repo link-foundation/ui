@@ -131,6 +131,9 @@ function withCommon(kinds, base) {
         'sound',
         'volume',
         'transparency',
+        'material',
+        'text-style',
+        'appearance',
       ].includes(name)
   );
   for (const kind of kinds.values()) {

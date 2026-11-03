@@ -37,6 +37,24 @@ const nonNegative = (v) => v.type !== 'dimension' || v.value >= 0;
 
 /** @type {Readonly<Record<string, PropertySpec>>} */
 export const PROPERTIES = Object.freeze({
+  'min-width': {
+    css: 'min-width',
+    type: 'dimension',
+    tokens: ['dimension'],
+    check: nonNegative,
+  },
+  'min-height': {
+    css: 'min-height',
+    type: 'dimension',
+    tokens: ['dimension'],
+    check: nonNegative,
+  },
+  material: {
+    css: 'background-color',
+    type: ['enum', 'regular', 'thin', 'thick'],
+    tokens: [],
+    write: (_v, ctx) => ctx.variable('color.surface'),
+  },
   background: { css: 'background-color', type: 'color', tokens: ['color'] },
   color: { css: 'color', type: 'color', tokens: ['color'] },
   radius: {

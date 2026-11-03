@@ -13,51 +13,101 @@ export async function readThemeFile(path) {
   return response.text();
 }
 const raw = (link) => (link.values.length ? link.values.map(raw) : link.id);
-function hasKind(fields, kind, status) {
-  return (
-    (typeof kind === 'string' || status === 'none') &&
-    fields.filter((field) => field[0] === 'kind').length ===
-      (status === 'none' ? 0 : 1)
+
+const fieldValue = (fields, name) =>
+  fields.find((field) => field[0] === name)?.[1];
+
+function validKind(kind, status, fields) {
+  const count = fields.filter((field) => field[0] === 'kind').length;
+  return typeof kind === 'string'
+    ? count === 1
+    : kind === null && status === 'none' && count === 0;
+}
+
+function validProps(props) {
+  return props.every(
+    ({ property, value, target }) =>
+      typeof property === 'string' &&
+      typeof value === 'string' &&
+      Array.isArray(target) &&
+      target.length >= 2 &&
+      target.every((atom) => typeof atom === 'string')
   );
 }
-/** Shared LiNo migration rows. Unknown statuses or malformed rows fail closed. */
+
+/** Read the shared #48 table format without interpreting source-language code. */
+function parseMapping(text, extended = false) {
+  const names = new Set();
+  const fieldNames = ['kind', 'status', 'prop', ...(extended ? ['note'] : [])];
+  const statuses = [
+    'mapped',
+    'partial',
+    'none',
+    ...(extended ? ['unsupported'] : []),
+  ];
+  return parseNested(text)
+    .map(raw)
+    .map((row) => {
+      if (!Array.isArray(row)) {
+        throw new TypeError('Invalid mapping row');
+      }
+      const [head, name, ...fields] = row;
+      if (
+        !fields.every(
+          (field) =>
+            Array.isArray(field) &&
+            fieldNames.includes(field[0]) &&
+            field.length === (field[0] === 'prop' ? 4 : 2)
+        )
+      ) {
+        throw new TypeError('Invalid mapping field');
+      }
+      const kind = fieldValue(fields, 'kind') ?? null;
+      const status = fieldValue(fields, 'status');
+      const props = fields
+        .filter((field) => field[0] === 'prop')
+        .map(([, property, value, target]) => ({ property, value, target }));
+      if (
+        head !== 'map' ||
+        typeof name !== 'string' ||
+        !validKind(kind, status, fields) ||
+        names.has(name) ||
+        fields.filter((field) => field[0] === 'status').length !== 1 ||
+        !validProps(props) ||
+        !statuses.includes(status)
+      ) {
+        throw new TypeError('Invalid mapping row');
+      }
+      names.add(name);
+      return {
+        name,
+        kind,
+        status,
+        props,
+        ...(extended ? { note: fieldValue(fields, 'note') ?? '' } : {}),
+      };
+    });
+}
+
+/** Preserve the shared SwiftUI/MUI row API. */
+export function readMapping(text) {
+  return parseMapping(text);
+}
+/** Fluent mappings add explanatory notes and an unsupported status. */
 export function loadMapping(text) {
-  const seen = new Set();
-  return parseNested(text).map((link) => {
-    const [head, component, ...fields] = raw(link);
-    const kind = fields.find((f) => f[0] === 'kind')?.[1];
-    const status = fields.find((f) => f[0] === 'status')?.[1];
-    if (
-      head !== 'map' ||
-      typeof component !== 'string' ||
-      seen.has(component) ||
-      !hasKind(fields, kind, status) ||
-      !['mapped', 'partial', 'unsupported', 'none'].includes(status) ||
-      fields.some((field) => !Array.isArray(field)) ||
-      fields.filter((field) => field[0] === 'status').length !== 1 ||
-      fields.some(
-        (field) =>
-          field[0] === 'prop' &&
-          (field.length !== 4 ||
-            typeof field[1] !== 'string' ||
-            typeof field[2] !== 'string' ||
-            !Array.isArray(field[3]) ||
-            field[3].some((v) => typeof v !== 'string'))
-      )
-    ) {
-      throw new TypeError('Invalid mapping row');
-    }
-    seen.add(component);
-    return {
-      component,
-      kind: kind ?? null,
+  return parseMapping(text, true).map(
+    ({ name, kind, status, props, note }) => ({
+      component: name,
+      kind,
       status,
-      props: fields
-        .filter((f) => f[0] === 'prop')
-        .map(([, name, value, target]) => ({ name, value, target })),
-      note: fields.find((f) => f[0] === 'note')?.[1] ?? '',
-    };
-  });
+      note,
+      props: props.map(({ property, value, target }) => ({
+        name: property,
+        value,
+        target,
+      })),
+    })
+  );
 }
 const cell = (text) => String(text).replaceAll('*', '\\*');
 /** Shared table writer; callers can retain their own columns and inline markup. */

@@ -18,6 +18,10 @@ export const VOCABULARY_TEXT = `ui-dialect: dialect
   common-property sound any
   common-property volume any
   common-property transparency any
+  common-property material
+    enum regular thin thick
+  common-property text-style string
+  common-property appearance string
 
 document: kind
   description 'Root of a UI document.'
@@ -50,7 +54,7 @@ button: kind
   positional label
   property label string
   property variant
-    enum filled tonal outlined text elevated secondary transparent
+    enum filled tonal outlined text elevated secondary transparent bordered borderless prominent
   property icon string
   property type
     enum button submit reset
@@ -140,7 +144,7 @@ icon-button: kind
   property icon string
   property label string
   property variant
-    enum filled tonal outlined text
+    enum filled tonal outlined text bordered borderless prominent
   property type
     enum button submit reset
   property disabled boolean

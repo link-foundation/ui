@@ -57,3 +57,5 @@ tests/e2e/fixtures/recorder-native-generated.mjs text eol=lf
 docs/themes/material3.md text eol=lf
 docs/themes/fluent2.md text eol=lf
 packages/ui-themes/src/fluent2/brand-aliases.js text eol=lf
+
+docs/themes/hig.md text eol=lf

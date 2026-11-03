@@ -4,6 +4,7 @@ import { readStyles } from '@link-foundation/ui-style';
 import { readTokens, isTokenPath } from '../model.js';
 import { resolveTokens, chainOf } from '../resolve.js';
 import { readTemplate } from './templates.js';
+import { isSpringToken, readSpring } from './springs.js';
 
 export const themeDiagnostic = (code, severity, message, at = {}) => ({
   code,
@@ -87,9 +88,26 @@ function readPair(args, theme, diagnostics) {
   }
 }
 
+function addSpring(args, theme, diagnostics) {
+  const spring = readSpring(args);
+  if (spring) {
+    theme.springs[spring.name] = spring.value;
+  } else {
+    diagnostics.push(
+      themeDiagnostic(
+        'invalid-spring',
+        'error',
+        'Spring needs a name, response in (0,10] seconds and damping in (0,1)'
+      )
+    );
+  }
+}
+
 function readThemeChild(child, theme, tokenLinks, diagnostics) {
   const [name, ...args] = raw(child);
-  if (name === 'token' || name === 'extends' || name === 'mode') {
+  if (name === 'token' && isSpringToken(args)) {
+    addSpring(args, theme, diagnostics);
+  } else if (name === 'token' || name === 'extends' || name === 'mode') {
     tokenLinks.push(raw(child));
   }
   if (name === 'motion' && args.length > 1) {
@@ -151,6 +169,7 @@ export function loadThemes(linoText) {
       forcedColors: new Map(),
       pairs: [],
       defaults: {},
+      springs: {},
       diagnostics: [],
     };
     const tokenLinks = [];
@@ -196,6 +215,7 @@ export function resolveTheme(registry, id) {
     forcedColors: new Map(),
     pairs: [],
     defaults: {},
+    springs: {},
     diagnostics,
     set: registry.get(id)?.set,
     sets,
@@ -215,6 +235,7 @@ export function resolveTheme(registry, id) {
       theme.forcedColors.set(path, value);
     }
     Object.assign(theme.defaults, parent.defaults);
+    Object.assign(theme.springs, parent.springs);
   }
   for (const name of resolved.modes.keys()) {
     theme.modes[name] = values(resolveTokens(sets, id, { mode: name }));

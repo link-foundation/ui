@@ -1,0 +1,54 @@
+hig-colors: theme
+  token color.surface '#FCFCFE'
+    description 'HIG role: system-background; independently chosen colour'
+  token color.on-surface '#20232C'
+    description 'HIG role: label; independently chosen colour'
+  token color.on-surface-variant '#555B68'
+    description 'HIG role: secondary-label; independently chosen colour'
+  token color.grouped-background '#EDF0F6'
+    description 'HIG role: system-grouped-background; independently chosen colour'
+  token color.separator '#737B89'
+    description 'HIG role: separator; independently chosen colour'
+  token color.primary '#2356B0'
+    description 'HIG role: tint; independently chosen colour'
+  token color.on-primary '#FFFFFF'
+    description 'HIG role: label-on-tint; independently chosen colour'
+  token color.accent.blue '#2356B0'
+  token color.accent.brown '#795332'
+  token color.accent.cyan '#006578'
+  token color.accent.green '#216738'
+  token color.accent.indigo '#51459E'
+  token color.accent.mint '#006C5E'
+  token color.accent.orange '#945000'
+  token color.accent.pink '#A12562'
+  token color.accent.purple '#7C369E'
+  token color.accent.red '#AA2834'
+  token color.accent.teal '#006778'
+  token color.accent.yellow '#756000'
+  token color.accent.gray '#555B68'
+  token color.outline
+    token color.separator
+  token color.error
+    token color.accent.red
+  pair color.on-surface color.surface
+  pair color.on-surface-variant color.surface
+  pair color.on-surface color.grouped-background
+  pair color.on-surface-variant color.grouped-background
+  pair color.primary color.surface
+  pair color.on-primary color.primary
+  mode dark
+    token color.surface '#181A20'
+    token color.on-surface '#F5F6FA'
+    token color.on-surface-variant '#BFC5D3'
+    token color.grouped-background '#242832'
+    token color.separator '#929BAB'
+    token color.primary '#AEC9FF'
+    token color.on-primary '#12284B'
+  mode high-contrast
+    token color.surface '#FFFFFF'
+    token color.on-surface '#111111'
+    token color.on-surface-variant '#333333'
+    token color.grouped-background '#FFFFFF'
+    token color.separator '#444444'
+    token color.primary '#143F8A'
+    token color.on-primary '#FFFFFF'

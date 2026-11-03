@@ -93,6 +93,8 @@ export interface CssContext {
 }
 
 export interface CompileOptions {
+  transparency?: 'on' | 'off';
+  reducedTransparency?: boolean;
   /** Zero-specificity theme boundary selector, including the boundary itself. */
   /** Use ':scope' inside a CSS @scope rule to include the boundary itself. */
   scope?: string;
