@@ -58,11 +58,16 @@ const voidTags = new Set([
 ]);
 
 function tagOf(node) {
+  const mapped =
+    extraTags[node.kind] ??
+    HTML_MAPPING.find((rule) => rule.kind === node.kind)?.tags[0];
+  if (!mapped && node.kind !== 'html') {
+    return null;
+  }
   return (
     prop(node, 'tag') ??
     (prop(node, 'level') ? `h${prop(node, 'level')}` : null) ??
-    extraTags[node.kind] ??
-    HTML_MAPPING.find((rule) => rule.kind === node.kind)?.tags[0]
+    mapped
   );
 }
 

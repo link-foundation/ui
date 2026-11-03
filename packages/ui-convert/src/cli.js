@@ -7,11 +7,14 @@
  *                     [--style <style>]
  *   ui-convert export <file.lino> --format <name> [--id <id>]
  *                     [--target-version <version>]
+ *   ui-convert export --target react|vue|swiftui|compose <file.lino>
+ *                     [--mode wrapper|eject] [--out <dir>]
  *
  * `import` writes LiNo to stdout (`--from` reads component markup: JSX or
  * TSX, a Vue single-file component or HTML; a `.jsx`, `.tsx`, `.vue`,
  * `.html` or `.htm` file needs no `--from`), `export` writes JSON (A2UI: one message
- * per line, the JSON Lines wire format). A file named `-` is stdin.
+ * per line, the JSON Lines wire format), or source files with `--target`.
+ * A file named `-` is stdin.
  * Diagnostics go to stderr, one per line; the exit code is 1 when one of
  * them is an error (the output is still written when there is one), 2 for a
  * usage error.
@@ -236,7 +239,7 @@ function convert(args, text) {
  * @param {{ stdout: { write(text: string): void },
  *   stderr: { write(text: string): void },
  *   readFile?: (file: string) => string }} io
- * @returns {number} The exit code.
+ * @returns {number | Promise<number>} The exit code (source export is asynchronous).
  */
 export function main(argv, io) {
   if (argv.length === 0 || argv.includes('--help') || argv.includes('-h')) {

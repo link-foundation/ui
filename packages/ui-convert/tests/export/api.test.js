@@ -115,3 +115,19 @@ test('top-level extension links produce a comment and unsupported diagnostic', a
     assert.match(result.files[0].contents, /Unsupported link extension custom/);
   }
 });
+
+test('a tag override cannot hide an unsupported kind', async () => {
+  for (const target of ['react', 'vue']) {
+    const result = await exportDocument('custom: spaceship\n  tag article\n', {
+      target,
+      mode: 'eject',
+    });
+    assert.ok(
+      result.diagnostics.some(
+        (d) =>
+          d.code === 'unsupported' && d.id === 'custom' && d.target === target
+      )
+    );
+    assert.match(result.files[0].contents, /Unsupported kind spaceship/);
+  }
+});
