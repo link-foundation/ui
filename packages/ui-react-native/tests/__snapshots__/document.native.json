@@ -1,0 +1,45 @@
+{
+  "type": "ScrollView",
+  "props": {
+    "testID": "app"
+  },
+  "children": [
+    {
+      "type": "View",
+      "props": {
+        "testID": "body",
+        "style": {
+          "flexDirection": "column",
+          "gap": 16
+        }
+      },
+      "children": [
+        {
+          "type": "Text",
+          "props": {
+            "testID": "greeting"
+          },
+          "children": ["Hello, links"]
+        },
+        {
+          "type": "Pressable",
+          "props": {
+            "testID": "ok",
+            "accessibilityRole": "button",
+            "disabled": false,
+            "accessibilityState": {
+              "disabled": false
+            }
+          },
+          "children": [
+            {
+              "type": "Text",
+              "props": {},
+              "children": ["OK"]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

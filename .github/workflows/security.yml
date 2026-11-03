@@ -139,6 +139,9 @@ jobs:
           # - khroma: MIT (its licence file) but no licence field; transitive
           #   dependency of mermaid, the optional peer of ui-components, which
           #   is installed in this repository for its tests only.
+          # - lightningcss and its platform binaries: MPL-2.0, build-only CSS
+          #   transformer of Expo's Metro tooling. Never modified or included
+          #   in the exported app or published renderer (like the resvg tools).
           allow-dependencies-licenses: >-
             pkg:npm/%40axe-core/playwright,
             pkg:npm/axe-core,
@@ -160,7 +163,19 @@ jobs:
             pkg:npm/truncate-utf8-bytes,
             pkg:npm/%40csstools/color-helpers,
             pkg:npm/%40csstools/css-syntax-patches-for-csstree,
-            pkg:npm/khroma
+            pkg:npm/khroma,
+            pkg:npm/lightningcss,
+            pkg:npm/lightningcss-android-arm64,
+            pkg:npm/lightningcss-darwin-arm64,
+            pkg:npm/lightningcss-darwin-x64,
+            pkg:npm/lightningcss-freebsd-x64,
+            pkg:npm/lightningcss-linux-arm-gnueabihf,
+            pkg:npm/lightningcss-linux-arm64-gnu,
+            pkg:npm/lightningcss-linux-arm64-musl,
+            pkg:npm/lightningcss-linux-x64-gnu,
+            pkg:npm/lightningcss-linux-x64-musl,
+            pkg:npm/lightningcss-win32-arm64-msvc,
+            pkg:npm/lightningcss-win32-x64-msvc
 
   npm-audit:
     name: Audit npm lock (${{ matrix.directory }})
@@ -177,6 +192,7 @@ jobs:
             '.',
             examples/universal-app,
             examples/react,
+            examples/react-native,
             examples/vue,
             .github/actions/artifact-transport,
           ]

@@ -1,0 +1,64 @@
+{
+  "name": "@link-foundation/ui-react-native",
+  "version": "0.0.0",
+  "description": "React Native New Architecture renderer for Links Notation UI documents",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./map": "./src/map.js",
+    "./style": "./src/style.js",
+    "./renderer": "./src/UiNativeView.js"
+  },
+  "types": "./src/index.d.ts",
+  "files": [
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "ui",
+    "links-notation",
+    "react",
+    "adapter",
+    "hooks",
+    "custom-elements"
+  ],
+  "license": "Unlicense",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/link-foundation/ui.git",
+    "directory": "packages/ui-react-native"
+  },
+  "homepage": "https://github.com/link-foundation/ui/tree/main/packages/ui-react-native#readme",
+  "bugs": {
+    "url": "https://github.com/link-foundation/ui/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@link-foundation/ui-react": "^0.0.0",
+    "@link-foundation/ui-core": "^0.0.0",
+    "@link-foundation/ui-store": "^0.0.0"
+  },
+  "peerDependencies": {
+    "react": ">=19.1.1",
+    "react-native": ">=0.82"
+  },
+  "devDependencies": {
+    "react": "^19.3.1",
+    "react-test-renderer": "^19.3.1",
+    "test-anywhere": "^0.8.48"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependenciesMeta": {
+    "react-native": {
+      "optional": true
+    }
+  }
+}
