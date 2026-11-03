@@ -11,9 +11,10 @@ import {
   persistUserLayer,
 } from '@link-foundation/ui-config';
 
-const document = parse(`(app: document
-  (greeting: text 'Hello, links')
-  (material3: theme (token color.primary '#6750A4')))`);
+const document = parse(`app: document
+  greeting: text 'Hello, links'
+  material3: theme
+    token color.primary '#6750A4'`);
 const config = createConfig({ document });
 
 config.set('user', 'greeting', 'text', ['Hello, agents']);

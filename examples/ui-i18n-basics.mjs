@@ -33,10 +33,14 @@ ar
 const catalogs = mergeCatalogs(await loadUiCatalogs(), appCatalogs);
 
 const document = parse(
-  `(app: document
-  (i18n required)
-  (close: button (label (t ui.dialog.close)))
-  (count: text (t files (count 3))))`,
+  `app: document
+  i18n required
+  close: button
+    label
+      t ui.dialog.close
+  count: text
+    t files
+      count 3`,
   { vocabulary: i18nVocabulary() }
 );
 const config = createConfig({ document });
@@ -74,7 +78,10 @@ config.clear('user');
 
 console.log(
   checkHardcodedText(
-    `(app: document (i18n required) (ok: button (label 'OK')))`
+    `app: document
+  i18n required
+  ok: button
+    label 'OK'`
   )
 );
 // [ { code: 'hardcoded-text', severity: 'error', message: …, at: { element: 'ok', property: 'label' }, value: 'OK' } ]
