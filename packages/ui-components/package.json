@@ -1,0 +1,63 @@
+{
+  "name": "@link-foundation/ui-components",
+  "version": "0.0.0",
+  "description": "Components of the associative UI framework written in Links Notation: behaviour state machines in LiNo with a DOM-free interpreter, an actions registry that never evaluates code, and DOM accessibility helpers (focus trap, roving tabindex, typeahead, key bindings, live region)",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./behavior": {
+      "types": "./src/behavior/index.d.ts",
+      "default": "./src/behavior/index.js"
+    },
+    "./behavior/dom": {
+      "types": "./src/behavior/dom.d.ts",
+      "default": "./src/behavior/dom.js"
+    },
+    "./a11y": {
+      "types": "./src/a11y/index.d.ts",
+      "default": "./src/a11y/index.js"
+    }
+  },
+  "types": "./src/index.d.ts",
+  "files": [
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "ui",
+    "links-notation",
+    "state-machine",
+    "accessibility",
+    "a11y",
+    "aria",
+    "keyboard"
+  ],
+  "license": "Unlicense",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/link-foundation/ui.git",
+    "directory": "packages/ui-components"
+  },
+  "homepage": "https://github.com/link-foundation/ui/tree/main/packages/ui-components#readme",
+  "bugs": {
+    "url": "https://github.com/link-foundation/ui/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@link-foundation/ui-core": "^0.0.0",
+    "@link-foundation/ui-dom": "^0.0.0"
+  },
+  "devDependencies": {
+    "jsdom": "^30.1.3",
+    "test-anywhere": "^0.8.48"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
