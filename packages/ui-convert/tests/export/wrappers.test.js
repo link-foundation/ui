@@ -40,6 +40,9 @@ const { UiView: VueView } = await import('@link-foundation/ui-vue');
 async function compiled(target, source, use, mode = 'wrapper') {
   // Keep generated modules inside this package's dependency scope for Deno.
   const dir = mkdtempSync(resolve('packages/ui-convert/.ui-export-'));
+  // Vite otherwise sets production globally, including Deno's parallel workers.
+  const nodeEnv = process.env.NODE_ENV;
+  process.env.NODE_ENV ??= 'test';
   try {
     const result = await exportDocument(source, { target, mode });
     const entry = join(dir, result.files[0].path);
@@ -74,6 +77,11 @@ async function compiled(target, source, use, mode = 'wrapper') {
     writeFileSync(module, code);
     await use(await import(pathToFileURL(module).href));
   } finally {
+    if (nodeEnv === undefined) {
+      delete process.env.NODE_ENV;
+    } else {
+      process.env.NODE_ENV = nodeEnv;
+    }
     rmSync(dir, { recursive: true, force: true });
   }
 }
@@ -83,6 +91,12 @@ function host() {
   dom.window.document.body.append(element);
   return element;
 }
+
+test('Vite builds leave NODE_ENV unchanged for other test workers', async () => {
+  const before = process.env.NODE_ENV;
+  await compiled('react', fixture('document'), async () => {});
+  assert.equal(process.env.NODE_ENV, before);
+});
 
 for (const target of ['react', 'vue']) {
   for (const name of fixtures) {
