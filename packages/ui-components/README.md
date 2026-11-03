@@ -1255,6 +1255,62 @@ runtime download. Consumers must preserve the relative
 `dist/network-layout.worker.mjs` asset when bundling the package, or inject a
 `createWorker` factory for their bundler's worker handling.
 
+## Arbitrary Links Notation as a network
+
+`linoToNetwork(text, { maxInputSize, maxDepth })` reads any LiNo with the
+pinned official parser. It returns `{ links, diagnostics, sourceMap }`.
+`buildNetwork(links)` accepts the converter's explicit point/value records as
+well as link records. Quoted values remain separate from references with the
+same text, and isolated words remain visible. Positions are one-based line
+and column; parse errors and limit errors are diagnostics rather than throws.
+
+Binary links use their two values as endpoints. Longer sequences start at
+the named anchor: `a: b c d` gives a→b, b→c, c→d under IDs a, a/1, a/2.
+Nested anonymous links use their parent path, such as a/0; anonymous roots
+use @0, @1, etc. Collisions add ~1, ~2, etc. The model reserves 0 for free
+ends, so an explicit LiNo ID 0 gets a generated alias. Duplicate definitions
+warn and keep the first definition. Ordinary undefined words are labelled
+points; undefined numeric IDs warn. This distinction keeps ordinary prose
+valid because LiNo has no separate syntax for an unresolved reference.
+
+`networkToLino(result)` (also accepting `result.links` or a built network)
+uses the retained LiNo structure and writes nested text with ui-core. IDs,
+references, empty links and quoted values survive a conversion round trip.
+Formatting is not preserved. Writing view edits into text is outside this API.
+Networks without LiNo origin metadata are rejected.
+
+```js
+import { defineLinoNetwork } from '@link-foundation/ui-components/links-view';
+defineLinoNetwork();
+const view = document.createElement('lino-network');
+view.textContent = "greeting: hello 'world'";
+view.addEventListener('select', ({ detail: { id, line, column } }) => {
+  console.log(id, line, column);
+});
+document.body.append(view);
+await view.ready;
+```
+
+The element accepts inline text, the `lino` property/attribute, or a `src`
+URL (which takes precedence). It displays diagnostics and highlights the
+source token selected with the pointer or keyboard. Inline text changes
+reload automatically; newer loads cancel older requests. `layout`,
+`style-mode`, `theme` and `label` forward to the existing network view.
+`network`, `sourceMap`, `diagnostics`, `networkView`, `select(id)`, `toSvg()`
+and `toPng(scale)` are available after `ready`. A fetch failure clears the
+old view and reports a diagnostic. Imports are safe in Node.
+
+```bash
+npx lino-network input.lino --layout force --out network.svg
+```
+
+The CLI supports all six network layouts, defaults to circle, and writes
+SVG to stdout if `--out` is absent. Input is bounded to 1 MiB; force is
+bounded to 300 ticks. Warnings go to stderr; errors exit unsuccessfully.
+Run the static server and open
+[`examples/lino-network.html`](examples/lino-network.html) for document,
+token and other case-study samples, source selection, and error diagnostics.
+
 ## Code and LiNo source editor
 
 Import `@link-foundation/ui-components/editor` to register `<ui-code-editor>`
