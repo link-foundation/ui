@@ -1,0 +1,15 @@
+format(true) of ((b c))
+  input : ((b c))
+  text  : "(b c)"
+  reads : (b c)
+  round-trips: false
+FormatOptions({ maxInlineRefs: 1, preferInline: false }) of (x: a b)
+  input : (x: a b)
+  text  : "x:\n  a\n  b"
+  reads : (x: a b)
+  round-trips: true
+FormatOptions({ maxInlineRefs: 1, preferInline: false }) of (a b c)
+  input : (a b c)
+  text  : "  a\n  b\n  c"
+  reads : (a) | (b) | (c)
+  round-trips: false
