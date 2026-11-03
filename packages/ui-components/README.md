@@ -480,11 +480,11 @@ See [`examples/diagrams.html`](examples/diagrams.html). Run
 | `(edge (from A) (to B) …)`        | a connection, with an optional `(label …)`; `(ID: edge …)` names it                                          |
 | `(ID: group (label …) (group P))` | a group (subgraph, composite state) inside group `P` if given                                                |
 
-The one-line form `(f: diagram (a: node) (b: node))` and the multi-line
-form give the same model. `parseDiagram` reads the first diagram of a text,
-`diagramsFromLinks` every diagram of a parsed document, and `diagramToLino`
-writes a model back: `diagramFromLinks(parse(diagramToLino(model)))` equals
-`model`. Every error is a `DiagramError` with a `code` (`no-diagram`,
+The nested form, the one-line form `(f: diagram (a: node) (b: node))` and
+the multi-line parenthesized form give the same model. `parseDiagram` reads
+the first diagram of a text, `diagramsFromLinks` every diagram of a parsed
+document, and `diagramToLino` writes a model back in the nested form:
+`diagramFromLinks(parse(diagramToLino(model)))` equals `model`. Every error is a `DiagramError` with a `code` (`no-diagram`,
 `unknown-property`, `invalid-value`, `missing-value`, `duplicate-id`,
 `unknown-node`, `unknown-group`) and an `at` position: the index path of the
 link and its text, since `links-notation` gives no line numbers.
@@ -722,7 +722,7 @@ The gallery `examples/layout.html` (served with
 | ----------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `stack`     | `(stack (direction row) (gap 8px) (align center) (justify space-between) (wrap true) ...)`     | CSS flexbox. `direction` takes `vertical`, `horizontal`, `row`, `column` and their `-reverse` forms.                                                                                          |
 | `grid`      | `(grid (columns 16rem 1fr) (rows auto 1fr) (areas 'nav main') ...)`                            | CSS grid. Tracks are lengths, `fr`, `auto`, `(repeat N ...)`, `(minmax MIN MAX)` and `(fit-content L)`; every token is checked. A child whose id names an area goes into it.                  |
-| `split`     | `(split (sizes 30 70) (min 20) (collapsible true false) (remember-size chat.split) ...)`       | Panes with dividers (WAI-ARIA window splitter). Sizes are percentages with a constant total. `remember-size` keeps `sizes 30 70` in the render storage.                                     |
+| `split`     | `(split (sizes 30 70) (min 20) (collapsible true false) (remember-size chat.split) ...)`       | Panes with dividers (WAI-ARIA window splitter). Sizes are percentages with a constant total. `remember-size` keeps `sizes 30 70` in the render storage.                                       |
 | `tab-group` | `(tab-group (label Inspector) (active styles) (styles: panel (title Styles) ...) ...)`         | Panels behind a tab strip (WAI-ARIA tabs, automatic activation). Tabs can be closed, reordered and dragged; a "More tabs" menu appears when they overflow.                                    |
 | `panel`     | `(panel (title Styles) (closable true) ...)`                                                   | A titled panel: a tab of a tab group or a dock panel.                                                                                                                                         |
 | `dock`      | `(dock (persist designer.layout) (left: region (size 16rem) (panels toolbox outline)) ...)`    | Panels docked left, right, top, bottom and center; each region shows its panels as tabs. A panel can move to another region, float, close and come back; the layout is saved under `persist`. |

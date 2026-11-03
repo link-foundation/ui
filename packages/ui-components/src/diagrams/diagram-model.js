@@ -15,7 +15,7 @@
  * `(H (H a) (H b))` it returns is folded back into `(H a b)` here.
  */
 
-import { parseNested } from '@link-foundation/ui-core';
+import { formatLinks, parseNested } from '@link-foundation/ui-core';
 import { Link } from 'links-notation';
 
 /** @typedef {'flowchart'|'sequence'|'state'|'class'} DiagramKind */
@@ -471,7 +471,8 @@ function itemLinks(model) {
 }
 
 /**
- * Write a diagram model as Links Notation (the multi-line form).
+ * Write a diagram model as Links Notation in the nested form (#133): the
+ * `diagram` line, then one indented block per setting, group, node and edge.
  * @param {DiagramModel} model
  * @returns {string} LiNo text that `parseDiagram` reads back into `model`
  */
@@ -485,11 +486,9 @@ export function diagramToLino(model) {
       settings.push(prop(name, model[name]));
     }
   }
-  const head = String(new Link(model.id, [ref('diagram')])).slice(1, -1);
-  const body = [...settings, ...itemLinks(model)].map(
-    (link) => `  ${String(link)}`
-  );
-  return `(${head}\n${body.join('\n')})\n`;
+  return formatLinks([
+    new Link(model.id, [ref('diagram'), ...settings, ...itemLinks(model)]),
+  ]);
 }
 
 /**

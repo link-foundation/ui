@@ -92,17 +92,26 @@ describe('diagramToLino', () => {
     });
   }
 
-  it('writes the multi-line form and leaves out default values', () => {
+  it('writes the nested form and leaves out default values (#133)', () => {
     expect(diagramToLino(parseDiagram(fixture('login-flow.lino')))).toBe(
       [
-        '(login-flow: diagram',
-        '  (kind flowchart)',
-        '  (direction down)',
-        '  (start: node (label Start))',
-        "  (check: node (label 'Signed in?') (shape diamond))",
-        '  (home: node (label Home))',
-        '  (edge (from start) (to check))',
-        '  (edge (from check) (to home) (label yes)))',
+        'login-flow: diagram',
+        '  kind flowchart',
+        '  direction down',
+        '  start: node',
+        '    label Start',
+        '  check: node',
+        "    label 'Signed in?'",
+        '    shape diamond',
+        '  home: node',
+        '    label Home',
+        '  edge',
+        '    from start',
+        '    to check',
+        '  edge',
+        '    from check',
+        '    to home',
+        '    label yes',
         '',
       ].join('\n')
     );
