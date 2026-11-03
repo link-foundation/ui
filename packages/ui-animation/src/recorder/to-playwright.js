@@ -30,11 +30,21 @@ function pointerLines(args) {
 const INPUT = {
   pointer: pointerLines,
   text: ([, id, value]) => [
-    `  await target(${quote(id)}).fill(${quote(value)});`,
+    `  if (await target(${quote(id)}).evaluate(node => String(node.value ?? node.textContent ?? '')) !== ${quote(value)}) await target(${quote(id)}).fill(${quote(value)});`,
   ],
-  key: (args) => [
-    `  await target(${quote(field(args, 'target')[0])}).dispatchEvent(${quote(`key${args[1]}`)}, { key: ${quote(args[2])} });`,
-  ],
+  key: (args) => {
+    const id = field(args, 'target')[0];
+    if (args[2] === '***') {
+      // A redacted key has no native equivalent; never type the placeholder.
+      return [
+        `  await target(${quote(id)}).dispatchEvent(${quote(`key${args[1]}`)}, { key: ${quote(args[2])} });`,
+      ];
+    }
+    return [
+      `  await target(${quote(id)}).focus();`,
+      `  await page.keyboard.${args[1] === 'up' ? 'up' : 'down'}(${quote(args[2])});`,
+    ];
+  },
   wheel: ([, id, x, y, mode = 0]) => [
     `  await target(${quote(id)}).dispatchEvent('wheel', { deltaX: ${Number(x)}, deltaY: ${Number(y)}, deltaMode: ${Number(mode)} });`,
   ],

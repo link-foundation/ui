@@ -426,6 +426,11 @@ contains `ok` and `{ time, expected, actual }` mismatches. Redacted recordings
 can only verify handlers whose observable output is independent of the removed
 secret values; a mismatch is reported rather than assuming those values.
 
+Keyboard events use Playwright’s native keyboard API, including default button
+activation. Text events skip a fill when the preceding key already produced the
+recorded value, avoiding duplicate input notifications. Redacted keys remain
+synthetic because their original character is unavailable.
+
 `toPlaywright(text, { url })` exports a Playwright spec with a controlled clock,
 viewport, stable `data-link-id` selectors, pointer/key/wheel/text/focus inputs,
 property assertions and named `test.step` markers. DOM properties such as labels

@@ -14,7 +14,8 @@ test('recorded session', async ({ page }) => {
   await page.clock.runFor(149);
   await expect(page.locator("[data-link-id=\"ok\"]")).toHaveText("Saved");
   await page.clock.runFor(510);
-  await target("ok").dispatchEvent("keydown", { key: "Enter" });
+  await target("ok").focus();
+  await page.keyboard.down("Enter");
   await page.clock.runFor(600);
   await test.step("saved once", async () => {});
 });

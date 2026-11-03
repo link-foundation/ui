@@ -46,3 +46,36 @@ test('browser fixture is exactly the generated spec executed by the e2e harness'
   );
   assert.equal(toPlaywright(input, { url: '/examples/animation/' }), generated);
 });
+
+test('native keyboard browser fixture is the exact generated spec', () => {
+  const input = readFileSync(
+    new URL('./fixtures/recording-native.lino', import.meta.url),
+    'utf8'
+  );
+  const generated = readFileSync(
+    new URL(
+      '../../../tests/e2e/fixtures/recorder-native-generated.mjs',
+      import.meta.url
+    ),
+    'utf8'
+  );
+  assert.equal(
+    toPlaywright(input, { url: '/tests/ui/pages/recorder-native.html' }),
+    generated
+  );
+});
+
+test('redacted keys export synthetic events without typing the placeholder', () => {
+  const spec = toPlaywright({
+    id: 'redacted-key',
+    events: [
+      {
+        time: 0,
+        kind: 'input',
+        args: ['key', 'down', '***', ['target', 'password']],
+      },
+    ],
+  });
+  assert.ok(spec.includes('dispatchEvent("keydown", { key: "***" })'));
+  assert.ok(!spec.includes('page.keyboard.down'));
+});

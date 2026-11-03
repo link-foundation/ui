@@ -1,0 +1,24 @@
+native-session: recording
+  viewport 1280 800
+  event 0ms
+    input focus in ok
+  event 10ms
+    input key down Enter
+      target ok
+  event 10ms
+    set ok label Saved
+  event 20ms
+    input key up Enter
+      target ok
+  event 30ms
+    input focus in field
+  event 40ms
+    input key down a
+      target field
+  event 40ms
+    input text field a
+  event 40ms
+    set count label 1
+  event 50ms
+    input key up a
+      target field

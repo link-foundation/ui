@@ -50,3 +50,4 @@ packages/ui-components/tests/links-view/__snapshots__/** text eol=lf
 # Recorder export snapshots are the exact LF output of toPlaywright.
 packages/ui-animation/tests/fixtures/recording-session.spec.txt text eol=lf
 tests/e2e/fixtures/recorder-generated.mjs text eol=lf
+tests/e2e/fixtures/recorder-native-generated.mjs text eol=lf
