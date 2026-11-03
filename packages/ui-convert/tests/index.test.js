@@ -59,6 +59,10 @@ describe('@link-foundation/ui-convert', () => {
         'readRules',
         'styleDeclarations',
         'substitute',
+        // One-way source exports.
+        'TARGETS',
+        'collectActions',
+        'exportDocument',
         // Interop: A2UI, Adaptive Cards, JSON Forms and Lottie.
         'A2UI_VERSION',
         'A2uiStream',
