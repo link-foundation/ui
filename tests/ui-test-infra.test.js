@@ -132,13 +132,22 @@ describe('shared static server', () => {
         '/docs/case-studies/issue-1/samples/document.lino',
         'docs/case-studies/issue-1/samples/document.lino',
       ],
+      [
+        '/packages/ui-components/examples/link-view.html',
+        'packages/ui-components/examples/link-view.html',
+      ],
+      [
+        '/packages/ui-components/src/index.js',
+        'packages/ui-components/src/index.js',
+      ],
     ]) {
       expect(resolveRequestPath(served, url)).toEqual({
         status: 200,
         file: path.resolve(repoRoot, file),
       });
     }
-    // Only src/ of a package is served, not its tests or package.json.
+    // Only src/ and examples/ of a package are served, not its tests or
+    // package.json.
     expect(
       resolveRequestPath(
         served,
