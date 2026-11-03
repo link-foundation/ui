@@ -87,6 +87,22 @@ export function removeDom() {
   saved.clear();
 }
 
+/**
+ * Delete every window global, including ones another package's tests
+ * installed before `installDom()` (Bun runs all files in one process, and
+ * the ui-react tests keep their own jsdom globals). `installDom()` puts the
+ * shared window back.
+ */
+export function hideDom() {
+  removeDom();
+  for (const name of GLOBALS) {
+    if (!saved.has(name)) {
+      saved.set(name, Object.getOwnPropertyDescriptor(globalThis, name));
+    }
+    delete globalThis[name];
+  }
+}
+
 installDom();
 
 /** `vue`, loaded after the globals. */

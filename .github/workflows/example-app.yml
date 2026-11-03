@@ -5,6 +5,7 @@ on:
     types: [opened, synchronize, reopened]
     paths:
       - 'examples/universal-app/**'
+      - 'examples/react/**'
       - 'packages/*/src/**'
       - 'package.json'
       - 'package-lock.json'
@@ -19,6 +20,7 @@ on:
       - main
     paths:
       - 'examples/universal-app/**'
+      - 'examples/react/**'
       - 'packages/*/src/**'
       - 'package.json'
       - 'package-lock.json'
@@ -102,6 +104,32 @@ jobs:
           name: github-pages
           pages: 'true'
           path: examples/universal-app/dist
+
+  # examples/react: the Vite + React app of @link-foundation/ui-react.
+  react-example:
+    name: Build ui-react example
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    concurrency:
+      group: check-${{ github.workflow }}-${{ github.ref }}-react-example
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24.x'
+          cache: npm
+          cache-dependency-path: examples/react/package-lock.json
+
+      - name: Install app dependencies
+        run: npm ci --prefix examples/react --no-audit --no-fund
+
+      - name: Build app
+        run: npm --prefix examples/react run build
 
   # Requires Settings → Pages → Source = GitHub Actions to be set once
   # in the repository before this job can succeed. See README → "Deploying
@@ -440,6 +468,7 @@ jobs:
       !cancelled()
     needs:
       - web-build
+      - react-example
       - pages-deploy
       - desktop-package
       - android-build
