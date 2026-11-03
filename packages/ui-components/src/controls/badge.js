@@ -2,20 +2,14 @@
  * `badge`: a short status or count shown next to something. The value is
  * visible; the label, when there is one, completes it for assistive
  * technology only ("3" → "3 unread messages"). `tone` is `neutral`
- * (default), `info`, `success`, `warning` or `error`.
+ * (default), `primary` or `error`.
  *
- *   (unread: badge 'unread messages' (value 3) (tone info))
+ *   (unread: badge 3 (label 'unread messages') (tone primary))
  */
 
 import { atomOf, changesOf, partOf, setAttr, setText } from './dom.js';
 
-export const BADGE_TONES = Object.freeze([
-  'neutral',
-  'info',
-  'success',
-  'warning',
-  'error',
-]);
+export const BADGE_TONES = Object.freeze(['neutral', 'primary', 'error']);
 
 export const BADGE_KIND = Object.freeze({
   tag: 'ui-badge',
