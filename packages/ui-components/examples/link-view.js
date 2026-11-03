@@ -4,7 +4,7 @@
  * (preset from `?renderer=` and `?theme=`).
  */
 
-import { defineLinkView } from '@link-foundation/ui-components';
+import { defineLinkView } from '@link-foundation/ui-components/links-view';
 
 defineLinkView(window);
 
