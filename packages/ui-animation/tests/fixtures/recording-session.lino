@@ -1,0 +1,21 @@
+session-7: recording
+  started '2026-11-01T12:00:00Z'
+  seed 42
+  viewport 1280 800
+  document app
+  redacted true
+  event 0ms
+    set ok label OK
+  event 840ms
+    input pointer down ok
+      at 12 8
+  event 841ms
+    play press-feedback
+      target ok
+  event 990ms
+    set ok label Saved
+  event 1500ms
+    input key down Enter
+      target ok
+  event 2100ms
+    mark 'saved once'

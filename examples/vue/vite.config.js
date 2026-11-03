@@ -22,6 +22,10 @@ export default defineConfig({
     // published packages would be from node_modules.
     alias: [
       {
+        find: '@link-foundation/ui-tokens/themes',
+        replacement: `${packages}ui-tokens/src/themes/index.js`,
+      },
+      {
         find: /^@link-foundation\/(ui-[a-z]+)$/,
         replacement: `${packages}$1/src/index.js`,
       },

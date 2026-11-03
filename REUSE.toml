@@ -205,3 +205,9 @@ path = "assets/icons/own/zoom-out.svg"
 precedence = "aggregate"
 SPDX-FileCopyrightText = "Link Foundation contributors"
 SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/data/dtcg-resolver/*.json"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "W3C and Design Tokens Community Group Contributors"
+SPDX-License-Identifier = "BSD-3-Clause"

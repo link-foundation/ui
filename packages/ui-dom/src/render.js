@@ -10,6 +10,7 @@ import { createScheduler } from './scheduler.js';
 import { adoptStyles, buildCss } from './styles.js';
 import { createTree } from './tree.js';
 import { atom, elementOf } from './model.js';
+import { applyThemes, themeRegistry } from './themes.js';
 
 /**
  * @typedef {import('@link-foundation/ui-store').Store} Store
@@ -29,6 +30,8 @@ import { atom, elementOf } from './model.js';
  * @property {boolean} [setTitle]  set `document.title` from the document
  * @property {string|object|Map<string, any>} [tokens]  ui-tokens LiNo text,
  *   `{ sets }` of `readTokens`, or resolved tokens
+ * @property {string|object[]|Map<string, object>} [themes] theme packages
+ * @property {object} [config] layered configuration and comfort choices
  * @property {string} [theme]  the token set (default: the document's
  *   `theme`, else the first set)
  * @property {string|object[]} [styles]  ui-style LiNo text or read rules
@@ -62,6 +65,12 @@ export function render(container, store, options = {}) {
     options.onDiagnostic?.(d);
   };
 
+  options = {
+    ...options,
+    themeRegistry: themeRegistry(options.themes, report),
+    themeHost: container,
+  };
+
   const styles =
     options.adoptStyles === false
       ? null
@@ -75,9 +84,13 @@ export function render(container, store, options = {}) {
     report,
   });
   tree.mount(store);
+  const syncThemes = () => applyThemes(tree, store, options);
+  syncThemes();
+  const stopConfig = options.config?.subscribe(syncThemes);
 
   const scheduler = createScheduler((events) => {
     applyEvents(tree, events, report);
+    syncThemes();
     options.onPatch?.(events);
   });
   let unsubscribe = store.subscribe((events) => scheduler.schedule(events));
@@ -98,6 +111,7 @@ export function render(container, store, options = {}) {
         return;
       }
       scheduler.cancel();
+      stopConfig?.();
       unsubscribe();
       unsubscribe = null;
       tree.clear();

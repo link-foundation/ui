@@ -164,6 +164,7 @@ export function createControl(context, runs) {
   const { clock } = context;
   const state = { startedAt: clock.now(), pausedAt: null, frame: null };
   let settled = false;
+  let cancelled = false;
   const done = deferred();
   const end = Math.max(0, ...runs.map((r) => r.end));
   const elapsed = () =>
@@ -245,9 +246,10 @@ export function createControl(context, runs) {
       }
     },
     cancel() {
-      if (settled) {
+      if (cancelled) {
         return;
       }
+      cancelled = true;
       settled = true;
       stopFrames();
       for (const run of runs) {

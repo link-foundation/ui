@@ -8,7 +8,7 @@ token file, SwiftUI constants and Jetpack Compose constants. It can also read
 a DTCG file back as Links Notation, and it can hand the tokens to
 [Style Dictionary](https://styledictionary.com) for other platforms.
 
-Its only runtime dependency is `@link-foundation/ui-core`. Style Dictionary
+The theme entry point also uses `@link-foundation/ui-style`. Style Dictionary
 is an optional peer dependency, and it is loaded only by
 `@link-foundation/ui-tokens/style-dictionary`.
 
@@ -241,3 +241,11 @@ usage.
 ## License
 
 [Unlicense](LICENSE): public domain.
+
+## Themes
+
+`@link-foundation/ui-tokens/themes` exports `loadThemes`, `resolveTheme`,
+`compileThemeCss`, `contrastRatio`, `ensureContrast`, `resolveTemplate`,
+`themeBootScript` and `exportThemeResolver`. See the
+[theme contract](../../docs/spec/themes.md) and
+[base theme package](../ui-themes/README.md).

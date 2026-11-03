@@ -103,3 +103,10 @@
 - **links-ui-logo** (image): `assets/links-ui-logo.svg`
   - Copyright: public domain
   - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+
+## BSD-3-Clause
+
+- [dtcg-resolver-schema](https://www.designtokens.org/schemas/2025.10/resolver.json) (data): `assets/data/dtcg-resolver/*.json`
+  - Copyright: W3C and Design Tokens Community Group Contributors
+  - Licence: [BSD-3-Clause](https://www.w3.org/Consortium/Legal/2008/03-bsd-license.html)
+  - Modified: yes
