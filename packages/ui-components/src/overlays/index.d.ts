@@ -47,7 +47,7 @@ export interface OverlayController {
     context?: { target?: string; selection?: string[] }
   ): void;
   close(restore?: boolean): void;
-  service?: import('../behavior/index.js').Service;
+  service?: import('@link-foundation/ui-components/behavior').Service;
   queue?: ReturnType<typeof createToastQueue>;
 }
 export function overlayController(node: Element): OverlayController | undefined;
@@ -73,7 +73,7 @@ export const TOAST_MACHINE: string;
 declare module '@link-foundation/ui-dom' {
   interface RenderOptions {
     overlays?: {
-      clock?: import('../behavior/index.js').Clock;
+      clock?: import('@link-foundation/ui-components/behavior').Clock;
       selection?: () => readonly string[];
     };
   }
