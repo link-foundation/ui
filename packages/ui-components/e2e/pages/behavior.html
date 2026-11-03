@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ui-components behaviour</title>
+    <!--
+      No bundler: the workspace packages load as ES modules from their src/
+      folders. Serve the repository with `node scripts/serve-static.mjs` and
+      open http://127.0.0.1:4173/packages/ui-components/e2e/pages/behavior.html
+    -->
+    <script type="importmap">
+      {
+        "imports": {
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "@link-foundation/ui-store": "/packages/ui-store/src/index.js",
+          "@link-foundation/ui-style": "/packages/ui-style/src/index.js",
+          "@link-foundation/ui-tokens": "/packages/ui-tokens/src/index.js",
+          "@link-foundation/ui-dom": "/packages/ui-dom/src/index.js",
+          "@link-foundation/ui-components": "/packages/ui-components/src/index.js",
+          "@link-foundation/ui-components/behavior": "/packages/ui-components/src/behavior/index.js",
+          "@link-foundation/ui-components/behavior/dom": "/packages/ui-components/src/behavior/dom.js",
+          "@link-foundation/ui-components/a11y": "/packages/ui-components/src/a11y/index.js",
+          "links-notation": "/node_modules/links-notation/dist/index.js"
+        }
+      }
+    </script>
+    <style>
+      body {
+        margin: 0;
+        padding: 24px;
+        font-family: system-ui, sans-serif;
+        color: #1d1b20;
+        background: #fffbfe;
+      }
+      output {
+        font-family: ui-monospace, monospace;
+      }
+      /* Make the machine state visible: aria-pressed and data-state. */
+      ui-button button {
+        margin-inline-end: 8px;
+        padding: 6px 16px;
+        border: 1px solid #79747e;
+        border-radius: 8px;
+        background: #fffbfe;
+        color: #1d1b20;
+        font: inherit;
+      }
+      ui-button button[aria-pressed='true'],
+      ui-button button[aria-expanded='true'] {
+        background: #6750a4;
+        border-color: #6750a4;
+        color: #ffffff;
+      }
+      [data-link-id='panel'] {
+        margin-top: 12px;
+        padding: 12px;
+        border-radius: 8px;
+        background: #f3edf7;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Behaviour state machines</h1>
+      <p>
+        The toggle and disclosure reference machines (LiNo) on ui-dom elements.
+        Keyboard: Tab, Enter, Space and Escape.
+      </p>
+      <div id="app"></div>
+      <p>
+        Diagnostics:
+        <output id="diagnostics" aria-live="polite">none</output>
+      </p>
+    </main>
+    <script type="module">
+      import { mountBehavior } from '@link-foundation/ui-components/behavior/dom';
+
+      const PAGE = `(page: document
+  (bold: button (label Bold) (machine toggle-machine))
+  (more: button (label Details) (machine disclosure-machine (content panel)))
+  (panel: stack (t: text 'Hidden details, shown by the disclosure machine.')))`;
+
+      const app = document.getElementById('app');
+      const behavior = mountBehavior(app, PAGE);
+      window.behavior = behavior;
+      document.getElementById('diagnostics').textContent =
+        behavior.diagnostics.length === 0
+          ? 'none'
+          : behavior.diagnostics.map((d) => d.code).join(', ');
+      app.dataset.ready = 'true';
+    </script>
+  </body>
+</html>

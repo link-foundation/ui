@@ -94,6 +94,26 @@ npx link-ui-tokens build tokens.lino --set material3 \
   --css tokens.css --dtcg tokens.json --swift Tokens.swift --kotlin Tokens.kt
 ```
 
+### Charts
+
+[`@link-foundation/ui-components`](packages/ui-components/README.md)
+renders charts written in Links Notation with `data`, `mark` and
+`encoding` as deterministic, accessible SVG: `<ui-chart>` has a data table
+twin and arrow-key navigation between points. ECharts is loaded only for
+`(renderer echarts)`:
+
+```html
+<ui-chart>
+  <script type="text/lino">
+    (sales: chart
+      (description 'Sales grew from 12 to 30 thousand')
+      (data (row (month 2026-01) (value 12)) (row (month 2026-02) (value 30)))
+      (mark bar)
+      (encoding (x (field month) (type ordinal)) (y (field value) (type quantitative))))
+  </script>
+</ui-chart>
+```
+
 ### DOM renderer
 
 [`@link-foundation/ui-dom`](packages/ui-dom/README.md) renders a document as
@@ -124,6 +144,69 @@ import { UiView } from '@link-foundation/ui-react';
   actions={{ save: () => console.log('saved') }}
   components={{ chart: Chart }}
 />;
+```
+
+### Animations
+
+[`@link-foundation/ui-animation`](packages/ui-animation/README.md) reads
+animations written in Links Notation (keyframe tracks, easings, springs,
+timelines with stagger, `(on pressed ...)` triggers and seeded procedural
+effects), samples them as pure functions of time, validates fills, WCAG
+2.3.1 flashes and reduced motion, and plays them on the Web Animations API.
+GSAP is never used:
+
+```js
+import { createPlayer } from '@link-foundation/ui-animation';
+
+const player = createPlayer(handle, { animations: text, resolveToken });
+player.bindTriggers(store); // (on pressed (play press-feedback))
+await player.play('intro').finished;
+```
+
+### Behaviour and accessibility
+
+[`@link-foundation/ui-components`](packages/ui-components/README.md) adds
+behaviour written as LiNo state machines (`toggle`, `disclosure`), an actions
+registry that never evaluates code, and keyboard and focus helpers:
+
+```js
+import { mountBehavior } from '@link-foundation/ui-components/behavior/dom';
+
+mountBehavior(
+  app,
+  `(page: document
+  (bold: button (label Bold) (machine toggle-machine)))`
+);
+// Enter, Space or a click switch aria-pressed on the button
+```
+
+### Link view
+
+[`@link-foundation/ui-components`](packages/ui-components/README.md) draws one
+link from Links Notation with `link-view`, using the links-visuals geometry.
+The SVG and Canvas renderers share one set of marker shapes. Each element has
+its own zoom and pan and asks for no animation frame while idle. The gallery
+is `packages/ui-components/examples/link-view.html`:
+
+```html
+<link-view
+  lino="(simple: link-view (link (id 1) (source 1) (target 2)) (markers (source bar) (target arrow)))"
+></link-view>
+```
+
+### Layout and windowing
+
+[`@link-foundation/ui-components/layout`](packages/ui-components/README.md#layout-and-windowing)
+adds the layout kinds `stack`, `grid`, `split`, `tab-group`, `dock`, `window` and
+`app-shell` to ui-dom, with a layer manager and dock layouts saved as Links
+Notation:
+
+```lino
+(designer-shell: dock (persist designer.layout)
+  (left: region (size 16rem) (panels toolbox outline))
+  (right: region (size 20rem) (panels properties))
+  (center: region (panels canvas))
+  ...)
 ```
 
 ### SwiftUI
@@ -230,14 +313,18 @@ npm run example:desktop:package
 ├── .github/workflows/    # GitHub Actions CI/CD
 ├── .husky/               # Git hooks (pre-commit)
 ├── examples/             # Usage examples
+│   ├── animation/        # ui-animation page: plays a LiNo timeline on ui-dom nodes
 │   ├── kotlin/           # Compose Desktop window for ui-kotlin (Gradle build)
 │   ├── react/            # Vite + React app of ui-react (sample document, counter, chart kind)
 │   ├── ui-dom/           # ui-dom page served with an import map (scripts/serve-static.mjs)
 │   └── universal-app/    # React + GitHub Pages + Electron + Capacitor app
 ├── scripts/              # Build and release scripts
 ├── packages/             # npm workspaces (see docs/monorepo.md)
+│   ├── ui-animation/     # @link-foundation/ui-animation (LiNo animations: tracks, springs, timelines, triggers, safety rules, WAAPI player)
+│   ├── ui-components/    # @link-foundation/ui-components (LiNo state machines, actions registry, a11y helpers, charts, diagrams with Dagre layout, SVG and Mermaid, layout and windowing, own CC0 icons, ui-icon, link-view)
 │   ├── ui-config/        # @link-foundation/ui-config (layered configuration, overrides patches)
 │   ├── ui-convert/       # @link-foundation/ui-convert (HTML/DOM, A2UI, Adaptive Cards, JSON Forms, Lottie <-> LiNo)
+│   ├── ui-devmode/       # @link-foundation/ui-devmode (dev mode inspector overlay, session and user edits)
 │   ├── ui-core/          # @link-foundation/ui-core
 │   ├── ui-dom/           # @link-foundation/ui-dom (DOM renderer, plain custom elements)
 │   ├── ui-i18n/          # @link-foundation/ui-i18n (localisation with lino-i18n, (t KEY) messages)

@@ -1,0 +1,401 @@
+/*
+ * The styles of the layout elements of @link-foundation/ui-components.
+ *
+ * Every colour comes from a design token variable with a system colour as
+ * its fallback, so the elements follow `prefers-color-scheme` (declare
+ * `color-scheme: light dark` on the page) and forced colours. Sizes come
+ * from the `--ui-*` variables below, which a theme may set.
+ */
+
+:root {
+  --ui-split-divider-size: 8px;
+  --ui-tab-height: 2.25rem;
+  --ui-window-header-height: 2.25rem;
+  --ui-rail-width: 5rem;
+  --ui-drawer-width: 16rem;
+  --ui-dock-center-min-width: 12rem;
+  --ui-focus-ring: 3px solid var(--color-primary, Highlight);
+  --ui-layout-transition: var(--motion-duration-short, 150ms) ease;
+}
+
+/* A rendered child that is hidden stays hidden whatever its display. */
+:where(
+  ui-split,
+  ui-tab-group,
+  ui-dock,
+  ui-app-shell,
+  ui-window,
+  ui-region
+)[hidden],
+:where(ui-split, ui-tab-group, .ui-dock-region, .ui-window-body, ui-app-shell)
+  > [hidden],
+:where(.ui-tab-strip, .ui-dock-tools, .ui-window-header) [hidden],
+.ui-dock-holder {
+  display: none !important;
+}
+
+/* stack and grid: thin wrappers; their kinds write the flex and grid styles. */
+:where(ui-stack) {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+}
+
+:where(ui-grid) {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* split */
+:where(ui-split) {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+:where(ui-split) > * {
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+}
+
+.ui-split-divider {
+  position: relative;
+  background: var(--color-outline-variant, var(--color-outline, GrayText));
+  background-clip: content-box;
+  box-sizing: border-box;
+  touch-action: none;
+  user-select: none;
+  overflow: visible !important;
+  transition: background-color var(--ui-layout-transition);
+}
+
+:where(ui-split[data-direction='row']) > .ui-split-divider {
+  cursor: col-resize;
+  padding: 0 calc((var(--ui-split-divider-size) - 2px) / 2);
+}
+
+:where(ui-split[data-direction='column']) > .ui-split-divider {
+  cursor: row-resize;
+  padding: calc((var(--ui-split-divider-size) - 2px) / 2) 0;
+}
+
+.ui-split-divider:hover,
+.ui-split-divider[data-dragging] {
+  background-color: var(--color-primary, Highlight);
+}
+
+.ui-split-divider:focus-visible {
+  outline: var(--ui-focus-ring);
+  outline-offset: -1px;
+  background-color: var(--color-primary, Highlight);
+}
+
+/* tab strip (tab-group and dock regions) */
+.ui-tab-strip {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+  border-bottom: 1px solid var(--color-outline, GrayText);
+  background: var(--color-surface-container, var(--color-surface, Canvas));
+}
+
+.ui-tab-strip > [role='tablist'] {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.ui-tab-strip [role='tab'],
+.ui-tab-strip > button,
+.ui-window-header > button,
+.ui-dock-tools > button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-small, 0.25rem);
+  min-height: var(--ui-tab-height);
+  min-width: 24px;
+  padding: 0 var(--space-medium, 0.75rem);
+  border: 0;
+  background: transparent;
+  color: var(--color-on-surface, CanvasText);
+  font: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.ui-tab-strip [role='tab'] {
+  flex: 0 0 auto;
+  border-bottom: 3px solid transparent;
+}
+
+.ui-tab-strip [role='tab'][aria-selected='true'] {
+  border-bottom-color: var(--color-primary, Highlight);
+  font-weight: 600;
+}
+
+.ui-tab-close {
+  display: inline-grid;
+  place-items: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: var(--shape-corner-small, 4px);
+}
+
+.ui-tab-close:hover {
+  background: var(--color-surface-variant, ButtonFace);
+}
+
+.ui-tab-strip :focus-visible,
+.ui-window-header :focus-visible,
+.ui-dock-tools :focus-visible,
+.ui-menu :focus-visible,
+[role='tabpanel']:focus-visible,
+.ui-window-frame:focus-visible {
+  outline: var(--ui-focus-ring);
+  outline-offset: -3px;
+}
+
+/* menu (tab overflow, panel actions, restore) */
+.ui-menu {
+  position: absolute;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  min-width: 10rem;
+  padding: var(--space-small, 0.25rem) 0;
+  border: 1px solid var(--color-outline, GrayText);
+  border-radius: var(--shape-corner-medium, 8px);
+  background: var(--color-surface, Canvas);
+  color: var(--color-on-surface, CanvasText);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.2);
+}
+
+.ui-menu [role='menuitem'] {
+  padding: var(--space-small, 0.5rem) var(--space-medium, 0.75rem);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.ui-menu [role='menuitem']:hover,
+.ui-menu [role='menuitem']:focus {
+  background: var(--color-surface-variant, ButtonFace);
+}
+
+.ui-menu [role='menuitem'][aria-disabled='true'] {
+  color: var(--color-on-surface-variant, GrayText);
+  cursor: default;
+}
+
+.ui-tab-strip,
+.ui-dock-tools {
+  position: relative;
+}
+
+/* tab-group */
+:where(ui-tab-group) {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+:where(ui-tab-group) > [role='tabpanel'] {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: var(--space-medium, 0.75rem);
+}
+
+/* window and floating dock panels */
+:where(ui-window),
+.ui-window-frame {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  border: 1px solid var(--color-outline, GrayText);
+  border-radius: var(--shape-corner-medium, 8px);
+  background: var(--color-surface, Canvas);
+  color: var(--color-on-surface, CanvasText);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.25);
+  overflow: hidden;
+}
+
+.ui-window-header {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  min-height: var(--ui-window-header-height);
+  padding-inline-start: var(--space-medium, 0.75rem);
+  background: var(--color-surface-container, var(--color-surface, Canvas));
+  border-bottom: 1px solid var(--color-outline, GrayText);
+  cursor: move;
+  touch-action: none;
+  user-select: none;
+}
+
+.ui-window-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.ui-window-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: var(--space-medium, 0.75rem);
+}
+
+.ui-window-grip {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 16px;
+  height: 16px;
+  cursor: nwse-resize;
+  touch-action: none;
+  background: linear-gradient(
+    135deg,
+    transparent 50%,
+    var(--color-outline, GrayText) 50%
+  );
+}
+
+/* dock */
+:where(ui-dock) {
+  display: grid;
+  grid-template-areas:
+    'tools tools tools'
+    'top top top'
+    'left center right'
+    'bottom bottom bottom';
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  gap: 1px;
+  background: var(--color-outline, GrayText);
+}
+
+.ui-dock-tools {
+  grid-area: tools;
+  display: flex;
+  justify-content: flex-end;
+  background: var(--color-surface, Canvas);
+}
+
+.ui-dock-region {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: var(--color-surface, Canvas);
+  color: var(--color-on-surface, CanvasText);
+}
+
+.ui-dock-region > [role='tabpanel'] {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: var(--space-medium, 0.75rem);
+}
+
+.ui-dock-floating {
+  display: contents;
+}
+
+/*
+ * app-shell: the navigation is a bottom bar, a rail or a drawer. The shell
+ * owns the axis of the navigation, so it wins over the inline direction of
+ * a navigation stack. The shell fills the viewport and its content
+ * scrolls, so the navigation stays in view.
+ */
+:where(ui-app-shell) {
+  display: grid;
+  height: 100dvh;
+}
+
+:where(ui-app-shell) > [data-slot='content'] {
+  grid-area: content;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+}
+
+:where(ui-app-shell) > [role='navigation'] {
+  grid-area: nav;
+  display: flex;
+  box-sizing: border-box;
+  background: var(--color-surface-container, var(--color-surface, Canvas));
+  color: var(--color-on-surface, CanvasText);
+}
+
+:where(ui-app-shell[mode='bottom-bar']) {
+  grid-template: 'content' minmax(0, 1fr) 'nav' auto / minmax(0, 1fr);
+}
+
+:where(ui-app-shell[mode='bottom-bar']) > [role='navigation'] {
+  flex-direction: row !important;
+  justify-content: space-around;
+  padding: var(--space-small, 0.5rem);
+  border-top: 1px solid var(--color-outline, GrayText);
+}
+
+:where(ui-app-shell[mode='rail']) {
+  grid-template: 'nav content' minmax(0, 1fr) / var(--ui-rail-width) minmax(
+      0,
+      1fr
+    );
+}
+
+:where(ui-app-shell[mode='rail']) > [role='navigation'] {
+  flex-direction: column !important;
+  align-items: center;
+  padding: var(--space-medium, 0.75rem) var(--space-small, 0.25rem);
+  border-inline-end: 1px solid var(--color-outline, GrayText);
+}
+
+:where(ui-app-shell[mode='drawer']) {
+  grid-template: 'nav content' minmax(0, 1fr) / var(--ui-drawer-width) minmax(
+      0,
+      1fr
+    );
+}
+
+:where(ui-app-shell[mode='drawer']) > [role='navigation'] {
+  flex-direction: column !important;
+  align-items: stretch;
+  padding: var(--space-medium, 0.75rem);
+  border-inline-end: 1px solid var(--color-outline, GrayText);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-split-divider,
+  .ui-tab-strip [role='tab'],
+  .ui-window-frame,
+  :where(ui-window) {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .ui-split-divider {
+    background-color: CanvasText;
+  }
+
+  .ui-tab-strip [role='tab'][aria-selected='true'] {
+    border-bottom-color: Highlight;
+  }
+}

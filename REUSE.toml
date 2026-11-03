@@ -13,3 +13,195 @@ path = "assets/links-ui-logo.svg"
 precedence = "aggregate"
 SPDX-FileCopyrightText = "Link Foundation contributors"
 SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/attach.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/check.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/chevron-down.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/chevron-left.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/chevron-right.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/chevron-up.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/close.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/copy.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/dock-bottom.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/dock-left.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/dock-right.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/drag-handle.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/error.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/fit.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/float.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/info.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/link.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/menu.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/minus.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/more.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/paste.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/pause.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/play.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/plus.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/record.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/reset.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/search.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/send.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/settings.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/warning.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/zoom-in.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "assets/icons/own/zoom-out.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Link Foundation contributors"
+SPDX-License-Identifier = "CC0-1.0"

@@ -18,6 +18,9 @@ export const DOM_EVENTS = Object.freeze({
   hover: 'pointerenter',
 });
 
+/** Whether a name is a vocabulary action (`navigate`, `emit`...). */
+const isVocabularyAction = (name) => vocabulary().actions.has(name);
+
 /** A frozen deep copy of an action link (the event detail is data). */
 function freeze(value) {
   return Array.isArray(value) ? Object.freeze(value.map(freeze)) : value;
@@ -28,9 +31,12 @@ function freeze(value) {
  * offending action (or handler) is left out.
  * @param {import('./model.js').Element} element
  * @param {(code: string, severity: string, at?: object) => void} report
+ * @param {(name: string) => boolean} [isAction]  which action names are
+ *   known; defaults to the vocabulary actions (a host with an actions
+ *   registry passes its own check)
  * @returns {{event: string, domEvent: string, actions: readonly any[]}[]}
  */
-export function handlersOf(element, report) {
+export function handlersOf(element, report, isAction = isVocabularyAction) {
   const handlers = [];
   for (const property of element.properties) {
     if (property.name !== 'on') {
@@ -52,7 +58,7 @@ export function handlersOf(element, report) {
     for (const link of links) {
       if (!Array.isArray(link) || typeof link[0] !== 'string') {
         report('invalid-handler', 'error', { property: 'on' });
-      } else if (!vocabulary().actions.has(link[0])) {
+      } else if (!isAction(link[0])) {
         report('unknown-action', 'warning', {
           property: 'on',
           action: link[0],

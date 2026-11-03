@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ui-components layout gallery</title>
+    <!--
+      No bundler: the workspace packages load as ES modules from their src/
+      folders. Serve the repository with `node scripts/serve-static.mjs` and
+      open http://127.0.0.1:4173/packages/ui-components/examples/layout.html
+    -->
+    <script type="importmap">
+      {
+        "imports": {
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "@link-foundation/ui-store": "/packages/ui-store/src/index.js",
+          "@link-foundation/ui-style": "/packages/ui-style/src/index.js",
+          "@link-foundation/ui-tokens": "/packages/ui-tokens/src/index.js",
+          "@link-foundation/ui-dom": "/packages/ui-dom/src/index.js",
+          "@link-foundation/ui-components/layout": "/packages/ui-components/src/layout/index.js",
+          "links-notation": "/node_modules/links-notation/dist/index.js"
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="../src/layout/layout.css" />
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: system-ui, sans-serif;
+      }
+      body {
+        margin: 0;
+        background: Canvas;
+        color: CanvasText;
+      }
+      [data-link-id='designer'] {
+        height: 22rem;
+        border: 1px solid GrayText;
+      }
+      [data-link-id='chat'] {
+        height: 12rem;
+        border: 1px solid GrayText;
+      }
+      [data-link-id='inspector-tabs'] {
+        min-height: 8rem;
+        border: 1px solid GrayText;
+      }
+      [data-link-id='chat'] > :not([role='separator']) {
+        padding: 0.75rem;
+      }
+      ui-button > button {
+        padding: 0.5rem 1rem;
+        border: 1px solid ButtonBorder;
+        border-radius: 8px;
+        background: ButtonFace;
+        color: ButtonText;
+        font: inherit;
+        cursor: pointer;
+      }
+      [data-slot='rail'] ui-button > button {
+        padding-inline: 0.25rem;
+        font-size: 0.8125rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="./layout.js"></script>
+  </body>
+</html>
