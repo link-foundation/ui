@@ -29,7 +29,7 @@
     "npm:jsdom@^30.1.3": "30.1.3",
     "npm:links-notation@~0.27.1": "0.27.1",
     "npm:lino-arguments@0.4.0": "0.4.0",
-    "npm:lino-i18n@0.5.0": "0.5.0_eslint@10.13.0_vue@3.5.44",
+    "npm:lino-i18n@0.5.0": "0.5.0_eslint@10.13.0_react@19.3.1_react-dom@19.3.1_vue@3.5.44",
     "npm:lint-staged@^16.4.0": "16.4.0",
     "npm:lottie-web@^5.13.0": "5.13.0",
     "npm:lucide@^1.66.0": "1.66.0",
@@ -37,6 +37,8 @@
     "npm:parse5@^8.0.1": "8.0.1",
     "npm:postcss@^8.5.6": "8.5.32",
     "npm:prettier@^3.6.2": "3.8.4",
+    "npm:react-dom@^19.3.1": "19.3.1_react@19.3.1",
+    "npm:react@^19.3.1": "19.3.1",
     "npm:svgo@^4.1.0": "4.1.0",
     "npm:test-anywhere@~0.8.48": "0.8.50",
     "npm:vue@^3.5.44": "3.5.44",
@@ -2004,7 +2006,7 @@
         "links-notation@0.11.2"
       ]
     },
-    "lino-i18n@0.5.0_eslint@10.13.0_vue@3.5.44": {
+    "lino-i18n@0.5.0_eslint@10.13.0_react@19.3.1_react-dom@19.3.1_vue@3.5.44": {
       "integrity": "sha512-WNfTmvkaEvyZsR8Uoj6ur3+wm7MvI/cX6J0MIFfit3vm0SM4czbcR3qEMS4fXeSf040LBDG9IeGMArBzRLMsaQ==",
       "dependencies": [
         "@babel/generator",
@@ -2017,10 +2019,14 @@
         "links-notation@0.23.0",
         "lino-arguments@0.3.0",
         "lino-objects-codec",
+        "react",
+        "react-dom",
         "vue"
       ],
       "optionalPeers": [
         "eslint",
+        "react",
+        "react-dom",
         "vue"
       ],
       "bin": true
@@ -2309,6 +2315,16 @@
         "hookified@2.2.0"
       ]
     },
+    "react-dom@19.3.1_react@19.3.1": {
+      "integrity": "sha512-Y0bARz53lhEC1NMCASs0/j+faB/zqt3R8hpvg1e8+61ZVJ4UL0UdC4cBbXfZMcIuhrfgeILTLe+ZeBCavQPtKQ==",
+      "dependencies": [
+        "react",
+        "scheduler"
+      ]
+    },
+    "react@19.3.1": {
+      "integrity": "sha512-QNhWdt7nrgVWWQG58QuGsAR3jv3Hbe4mb4vz7w2csnHavciZJgda1CPNaldF6eVxv90ud3jUXpKlHL69gO38yw=="
+    },
     "require-directory@2.1.1": {
       "integrity": "sha512-fGxEI7+wsG9xrvdjsrlmL22OMTTiHRwAMroiEeMgq8gzoLC/PQr7RsRDSTLUg/bZAZtF+TVIkHc6/4RIKrui+Q=="
     },
@@ -2351,6 +2367,9 @@
       "dependencies": [
         "xmlchars"
       ]
+    },
+    "scheduler@0.28.0": {
+      "integrity": "sha512-juorfCmIkIw8tT+p5BXSm6PJjQF/ycEYmKyzURCIt/RaZIhL+PulbQ9Yu2z1HdOJDdqDTlxA1+xKBmHXJsczAw=="
     },
     "semver@7.8.5": {
       "integrity": "sha512-Y7/KDsb8LjooZpwaqGyulO6DQlksgCncchHGk+sZIY4SBvUocMBEFH5Ur1fI4dV+Jvl0w6cjvucaIi40puRioA==",
@@ -2770,6 +2789,19 @@
             "npm:doublets-web@~0.1.3",
             "npm:fake-indexeddb@^6.2.7",
             "npm:links-notation@~0.27.1",
+            "npm:test-anywhere@~0.8.48"
+          ]
+        }
+      },
+      "packages/ui-react": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@link-foundation/ui-core@^0.0.0",
+            "npm:@link-foundation/ui-dom@^0.0.0",
+            "npm:@link-foundation/ui-store@^0.0.0",
+            "npm:jsdom@^30.1.3",
+            "npm:react-dom@^19.3.1",
+            "npm:react@^19.3.1",
             "npm:test-anywhere@~0.8.48"
           ]
         }
