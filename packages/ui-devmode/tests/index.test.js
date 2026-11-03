@@ -6,7 +6,15 @@
 
 import { describe, it, expect } from 'test-anywhere';
 import { GLOBAL_NAME, mountDevMode } from '../src/index.js';
-import { createPage, key, POLICY, sample, shortcut, tick } from './setup.js';
+import {
+  createPage,
+  key,
+  POLICY,
+  sample,
+  shortcut,
+  tick,
+  waitFor,
+} from './setup.js';
 
 /** The sample page with dev mode mounted (and opened unless `open: false`). */
 async function openPage({ policy = POLICY, open = true, url } = {}) {
@@ -214,8 +222,8 @@ describe('mountDevMode entry points', () => {
     const { dev, window } = await openPage({ open: false });
     expect(dev.isOpen).toBe(false);
     window.dispatchEvent(shortcut(window));
-    await tick(30);
-    expect(dev.isOpen).toBe(true);
+    await waitFor(() => dev.isOpen);
+    expect(globalThis[GLOBAL_NAME]).not.toBe(undefined);
     window.dispatchEvent(shortcut(window));
     expect(dev.isOpen).toBe(false);
     dev.destroy();
@@ -224,7 +232,7 @@ describe('mountDevMode entry points', () => {
       open: false,
       url: 'http://localhost/?ui-dev',
     });
-    await tick(30);
+    await waitFor(() => viaUrl.dev.isOpen);
     expect(viaUrl.dev.isOpen).toBe(true);
     viaUrl.dev.destroy();
     expect(globalThis[GLOBAL_NAME]).toBe(undefined);

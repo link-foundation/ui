@@ -66,6 +66,19 @@ export function createPage(options = {}) {
 export const tick = (ms = 0) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
+/**
+ * Wait until `condition()` holds, for things behind a dynamic `import()`
+ * (opening dev mode), whose time depends on the machine load.
+ */
+export async function waitFor(condition, { timeout = 5000, step = 10 } = {}) {
+  for (let waited = 0; !condition(); waited += step) {
+    if (waited >= timeout) {
+      throw new Error(`Condition not met within ${timeout} ms`);
+    }
+    await tick(step);
+  }
+}
+
 /** A key event of the window. */
 export const key = (window, init) =>
   new window.KeyboardEvent('keydown', {
