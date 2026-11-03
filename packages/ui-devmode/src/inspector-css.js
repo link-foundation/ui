@@ -80,6 +80,8 @@ tr.is-changed .layer { border-color: var(--changed-line); font-weight: 700; }
   width: 100%; min-width: 0; padding: 2px 4px; border-radius: 4px;
   border: 1px solid var(--muted); background: var(--bg); }
 .editor input[type="number"] { width: 6em; }
+.editor input[type="checkbox"] { width: 24px; height: 24px; margin: 0;
+  accent-color: var(--accent); }
 .editor input[type="color"] { width: 3em; height: 26px; padding: 0;
   border: 1px solid var(--muted); background: var(--bg); }
 [aria-invalid="true"] { border-color: var(--error) !important;

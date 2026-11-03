@@ -62,6 +62,11 @@ describe('mountDevMode', () => {
       'close',
     ]);
     expect($('[role="complementary"]')).not.toBe(null);
+    // Each view renders into its tabpanel; the tab buttons hold text only.
+    expect($('[role="tab"] *')).toBe(null);
+    expect($('[role="tabpanel"][data-view="outline"] [role="tree"]')).not.toBe(
+      null
+    );
     expect(document.querySelector('ui-devmode-overlay')).not.toBe(null);
     expect($('[data-command="pick"]').getAttribute('aria-pressed')).toBe(
       'true'
@@ -193,12 +198,18 @@ describe('mountDevMode edits', () => {
   it('fills the Styles, Tokens, Animations and Source views', async () => {
     const { dev, $ } = await openPage();
     globalThis[GLOBAL_NAME].select('ok');
-    expect($('[data-view="source"] pre').textContent).toBe(
+    expect($('[role="tabpanel"][data-view="source"] pre').textContent).toBe(
       '(ok: button\n  (label OK)\n  (variant filled)\n  (on press (navigate home)))'
     );
-    expect($('[data-view="styles"]').textContent.length > 0).toBe(true);
-    expect($('[data-view="tokens"]').textContent.length > 0).toBe(true);
-    expect($('[data-view="animations"]').textContent.length > 0).toBe(true);
+    expect(
+      $('[role="tabpanel"][data-view="styles"]').textContent.length > 0
+    ).toBe(true);
+    expect(
+      $('[role="tabpanel"][data-view="tokens"]').textContent.length > 0
+    ).toBe(true);
+    expect(
+      $('[role="tabpanel"][data-view="animations"]').textContent.length > 0
+    ).toBe(true);
     dev.destroy();
   });
 
@@ -209,7 +220,7 @@ describe('mountDevMode edits', () => {
     globalThis[GLOBAL_NAME].select('ok');
     expect(row('label').classList.contains('is-locked')).toBe(true);
     expect(row('label').querySelector('input').disabled).toBe(true);
-    expect($('[data-view="properties"] .note')).not.toBe(null);
+    expect($('[role="tabpanel"][data-view="properties"] .note')).not.toBe(null);
     expect(() =>
       globalThis[GLOBAL_NAME].setProperty('ok', 'label', 'X')
     ).toThrow();

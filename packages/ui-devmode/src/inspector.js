@@ -309,7 +309,8 @@ export function createInspector({ window, layout, t, onCommand, onView }) {
     host,
     shadow,
     /** The panel element of a view (`outline`, `properties`, …). */
-    panel: (name) => shadow.querySelector(`[data-view="${name}"]`),
+    panel: (name) =>
+      shadow.querySelector(`[role="tabpanel"][data-view="${name}"]`),
     get view() {
       return view;
     },
