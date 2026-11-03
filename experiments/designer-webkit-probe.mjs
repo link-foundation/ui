@@ -48,7 +48,7 @@ try {
   });
   await page.mouse.up();
   const parent = await page.evaluate(() =>
-    window.designer.store.parentOf('greeting')
+    globalThis.designer.store.parentOf('greeting')
   );
   console.log('Dropped greeting parent:', parent);
   if (!before) {
