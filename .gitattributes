@@ -30,3 +30,7 @@ packages/ui-links/tests/fixtures/** text eol=lf
 # The ui-dom snapshots are the exact HTML the renderer writes (always LF), and
 # the tests compare them byte for byte.
 packages/ui-dom/tests/__snapshots__/** text eol=lf
+
+# The own icon module is written by scripts/build-icons.mjs (always LF), and
+# `npm run check:icons` compares it byte for byte.
+packages/ui-components/src/icons/own-icons.js text eol=lf

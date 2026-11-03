@@ -1,0 +1,73 @@
+{
+  "name": "@link-foundation/ui-components",
+  "version": "0.0.0",
+  "description": "Components of the associative UI framework written in Links Notation: a public-domain icon set, the ui-icon element and adapters for Lucide, Tabler and Material Symbols that emit asset records",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js",
+    "./icons": "./src/icons/index.js",
+    "./icons/adapters/lucide": "./src/icons/adapters/lucide.js",
+    "./icons/adapters/tabler": "./src/icons/adapters/tabler.js",
+    "./icons/adapters/material-symbols": "./src/icons/adapters/material-symbols.js",
+    "./dist/icons/*": "./dist/icons/*"
+  },
+  "files": [
+    "src/",
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "prepack": "node ../../scripts/build-icons.mjs --root ../.."
+  },
+  "keywords": [
+    "ui",
+    "links-notation",
+    "components",
+    "icons",
+    "custom-elements"
+  ],
+  "license": "Unlicense",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/link-foundation/ui.git",
+    "directory": "packages/ui-components"
+  },
+  "homepage": "https://github.com/link-foundation/ui/tree/main/packages/ui-components#readme",
+  "bugs": {
+    "url": "https://github.com/link-foundation/ui/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@link-foundation/ui-core": "^0.0.0",
+    "@link-foundation/ui-dom": "^0.0.0"
+  },
+  "peerDependencies": {
+    "@material-symbols/svg-400": ">=0.40.0",
+    "@tabler/icons": ">=3.0.0",
+    "lucide": ">=1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@material-symbols/svg-400": {
+      "optional": true
+    },
+    "@tabler/icons": {
+      "optional": true
+    },
+    "lucide": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@material-symbols/svg-400": "^0.48.2",
+    "@tabler/icons": "^3.50.0",
+    "jsdom": "^30.1.3",
+    "lucide": "^1.66.0",
+    "test-anywhere": "^0.8.48"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

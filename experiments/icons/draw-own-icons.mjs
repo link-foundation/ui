@@ -41,7 +41,8 @@ function gear() {
 }
 
 const frame = '<rect x="3" y="4" width="18" height="16" rx="2"/>';
-const lens = '<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/>';
+const lens =
+  '<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/>';
 const dot = (cx, cy, r = 1) =>
   `<circle cx="${cx}" cy="${cy}" r="${r}" fill="currentColor" stroke="none"/>`;
 

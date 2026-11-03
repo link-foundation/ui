@@ -9,6 +9,10 @@
  *   /examples/ui-dom/         -> examples/ui-dom/ (the ui-dom example page)
  *   /packages/<name>/src/     -> packages/<name>/src/ (ES modules of the
  *                                import map of the example pages)
+ *   /packages/<name>/examples/ -> packages/<name>/examples/ (package demos,
+ *                                such as the ui-components icon gallery)
+ *   /packages/<name>/dist/    -> packages/<name>/dist/ (build output, such
+ *                                as the icon modules of build-icons.mjs)
  *   /node_modules/links-notation/dist/ -> the browser build of links-notation
  *   /docs/case-studies/issue-1/samples/ -> the sample documents
  *
@@ -53,7 +57,7 @@ export function defaultMounts(root) {
   const packagesDir = path.join(root, 'packages');
   if (existsSync(packagesDir)) {
     for (const name of readdirSync(packagesDir).sort()) {
-      for (const sub of [['e2e', 'pages'], ['src']]) {
+      for (const sub of [['e2e', 'pages'], ['src'], ['examples'], ['dist']]) {
         const dir = path.join(packagesDir, name, ...sub);
         if (existsSync(dir)) {
           mounts.push({ prefix: `/packages/${name}/${sub.join('/')}/`, dir });
