@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="data:," />
+    <title>Schema-generated settings</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "@floating-ui/dom": "/node_modules/@floating-ui/dom/dist/floating-ui.dom.mjs",
+          "@floating-ui/core": "/node_modules/@floating-ui/core/dist/floating-ui.core.mjs",
+          "@floating-ui/utils": "/node_modules/@floating-ui/utils/dist/floating-ui.utils.mjs",
+          "@floating-ui/utils/dom": "/node_modules/@floating-ui/utils/dist/floating-ui.utils.dom.mjs",
+          "@link-foundation/ui-settings": "/packages/ui-settings/src/index.js",
+          "@link-foundation/ui-config": "/packages/ui-config/src/index.js",
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "@link-foundation/ui-store": "/packages/ui-store/src/index.js",
+          "@link-foundation/ui-dom": "/packages/ui-dom/src/index.js",
+          "@link-foundation/ui-style": "/packages/ui-style/src/index.js",
+          "@link-foundation/ui-tokens": "/packages/ui-tokens/src/index.js",
+          "links-notation": "/node_modules/links-notation/dist/index.js"
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="../src/controls/styles.css" />
+    <link rel="stylesheet" href="../src/settings/settings.css" />
+    <style>
+      body {
+        margin: 0;
+        padding: 1rem;
+        background: #f4f0fa;
+        color: #1d1b20;
+        font:
+          16px/1.5 system-ui,
+          sans-serif;
+      }
+      main {
+        max-width: 70rem;
+        margin: auto;
+      }
+      #preview {
+        padding: 2rem;
+        margin-block: 1rem;
+        background: #fff;
+        border: 3px solid var(--accent);
+        border-radius: 1rem;
+      }
+      #preview::before {
+        content: attr(data-title);
+        display: block;
+        font-size: 1.5rem;
+      }
+      #preview::after {
+        content: 'Offset: ' attr(data-offset) ' · Tags: ' attr(data-tags);
+      }
+      #preview .sample {
+        display: inline-block;
+        padding: 1rem;
+        background: var(--accent);
+        color: white;
+        box-shadow: 0 0 var(--liquid-blur) var(--accent);
+        font-size: calc(1rem * var(--scale));
+      }
+      #preview[data-theme-mode='dark'] {
+        background: #211f26;
+        color: #fff;
+      }
+      #preview[data-theme-mode='light'] {
+        background: #fff8d8;
+      }
+      #preview[data-reduce-motion='false'] .sample {
+        animation: sway 2s infinite alternate;
+      }
+      #preview[data-reduce-motion='true'] .sample {
+        animation: none;
+        border-radius: 1rem;
+      }
+      @keyframes sway {
+        to {
+          transform: translateX(1rem);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #preview .sample {
+          animation: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Schema-generated settings</h1>
+      <p>
+        Changes apply immediately. Export them as Links Notation or a share
+        link.
+      </p>
+      <button id="open" type="button">Open settings drawer</button>
+      <section id="preview" aria-label="Live preview">
+        <p class="sample">Live interface preview</p>
+      </section>
+      <div id="panel"></div>
+    </main>
+    <script type="module">
+      import { createSettingsPanel } from '../src/settings/index.js';
+      import { fromShareHash } from '@link-foundation/ui-settings';
+      import { schema } from './settings-schema.js';
+      const drawer = new URLSearchParams(location.search).has('drawer');
+      const panel = createSettingsPanel(schema, {
+        mode: drawer ? 'drawer' : 'page',
+        previewRoot: document.querySelector('#preview'),
+        values: fromShareHash(schema, location.hash).values,
+      });
+      document.querySelector('#panel').append(panel.element);
+      document
+        .querySelector('#open')
+        .addEventListener('click', (event) => panel.open(event.currentTarget));
+      window.panel = panel;
+    </script>
+  </body>
+</html>

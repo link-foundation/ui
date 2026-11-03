@@ -72,7 +72,12 @@
       "types": "./src/data/index.d.ts",
       "default": "./src/data/index.js"
     },
-    "./data.css": "./src/data/data.css"
+    "./data.css": "./src/data/data.css",
+    "./settings": {
+      "types": "./src/settings/index.d.ts",
+      "default": "./src/settings/index.js"
+    },
+    "./settings.css": "./src/settings/settings.css"
   },
   "types": "./src/index.d.ts",
   "files": [
@@ -138,7 +143,8 @@
     "d3-force": "3.0.0",
     "d3-scale": "4.0.2",
     "d3-shape": "3.2.0",
-    "links-notation": "^0.27.1"
+    "links-notation": "^0.27.1",
+    "@link-foundation/ui-settings": "^0.0.0"
   },
   "peerDependencies": {
     "@material-symbols/svg-400": ">=0.40.0",

@@ -23,6 +23,7 @@ const ENTRY_POINTS = [
   'overlays',
   'controls',
   'data',
+  'settings',
 ];
 const SRC = new URL('../../src/', import.meta.url);
 
