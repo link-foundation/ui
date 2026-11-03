@@ -54,9 +54,9 @@ export function keyOf(event) {
 }
 
 /**
+ * A key combination written by hand in its canonical form: modifier order,
  * `Control` → `Ctrl`, `Cmd` → `Meta`, `space` and `' '` → `Space`, `esc` →
  * `Escape` (modifier and key names in any case).
- * `Control` → `Ctrl`, `Cmd` → `Meta`, `' '` → `Space`.
  * @param {string} combo
  */
 export function normalizeKey(combo) {
