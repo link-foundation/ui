@@ -46,9 +46,12 @@ for (const engine of ['codemirror', 'monaco']) {
       name: 'Read-only Source',
       exact: true,
     });
+    const editorModifier = await page.evaluate(() =>
+      window.navigator.platform.startsWith('Mac') ? 'Meta' : 'Control'
+    );
     await field.focus();
     await expect(field).toBeFocused();
-    await page.keyboard.press('ControlOrMeta+a');
+    await page.keyboard.press(`${editorModifier}+a`);
     await page.keyboard.type('Blocked');
     expect(await page.evaluate(() => window.readOnlyChanges)).toEqual([]);
     await page.evaluate(async () => {
@@ -63,11 +66,14 @@ for (const engine of ['codemirror', 'monaco']) {
     expect(await page.evaluate(() => window.readOnlyChanges)).toEqual([]);
     await page.evaluate(() => window.readOnlyEditor.setReadOnly(false));
     await field.focus();
-    await page.keyboard.press('ControlOrMeta+a');
+    await page.keyboard.press(`${editorModifier}+a`);
     await page.keyboard.type('app: document\n  title Allowed');
     await expect
       .poll(() => page.evaluate(() => window.readOnlyChanges.at(-1)))
       .toContain('Allowed');
+    expect(
+      await page.evaluate(() => window.readOnlyChanges.at(-1))
+    ).not.toContain('Second');
     await page.evaluate(() => window.readOnlyEditor.destroy());
   });
 }

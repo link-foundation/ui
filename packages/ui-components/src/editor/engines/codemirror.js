@@ -89,10 +89,8 @@ export async function createCodeMirrorEngine(
   let destroyed = false;
   let readOnly = false;
   const access = new state.Compartment();
-  const accessExtensions = () => [
-    EditorState.readOnly.of(readOnly),
-    EditorView.editable.of(!readOnly),
-  ];
+  // Keep the DOM focusable and copyable in Safari; the state facet blocks input.
+  const accessExtensions = () => EditorState.readOnly.of(readOnly);
   const lino = ViewPlugin.fromClass(
     class {
       constructor(view) {

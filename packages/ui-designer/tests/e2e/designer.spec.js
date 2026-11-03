@@ -78,7 +78,7 @@ test('Source uses the shared LiNo editor, retains invalid drafts, escapes by key
   await expect(source(page)).not.toBeFocused();
   await page.getByRole('button', { name: 'Run', exact: true }).click();
   await expect(source(page)).toHaveAttribute('aria-readonly', 'true');
-  await expect(source(page)).toHaveAttribute('contenteditable', 'false');
+  await expect(source(page)).toHaveAttribute('contenteditable', 'true');
   await source(page).focus();
   await expect(source(page)).toBeFocused();
   await page.keyboard.press('End');
@@ -372,9 +372,18 @@ test('keyboard-only insert, Outline reorder, resize, clipboard, open, save and s
   await page.getByRole('button', { name: 'Run', exact: true }).click();
   await page.getByRole('button', { name: 'Copy source', exact: true }).click();
   await expect(source(page)).toBeFocused();
-  await page.keyboard.press('ControlOrMeta+a');
+  // CodeMirror follows the emulated browser platform; native copy follows the host.
+  const editorModifier = await page.evaluate(() =>
+    window.navigator.platform.startsWith('Mac') ? 'Meta' : 'Control'
+  );
+  await page.keyboard.press(`${editorModifier}+a`);
+  await expect
+    .poll(() => page.evaluate(() => window.getSelection().toString()))
+    .toBe(upload);
   await page.keyboard.press('ControlOrMeta+c');
-  expect(await page.evaluate(() => window.copiedSource)).toBe(upload);
+  await expect
+    .poll(() => page.evaluate(() => window.copiedSource))
+    .toBe(upload);
 });
 
 for (const scheme of ['light', 'dark']) {
