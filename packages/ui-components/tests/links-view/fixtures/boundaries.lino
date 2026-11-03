@@ -1,0 +1,6 @@
+empty-pair: () ()
+nested-empty: (child:) ()
+unary: (x) y
+literal: ~bare ~1{00}
+quoted: '''one'two''' `three`
+unicode: 日本語 '🦊'
