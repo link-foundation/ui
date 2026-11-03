@@ -9,7 +9,12 @@
  *   /examples/ui-dom/         -> examples/ui-dom/ (the ui-dom example page)
  *   /packages/<name>/src/     -> packages/<name>/src/ (ES modules of the
  *                                import map of the example pages)
+ *   /packages/<name>/examples/ -> packages/<name>/examples/ (when present;
+ *                                the ui-components chart gallery)
  *   /node_modules/links-notation/dist/ -> the browser build of links-notation
+ *   /node_modules/<d3 package>/ -> the ES modules of d3-scale, d3-shape and
+ *                                their dependencies (the chart gallery)
+ *   /node_modules/echarts/dist/ -> the optional ECharts build
  *   /docs/case-studies/issue-1/samples/ -> the sample documents
  *
  * Usage: node scripts/serve-static.mjs [--port 4173] [--host 127.0.0.1]
@@ -24,6 +29,20 @@ const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '..'
 );
+
+/** The npm packages the chart gallery loads as ES modules (no bundler). */
+export const BROWSER_MODULES = [
+  'd3-array',
+  'd3-color',
+  'd3-format',
+  'd3-interpolate',
+  'd3-path',
+  'd3-scale',
+  'd3-shape',
+  'd3-time',
+  'd3-time-format',
+  'internmap',
+];
 
 /**
  * @param {string} root repository root
@@ -43,6 +62,8 @@ export function defaultMounts(root) {
   for (const parts of [
     ['examples', 'ui-dom'],
     ['node_modules', 'links-notation', 'dist'],
+    ...BROWSER_MODULES.map((name) => ['node_modules', name]),
+    ['node_modules', 'echarts', 'dist'],
     ['docs', 'case-studies', 'issue-1', 'samples'],
   ]) {
     mounts.push({
@@ -53,7 +74,7 @@ export function defaultMounts(root) {
   const packagesDir = path.join(root, 'packages');
   if (existsSync(packagesDir)) {
     for (const name of readdirSync(packagesDir).sort()) {
-      for (const sub of [['e2e', 'pages'], ['src']]) {
+      for (const sub of [['e2e', 'pages'], ['examples'], ['src']]) {
         const dir = path.join(packagesDir, name, ...sub);
         if (existsSync(dir)) {
           mounts.push({ prefix: `/packages/${name}/${sub.join('/')}/`, dir });

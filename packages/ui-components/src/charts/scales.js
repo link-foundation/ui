@@ -66,6 +66,12 @@ function spread([low, high], def) {
   return [low - step, high + step];
 }
 
+/** A domain widened by a share of its span at both ends. */
+function padded([low, high], pad) {
+  const margin = (high - low) * pad;
+  return [low - margin, high + margin];
+}
+
 /**
  * A position scale of a channel.
  * @param {import('./chart-model.js').FieldDef} def
@@ -75,6 +81,8 @@ function spread([low, high], def) {
  * @param {boolean} [options.band]  a band per value (bars)
  * @param {boolean} [options.zero]  include zero (bars, areas)
  * @param {number[]} [options.extent]  extra values to include (stacks)
+ * @param {number} [options.pad]  a share of the span added at both ends
+ *   of a quantitative domain, so marks (points) clear the axes
  * @returns {PositionScale}
  *
  * @typedef {object} PositionScale
@@ -85,7 +93,7 @@ function spread([low, high], def) {
  * @property {(count: number) => {position: number, label: string, value: number|string}[]} ticks
  */
 export function positionScale(def, rows, range, options = {}) {
-  const { band = false, zero = false, extent = [] } = options;
+  const { band = false, zero = false, extent = [], pad = 0 } = options;
   if (band || isDiscrete(def)) {
     const domain = discreteDomain(def, rows);
     const scale = band
@@ -113,7 +121,10 @@ export function positionScale(def, rows, range, options = {}) {
     ...extent,
     ...(zero ? [0] : []),
   ];
-  const bounds = spread([Math.min(...values), Math.max(...values)], def);
+  const bounds = padded(
+    spread([Math.min(...values), Math.max(...values)], def),
+    def.type === 'quantitative' ? pad : 0
+  );
   const scale =
     def.type === 'temporal'
       ? scaleUtc().domain(bounds).range(range)

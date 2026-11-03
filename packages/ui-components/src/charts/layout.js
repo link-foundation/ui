@@ -168,15 +168,18 @@ function cartesianScales(spec, groups, plot) {
     extent = stack(groups, keyDef, valueDef);
   }
   const keyBand = spec.mark.type === 'bar';
+  const pad = spec.mark.type === 'point' ? 0.05 : 0;
   const xScale = positionScale(x, rows, [0, plot.width], {
     band: keyBand && !horizontal,
     zero: filled && horizontal,
     extent: horizontal ? extent : [],
+    pad,
   });
   const yScale = positionScale(y, rows, [plot.height, 0], {
     band: keyBand && horizontal,
     zero: filled && !horizontal,
     extent: horizontal ? [] : extent,
+    pad,
   });
   return { xScale, yScale, horizontal, keyDef, valueDef };
 }
@@ -295,12 +298,10 @@ function seriesShapes(spec, group, scales, color, fields) {
         d: path(points),
         fill: color,
         'fill-opacity': 0.35,
-        stroke: color,
-        'stroke-width': 2,
       },
     });
   }
-  if (mark.type === 'line') {
+  if (mark.type === 'line' || mark.type === 'area') {
     const path = d3Line()
       .x((p) => p.x)
       .y((p) => p.y)

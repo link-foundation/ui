@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Charts gallery: @link-foundation/ui-components</title>
+    <!--
+      No bundler: the packages load as ES modules. Serve the repository with
+      `node scripts/serve-static.mjs` and open
+      http://127.0.0.1:4173/packages/ui-components/examples/charts.html
+      The charts are the test fixtures (tests/charts/fixtures/), and
+      tests/charts/gallery.test.js checks that they stay equal.
+    -->
+    <script type="importmap">
+      {
+        "imports": {
+          "@link-foundation/ui-components": "/packages/ui-components/src/index.js",
+          "links-notation": "/node_modules/links-notation/dist/index.js",
+          "d3-array": "/node_modules/d3-array/dist/d3-array.mjs",
+          "d3-color": "/node_modules/d3-color/dist/d3-color.mjs",
+          "d3-format": "/node_modules/d3-format/src/index.js",
+          "d3-interpolate": "/node_modules/d3-interpolate/dist/d3-interpolate.mjs",
+          "d3-path": "/node_modules/d3-path/dist/d3-path.mjs",
+          "d3-scale": "/node_modules/d3-scale/src/index.js",
+          "d3-shape": "/node_modules/d3-shape/dist/d3-shape.mjs",
+          "d3-time": "/node_modules/d3-time/src/index.js",
+          "d3-time-format": "/node_modules/d3-time-format/src/index.js",
+          "internmap": "/node_modules/internmap/src/index.js",
+          "echarts": "/node_modules/echarts/dist/echarts.esm.min.mjs"
+        }
+      }
+    </script>
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+      :root[data-theme='light'] {
+        color-scheme: light;
+      }
+      :root[data-theme='dark'] {
+        color-scheme: dark;
+      }
+      body {
+        margin: 0;
+        padding: 24px;
+        font-family: system-ui, sans-serif;
+        color: var(--color-chart-text, #1f1f24);
+        background: var(--color-chart-background, #ffffff);
+      }
+      header {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: baseline;
+        justify-content: space-between;
+      }
+      h1 {
+        margin: 0;
+        font-size: 1.5rem;
+      }
+      h2 {
+        margin: 0 0 8px;
+        font-size: 1.125rem;
+      }
+      .gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 660px), 1fr));
+        gap: 24px;
+        margin-top: 24px;
+      }
+      .card {
+        border: 1px solid var(--color-chart-grid, #e4e4e7);
+        border-radius: 8px;
+        padding: 16px;
+      }
+      .small {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: center;
+      }
+      button {
+        font: inherit;
+        color: inherit;
+        background: transparent;
+        border: 1px solid var(--color-chart-axis, #71717a);
+        border-radius: 4px;
+        padding: 0.25rem 0.75rem;
+        cursor: pointer;
+      }
+      button:focus-visible {
+        outline: 2px solid var(--color-chart-focus, #1f6fb2);
+        outline-offset: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Charts gallery</h1>
+      <button id="theme" type="button" aria-pressed="false">Dark theme</button>
+    </header>
+    <main class="gallery">
+      <section class="card" data-mark="line" aria-labelledby="line-heading">
+        <h2 id="line-heading">Line</h2>
+        <ui-chart id="chart-line">
+          <script type="text/lino">
+            (sales: chart
+              (title 'Monthly sales')
+              (description 'Sales grew from 12 to 30 thousand between January and June 2026')
+              (data
+                (row (month 2026-01) (value 12))
+                (row (month 2026-02) (value 18))
+                (row (month 2026-03) (value 15))
+                (row (month 2026-04) (value 21))
+                (row (month 2026-05) (value 25))
+                (row (month 2026-06) (value 30)))
+              (mark line (point true))
+              (encoding
+                (x (field month) (type temporal) (title Month))
+                (y (field value) (type quantitative) (title 'Sales, thousand USD'))))
+          </script>
+        </ui-chart>
+      </section>
+      <section class="card" data-mark="area" aria-labelledby="area-heading">
+        <h2 id="area-heading">Area</h2>
+        <ui-chart id="chart-area">
+          <script type="text/lino">
+            (regions: chart
+              (title 'Sales by region')
+              (description 'Stacked monthly sales of the North and South regions in the first half of 2026')
+              (data
+                (row (month 2026-01) (region North) (value 7))
+                (row (month 2026-01) (region South) (value 5))
+                (row (month 2026-02) (region North) (value 9))
+                (row (month 2026-02) (region South) (value 9))
+                (row (month 2026-03) (region North) (value 8))
+                (row (month 2026-03) (region South) (value 7))
+                (row (month 2026-04) (region North) (value 12))
+                (row (month 2026-04) (region South) (value 9))
+                (row (month 2026-05) (region North) (value 14))
+                (row (month 2026-05) (region South) (value 11))
+                (row (month 2026-06) (region North) (value 17))
+                (row (month 2026-06) (region South) (value 13)))
+              (mark area (interpolate monotone))
+              (encoding
+                (x (field month) (type temporal))
+                (y (field value) (type quantitative))
+                (color (field region) (type nominal))))
+          </script>
+        </ui-chart>
+      </section>
+      <section class="card" data-mark="bar" aria-labelledby="bar-heading">
+        <h2 id="bar-heading">Bar</h2>
+        <ui-chart id="chart-bar">
+          <script type="text/lino">
+            (products: chart
+              (title 'Sales by product')
+              (description 'Laptops sold the most units, followed by phones, tablets and watches')
+              (data
+                (row (product Laptops) (units 42))
+                (row (product Phones) (units 35))
+                (row (product Tablets) (units 18))
+                (row (product Watches) (units 9)))
+              (mark bar)
+              (encoding
+                (x (field product) (type nominal))
+                (y (field units) (type quantitative) (title Units))
+                (tooltip ((field product) (type nominal)) ((field units) (type quantitative)))))
+          </script>
+        </ui-chart>
+      </section>
+      <section class="card" data-mark="point" aria-labelledby="point-heading">
+        <h2 id="point-heading">Point</h2>
+        <ui-chart id="chart-point">
+          <script type="text/lino">
+            (cars: chart
+              (title 'Weight and fuel use')
+              (description 'Heavier cars use more fuel; the electric cars are the exception')
+              (data
+                (row (model A) (weight 1.1) (fuel 5.2) (drive petrol) (seats 4))
+                (row (model B) (weight 1.4) (fuel 6.8) (drive petrol) (seats 5))
+                (row (model C) (weight 1.9) (fuel 9.1) (drive petrol) (seats 7))
+                (row (model D) (weight 1.6) (fuel 1.5) (drive electric) (seats 5))
+                (row (model E) (weight 2.2) (fuel 2.1) (drive electric) (seats 7))
+                (row (model F) (weight 1.3) (fuel 4.4) (drive hybrid) (seats 5)))
+              (mark point)
+              (encoding
+                (x (field weight) (type quantitative) (title 'Weight, t'))
+                (y (field fuel) (type quantitative) (title 'Fuel, l/100 km'))
+                (color (field drive) (type nominal))
+                (size (field seats) (type quantitative))))
+          </script>
+        </ui-chart>
+      </section>
+      <section class="card" data-mark="arc" aria-labelledby="arc-heading">
+        <h2 id="arc-heading">Arc</h2>
+        <ui-chart id="chart-arc">
+          <script type="text/lino">
+            (share: chart
+              (title 'Traffic sources')
+              (description 'Search brings half of the visits, then direct visits, social and email')
+              (data
+                (row (source Search) (visits 50))
+                (row (source Direct) (visits 25))
+                (row (source Social) (visits 15))
+                (row (source Email) (visits 10)))
+              (mark arc (inner-radius 40))
+              (encoding
+                (theta (field visits) (type quantitative))
+                (color (field source) (type nominal))))
+          </script>
+        </ui-chart>
+      </section>
+      <section class="card" data-mark="small" aria-labelledby="small-heading">
+        <h2 id="small-heading">Gauge, stat tile and sparkline</h2>
+        <div class="small">
+          <ui-gauge
+            id="cpu"
+            label="CPU"
+            value="72"
+            unit="%"
+            description="CPU load is 72 percent"
+          ></ui-gauge>
+          <ui-stat-tile
+            id="revenue"
+            label="Revenue"
+            value="30200"
+            unit="USD"
+            delta="12.5"
+            trend="12 18 15 21 25 30"
+          ></ui-stat-tile>
+          <p>
+            Visits this week
+            <ui-sparkline
+              id="visits"
+              label="Visits"
+              values="3 5 2 8 6 9"
+              mark="area"
+            ></ui-sparkline>
+          </p>
+        </div>
+      </section>
+      <section
+        class="card"
+        data-mark="echarts"
+        aria-labelledby="echarts-heading"
+      >
+        <h2 id="echarts-heading">ECharts renderer</h2>
+        <p>
+          <code>(renderer echarts)</code> loads ECharts only when a chart uses
+          it. Nothing is loaded until you press the button.
+        </p>
+        <button id="load-echarts" type="button">Render with ECharts</button>
+        <div id="echarts-slot"></div>
+      </section>
+    </main>
+    <script type="module">
+      import { defineChartElements } from '@link-foundation/ui-components';
+
+      defineChartElements(window);
+
+      const root = document.documentElement;
+      const theme = document.getElementById('theme');
+      theme.addEventListener('click', () => {
+        const dark = theme.getAttribute('aria-pressed') !== 'true';
+        theme.setAttribute('aria-pressed', String(dark));
+        root.setAttribute('data-theme', dark ? 'dark' : 'light');
+      });
+
+      document.getElementById('load-echarts').addEventListener(
+        'click',
+        (event) => {
+          event.currentTarget.disabled = true;
+          const sales =
+            document.querySelector('#chart-line script').textContent;
+          const chart = document.createElement('ui-chart');
+          chart.id = 'chart-echarts';
+          // Add (renderer echarts) as the first property, on its own line
+          // with the indentation of the others.
+          chart.lino = sales.replace(
+            /\(sales: chart(\s+)/u,
+            '(sales-echarts: chart$1(renderer echarts)$1'
+          );
+          document.getElementById('echarts-slot').append(chart);
+        },
+        { once: true }
+      );
+    </script>
+  </body>
+</html>
