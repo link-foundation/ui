@@ -4,6 +4,102 @@
 
 ## Public domain
 
+- **icon-attach** (icon): `assets/icons/own/attach.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-check** (icon): `assets/icons/own/check.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-chevron-down** (icon): `assets/icons/own/chevron-down.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-chevron-left** (icon): `assets/icons/own/chevron-left.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-chevron-right** (icon): `assets/icons/own/chevron-right.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-chevron-up** (icon): `assets/icons/own/chevron-up.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-close** (icon): `assets/icons/own/close.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-copy** (icon): `assets/icons/own/copy.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-dock-bottom** (icon): `assets/icons/own/dock-bottom.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-dock-left** (icon): `assets/icons/own/dock-left.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-dock-right** (icon): `assets/icons/own/dock-right.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-drag-handle** (icon): `assets/icons/own/drag-handle.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-error** (icon): `assets/icons/own/error.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-fit** (icon): `assets/icons/own/fit.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-float** (icon): `assets/icons/own/float.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-info** (icon): `assets/icons/own/info.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-link** (icon): `assets/icons/own/link.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-menu** (icon): `assets/icons/own/menu.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-minus** (icon): `assets/icons/own/minus.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-more** (icon): `assets/icons/own/more.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-paste** (icon): `assets/icons/own/paste.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-pause** (icon): `assets/icons/own/pause.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-play** (icon): `assets/icons/own/play.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-plus** (icon): `assets/icons/own/plus.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-record** (icon): `assets/icons/own/record.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-reset** (icon): `assets/icons/own/reset.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-search** (icon): `assets/icons/own/search.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-send** (icon): `assets/icons/own/send.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-settings** (icon): `assets/icons/own/settings.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-warning** (icon): `assets/icons/own/warning.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-zoom-in** (icon): `assets/icons/own/zoom-in.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
+- **icon-zoom-out** (icon): `assets/icons/own/zoom-out.svg`
+  - Copyright: public domain
+  - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
 - **links-ui-logo** (image): `assets/links-ui-logo.svg`
   - Copyright: public domain
   - Licence: [CC0-1.0 (public domain)](https://spdx.org/licenses/CC0-1.0.html)
