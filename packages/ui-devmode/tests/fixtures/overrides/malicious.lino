@@ -1,0 +1,6 @@
+user-overrides: overrides
+  set missing label surprise
+  set ok on press
+    navigate 'javascript:alert(1)'
+  on press
+    emit stolen

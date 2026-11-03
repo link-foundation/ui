@@ -14,6 +14,9 @@ devmode-inspector: devmode-panel
     devmode-discard: devmode-action
       label toolbar.discard
       command discard
+    devmode-defaults: devmode-action
+      label toolbar.defaults
+      command defaults
     devmode-close: devmode-action
       label toolbar.close
       command close

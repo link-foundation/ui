@@ -17,7 +17,12 @@ import {
   persistUserLayer,
 } from '@link-foundation/ui-config';
 import { mountDocument } from '@link-foundation/ui-dom';
-import { mountDevMode } from '@link-foundation/ui-devmode';
+import {
+  mountDevMode,
+  applySharedOverrides,
+  parseDevModePolicy,
+  translator,
+} from '@link-foundation/ui-devmode';
 
 const SAMPLES = new URL(
   '../../../docs/case-studies/issue-1/samples/',
@@ -43,7 +48,10 @@ const policy =
   entry shortcut url-parameter element
   shortcut 'Alt+Shift+D'
   write-layers session user
-  locked-elements ${locked}`;
+  locked-elements ${locked}
+  repository link-foundation/ui
+  site-config site/config/site.lino
+  comfort-keys motion.mode sound.on sound.volume`;
 
 const output = document.getElementById('action');
 const app = document.getElementById('app');
@@ -62,6 +70,16 @@ const config = createConfig({ document: parse(text) });
 persistUserLayer(config);
 persistSessionLayer(config);
 config.bindStore(store);
+
+applySharedOverrides({
+  config,
+  location: globalThis.location,
+  history: globalThis.history,
+  storage: globalThis.localStorage,
+  policy: parseDevModePolicy(policy),
+  document,
+  t: translator(),
+});
 
 const devMode = mountDevMode({
   root: app,

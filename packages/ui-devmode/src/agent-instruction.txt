@@ -1,0 +1,8 @@
+Make these UI overrides the defaults of {repository}.
+1. Open {siteConfig}. Apply every `set` link below to the matching element
+   or token. Keep comments and layout (do not reformat the file).
+2. Do not change anything else. Run: npm test
+3. Open a pull request titled "Make UI overrides the defaults"
+   and paste the overrides block into its description.
+
+{overrides}
