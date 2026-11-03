@@ -1,8 +1,15 @@
-(cpu: gauge (label CPU) (description 'CPU load is 72 percent') (value 72) (unit %))
-(revenue: stat-tile
-  (label Revenue)
-  (value 30200)
-  (unit USD)
-  (delta 12.5)
-  (trend 12 18 15 21 25 30))
-(visits: sparkline (label Visits) (values 3 5 2 8 6 9) (mark area))
+cpu: gauge
+  label CPU
+  description 'CPU load is 72 percent'
+  value 72
+  unit %
+revenue: stat-tile
+  label Revenue
+  value 30200
+  unit USD
+  delta 12.5
+  trend 12 18 15 21 25 30
+visits: sparkline
+  label Visits
+  values 3 5 2 8 6 9
+  mark area

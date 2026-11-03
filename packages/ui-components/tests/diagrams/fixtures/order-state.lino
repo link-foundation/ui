@@ -1,18 +1,47 @@
-(order: diagram
-  (kind state)
-  (direction right)
-  (label 'Order lifecycle')
-  (active: group (label 'Active'))
-  (paying: group (label 'Paying') (group active))
-  (begin: node (shape start))
-  (cart: node (label 'In cart') (group active))
-  (pending: node (label 'Payment pending') (shape round) (group paying))
-  (paid: node (label 'Paid') (shape stadium) (group paying))
-  (shipped: node (label 'Shipped'))
-  (done: node (shape end))
-  (edge (from begin) (to cart))
-  (checkout: edge (from cart) (to pending) (label 'check out'))
-  (edge (from pending) (to paid) (label 'card accepted'))
-  (edge (from pending) (to cart) (label 'card declined'))
-  (edge (from paid) (to shipped))
-  (edge (from shipped) (to done)))
+order: diagram
+  kind state
+  direction right
+  label 'Order lifecycle'
+  active: group
+    label 'Active'
+  paying: group
+    label 'Paying'
+    group active
+  begin: node
+    shape start
+  cart: node
+    label 'In cart'
+    group active
+  pending: node
+    label 'Payment pending'
+    shape round
+    group paying
+  paid: node
+    label 'Paid'
+    shape stadium
+    group paying
+  shipped: node
+    label 'Shipped'
+  done: node
+    shape end
+  edge
+    from begin
+    to cart
+  checkout: edge
+    from cart
+    to pending
+    label 'check out'
+  edge
+    from pending
+    to paid
+    label 'card accepted'
+  edge
+    from pending
+    to cart
+    label 'card declined'
+  edge
+    from paid
+    to shipped
+  edge
+    from shipped
+    to done

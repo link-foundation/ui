@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect } from 'test-anywhere';
-import { Parser } from 'links-notation';
+import { parseNested } from '@link-foundation/ui-core';
 import {
   DiagramError,
   describeDiagram,
@@ -15,7 +15,8 @@ import {
 } from '@link-foundation/ui-components/diagrams';
 import { fixture, linoFixtures } from './fixtures.js';
 
-const parse = (text) => new Parser().parse(text);
+// The readers' own parse: indented lines are values of the line above.
+const parse = (text) => parseNested(text);
 
 /** The DiagramError thrown by `fn` (fails when nothing is thrown). */
 function errorOf(fn) {

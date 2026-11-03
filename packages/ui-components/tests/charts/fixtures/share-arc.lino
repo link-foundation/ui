@@ -1,12 +1,25 @@
-(share: chart
-  (title 'Traffic sources')
-  (description 'Search brings half of the visits, then direct visits, social and email')
-  (data
-    (row (source Search) (visits 50))
-    (row (source Direct) (visits 25))
-    (row (source Social) (visits 15))
-    (row (source Email) (visits 10)))
-  (mark arc (inner-radius 40))
-  (encoding
-    (theta (field visits) (type quantitative))
-    (color (field source) (type nominal))))
+share: chart
+  title 'Traffic sources'
+  description 'Search brings half of the visits, then direct visits, social and email'
+  data
+    row
+      source Search
+      visits 50
+    row
+      source Direct
+      visits 25
+    row
+      source Social
+      visits 15
+    row
+      source Email
+      visits 10
+  mark arc
+    inner-radius 40
+  encoding
+    theta
+      field visits
+      type quantitative
+    color
+      field source
+      type nominal

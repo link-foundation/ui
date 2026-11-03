@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect } from 'test-anywhere';
-import { Parser } from 'links-notation';
+import { parseNested } from '@link-foundation/ui-core';
 import {
   ChartSpecError,
   chartFromLinks,
@@ -14,7 +14,8 @@ import {
 } from '../../src/charts/chart-model.js';
 import { chartFixtures, fixture, thrown } from './helpers.js';
 
-const parse = (text) => new Parser().parse(text);
+// The readers' own parse: indented lines are values of the line above.
+const parse = (text) => parseNested(text);
 
 describe('chartFromLinks / chartToLino', () => {
   it('round-trips every fixture through the official parser', () => {

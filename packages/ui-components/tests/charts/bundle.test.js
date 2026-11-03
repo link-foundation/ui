@@ -149,8 +149,8 @@ describe('the modules loaded at run time', () => {
 
       const chart = win.document.createElement('ui-chart');
       chart.lino = fixture('sales-line.lino').replace(
-        '(sales: chart',
-        '(sales: chart (renderer echarts)'
+        'sales: chart\n',
+        'sales: chart\n  renderer echarts\n'
       );
       win.document.body.append(chart);
       await chart.ready;
