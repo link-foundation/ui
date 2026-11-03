@@ -117,10 +117,21 @@ export const controlKindNames = () => [...read().meta.keys()];
  */
 export const controlKindMeta = (kind) => read().meta.get(kind);
 
-/** The common properties of the dialect (`note`, `machine`). */
+/** The common properties shared by every dialect kind. */
 function withCommon(kinds, base) {
   const common = [...(base.kinds.get('document')?.properties ?? [])].filter(
-    ([name]) => name === 'note' || name === 'machine'
+    ([name]) =>
+      [
+        'note',
+        'machine',
+        'theme',
+        'scheme',
+        'contrast',
+        'motion',
+        'sound',
+        'volume',
+        'transparency',
+      ].includes(name)
   );
   for (const kind of kinds.values()) {
     for (const [name, spec] of common) {

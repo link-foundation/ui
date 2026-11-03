@@ -1,8 +1,8 @@
 // Usage of @link-foundation/ui-animation in a browser: render a document
 // with ui-dom, load the animations of animations.lino and play the `intro`
 // timeline on the rendered nodes (WAAPI for CSS tracks, the frame loop for
-// the seeded `decipher` effect). "Reduce motion" sets `data-motion` on the
-// theme boundary, so the `(reduced-motion ...)` variants play; pressing OK
+// the seeded `decipher` effect). "Reduce motion" updates the document's
+// motion boundary, so the `(reduced-motion ...)` variants play; pressing OK
 // sets the `pressed` state in the store, which fires `press-feedback`.
 // Serve the repository with `node scripts/serve-static.mjs` and open
 // http://127.0.0.1:4173/examples/animation/
@@ -64,7 +64,10 @@ document.getElementById('spring').textContent = `${Math.round(
 const status = document.getElementById('status');
 const motion = document.getElementById('reduced');
 const syncMotion = () => {
-  app.dataset.motion = motion.checked ? 'reduced' : 'full';
+  const value = motion.checked ? 'reduced' : 'full';
+  app.dataset.motion = value;
+  store.setProp('animation-example', 'motion', [value]);
+  handle.flush();
 };
 motion.addEventListener('change', syncMotion);
 syncMotion();

@@ -51,6 +51,8 @@ export interface UiElement {
 }
 
 export interface KindContext {
+  /** Effective theme at mount time. Theme switching preserves this part tree. */
+  theme(): import('@link-foundation/ui-tokens/themes').Theme | null;
   /** The document nodes are created in. */
   document: Document;
   /** The render options. */
@@ -125,6 +127,24 @@ export interface StyleOptions {
 }
 
 export interface RenderOptions extends StyleOptions {
+  /** Theme packages as LiNo, loaded themes, or a registry. */
+  themes?:
+    | string
+    | import('@link-foundation/ui-tokens/themes').Theme[]
+    | Map<string, import('@link-foundation/ui-tokens/themes').Theme>;
+  /** Layered configuration; comfort choices from user/session always win. */
+  config?: {
+    resolve(
+      id: string,
+      name: string
+    ): { value: readonly unknown[] } | undefined;
+    valueIn(
+      layer: string,
+      id: string,
+      name: string
+    ): readonly unknown[] | undefined;
+    subscribe(listener: (...args: any[]) => void): () => void;
+  };
   /** Kind renderers of this render, looked up before the registry. */
   kinds?: Kinds;
   /** Called for every `ui-action`, after the event is dispatched. */

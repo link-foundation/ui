@@ -15,6 +15,13 @@ import { STATE_CSS, conditionsCss } from './conditions.js';
 import { flatten } from './match.js';
 import { PROPERTIES, declarationCss } from './properties.js';
 
+/** A theme boundary can itself be the selected control. */
+function scopedSelector(selector, scope) {
+  return scope
+    ? `${scope} ${selector}, :where(:scope)${scope}:is(${selector})`
+    : selector;
+}
+
 /**
  * @typedef {import('./types.js').StyleRule} StyleRule
  * @typedef {import('./types.js').Selector} Selector
@@ -22,6 +29,7 @@ import { PROPERTIES, declarationCss } from './properties.js';
  * @typedef {object} CompileOptions
  * @property {(kind: string) => string} [tagFor]  the CSS selector of an
  *   element kind (default `ui-KIND`, escaped); its result is used verbatim
+ * @property {string} [scope] theme boundary selector (includes the boundary itself)
  * @property {string} [prefix]  the custom property prefix of ui-tokens
  *   `toCss` (`md` gives `var(--md-color-primary)`)
  */
@@ -146,7 +154,7 @@ export function compileCss(rules, options = {}) {
         ({ kind, conditions }, i) =>
           `${'  '.repeat(i)}@${kind} ${conditionsCss(conditions)} {`
       ),
-      `${pad}${selectorCss(entry.selector, tagFor, states)} {`,
+      `${pad}${scopedSelector(selectorCss(entry.selector, tagFor, states), options.scope)} {`,
       ...lastDeclarations(entry.declarations).map(
         (decl) =>
           `${pad}  ${PROPERTIES[decl.property].css}: ${declarationCss(decl, ctx)};`

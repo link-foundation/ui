@@ -7,6 +7,7 @@
  *   (save: button 'Save' (variant filled) (icon check) (on press (emit save)))
  */
 
+import { buttonParts } from './button-template.js';
 import { defineIconElement } from '../icons/icon.js';
 import {
   atomOf,
@@ -43,8 +44,10 @@ export function createButton(el, ctx, { tag, kind }) {
   });
   const icon = partOf(doc, 'ui-icon', 'icon', { 'aria-hidden': 'true' });
   const label = partOf(doc, 'span', 'label');
-  button.appendChild(icon);
-  button.appendChild(label);
+  if (!buttonParts(button, ctx, kind)) {
+    button.appendChild(icon);
+    button.appendChild(label);
+  }
   node.appendChild(button);
   startControl(node, el, ctx, {
     kind,
@@ -57,7 +60,7 @@ export function createButton(el, ctx, { tag, kind }) {
 /** Apply the properties every button kind has. */
 export function updateButton(node, el, has) {
   const button = buttonOf(node);
-  const [icon] = button.children;
+  const icon = button.querySelector('[data-part="icon"]');
   if (has('icon')) {
     setAttr(icon, 'name', atomOf(el, 'icon'));
     icon.toggleAttribute('hidden', atomOf(el, 'icon') === undefined);
@@ -84,7 +87,10 @@ export const BUTTON_KIND = Object.freeze({
     const has = changesOf(node, changed);
     updateButton(node, el, has);
     if (has('label')) {
-      setText(buttonOf(node).children[1], atomOf(el, 'label'));
+      setText(
+        buttonOf(node).querySelector('[data-part="label"]'),
+        atomOf(el, 'label')
+      );
     }
   },
   destroy: stopControl,

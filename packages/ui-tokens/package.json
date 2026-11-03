@@ -11,6 +11,10 @@
     "./style-dictionary": {
       "types": "./src/style-dictionary.d.ts",
       "default": "./src/style-dictionary.js"
+    },
+    "./themes": {
+      "types": "./src/themes/index.d.ts",
+      "default": "./src/themes/index.js"
     }
   },
   "types": "./src/index.d.ts",
@@ -46,7 +50,8 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@link-foundation/ui-core": "^0.0.0"
+    "@link-foundation/ui-core": "^0.0.0",
+    "@link-foundation/ui-style": "^0.0.0"
   },
   "peerDependencies": {
     "style-dictionary": ">=4.0.0"
@@ -57,6 +62,7 @@
     }
   },
   "devDependencies": {
+    "ajv": "^6.15.0",
     "test-anywhere": "^0.8.48"
   },
   "publishConfig": {

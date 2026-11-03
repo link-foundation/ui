@@ -149,6 +149,11 @@ test.describe('ui-animation example', () => {
       'data-motion',
       'reduced'
     );
+    expect(
+      await page.evaluate(() =>
+        window.animationExample.player.motion('sidebar')
+      )
+    ).toBe('reduced');
     await page.getByRole('button', { name: 'Play intro' }).click();
     const durations = await page.evaluate(() =>
       document.getAnimations().map((a) => a.effect.getTiming().duration)

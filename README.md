@@ -85,6 +85,11 @@ what each format supports.
 
 ### Design tokens
 
+[`@link-foundation/ui-themes`](packages/ui-themes/README.md) ships the base
+LiNo theme. The [theme engine](docs/spec/themes.md) resolves inheritance,
+contrast-safe colors and system preferences, and applies nested boundaries
+without replacing controls. Try the [four-panel example](examples/themes/README.md).
+
 [`@link-foundation/ui-tokens`](packages/ui-tokens/README.md) reads design
 tokens written in Links Notation, with inheritance, aliases and modes, and
 writes them as CSS custom properties, DTCG 2025.10 JSON, Swift and Kotlin:
@@ -356,6 +361,7 @@ npm run example:desktop:package
 │   ├── ui-store/         # @link-foundation/ui-store
 │   ├── ui-style/         # @link-foundation/ui-style (style rules, states, media and container conditions)
 │   ├── ui-swift/         # SwiftUI renderer (Swift package, see Package.swift)
+│   ├── ui-themes/        # @link-foundation/ui-themes (LiNo theme packages)
 │   ├── ui-tokens/        # @link-foundation/ui-tokens (design tokens)
 │   └── ui-vue/           # @link-foundation/ui-vue (Vue 3 adapter: UiView, composables, plugin)
 ├── tests/                # Repository and release-script tests

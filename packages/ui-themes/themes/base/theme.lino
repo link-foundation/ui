@@ -1,0 +1,35 @@
+base: theme
+  token color.primary '#3A5BA0'
+  token color.on-primary '#FFFFFF'
+  token color.surface '#FFFFFF'
+  token color.on-surface '#1B1B1F'
+  token color.on-surface-variant
+    token color.on-surface
+  token color.outline '#727278'
+  token motion.duration.short 150ms
+  pair color.on-primary color.primary
+  pair color.on-surface color.surface
+  mode dark
+    token color.primary '#AFC6FF'
+    token color.on-primary '#0A2F6B'
+    token color.surface '#121316'
+    token color.on-surface '#E3E2E6'
+    token color.outline '#94949B'
+  mode high-contrast
+    token color.primary '#0B2A66'
+  motion reduced
+    token motion.duration.short 0ms
+  template button
+    part root
+      kind box
+    part icon
+      kind icon
+    part label
+      kind text
+    part indicator
+      kind box
+  style
+    selector
+      type button
+    state hover
+      opacity 0.92
