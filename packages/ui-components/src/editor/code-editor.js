@@ -11,7 +11,10 @@ let instances = 0;
 export function mountCodeEditor(
   host,
   {
-    model = createDocumentsModel(),
+    storage,
+    clock,
+    key,
+    model = createDocumentsModel({ storage, clock, key }),
     engine = 'codemirror',
     engineOptions,
     ...options

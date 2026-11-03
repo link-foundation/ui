@@ -23,7 +23,7 @@ sequential required gates with logs outside the repository and CI's full matrix.
 Evidence before final CI:
 
 - `node --test packages/ui-components/tests/editor/*.test.js` plus the public
-  entry-point collision tests: 23 passing;
+  entry-point collision tests: 24 passing;
   language tests pin all seven samples, EOF 3:1 and the full parser message.
 - `npx playwright test packages/ui-components/tests/e2e/editor.spec.js`:
   18 passing in Chromium/WebKit, including both engines, all four additional
@@ -43,3 +43,9 @@ CI investigation for 2b2ff87:
   regenerate both runtime locks; upstream report microsoft/monaco-editor#5517.
 - Swift core job 126086198132, log lines 288 and 1351: the embedded vocabulary
   must match the updated shared spec byte for byte. Refresh that data copy.
+
+Final review regression:
+
+- Imperative mounting must inject storage, key and clock into its default
+  model, like the custom element. The new element test fails before the fix
+  (injected clock has zero pending jobs) and passes after forwarding options.
