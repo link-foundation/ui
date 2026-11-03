@@ -5,17 +5,17 @@ import type { KindSpec } from '@link-foundation/ui-dom';
 
 // ---------------------------------------------------------------- geometry
 
-export interface Point {
+export interface LinkPoint {
   x: number;
   y: number;
 }
 
 /** One cubic Bézier segment of a link path. */
 export interface CubicSegment {
-  p0: Point;
-  c1: Point;
-  c2: Point;
-  p3: Point;
+  p0: LinkPoint;
+  c1: LinkPoint;
+  c2: LinkPoint;
+  p3: LinkPoint;
 }
 
 export interface Bounds {
@@ -29,20 +29,20 @@ export interface LinkGeometry {
   /** The link from the source to the target. */
   path: CubicSegment[];
   /** The point at half the arc length (the anchor). */
-  center: Point;
+  center: LinkPoint;
   /** The arc length of the path. */
   length: number;
   /** The control points the spline passes through. */
-  points: Point[];
-  source: Point;
-  target: Point;
+  points: LinkPoint[];
+  source: LinkPoint;
+  target: LinkPoint;
   selfLoop: boolean;
 }
 
 export interface LinkGeometryOptions {
-  source: Point;
+  source: LinkPoint;
   /** Without a target the link is a self-loop at the source. */
-  target?: Point;
+  target?: LinkPoint;
   /** How far the middle bends off the line, as a fraction of its length. */
   bend?: number;
   selfLoop?: boolean;
@@ -55,7 +55,10 @@ export const DEFAULT_LOOP_RADIUS: number;
 
 export function linkGeometry(options: LinkGeometryOptions): LinkGeometry;
 /** The point at a fraction `t` (0…1) of the arc length. */
-export function pointAtLength(path: readonly CubicSegment[], t: number): Point;
+export function pointAtLength(
+  path: readonly CubicSegment[],
+  t: number
+): LinkPoint;
 /** The direction (radians) at a fraction `t` of the arc length. */
 export function angleAtLength(path: readonly CubicSegment[], t: number): number;
 /** The direction of travel at the start and at the end (radians). */
@@ -63,18 +66,20 @@ export function endAngles(path: readonly CubicSegment[]): {
   start: number;
   end: number;
 };
-export function cubicPoint(s: CubicSegment, t: number): Point;
-export function cubicDerivative(s: CubicSegment, t: number): Point;
+export function cubicPoint(s: CubicSegment, t: number): LinkPoint;
+export function cubicDerivative(s: CubicSegment, t: number): LinkPoint;
 export function segmentLength(s: CubicSegment, t?: number): number;
 export function pathLength(path: readonly CubicSegment[]): number;
-export function catmullRomTangents(points: readonly Point[]): Point[];
-export function catmullRomToCubics(points: readonly Point[]): CubicSegment[];
+export function catmullRomTangents(points: readonly LinkPoint[]): LinkPoint[];
+export function catmullRomToCubics(
+  points: readonly LinkPoint[]
+): CubicSegment[];
 export function controlPoints(
-  source: Point,
-  target: Point,
+  source: LinkPoint,
+  target: LinkPoint,
   bend?: number
-): Point[];
-export function selfLoopPoints(anchor: Point, radius?: number): Point[];
+): LinkPoint[];
+export function selfLoopPoints(anchor: LinkPoint, radius?: number): LinkPoint[];
 export function pathBounds(path: readonly CubicSegment[]): Bounds;
 export function pathToSvgD(path: readonly CubicSegment[]): string;
 
@@ -120,7 +125,7 @@ export function svgMarkerDefs(
 export function drawMarker(
   ctx: CanvasRenderingContext2D,
   marker: Readonly<Marker>,
-  at: Point,
+  at: LinkPoint,
   angle: number,
   scale: number,
   options?: { color?: string; Path2D?: typeof Path2D }
@@ -192,7 +197,7 @@ export interface LinkStyle {
 export interface SceneEnd {
   end: LinkEnd;
   shape: string;
-  at: Point;
+  at: LinkPoint;
   angle: number;
   color: string;
 }
@@ -216,9 +221,9 @@ export interface Scene {
     radius: number;
     strokeWidth: number;
     dash: readonly number[];
-    guide: { points: Point[]; color: string; width: number };
+    guide: { points: LinkPoint[]; color: string; width: number };
     points: {
-      at: Point;
+      at: LinkPoint;
       role: 'start' | 'end' | 'center' | 'point';
       color: string;
     }[];
@@ -282,7 +287,7 @@ export interface ZoomPan {
   set(view: Partial<View>): View;
   reset(): View;
   /** The pivot stays in place (default: the middle of the element). */
-  zoomBy(factor: number, pivot?: Point): View;
+  zoomBy(factor: number, pivot?: LinkPoint): View;
   panBy(dx: number, dy: number): View;
   /** Removes every listener. */
   destroy(): void;
@@ -395,7 +400,7 @@ export interface LinkViewElement extends HTMLElement {
   /** The zoom and pan of this element, relative to the fitted view. */
   view: View;
   readonly drawn: LinkViewDrawn | null;
-  zoomBy(factor: number, pivot?: Point): View | undefined;
+  zoomBy(factor: number, pivot?: LinkPoint): View | undefined;
   resetView(): View | undefined;
   /** Draw on the next frame (several requests draw once). */
   requestDraw(): void;
