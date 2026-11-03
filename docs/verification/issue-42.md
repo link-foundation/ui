@@ -39,8 +39,10 @@ records 60 animation frames during an active background drag, checks at least
 The gallery screenshot includes circle, hex and force networks and 500 links
 with hidden labels; the selection screenshot shows highlighted neighbours.
 
-The initial repository test run hit two file deadlines under parallel load in
-this memory-limited container. Verification uses Node 22 with one test process
-at a time, preserving the repository's 30-second deadline and complete file
-list. Browser verification uses the installed Chrome with one worker. CI runs
-the supported runtime matrix and both Chromium and WebKit.
+Node 22 repository runs reached file deadlines in release-script tests in this
+memory-limited container. Those 58 tests passed on the default Node runtime;
+final repository verification uses that runtime with CPU affinity limiting
+parallel test processes. The repository timeout flag and complete file list
+are preserved. Browser verification uses Node 22 and the installed Chrome
+with one worker. CI runs the supported runtime matrix and both Chromium
+and WebKit.
