@@ -1192,3 +1192,41 @@ The chat kit can reuse them without timeline logic here. `anchorScrollTop`
 takes `{keys, offsets, scrollTop}` before, `{keys, offsets}` after, and an anchor
 key, preserving that row's intra-row offset. Range ends are exclusive;
 `indexAt` returns `-1` for an empty collection.
+
+## Settings panel
+
+Import `createSettingsPanel`, `controlFor` and `buildPanelModel` from
+`@link-foundation/ui-components/settings` and load `controls.css` and
+`settings.css` from this package. The panel uses the real `ui-settings`
+schema engine and the basic controls. See
+[`examples/settings.html`](examples/settings.html) (serve with
+`node scripts/serve-static.mjs`).
+
+```js
+const panel = createSettingsPanel(schema, {
+  values,
+  previewRoot: document.querySelector('#preview'),
+  // target: bindConfig(config, schema, { layer: 'session' }),
+  mode: 'drawer', // or 'page' (the default)
+  random: seededRandom,
+});
+document.body.append(panel.element);
+openButton.addEventListener('click', () => panel.open(openButton));
+// panel.update({ 'liquid.blur': 24 }); panel.values(); panel.destroy();
+```
+
+The optional target has `values()`, `update(values)` and
+`subscribe(listener)` (returning an unsubscribe function), matching
+`ui-settings`' `bindConfig`. Writes are validated before reaching it.
+`previewRoot` receives schema CSS variable and data attribute hints. Holding
+Peek defaults applies defaults only to the preview and controls; releasing
+restores current values without writing the target. Sections are native
+collapsible groups. Drawer mode is non-modal; Escape closes it and restores
+focus to its opener. Destroy the panel to release subscriptions and controls.
+
+Choice fields use a select; ranges include the existing slider, a number
+input and a unit output. The `vector`/`vector3` and `list` controls support
+application-defined array types registered through `defineFieldType` of
+`ui-settings`; the example demonstrates this without adding schema types.
+Paste changes validates a complete diff document before applying it; absent
+fields restore defaults. Clipboard failures reveal a selectable text field.
