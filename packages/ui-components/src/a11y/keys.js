@@ -13,7 +13,6 @@ const MODIFIERS = [
   ['metaKey', 'Meta'],
 ];
 
-/** Whether a key is a printable character (one code point, not a space). */
 /** Modifier names as written (lower case) → their canonical names. */
 const MODIFIER_ALIASES = {
   ctrl: 'Ctrl',
@@ -37,6 +36,7 @@ const KEY_ALIASES = {
   tab: 'Tab',
 };
 
+/** Whether a key is a printable character (one code point, not a space). */
 const isCharacter = (key) => [...key].length === 1 && key !== ' ';
 
 /**
@@ -93,11 +93,6 @@ const TEXT_INPUTS = new Set([
 ]);
 
 /**
- * Whether an element takes typed text: a text-like `<input>`, a
- * `<textarea>`, a `<select>` or an editable element.
- * @param {EventTarget|null|undefined} element
- */
-/**
  * Whether an element is editable content: `isContentEditable`, or (where
  * the DOM has no such property, as in jsdom) the closest `contenteditable`
  * attribute.
@@ -112,6 +107,11 @@ function isEditable(element) {
   return value !== undefined && value !== null && value !== 'false';
 }
 
+/**
+ * Whether an element takes typed text: a text-like `<input>`, a
+ * `<textarea>`, a `<select>` or an editable element.
+ * @param {EventTarget|null|undefined} element
+ */
 export function isTextField(element) {
   if (!element || element.nodeType !== 1) {
     return false;
