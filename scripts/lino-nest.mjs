@@ -17,11 +17,14 @@
  *
  * A group is left as it is, with a note on stderr, when it does not parse,
  * when it holds a line comment, or when the nested text would not read back
- * as the same links.
+ * as the same links. A group already in the nested form (the same lines as
+ * the formatter writes, only quoted or spaced differently) is kept as
+ * written; elsewhere a reference keeps the quoting it was written with.
  */
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { formatLinks, parseLinks } from '../packages/ui-core/src/index.js';
+import { indexSource } from '../packages/ui-core/src/source.js';
 
 const isLink = (value) => typeof value !== 'string';
 const parts = (value) => (Array.isArray(value) ? value : value.values);
@@ -65,6 +68,80 @@ export function fold(value) {
 const unlimited = { maxDepth: Infinity, maxInputSize: Infinity };
 
 /**
+ * The shape of a text's lines: the indentation of each line and whether it
+ * opens with a parenthesis. Two texts with the same layout differ only
+ * inside their lines (quoting, spacing).
+ */
+export function layout(text) {
+  return text
+    .split('\n')
+    .filter((line) => line.trim() !== '')
+    .map(
+      (line) =>
+        `${line.length - line.trimStart().length}${line.trimStart()[0] === '(' ? '(' : ''}`
+    )
+    .join(' ');
+}
+
+/** Every reference span of a text: `{ text, start, end }`. */
+function references(text) {
+  const found = [];
+  const visit = (span) => {
+    if (span.kind === 'value' && typeof span.text === 'string') {
+      found.push(span);
+    }
+    span.children?.forEach(visit);
+  };
+  try {
+    visit(indexSource(text, unlimited).root);
+  } catch {
+    // Not indexed: the formatter's quoting stays.
+  }
+  return found;
+}
+
+/**
+ * `nested` with every reference spelled as in `original` (`'OK'` stays
+ * quoted): reference by reference when both write the same references in
+ * the same order, otherwise for the references the original spells one way
+ * only.
+ */
+function respell(original, nested) {
+  const from = references(original);
+  const to = references(nested);
+  const spelled = (span) => original.slice(span.start, span.end);
+  let spelling;
+  if (
+    same(
+      from.map((r) => r.text),
+      to.map((r) => r.text)
+    )
+  ) {
+    spelling = (span, i) => spelled(from[i]);
+  } else {
+    const spellings = new Map();
+    for (const span of from) {
+      spellings.set(
+        span.text,
+        (spellings.get(span.text) ?? new Set()).add(spelled(span))
+      );
+    }
+    spelling = (span) => {
+      const set = spellings.get(span.text);
+      return set?.size === 1 ? [...set][0] : null;
+    };
+  }
+  let out = nested;
+  for (let i = to.length - 1; i >= 0; i--) {
+    const written = spelling(to[i], i);
+    if (written !== null) {
+      out = out.slice(0, to[i].start) + written + out.slice(to[i].end);
+    }
+  }
+  return out;
+}
+
+/**
  * The nested text of one group of lines, or `null` when it is kept as it
  * is (with the reason).
  * @param {string} text
@@ -80,9 +157,13 @@ export function nestGroup(text) {
   } catch (error) {
     return { reason: `it does not parse: ${error.message}` };
   }
-  const nested = formatLinks(values);
+  const nested = respell(text, formatLinks(values));
   if (!same(parseLinks(nested, unlimited), values)) {
     return { reason: 'the nested form would read differently' };
+  }
+  // Already nested (the same lines, only quoted differently): kept as written.
+  if (layout(nested) === layout(text)) {
+    return { text };
   }
   return { text: nested };
 }

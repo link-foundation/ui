@@ -1,5 +1,5 @@
 ui-convert: dialect
-  version ui-dialect/0
+  version 'ui-dialect/0'
 
 common: kind
   description 'Properties every kind accepts in interop documents.'

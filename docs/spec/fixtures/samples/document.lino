@@ -7,7 +7,7 @@ app: document
       token space.medium
     greeting: text 'Hello, links'
     ok: button
-      label OK
+      label 'OK'
       variant filled
       on press
         navigate home
