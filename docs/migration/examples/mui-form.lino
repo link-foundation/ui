@@ -1,0 +1,17 @@
+profile: stack
+  direction vertical
+  gap 16px
+  email: text-field
+    label Email
+    name email
+    type email
+    required true
+  updates: checkbox
+    label 'Email updates'
+    name updates
+    checked false
+  save-profile: button
+    label 'Save profile'
+    variant filled
+    on press
+      emit save-profile

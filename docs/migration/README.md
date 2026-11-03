@@ -32,7 +32,8 @@ layout/overlay entry points; mount with ui-dom's `mountDocument` and dispatch
 `overlays.css`. Use `mountControls` when control changes must also write to a
 store. The form is a field group: the host owns validation and persistence;
 it is not a native submit form. The dialog pair shows the initially open state;
-the host owns opening and completion, and the renderer supplies Close/Escape.
+the host owns opening and completion, receives `dialog-closed` through `onAction`,
+and the renderer supplies Close/Escape.
 
 The examples preserve intent, labels and named actions; the target application's
 screenshots still decide visual equivalence. They are English teaching samples;
