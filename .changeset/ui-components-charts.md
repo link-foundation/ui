@@ -1,0 +1,5 @@
+---
+'@link-foundation/ui-components': minor
+---
+
+Add `@link-foundation/ui-components` with charts written in Links Notation in the grammar of Vega-Lite: `data`, `mark` (line, area, bar, point, arc), `encoding` (x, y, color, size, theta, tooltip), `title` and `description`. `chartFromLinks`/`parseChart` read a spec and throw a `ChartSpecError` with the link position; `chartToLino` writes it back. `renderChartSvg` renders a deterministic SVG with the pinned d3-scale and d3-shape. `<ui-chart>` shows it as `role="img"` named by the description, with a data table twin behind a "Show data table" button and arrow-key navigation between points announced through `aria-live`. `<ui-stat-tile>`, `<ui-gauge>` and `<ui-sparkline>` are small charts. The chart colour tokens `color.chart.1`–`color.chart.8` have at least 3:1 contrast in light and dark. `toEChartsOption` (`@link-foundation/ui-components/charts/echarts`) is a pure ECharts adapter, and ECharts, an optional peer dependency, is loaded only for `(renderer echarts)`.
