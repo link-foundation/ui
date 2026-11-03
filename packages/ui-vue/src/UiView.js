@@ -58,6 +58,32 @@ function ownHandler(actions, name) {
     : undefined;
 }
 
+/** A development warning, at most one per name and view. */
+function warnOnce(warned, name, message) {
+  if (isDevelopment() && !warned.has(name)) {
+    warned.add(name);
+    console.warn(`[ui-vue] UiView: ${message}`);
+  }
+}
+
+/**
+ * Run the handlers of the first handler name of an action that has any:
+ * the one of the `actions` prop, else those of the registry. Returns
+ * whether a handler ran.
+ */
+function runHandlers(actions, registry, detail, event) {
+  for (const name of actionNames(detail.action)) {
+    const own = ownHandler(actions, name);
+    const handlers =
+      typeof own === 'function' ? [own] : registry.handlers(name);
+    if (handlers.length > 0) {
+      handlers.forEach((handler) => handler(detail, event));
+      return true;
+    }
+  }
+  return false;
+}
+
 let nextHostKey = 0;
 
 export const UiView = defineComponent({
@@ -110,20 +136,12 @@ export const UiView = defineComponent({
     const warned = new Set();
     const onAction = (detail, event) => {
       emit('action', detail, event);
-      for (const name of actionNames(detail.action)) {
-        const own = ownHandler(props.actions, name);
-        const handlers =
-          typeof own === 'function' ? [own] : registry.handlers(name);
-        if (handlers.length > 0) {
-          handlers.forEach((handler) => handler(detail, event));
-          return;
-        }
-      }
-      const [name] = actionNames(detail.action);
-      if (isDevelopment() && !warned.has(name)) {
-        warned.add(name);
-        console.warn(
-          `[ui-vue] UiView: no handler for the action "${name}" (from "${detail.source}"); pass it in the actions prop or register it with useUiAction.`
+      if (!runHandlers(props.actions, registry, detail, event)) {
+        const [name] = actionNames(detail.action);
+        warnOnce(
+          warned,
+          name,
+          `no handler for the action "${name}" (from "${detail.source}"); pass it in the actions prop or register it with useUiAction.`
         );
       }
     };
@@ -134,14 +152,14 @@ export const UiView = defineComponent({
      * are written `(emit NAME)`.
      */
     const onDiagnostic = (d) => {
-      const name = d.at?.action;
-      if (d.code !== 'unknown-action' || !isDevelopment() || warned.has(name)) {
-        return;
+      if (d.code === 'unknown-action') {
+        const name = d.at?.action;
+        warnOnce(
+          warned,
+          name,
+          `${d.message}. Write host actions as (emit ${name}).`
+        );
       }
-      warned.add(name);
-      console.warn(
-        `[ui-vue] UiView: ${d.message}. Write host actions as (emit ${name}).`
-      );
     };
 
     /** Follow renames: the components receive the current ID. */
