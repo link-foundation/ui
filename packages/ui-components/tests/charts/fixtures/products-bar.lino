@@ -1,0 +1,13 @@
+(products: chart
+  (title 'Sales by product')
+  (description 'Laptops sold the most units, followed by phones, tablets and watches')
+  (data
+    (row (product Laptops) (units 42))
+    (row (product Phones) (units 35))
+    (row (product Tablets) (units 18))
+    (row (product Watches) (units 9)))
+  (mark bar)
+  (encoding
+    (x (field product) (type nominal))
+    (y (field units) (type quantitative) (title Units))
+    (tooltip ((field product) (type nominal)) ((field units) (type quantitative)))))

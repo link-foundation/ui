@@ -11,7 +11,7 @@ import {
   getIconSet,
   iconRecords,
   registerIconSet,
-} from '@link-foundation/ui-components';
+} from '@link-foundation/ui-components/icons';
 
 const SETS = ['own', 'lucide', 'tabler', 'material-symbols'];
 const grid = document.getElementById('grid');

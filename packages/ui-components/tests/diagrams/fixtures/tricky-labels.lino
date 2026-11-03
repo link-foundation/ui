@@ -1,0 +1,10 @@
+(tricky: diagram
+  (kind flowchart)
+  (direction left)
+  (layout dagre)
+  (end: node (label `It's "quoted" <b>bold</b> & #1`))
+  (a-b: node (label 'a:b (c)') (shape circle))
+  (a_b: node (label 'underscore'))
+  (edge (from end) (to a-b) (label '<script>|pipe|'))
+  (edge (from a-b) (to a_b))
+  (edge (from a-b) (to a_b) (label 'second')))

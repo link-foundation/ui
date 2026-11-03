@@ -109,6 +109,22 @@ describe('shared static server', () => {
         'node_modules/links-notation/dist/index.js',
       ],
       [
+        '/packages/ui-components/examples/charts.html',
+        'packages/ui-components/examples/charts.html',
+      ],
+      [
+        '/node_modules/d3-scale/src/index.js',
+        'node_modules/d3-scale/src/index.js',
+      ],
+      [
+        '/node_modules/d3-shape/src/index.js',
+        'node_modules/d3-shape/src/index.js',
+      ],
+      [
+        '/node_modules/echarts/dist/echarts.esm.min.mjs',
+        'node_modules/echarts/dist/echarts.esm.min.mjs',
+      ],
+      [
         '/docs/case-studies/issue-1/samples/document.lino',
         'docs/case-studies/issue-1/samples/document.lino',
       ],
@@ -149,6 +165,40 @@ describe('shared static server', () => {
     expect(mounted.includes('/packages/ui-components/dist/')).toBe(
       existsSync(dist)
     );
+  });
+
+  it('serves the diagrams example with Dagre and the lazily loaded Mermaid', () => {
+    const served = normaliseMounts(defaultMounts(repoRoot));
+    for (const [url, file] of [
+      [
+        '/packages/ui-components/examples/diagrams.html',
+        'packages/ui-components/examples/diagrams.html',
+      ],
+      [
+        '/packages/ui-components/src/index.js',
+        'packages/ui-components/src/index.js',
+      ],
+      [
+        '/node_modules/@dagrejs/dagre/dist/dagre.esm.js',
+        'node_modules/@dagrejs/dagre/dist/dagre.esm.js',
+      ],
+      [
+        '/node_modules/mermaid/dist/mermaid.esm.min.mjs',
+        'node_modules/mermaid/dist/mermaid.esm.min.mjs',
+      ],
+    ]) {
+      expect(resolveRequestPath(served, url)).toEqual({
+        status: 200,
+        file: path.resolve(repoRoot, file),
+      });
+    }
+    // The tests and fixtures of a package stay unserved.
+    expect(
+      resolveRequestPath(
+        served,
+        '/packages/ui-components/tests/diagrams/fixtures/login-flow.lino'
+      ).status
+    ).toBe(404);
   });
 
   it('refuses paths that escape a mount', () => {

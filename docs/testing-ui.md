@@ -35,6 +35,7 @@ and `deno test` never pick them up. Playwright discovers
 `tests/e2e` specs test packages together. For example,
 `interop-lottie.spec.js` plays a ui-convert export in lottie-web. A package's
 `tests/e2e` specs test that package's example pages. For example,
+`packages/ui-components/tests/e2e/charts.spec.js` tests the chart gallery, and
 `packages/ui-components/tests/e2e/icons.spec.js` tests the icon gallery
 `packages/ui-components/examples/icons.html`, which needs
 `npm run build:icons` first. `bunfig.toml` keeps these specs out of
