@@ -1,7 +1,7 @@
 /**
  * Engine contract. Adapters own editor state, history, selection and disposal.
  * @typedef {object} EditorEngine
- * @property {(document: {id: string, text: string, language: string}) => void} setDocument
+ * @property {(document: {id: string, text: string, language: string}) => (void|Promise<void>)} setDocument
  * @property {(diagnostics: object[]) => void} setDiagnostics
  * @property {(offset?: number) => void} focus
  * @property {() => void} destroy
