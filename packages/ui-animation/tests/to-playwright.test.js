@@ -4,6 +4,16 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { toPlaywright } from '../src/index.js';
 
+test('generated literals escape script boundaries and Unicode line separators', () => {
+  const value = '</script>\u2028\u2029';
+  const spec = toPlaywright({
+    id: 'hostile-values',
+    events: [{ time: 0, kind: 'set', args: ['ok', 'label', value] }],
+  });
+  assert.ok(!spec.includes(value));
+  assert.ok(spec.includes('\\u003c/script\\u003e\\u2028\\u2029'));
+});
+
 test('generated Playwright spec matches the snapshot', () => {
   const input = readFileSync(
     new URL('./fixtures/recording-session.lino', import.meta.url),

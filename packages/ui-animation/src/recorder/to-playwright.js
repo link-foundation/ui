@@ -1,5 +1,10 @@
 import { asRecording } from './format.js';
-const quote = JSON.stringify;
+// Keep literals safe if the exported spec is embedded in an HTML script too.
+const quote = (value) =>
+  JSON.stringify(value).replace(
+    /[<>\u2028\u2029]/g,
+    (char) => `\\u${char.charCodeAt(0).toString(16).padStart(4, '0')}`
+  );
 const selector = (id) => `[data-link-id=${quote(String(id))}]`;
 const locator = (id) => `page.locator(${quote(selector(id))})`;
 const field = (args, name) =>
