@@ -150,6 +150,7 @@ export function defaultMounts(root) {
     for (const name of readdirSync(packagesDir).sort()) {
       for (const sub of [
         ['e2e', 'pages'],
+        ['tests', 'fixtures'],
         ['src'],
         ['stories'],
         ['themes'],

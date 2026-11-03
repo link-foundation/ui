@@ -270,7 +270,14 @@ function buildSplitter(host, shadow, t, window) {
  *   onCommand: (command: string) => void,
  *   onView?: (view: string) => void }} options
  */
-export function createInspector({ window, layout, t, onCommand, onView }) {
+export function createInspector({
+  window,
+  layout,
+  t,
+  onCommand,
+  onView,
+  container = window.document.body,
+}) {
   const doc = window.document;
   const host = doc.createElement('ui-devmode-inspector');
   host.dataset.uiDevmode = 'inspector';
@@ -279,7 +286,7 @@ export function createInspector({ window, layout, t, onCommand, onView }) {
   const frame = doc.createElement('div');
   frame.className = 'frame';
   shadow.append(splitter, frame);
-  doc.body.append(host);
+  container.append(host);
   const mounted = mountDocument(frame, layout, {
     parseOptions: { vocabulary: LAYOUT_VOCABULARY },
     kinds: LAYOUT_KINDS,

@@ -7,11 +7,14 @@
  *                     [--style <style>]
  *   ui-convert export <file.lino> --format <name> [--id <id>]
  *                     [--target-version <version>]
+ *   ui-convert export --target react|vue|swiftui|compose <file.lino>
+ *                     [--mode wrapper|eject] [--out <dir>]
  *
  * `import` writes LiNo to stdout (`--from` reads component markup: JSX or
  * TSX, a Vue single-file component or HTML; a `.jsx`, `.tsx`, `.vue`,
  * `.html` or `.htm` file needs no `--from`), `export` writes JSON (A2UI: one message
- * per line, the JSON Lines wire format). A file named `-` is stdin.
+ * per line, the JSON Lines wire format), or source files with `--target`.
+ * A file named `-` is stdin.
  * Diagnostics go to stderr, one per line; the exit code is 1 when one of
  * them is an error (the output is still written when there is one), 2 for a
  * usage error.
@@ -24,6 +27,8 @@ import { importHtml } from './html/import.js';
 import { importJsx } from './jsx/import.js';
 import { importVue } from './vue/import.js';
 import { MAPPINGS } from './mappings/index.js';
+import { TARGETS } from './export/index.js';
+import { exportCommand } from './export/cli.js';
 
 /** The component importers of `import --from`. */
 export const SOURCES = {
@@ -51,6 +56,8 @@ export const USAGE = `Usage:
   ui-convert import --from jsx|vue|html <file> [--mapping <name|file.lino>] [--style <style>]
   ui-convert export <file.lino> --format <name> [--id <id>] [--target-version <version>]
 
+  ui-convert export --target react|vue|swiftui|compose [--mode wrapper|eject] [--component-name App] [--out <dir>] <file.lino>
+
 Formats: ${FORMATS.join(', ')}. A file named - is read from stdin.
 import detects the format when --format is missing.
 --from reads component markup (.jsx, .tsx, .vue, .html files need no --from);
@@ -59,6 +66,10 @@ import detects the format when --format is missing.
 --style is one of indented (default), multiline, inline.`;
 
 const OPTIONS = {
+  '--target': 'target',
+  '--mode': 'mode',
+  '--out': 'out',
+  '--component-name': 'componentName',
   '--format': 'format',
   '--style': 'style',
   '--id': 'id',
@@ -122,10 +133,40 @@ function checkArgs(args) {
   if (args.from !== undefined && !(args.from in SOURCES)) {
     throw new UsageError(`Unknown --from "${args.from}".`);
   }
-  if (command === 'export' && args.format === undefined) {
+  checkSourceArgs(args);
+  if (
+    command === 'export' &&
+    args.format === undefined &&
+    args.target === undefined
+  ) {
     throw new UsageError('export needs --format.');
   }
   return args;
+}
+
+/** Validate source-export flags separately from interop flags. */
+function checkSourceArgs(args) {
+  const { command } = args;
+  if (args.target !== undefined) {
+    if (
+      command !== 'export' ||
+      args.format !== undefined ||
+      !TARGETS.includes(args.target)
+    ) {
+      throw new UsageError(
+        'Use export --target react|vue|swiftui|compose without --format.'
+      );
+    }
+    if (args.mode !== undefined && !['wrapper', 'eject'].includes(args.mode)) {
+      throw new UsageError('Unknown --mode.');
+    }
+  } else if (
+    args.mode !== undefined ||
+    args.out !== undefined ||
+    args.componentName !== undefined
+  ) {
+    throw new UsageError('--mode, --out and --component-name need --target.');
+  }
 }
 
 /**
@@ -198,7 +239,7 @@ function convert(args, text) {
  * @param {{ stdout: { write(text: string): void },
  *   stderr: { write(text: string): void },
  *   readFile?: (file: string) => string }} io
- * @returns {number} The exit code.
+ * @returns {number | Promise<number>} The exit code (source export is asynchronous).
  */
 export function main(argv, io) {
   if (argv.length === 0 || argv.includes('--help') || argv.includes('-h')) {
@@ -213,6 +254,12 @@ export function main(argv, io) {
       MAPPINGS.includes(mapping) ? mapping : readFile(mapping)
     );
     const text = readFile(args.file === '-' ? 0 : args.file);
+    if (args.target !== undefined) {
+      return exportCommand(args, text, io, formatDiagnostic).catch((error) => {
+        io.stderr.write(`ui-convert: ${error.message}\n`);
+        return 2;
+      });
+    }
     const { output, diagnostics } = convert(args, text);
     io.stdout.write(output);
     for (const diagnostic of diagnostics) {
@@ -242,5 +289,5 @@ function isProgram() {
 }
 
 if (isProgram()) {
-  process.exitCode = main(process.argv.slice(2), process);
+  process.exitCode = await main(process.argv.slice(2), process);
 }

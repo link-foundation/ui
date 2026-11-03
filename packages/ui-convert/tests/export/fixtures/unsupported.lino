@@ -1,0 +1,7 @@
+app: document
+  mystery: spaceship
+    destination moon
+    message: text 'Still here'
+  ok: button
+    label OK
+    magic sparkles

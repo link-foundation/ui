@@ -57,3 +57,6 @@ export {
 
 export { Diagnostics } from './diagnostics.js';
 export * from './interop/index.js';
+
+export { exportDocument, TARGETS } from './export/index.js';
+export { collectActions } from './export/actions.js';

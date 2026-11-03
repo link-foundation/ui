@@ -1,0 +1,9 @@
+{
+  "manifest_version": 3,
+  "name": "Links UI dev mode",
+  "version": "0.0.0",
+  "description": "Inspect a live page and export edits as Links Notation.",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "action": { "default_title": "Toggle Links UI dev mode" },
+  "background": { "service_worker": "background.js" }
+}

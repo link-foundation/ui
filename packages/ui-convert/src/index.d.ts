@@ -76,6 +76,8 @@ export interface ImportHtmlOptions extends ImportOptions {
 }
 
 export interface ImportDomOptions extends ImportOptions {
+  /** Exclude a node and its descendants before assigning IDs. */
+  ignore?: (node: Node) => boolean;
   /** Source offsets of a DOM node, when the host knows them. */
   location?: (
     node: unknown
@@ -513,3 +515,31 @@ export function exportLottie(
 export function svgToBezier(text: string): LottieBezier | null;
 export function encodePath(bezier: unknown): string;
 export function decodePath(text: unknown): LottieBezier | null;
+
+export type ExportTarget = 'react' | 'vue' | 'swiftui' | 'compose';
+export interface ExportOptions {
+  target: ExportTarget;
+  /** Web targets default to wrapper; native targets always produce native source. */
+  mode?: 'wrapper' | 'eject';
+  componentName?: string;
+}
+export interface ExportDiagnostic {
+  code: 'unsupported';
+  severity: 'warning';
+  id: string | null;
+  target: ExportTarget;
+  message: string;
+}
+export interface ExportResult {
+  files: { path: string; contents: string }[];
+  diagnostics: (Diagnostic | ExportDiagnostic)[];
+}
+/** Formatted one-way source export (Prettier 3 is asynchronous). */
+export function exportDocument(
+  source: string | UiDocument,
+  options: ExportOptions
+): Promise<ExportResult>;
+export function collectActions(
+  tree: UiDocument
+): { name: string; args: RawValue[] }[];
+export const TARGETS: readonly ExportTarget[];

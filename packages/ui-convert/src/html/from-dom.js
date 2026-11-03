@@ -27,7 +27,7 @@ const TYPES = {
  *   `dom.nodeLocation`) or `{ start, end }`
  * @returns {import('./tree.js').Reader}
  */
-const domReader = (location) => ({
+const domReader = (location, ignore) => ({
   type: (node) => TYPES[node.nodeType] ?? 'other',
   tag: (node) => node.localName,
   attrs: (node) =>
@@ -38,7 +38,7 @@ const domReader = (location) => ({
       node.localName === 'template' && node.content
         ? node.content.childNodes
         : node.childNodes
-    ),
+    ).filter((child) => !ignore?.(child)),
   span(node) {
     const found = location?.(node);
     if (!found) {
@@ -58,5 +58,5 @@ const domReader = (location) => ({
  * @returns {import('./tree.js').HtmlNode[]}
  */
 export function readDom(root, options) {
-  return readTree(domReader(options.location), root, options);
+  return readTree(domReader(options.location, options.ignore), root, options);
 }

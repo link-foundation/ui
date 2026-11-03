@@ -6,7 +6,7 @@
  * the model it imports).
  */
 
-import { defaultVocabulary, parse } from '@link-foundation/ui-core';
+import { parse } from '@link-foundation/ui-core';
 import { readStyles } from '@link-foundation/ui-style';
 import { readTokens, resolveTokens } from '@link-foundation/ui-tokens';
 import {
@@ -16,17 +16,15 @@ import {
   sourceOf,
   tokensUsed,
 } from './details.js';
+import { createUiDomAdapter } from './adapter.js';
 import { createInspector, loadLayout } from './inspector.js';
 import {
-  applyEdit,
   buildOutline,
   DevModeError,
   discardSession,
   isLocked,
-  propertyRows,
   resetProperty,
   saveSession,
-  topWritableLayer,
 } from './model.js';
 import { openDefaultsDialog } from './defaults-dialog.js';
 import { createOverlay } from './overlay.js';
@@ -50,40 +48,6 @@ const PICK_EVENTS = [
   'dblclick',
   'auxclick',
 ];
-
-/**
- * The tree of the document read from the effective configuration, for a
- * page that passes no ui-store store. Same shape as a store.
- */
-export function documentTree(config) {
-  let doc = null;
-  const parents = new Map();
-  const load = () => {
-    if (doc === null) {
-      doc = config.effective();
-      parents.clear();
-      const walk = (node, parent) => {
-        parents.set(node.id, parent);
-        (node.children ?? []).forEach((child) => walk(child, node.id));
-      };
-      doc.roots.forEach((node) => walk(node, null));
-    }
-    return doc;
-  };
-  return {
-    get: (id) => load().byId.get(id),
-    roots: () => load().roots.map((node) => node.id),
-    children: (id) =>
-      (load().byId.get(id)?.children ?? []).map((node) => node.id),
-    parentOf: (id) => (load(), parents.get(id) ?? null),
-    toDocument: load,
-    subscribe: (listener) =>
-      config.subscribe((...args) => {
-        doc = null;
-        listener(...args);
-      }),
-  };
-}
 
 /** The `theme` atom of the first root element, if any. */
 function themeOf(tree) {
@@ -155,21 +119,6 @@ function tokenOverride(config, tree) {
     }
     return undefined;
   };
-}
-
-/** The `[data-link-id]` element of an event inside the root, if any. */
-function pickedNode(event, root) {
-  const path = event.composedPath?.() ?? [event.target];
-  for (const node of path) {
-    if (
-      node?.nodeType === 1 &&
-      node.hasAttribute('data-link-id') &&
-      root.contains(node)
-    ) {
-      return node;
-    }
-  }
-  return null;
 }
 
 /** The views of the selection: the property grid and the read-only tabs. */
@@ -321,17 +270,27 @@ function selectionController(ctx) {
  * a click selects it; the pointer events of a pick never reach the app.
  */
 function installPicking(ctx, listen, select) {
-  const { window, root, inspector, overlay, state } = ctx;
+  const { window, inspector, overlay, state } = ctx;
   const own = (event) =>
     inspector.contains(event) ||
     (event.composedPath?.() ?? []).includes(overlay.host);
+  const pickedId = (event) => {
+    for (const node of event.composedPath?.() ?? [event.target]) {
+      if (node?.nodeType) {
+        const id = ctx.adapter.idFor(node);
+        if (id !== null) {
+          return id;
+        }
+      }
+    }
+    return null;
+  };
   listen(
     window,
     'pointermove',
     (event) => {
       if (state.picking && !own(event)) {
-        const node = pickedNode(event, root);
-        const id = node?.getAttribute('data-link-id') ?? null;
+        const id = pickedId(event);
         overlay.show('hover', ctx.target(id));
       }
     },
@@ -342,15 +301,15 @@ function installPicking(ctx, listen, select) {
       window,
       type,
       (event) => {
-        const node =
-          state.picking && !own(event) ? pickedNode(event, root) : null;
+        const id = state.picking && !own(event) ? pickedId(event) : null;
+        const node = id === null ? null : ctx.adapter.nodeFor(id);
         if (node === null) {
           return;
         }
         event.preventDefault();
         event.stopImmediatePropagation();
         if (type === 'click') {
-          select(node.getAttribute('data-link-id'));
+          select(id);
         }
       },
       true
@@ -360,30 +319,15 @@ function installPicking(ctx, listen, select) {
 
 /** The shared state and helpers of an open dev mode. */
 async function createContext(options) {
-  const { window, root, config, policy } = options;
-  const tree = options.store ?? documentTree(config);
-  const vocabulary = options.vocabulary ?? defaultVocabulary();
+  const { window, config } = options;
+  const adapter = options.adapter ?? createUiDomAdapter(options);
+  const tree = adapter.tree();
   const parentOf = (id) => tree.parentOf(id);
-  const modelOptions = {
-    policy,
-    vocabulary,
-    parentOf,
-    getElement: (id) => tree.get(id),
-  };
-  const editLayer = policy.writeLayers.includes('session')
-    ? 'session'
-    : topWritableLayer(policy);
   const typeOf = (id) => tree.get(id)?.kind ?? '';
-  const nodeFor = (id) =>
-    options.handle?.nodeFor?.(id) ??
-    [...root.querySelectorAll('[data-link-id]')].find(
-      (node) => node.getAttribute('data-link-id') === id
-    ) ??
-    null;
-  const rowsOf = (id) =>
-    tree.get(id) ? propertyRows(tree.get(id), config, modelOptions) : [];
+  const rowsOf = (id) => adapter.rows(id);
   return {
     ...options,
+    adapter,
     layout: options.layout ?? (await loadLayout()),
     tree,
     parentOf,
@@ -395,16 +339,12 @@ async function createContext(options) {
     },
     state: { selected: null, picking: false, closed: false },
     target(id) {
-      const node = id === null ? null : nodeFor(id);
+      const node = id === null ? null : adapter.nodeFor(id);
       return node ? { node, id, type: typeOf(id) } : null;
     },
     /** Write a property of the grid (a row, or a name) to the session. */
     applyRow(id, row, value) {
-      return applyEdit(
-        config,
-        { id, name: row.name, key: row.key ?? null, value, layer: editLayer },
-        modelOptions
-      );
+      return adapter.applyProperty(id, row, value);
     },
     nameRow: (id, name) =>
       rowsOf(id).find((r) => r.label === name || r.name === name) ?? {
@@ -450,6 +390,8 @@ function commandsOf(ctx, close) {
  *   styles?: string|object[], tokens?: string|Map<string, object>,
  *   theme?: string, animations?: string|object[], vocabulary?: object,
  *   layout?: string, t: (key: string, params?: object) => string,
+ *   adapter?: import('./adapter.js').PageAdapter, container?: Node,
+ *   onInspector?: (inspector: object) => void,
  *   onClose?: () => void }} options
  * @returns {Promise<DevModeSession>}
  *
@@ -463,7 +405,7 @@ function commandsOf(ctx, close) {
  */
 export async function openSession(options) {
   const ctx = await createContext(options);
-  const { window, config, policy, t, state } = ctx;
+  const { window, policy, t, state } = ctx;
   const cleanups = [];
   const listen = (target, type, listener, capture = false) => {
     target.addEventListener(type, listener, capture);
@@ -472,15 +414,18 @@ export async function openSession(options) {
   let commands = {};
   ctx.overlay = createOverlay({
     document: window.document,
+    container: options.container,
     label: (id, type) => t('overlay.label', { id, type }),
   });
   ctx.inspector = createInspector({
     window,
+    container: options.container,
     layout: ctx.layout,
     t,
     onCommand: (command) => commands[command]?.(),
   });
   const { inspector, overlay } = ctx;
+  options.onInspector?.(inspector);
   const view = selectionController(ctx);
   ctx.setPicking = (picking) => {
     state.picking = Boolean(picking);
@@ -551,7 +496,7 @@ export async function openSession(options) {
   );
   listen(window, 'scroll', reposition, true);
   listen(window, 'resize', reposition);
-  cleanups.push(config.subscribe(schedule));
+  cleanups.push(ctx.adapter.observe(schedule));
   if (options.store?.subscribe) {
     cleanups.push(options.store.subscribe(schedule));
   }
