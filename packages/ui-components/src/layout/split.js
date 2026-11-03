@@ -258,10 +258,14 @@ function onPointerDown(split, event, i) {
   event.preventDefault();
 }
 
+/** The drag of the pointer of `event`, else `null`. */
+const dragOf = (state, event) =>
+  state.drag?.pointer === event.pointerId ? state.drag : null;
+
 function onPointerMove(split, event) {
   const { state } = split;
-  const drag = state.drag;
-  if (drag === null || event.pointerId !== drag.pointer) {
+  const drag = dragOf(state, event);
+  if (drag === null) {
     return;
   }
   const at = state.axis === 'row' ? event.clientX : event.clientY;
@@ -275,8 +279,8 @@ function onPointerMove(split, event) {
 
 function onPointerUp(split, event) {
   const { state } = split;
-  const drag = state.drag;
-  if (drag === null || event.pointerId !== drag.pointer) {
+  const drag = dragOf(state, event);
+  if (drag === null) {
     return;
   }
   state.dividers[drag.index].releasePointerCapture?.(event.pointerId);
