@@ -14,7 +14,12 @@ for (const opts of [
   { lessParentheses: true },
   { lessParentheses: true, maxInlineRefs: 1 },
   { lessParentheses: true, indentLongLines: true, maxLineLength: 20 },
-  { lessParentheses: true, maxInlineRefs: 2, indentLongLines: true, maxLineLength: 20 },
+  {
+    lessParentheses: true,
+    maxInlineRefs: 2,
+    indentLongLines: true,
+    maxLineLength: 20,
+  },
 ]) {
   const text = formatLinks(links, new FormatOptions(opts));
   console.log('options', JSON.stringify(opts));
@@ -30,5 +35,7 @@ for (const opts of [
     back.length === links.length &&
     back.every((l, i) => l.equals(links[i]));
   console.log('  reads back as the same links:', same);
-  if (!same && Array.isArray(back)) console.log('  read back:', back.map((l) => l.format()).join(' | '));
+  if (!same && Array.isArray(back)) {
+    console.log('  read back:', back.map((l) => l.format()).join(' | '));
+  }
 }

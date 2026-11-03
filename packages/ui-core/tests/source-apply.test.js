@@ -83,7 +83,7 @@ describe('applyOpsToSource', () => {
     // The node is written by `format` in the document's style and indent.
     expect(
       result.text.endsWith(
-        '    done: button\n      (label Done)\n      (variant filled)\n'
+        '    done: button\n      label Done\n      variant filled\n'
       )
     ).toBe(true);
   });

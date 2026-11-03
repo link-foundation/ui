@@ -14,8 +14,20 @@ npm install @link-foundation/ui-core
 
 ## Three forms, one tree
 
-The same button can be written on one line, over several lines inside
-parentheses, or indented without parentheses:
+Documents are written in the nested (indented) form of Links Notation, with
+as few parentheses as possible. It is the default of `format` and the form
+used everywhere in this repository:
+
+```lino
+ok: button
+  label 'OK'
+  variant filled
+  on press
+    navigate home
+```
+
+The same button can also be written inline, on one line, or over several
+lines inside parentheses; the parser accepts both:
 
 ```lino
 (ok: button (label 'OK') (variant filled) (on press (navigate home)))
@@ -27,14 +39,6 @@ parentheses, or indented without parentheses:
   (variant filled)
   (on press
     (navigate home)))
-```
-
-```lino
-ok: button
-  label 'OK'
-  variant filled
-  on press
-    navigate home
 ```
 
 All three give the same tree:
@@ -233,20 +237,20 @@ there and back changes no channel by more than 0.001.
 
 ## API
 
-| Export                                   | Purpose                                                                                                                                                                    |
-| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `parse(text, options?)`                  | Text to `{ roots, diagnostics }`. Options: `maxDepth` (64), `maxInputSize` (1 MiB), `mode` (`'auto'`, `'groups'` or `'fold'`), `checks` (`true`), `vocabulary`.            |
-| `parseOrThrow(text, options?)`           | Same as `parse`, but throws `UiParseError` on an error diagnostic.                                                                                                         |
-| `toTree(doc)`                            | The tree JSON of the specification: `{ spec, elements, unknown?, diagnostics }`.                                                                                           |
-| `format(doc, { style, indent }?)`        | Tree back to text, in the `'inline'`, `'multiline'` (default) or `'indented'` style. `parse(format(doc))` gives the same tree.                                             |
-| `parseLinks(text, options?)`             | Text to raw values (atoms as strings, links as arrays or `{ id, values }`), without the element projection, for formats such as the `ui-store` log. Throws `UiParseError`. |
-| `formatLinks(values)`                    | Raw values back to text, one link per line. `parseLinks(formatLinks(v))` gives `v` back.                                                                                   |
-| `walk(docOrNode, visitor)`               | Depth-first, pre-order visit `visitor(node, parent, depth)`; returning `false` skips the children.                                                                         |
-| `projectLink(link)`, `projectLinks(...)` | Project `links-notation` `Link` objects you already have.                                                                                                                  |
-| `defaultVocabulary()`, `loadVocabulary`  | The `ui-dialect/0` vocabulary of kinds, properties and actions, or your own one written in the same LiNo form.                                                             |
-| `valueMatches(type, value)`              | Checks a value against a property type of the vocabulary.                                                                                                                  |
-| `values`                                 | The value layer: see [Typed values](#typed-values).                                                                                                                        |
-| `UI_DIALECT_VERSION`, `SPEC_VERSION`     | `'ui-dialect/0'`.                                                                                                                                                          |
+| Export                                    | Purpose                                                                                                                                                                    |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `parse(text, options?)`                   | Text to `{ roots, diagnostics }`. Options: `maxDepth` (64), `maxInputSize` (1 MiB), `mode` (`'auto'`, `'groups'` or `'fold'`), `checks` (`true`), `vocabulary`.            |
+| `parseOrThrow(text, options?)`            | Same as `parse`, but throws `UiParseError` on an error diagnostic.                                                                                                         |
+| `toTree(doc)`                             | The tree JSON of the specification: `{ spec, elements, unknown?, diagnostics }`.                                                                                           |
+| `format(doc, { style, indent }?)`         | Tree back to text, in the `'indented'` (default, nested), `'multiline'` or `'inline'` style. `parse(format(doc))` gives the same tree.                                     |
+| `parseLinks(text, options?)`              | Text to raw values (atoms as strings, links as arrays or `{ id, values }`), without the element projection, for formats such as the `ui-store` log. Throws `UiParseError`. |
+| `formatLinks(values, { style, indent }?)` | Raw values back to text, nested (`'indented'`, default) or one link per line (`'inline'`). `parseLinks(formatLinks(v))` gives `v` back.                                    |
+| `walk(docOrNode, visitor)`                | Depth-first, pre-order visit `visitor(node, parent, depth)`; returning `false` skips the children.                                                                         |
+| `projectLink(link)`, `projectLinks(...)`  | Project `links-notation` `Link` objects you already have.                                                                                                                  |
+| `defaultVocabulary()`, `loadVocabulary`   | The `ui-dialect/0` vocabulary of kinds, properties and actions, or your own one written in the same LiNo form.                                                             |
+| `valueMatches(type, value)`               | Checks a value against a property type of the vocabulary.                                                                                                                  |
+| `values`                                  | The value layer: see [Typed values](#typed-values).                                                                                                                        |
+| `UI_DIALECT_VERSION`, `SPEC_VERSION`      | `'ui-dialect/0'`.                                                                                                                                                          |
 
 Type declarations are in [`src/index.d.ts`](src/index.d.ts) and, for
 `@link-foundation/ui-core/source`, [`src/source.d.ts`](src/source.d.ts).

@@ -86,8 +86,11 @@ export interface ParseOptions {
 }
 
 export interface FormatOptions {
-  /** Default `multiline`. */
-  style?: 'inline' | 'multiline' | 'indented';
+  /**
+   * Default `indented`: the nested form, with as few parentheses as
+   * possible. `multiline` and `inline` write parenthesized links.
+   */
+  style?: 'indented' | 'multiline' | 'inline';
   /** Default two spaces. */
   indent?: string;
 }
@@ -130,8 +133,14 @@ export function parseLinks(
   options?: { maxDepth?: number; maxInputSize?: number }
 ): RawValue[];
 
-/** Write raw values as Links Notation text, one top-level link per line. */
-export function formatLinks(values: RawValue[]): string;
+/**
+ * Write raw values as Links Notation text: nested by default, or one
+ * top-level link per line with `style: 'inline'`.
+ */
+export function formatLinks(
+  values: RawValue[],
+  options?: FormatOptions
+): string;
 
 /** One element as a single `Link` (the one-line form). */
 export function elementLink(node: UiNode): Link;

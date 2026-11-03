@@ -34,10 +34,20 @@ for (const text of cases) {
 for (const link of [
   new Link(null, [new Link('a')]),
   new Link(null, [new Link('a'), new Link('b')]),
-  new Link('x', [new Link('a'), new Link(null, [new Link('b'), new Link('c')])]),
+  new Link('x', [
+    new Link('a'),
+    new Link(null, [new Link('b'), new Link('c')]),
+  ]),
   new Link('x', []),
-  new Link(null, [new Link(null, [new Link('x'), new Link('y')]), new Link('z')]),
+  new Link(null, [
+    new Link(null, [new Link('x'), new Link('y')]),
+    new Link('z'),
+  ]),
   new Link('a b', [new Link('c d')]),
 ]) {
-  console.log(link.format(), '=> lessParentheses:', JSON.stringify(link.format(true)));
+  console.log(
+    link.format(),
+    '=> lessParentheses:',
+    JSON.stringify(link.format(true))
+  );
 }
