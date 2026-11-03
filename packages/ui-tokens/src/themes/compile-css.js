@@ -1,3 +1,4 @@
+import { themeExtrasCss } from './extras-css.js';
 import { values } from '@link-foundation/ui-core';
 import { compileCss } from '@link-foundation/ui-style';
 import { toCss } from '../export/css.js';
@@ -176,9 +177,15 @@ export function compileThemeCss(theme, options = {}) {
   const style = compileCss(theme.styles, {
     prefix: options.prefix,
     scope: ':scope',
+    transparency: options.transparency,
+    reducedTransparency: options.reducedTransparency,
   });
   if (style) {
     css.push(`@scope (${root}) to ([data-theme]) {\n${style}\n}`);
+  }
+  const extras = themeExtrasCss(theme, root, options);
+  if (extras) {
+    css.push(extras);
   }
   return css.join('\n');
 }

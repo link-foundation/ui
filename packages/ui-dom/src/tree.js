@@ -36,7 +36,12 @@ import {
 
 /** Mirror the properties a kind lists in `attributes` (for CSS). */
 function mirrorAttributes(node, spec, el, changed) {
-  for (const [name, type] of Object.entries(spec.attributes ?? {})) {
+  for (const [name, type] of Object.entries({
+    material: 'string',
+    'text-style': 'string',
+    appearance: 'string',
+    ...spec.attributes,
+  })) {
     if (!changed.includes(name)) {
       continue;
     }

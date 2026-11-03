@@ -26,3 +26,9 @@ THEME_SCREENSHOTS=docs/screenshots/themes npx playwright test tests/e2e/themes.s
 The test checks nested computed colors, preserved node identity, system
 preferences, forced colors, synchronous saved preference restoration, and
 axe accessibility (including contrast). See [the API contract](../../docs/spec/themes.md).
+
+Open http://127.0.0.1:4173/examples/themes/hig.html for the six HIG panels (iOS/macOS × light/dark/increased contrast). See [the HIG guide](../../docs/themes/hig.md). Capture review images with:
+
+```sh
+HIG_SCREENSHOTS=docs/screenshots/hig npx playwright test tests/e2e/theme-hig.spec.js --project=chromium --workers=1
+```
