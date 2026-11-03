@@ -160,3 +160,24 @@ The ui-core value layer already reads a `boolean` type name
 
 The `asset` kind lists the fields used by the samples (`kind`, `source`,
 `license`, `copyright`, `notice`). Owner of the final field set: #10.
+
+## Icon element kind
+
+`vocabulary.lino` has no `icon` kind. `@link-foundation/ui-components` (#44)
+declares one in `ICON_KIND_TEXT`. Its forms are `(icon close)`, with the name as
+the first positional value, and `(icon (set lucide) (name check) (label 'Done'))`.
+It has these properties:
+
+- `name`, `set`, `label` and `note`: `string`;
+- `mirror`: `(enum true false)`.
+
+`iconVocabulary()` adds the kind to the default vocabulary.
+
+- (a) Add the `icon` kind to `vocabulary.lino` as declared there.
+- (b) Make `icon` a property of other kinds (`(button (icon close))`).
+- (c) Both.
+
+Owner: #44 for the kind as declared. Deciding the core vocabulary is left to
+a later dialect version. v0 rule: documents that use `(icon ...)` are parsed
+with `iconVocabulary()`. With the default vocabulary, `icon` is an unknown
+kind and a warning is reported.

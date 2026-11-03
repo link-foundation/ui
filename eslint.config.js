@@ -106,13 +106,29 @@ export default [
     },
   },
   {
-    // The ui-dom and ui-animation example pages run in the browser only.
-    files: ['examples/ui-dom/**/*.js', 'examples/animation/**/*.js'],
+    // The ui-dom, ui-animation and package example pages run in the browser only.
+    files: [
+      'examples/ui-dom/**/*.js',
+      'examples/animation/**/*.js',
+      'packages/*/examples/**/*.js',
+    ],
     languageOptions: {
       globals: {
         document: 'readonly',
         window: 'readonly',
         URL: 'readonly',
+      },
+    },
+  },
+  {
+    // Package demo pages (such as the icon gallery) run in the browser only.
+    files: ['packages/*/examples/**/*.js'],
+    languageOptions: {
+      globals: {
+        document: 'readonly',
+        window: 'readonly',
+        location: 'readonly',
+        CSS: 'readonly',
       },
     },
   },
