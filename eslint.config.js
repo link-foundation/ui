@@ -107,7 +107,7 @@ export default [
   },
   {
     // The ui-dom example page runs in the browser only.
-    files: ['examples/ui-dom/**/*.js'],
+    files: ['examples/ui-dom/**/*.js', 'packages/*/examples/**/*.js'],
     languageOptions: {
       globals: {
         document: 'readonly',

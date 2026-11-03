@@ -146,6 +146,21 @@ mountBehavior(
 // Enter, Space or a click switch aria-pressed on the button
 ```
 
+### Layout and windowing
+
+[`@link-foundation/ui-components/layout`](packages/ui-components/README.md#layout-and-windowing)
+adds the layout kinds `stack`, `grid`, `split`, `tab-group`, `dock`, `window` and
+`app-shell` to ui-dom, with a layer manager and dock layouts saved as Links
+Notation:
+
+```lino
+(designer-shell: dock (persist designer.layout)
+  (left: region (size 16rem) (panels toolbox outline))
+  (right: region (size 20rem) (panels properties))
+  (center: region (panels canvas))
+  ...)
+```
+
 ### SwiftUI
 
 [`ui-swift`](packages/ui-swift/README.md) draws a LiNo document with native
@@ -255,7 +270,7 @@ npm run example:desktop:package
 │   └── universal-app/    # React + GitHub Pages + Electron + Capacitor app
 ├── scripts/              # Build and release scripts
 ├── packages/             # npm workspaces (see docs/monorepo.md)
-│   ├── ui-components/    # @link-foundation/ui-components (LiNo state machines, actions registry, a11y helpers, charts, diagrams with Dagre layout, SVG and Mermaid)
+│   ├── ui-components/    # @link-foundation/ui-components (LiNo state machines, actions registry, a11y helpers, charts, diagrams with Dagre layout, SVG and Mermaid, layout and windowing)
 │   ├── ui-config/        # @link-foundation/ui-config (layered configuration, overrides patches)
 │   ├── ui-convert/       # @link-foundation/ui-convert (HTML/DOM, A2UI, Adaptive Cards, JSON Forms, Lottie <-> LiNo)
 │   ├── ui-core/          # @link-foundation/ui-core
