@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect } from 'test-anywhere';
-import { attrs, mountDoc } from '../support/controls.js';
+import { attrs, microtasks, mountDoc } from '../support/controls.js';
 
 const ARIA = ['role', 'aria-valuenow', 'aria-valuemin', 'aria-valuemax'];
 
@@ -40,7 +40,7 @@ describe('progress', () => {
   it('follows a store change of the value', async () => {
     const t = mountDoc(`  (up: progress (label 'Upload') (value 10) (max 50))`);
     t.mounted.store.setProp('up', 'value', ['25']);
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await microtasks();
     const track = t.part('up', 'track');
     expect(attrs(track, ['aria-valuenow', 'aria-valuemax'])).toEqual({
       'aria-valuenow': '25',
