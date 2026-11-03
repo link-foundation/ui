@@ -1,10 +1,17 @@
-(press-feedback: animation
-  (target ok)
-  (duration (token motion.duration.short))
-  (easing standard)
-  (track scale (key 0 1) (key 0.5 0.96) (key 1 1)))
-(recording-1: recording
-  (started '2026-11-01T12:00:00Z')
-  (event 0ms (set ok label 'OK'))
-  (event 840ms (input pointer down ok))
-  (event 990ms (set ok label 'Saved')))
+press-feedback: animation
+  target ok
+  duration
+    token motion.duration.short
+  easing standard
+  track scale
+    key 0 1
+    key 0.5 0.96
+    key 1 1
+recording-1: recording
+  started '2026-11-01T12:00:00Z'
+  event 0ms
+    set ok label 'OK'
+  event 840ms
+    input pointer down ok
+  event 990ms
+    set ok label 'Saved'

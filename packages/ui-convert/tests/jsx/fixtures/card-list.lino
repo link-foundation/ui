@@ -1,22 +1,24 @@
-(card-0: card
-  (variant elevated)
-  (card-content-0-0: card-content
-    (text-0-0-0: text Today
-      (level 5))
-    (list-0-0-1: list
-      (list-item-0-0-1-0: list-item
-        (text-0-0-1-0-0: text 'Buy milk'))
-      (list-item-0-0-1-1: list-item
-        (attr class done)
-        (text-0-0-1-1-0: text 'Write the report')))
-    (stack-0-0-2: stack
-      (direction horizontal)
-      (gap (token space.1))
-      (button-0-0-2-0: button
-        (label Clear)
-        (variant outlined)
-        (on press (action clearDone)))
-      (button-0-0-2-1: button
-        (label Archive)
-        (variant text)
-        (disabled true)))))
+card-0: card
+  variant elevated
+  card-content-0-0: card-content
+    text-0-0-0: text Today
+      level 5
+    list-0-0-1: list
+      list-item-0-0-1-0: list-item
+        text-0-0-1-0-0: text 'Buy milk'
+      list-item-0-0-1-1: list-item
+        attr class done
+        text-0-0-1-1-0: text 'Write the report'
+    stack-0-0-2: stack
+      direction horizontal
+      gap
+        token space.1
+      button-0-0-2-0: button
+        label Clear
+        variant outlined
+        on press
+          action clearDone
+      button-0-0-2-1: button
+        label Archive
+        variant text
+        disabled true

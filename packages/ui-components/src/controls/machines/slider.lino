@@ -1,47 +1,99 @@
-(slider-machine: machine
-  (initial idle)
-  (context (disabled false) (orientation horizontal))
-  (state idle
-    (on grab (target dragging) (do move-to-pointer) (when not-disabled))
-    (on arrow-up (do (numeric-key ArrowUp)) (when not-disabled))
-    (on arrow-right (do (numeric-key ArrowRight)) (when not-disabled))
-    (on arrow-down (do (numeric-key ArrowDown)) (when not-disabled))
-    (on arrow-left (do (numeric-key ArrowLeft)) (when not-disabled))
-    (on shift-arrow-up (do (numeric-key ArrowUp shift)) (when not-disabled))
-    (on shift-arrow-right (do (numeric-key ArrowRight shift)) (when not-disabled))
-    (on shift-arrow-down (do (numeric-key ArrowDown shift)) (when not-disabled))
-    (on shift-arrow-left (do (numeric-key ArrowLeft shift)) (when not-disabled))
-    (on page-up (do (numeric-key PageUp)) (when not-disabled))
-    (on page-down (do (numeric-key PageDown)) (when not-disabled))
-    (on home (do (numeric-key Home)) (when not-disabled))
-    (on end (do (numeric-key End)) (when not-disabled)))
-  (state dragging
-    (on drag (do move-to-pointer))
-    (on release (target idle) (do move-to-pointer)))
-  (part thumb
-    (attr role slider)
-    (attr aria-valuenow (context value))
-    (attr aria-valuemin (context min))
-    (attr aria-valuemax (context max))
-    (attr aria-valuetext (context text))
-    (attr aria-orientation (context orientation))
-    (attr aria-disabled (context disabled))
-    (attr data-state (state))
-    (key ArrowUp arrow-up)
-    (key ArrowRight arrow-right)
-    (key ArrowDown arrow-down)
-    (key ArrowLeft arrow-left)
-    (key Shift+ArrowUp shift-arrow-up)
-    (key Shift+ArrowRight shift-arrow-right)
-    (key Shift+ArrowDown shift-arrow-down)
-    (key Shift+ArrowLeft shift-arrow-left)
-    (key PageUp page-up)
-    (key PageDown page-down)
-    (key Home home)
-    (key End end))
-  (part track
-    (attr data-state (state))
-    (on pointerdown grab)
-    (on pointermove drag)
-    (on pointerup release)
-    (on lostpointercapture release)))
+slider-machine: machine
+  initial idle
+  context
+    disabled false
+    orientation horizontal
+  state idle
+    on grab
+      target dragging
+      do move-to-pointer
+      when not-disabled
+    on arrow-up
+      do
+        numeric-key ArrowUp
+      when not-disabled
+    on arrow-right
+      do
+        numeric-key ArrowRight
+      when not-disabled
+    on arrow-down
+      do
+        numeric-key ArrowDown
+      when not-disabled
+    on arrow-left
+      do
+        numeric-key ArrowLeft
+      when not-disabled
+    on shift-arrow-up
+      do
+        numeric-key ArrowUp shift
+      when not-disabled
+    on shift-arrow-right
+      do
+        numeric-key ArrowRight shift
+      when not-disabled
+    on shift-arrow-down
+      do
+        numeric-key ArrowDown shift
+      when not-disabled
+    on shift-arrow-left
+      do
+        numeric-key ArrowLeft shift
+      when not-disabled
+    on page-up
+      do
+        numeric-key PageUp
+      when not-disabled
+    on page-down
+      do
+        numeric-key PageDown
+      when not-disabled
+    on home
+      do
+        numeric-key Home
+      when not-disabled
+    on end
+      do
+        numeric-key End
+      when not-disabled
+  state dragging
+    on drag
+      do move-to-pointer
+    on release
+      target idle
+      do move-to-pointer
+  part thumb
+    attr role slider
+    attr aria-valuenow
+      context value
+    attr aria-valuemin
+      context min
+    attr aria-valuemax
+      context max
+    attr aria-valuetext
+      context text
+    attr aria-orientation
+      context orientation
+    attr aria-disabled
+      context disabled
+    attr data-state
+      state
+    key ArrowUp arrow-up
+    key ArrowRight arrow-right
+    key ArrowDown arrow-down
+    key ArrowLeft arrow-left
+    key Shift+ArrowUp shift-arrow-up
+    key Shift+ArrowRight shift-arrow-right
+    key Shift+ArrowDown shift-arrow-down
+    key Shift+ArrowLeft shift-arrow-left
+    key PageUp page-up
+    key PageDown page-down
+    key Home home
+    key End end
+  part track
+    attr data-state
+      state
+    on pointerdown grab
+    on pointermove drag
+    on pointerup release
+    on lostpointercapture release

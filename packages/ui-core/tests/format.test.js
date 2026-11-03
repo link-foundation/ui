@@ -35,6 +35,9 @@ describe('format round trip', () => {
         expect(shape(again)).toEqual(shape(doc));
         expect([...again.byId.keys()]).toEqual([...doc.byId.keys()]);
         expect(treeDiagnostics(again)).toEqual(treeDiagnostics(doc));
+        // `Parser.parse()` (the `fold` mode) reads it the same way.
+        const folded = parse(format(doc, { style }), { mode: 'fold' });
+        expect(shape(folded)).toEqual(shape(doc));
       });
     }
   }
@@ -65,9 +68,12 @@ describe('format styles', () => {
     '(ok: button (label OK) (on press (navigate home)) (badge: text 1))'
   );
 
-  it('defaults to multiline', () => {
-    expect(format(doc)).toBe(format(doc, { style: 'multiline' }));
-    expect(format(doc)).toBe(
+  it('defaults to the nested indented form (#133)', () => {
+    expect(format(doc)).toBe(format(doc, { style: 'indented' }));
+  });
+
+  it('writes the multiline form on request', () => {
+    expect(format(doc, { style: 'multiline' })).toBe(
       [
         '(ok: button',
         '  (label OK)',
@@ -84,22 +90,46 @@ describe('format styles', () => {
     );
   });
 
-  it('writes the indented form without element parentheses', () => {
+  it('writes the indented form without parentheses', () => {
     expect(format(doc, { style: 'indented' })).toBe(
       [
         'ok: button',
-        '  (label OK)',
-        '  (on press (navigate home))',
+        '  label OK',
+        '  on press',
+        '    navigate home',
         '  badge: text 1',
         '',
       ].join('\n')
     );
   });
 
+  it('keeps parentheses only where a line cannot hold a link', () => {
+    // A nested property value, a flag property, a link whose only value is
+    // a link (kept in parentheses) and a child element.
+    const tricky = parse(
+      "(row: stack (gap (token space.m)) (x: text 'a b') (hidden) (u ((v w))))"
+    );
+    const text = format(tricky);
+    expect(text).toBe(
+      [
+        'row: stack',
+        '  gap',
+        '    token space.m',
+        '  hidden',
+        '  u ((v w))',
+        "  x: text 'a b'",
+        '',
+      ].join('\n')
+    );
+    expect(parse(text).roots).toEqual(tricky.roots);
+    expect(parse(text, { mode: 'fold' }).roots).toEqual(tricky.roots);
+  });
+
   it('honours a custom indent', () => {
     expect(format(doc, { style: 'multiline', indent: '    ' })).toContain(
       '\n    (label OK)'
     );
+    expect(format(doc, { indent: '\t' })).toContain('\n\t\tnavigate home');
   });
 
   it('writes an empty document as an empty string', () => {

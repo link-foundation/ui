@@ -66,7 +66,9 @@ describe('control catalog', () => {
         machine !== null
       );
       if (machine !== null) {
-        expect(CONTROL_MACHINES[kind]).toContain(`(${machine}: machine`);
+        expect(CONTROL_MACHINES[kind]).toMatch(
+          new RegExp(`^${machine}: machine$`, 'mu')
+        );
       }
     }
   });

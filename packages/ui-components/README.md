@@ -64,20 +64,31 @@ npm install @link-foundation/ui-components
 ## A machine in LiNo
 
 ```lino
-(toggle-machine: machine
-  (initial off)
-  (context (pressed false) (disabled false))
-  (action set-pressed (set pressed true))
-  (action clear-pressed (set pressed false))
-  (state off
-    (on toggle (target on) (do set-pressed) (when not-disabled)))
-  (state on
-    (on toggle (target off) (do clear-pressed) (when not-disabled)))
-  (part root
-    (attr aria-pressed (context pressed))
-    (key Enter toggle)
-    (key Space toggle)
-    (on press toggle)))
+toggle-machine: machine
+  initial off
+  context
+    pressed false
+    disabled false
+  action set-pressed
+    set pressed true
+  action clear-pressed
+    set pressed false
+  state off
+    on toggle
+      target on
+      do set-pressed
+      when not-disabled
+  state on
+    on toggle
+      target off
+      do clear-pressed
+      when not-disabled
+  part root
+    attr aria-pressed
+      context pressed
+    key Enter toggle
+    key Space toggle
+    on press toggle
 ```
 
 | Form                                               | Meaning                                                                                                                                                                     |
@@ -429,14 +440,23 @@ renderer draws it. It can also be written out as Mermaid text, or drawn by
 shows a Mermaid diagram.
 
 ```lino
-(login-flow: diagram
-  (kind flowchart)
-  (direction down)
-  (start: node (label 'Start'))
-  (check: node (label 'Signed in?') (shape diamond))
-  (home: node (label 'Home'))
-  (edge (from start) (to check))
-  (edge (from check) (to home) (label 'yes')))
+login-flow: diagram
+  kind flowchart
+  direction down
+  start: node
+    label 'Start'
+  check: node
+    label 'Signed in?'
+    shape diamond
+  home: node
+    label 'Home'
+  edge
+    from start
+    to check
+  edge
+    from check
+    to home
+    label 'yes'
 ```
 
 ```js
@@ -468,11 +488,11 @@ See [`examples/diagrams.html`](examples/diagrams.html). Run
 | `(edge (from A) (to B) …)`        | a connection, with an optional `(label …)`; `(ID: edge …)` names it                                          |
 | `(ID: group (label …) (group P))` | a group (subgraph, composite state) inside group `P` if given                                                |
 
-The one-line form `(f: diagram (a: node) (b: node))` and the multi-line
-form give the same model. `parseDiagram` reads the first diagram of a text,
-`diagramsFromLinks` every diagram of a parsed document, and `diagramToLino`
-writes a model back: `diagramFromLinks(parse(diagramToLino(model)))` equals
-`model`. Every error is a `DiagramError` with a `code` (`no-diagram`,
+The nested form, the one-line form `(f: diagram (a: node) (b: node))` and
+the multi-line parenthesized form give the same model. `parseDiagram` reads
+the first diagram of a text, `diagramsFromLinks` every diagram of a parsed
+document, and `diagramToLino` writes a model back in the nested form:
+`diagramFromLinks(parse(diagramToLino(model)))` equals `model`. Every error is a `DiagramError` with a `code` (`no-diagram`,
 `unknown-property`, `invalid-value`, `missing-value`, `duplicate-id`,
 `unknown-node`, `unknown-group`) and an `at` position: the index path of the
 link and its text, since `links-notation` gives no line numbers.
@@ -584,11 +604,16 @@ no animation frame while nothing moves.
 The model, as LiNo:
 
 ```lino
-(simple: link-view
-  (link (id 1) (source 1) (target 2))
-  (markers (source bar) (target arrow))
-  (blueprint true)
-  (grid true))
+simple: link-view
+  link
+    id 1
+    source 1
+    target 2
+  markers
+    source bar
+    target arrow
+  blueprint true
+  grid true
 ```
 
 - **Ends.** A `source` or `target` that is missing or `0` is a free end, drawn
@@ -705,7 +730,7 @@ The gallery `examples/layout.html` (served with
 | ----------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `stack`     | `(stack (direction row) (gap 8px) (align center) (justify space-between) (wrap true) ...)`     | CSS flexbox. `direction` takes `vertical`, `horizontal`, `row`, `column` and their `-reverse` forms.                                                                                          |
 | `grid`      | `(grid (columns 16rem 1fr) (rows auto 1fr) (areas 'nav main') ...)`                            | CSS grid. Tracks are lengths, `fr`, `auto`, `(repeat N ...)`, `(minmax MIN MAX)` and `(fit-content L)`; every token is checked. A child whose id names an area goes into it.                  |
-| `split`     | `(split (sizes 30 70) (min 20) (collapsible true false) (remember-size chat.split) ...)`       | Panes with dividers (WAI-ARIA window splitter). Sizes are percentages with a constant total. `remember-size` keeps `(sizes 30 70)` in the render storage.                                     |
+| `split`     | `(split (sizes 30 70) (min 20) (collapsible true false) (remember-size chat.split) ...)`       | Panes with dividers (WAI-ARIA window splitter). Sizes are percentages with a constant total. `remember-size` keeps `sizes 30 70` in the render storage.                                       |
 | `tab-group` | `(tab-group (label Inspector) (active styles) (styles: panel (title Styles) ...) ...)`         | Panels behind a tab strip (WAI-ARIA tabs, automatic activation). Tabs can be closed, reordered and dragged; a "More tabs" menu appears when they overflow.                                    |
 | `panel`     | `(panel (title Styles) (closable true) ...)`                                                   | A titled panel: a tab of a tab group or a dock panel.                                                                                                                                         |
 | `dock`      | `(dock (persist designer.layout) (left: region (size 16rem) (panels toolbox outline)) ...)`    | Panels docked left, right, top, bottom and center; each region shows its panels as tabs. A panel can move to another region, float, close and come back; the layout is saved under `persist`. |
@@ -795,23 +820,35 @@ import {
   movePanel,
 } from '@link-foundation/ui-components/layout';
 
-const layout = dockLayoutFromLinks(`(designer: dock
-  (persist designer.layout)
-  (left: region (size 16rem) (panels toolbox outline))
-  (right: region (size 20rem) (panels properties))
-  (center: region (panels canvas)))`);
+const layout = dockLayoutFromLinks(`designer: dock
+  persist designer.layout
+  left: region
+    size 16rem
+    panels toolbox outline
+  right: region
+    size 20rem
+    panels properties
+  center: region
+    panels canvas`);
 dockLayoutToLino(movePanel(layout, 'outline', 'right'));
-// (designer: dock
-//   (persist designer.layout)
-//   (left: region (size 16rem) (panels toolbox))
-//   (right: region (size 20rem) (panels properties outline))
-//   (center: region (panels canvas)))
+// designer: dock
+//   persist designer.layout
+//   left: region
+//     size 16rem
+//     panels toolbox
+//   right: region
+//     size 20rem
+//     panels properties outline
+//   center: region
+//     panels canvas
 ```
 
 `movePanel`, `floatPanel`, `closePanel`, `restorePanel`, `activatePanel` and
-`updateRegion` change a layout. Floating and closed panels are written as
-`(float PANEL (x ...) (y ...) (width ...) (height ...) (region SIDE))` and
-`(closed PANEL SIDE)`. Reading the written text gives the same layout back.
+`updateRegion` change a layout. The layout is written in the nested form;
+a floating panel is a `float PANEL` line with the indented lines `x ...`,
+`y ...`, `width ...`, `height ...` and `region SIDE`, and a closed panel is a
+`closed PANEL SIDE` line. Reading the written text gives the same layout
+back, and the parenthesized form reads the same.
 
 ## Basic controls
 
@@ -879,10 +916,15 @@ Each control has stories in `stories/<kind>.lino` and an entry in
 `src/controls/catalog.lino`:
 
 ```lino
-(button-stories: stories
-  (component button)
-  (story filled (button 'Save' (variant filled))))
-(button: control (title 'Button') (stories button-stories) (apg button))
+button-stories: stories
+  component button
+  story filled
+    button 'Save'
+      variant filled
+button: control
+  title 'Button'
+  stories button-stories
+  apg button
 ```
 
 `parseStories`, `parseCatalog` and `storiesDocument` read them; the page
@@ -918,9 +960,12 @@ await resolveIcon({ set: 'lucide', name: 'check' }); // record: ISC, Lucide
 ```
 
 ```lino
-(app: document
-  (icon close)
-  (ok: icon (set lucide) (name check) (label 'Done')))
+app: document
+  icon close
+  ok: icon
+    set lucide
+    name check
+    label 'Done'
 ```
 
 The complete example is `examples/ui-components-icons.mjs`. The gallery

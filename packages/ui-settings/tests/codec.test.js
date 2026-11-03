@@ -24,6 +24,9 @@ describe('values documents', () => {
     };
     const text = toLino(schema, values);
     expect(text).toBe(
+      "settings\n  version 2\n  liquid.blur 24\n  theme.mode dark\n  accent '#00AAFF'"
+    );
+    expect(toLino(schema, values, { style: 'inline' })).toBe(
       "(settings (version 2) (liquid.blur 24) (theme.mode dark) (accent '#00AAFF'))"
     );
     const read = fromLino(schema, text);
@@ -32,7 +35,7 @@ describe('values documents', () => {
   });
 
   it('writes an empty document for the defaults', () => {
-    expect(toLino(schema, defaults(schema))).toBe('(settings (version 2))');
+    expect(toLino(schema, defaults(schema))).toBe('settings\n  version 2');
   });
 
   it('migrates documents of an older version', () => {

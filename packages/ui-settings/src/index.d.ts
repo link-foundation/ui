@@ -192,7 +192,11 @@ export interface ReadResult {
 export const MAX_SHARE_HASH: number;
 export const SHARE_PARAM: 'settings';
 export const LEGACY_SHARE_PARAM: 'ui';
-export function toLino(schema: SettingsSchema, values: SettingsValues): string;
+export function toLino(
+  schema: SettingsSchema,
+  values: SettingsValues,
+  options?: { style?: 'indented' | 'inline' }
+): string;
 export function fromLino(
   schema: SettingsSchema,
   text: string,

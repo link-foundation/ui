@@ -1,0 +1,20 @@
+"x:\n  a\n  b"
+  parse      : (x: a b)
+  parseGroups: (x: (a) (b))
+  same: false
+"x: kind\n  a\n  b"
+  parse      : (x: kind) | ((x: kind) (a)) | ((x: kind) (b))
+  parseGroups: (x: kind (a) (b))
+  same: false
+"x: kind\n  a 1\n  b 2"
+  parse      : (x: kind) | ((x: kind) (a 1)) | ((x: kind) (b 2))
+  parseGroups: (x: kind (a 1) (b 2))
+  same: false
+"x: kind\n  a 1\n    c 3"
+  parse      : (x: kind) | ((x: kind) (a 1)) | (((x: kind) (a 1)) (c 3))
+  parseGroups: (x: kind (a 1 (c 3)))
+  same: false
+"a b\n  c d"
+  parse      : (a b) | ((a b) (c d))
+  parseGroups: (a b (c d))
+  same: false

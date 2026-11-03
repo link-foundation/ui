@@ -1,14 +1,20 @@
-(button-machine: machine
-  (initial idle)
-  (context (disabled false))
-  (state idle
-    (on down (target pressed) (when not-disabled)))
-  (state pressed
-    (on up (target idle))
-    (on leave (target idle)))
-  (part root
-    (attr data-state (state))
-    (on pointerdown down)
-    (on pointerup up)
-    (on pointerleave leave)
-    (on pointercancel leave)))
+button-machine: machine
+  initial idle
+  context
+    disabled false
+  state idle
+    on down
+      target pressed
+      when not-disabled
+  state pressed
+    on up
+      target idle
+    on leave
+      target idle
+  part root
+    attr data-state
+      state
+    on pointerdown down
+    on pointerup up
+    on pointerleave leave
+    on pointercancel leave

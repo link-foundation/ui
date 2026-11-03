@@ -12,17 +12,20 @@ import {
 } from '@link-foundation/ui-tokens';
 
 const text = `
-(base: theme
-  (token space.small 8px))
+base: theme
+  token space.small 8px
 
-(brand: theme
-  (extends base)
-  (token color.primary '#6750A4' (description 'Brand colour'))
-  (token color.action (token color.primary))
-  (token space.gap (token space.small))
-  (token motion.duration.short 150ms)
-  (mode dark
-    (token color.primary '#D0BCFF')))
+brand: theme
+  extends base
+  token color.primary '#6750A4'
+    description 'Brand colour'
+  token color.action
+    token color.primary
+  token space.gap
+    token space.small
+  token motion.duration.short 150ms
+  mode dark
+    token color.primary '#D0BCFF'
 `;
 
 const { sets, diagnostics } = readTokens(text);
@@ -44,7 +47,11 @@ console.log(toSwift(resolved));
 console.log(toKotlin(resolved, { packageName: 'com.example.tokens' }));
 
 // An alias cycle is a diagnostic, never an exception.
-const cyclic = readTokens('(t: theme (token a (token b)) (token b (token a)))');
+const cyclic = readTokens(`t: theme
+  token a
+    token b
+  token b
+    token a`);
 for (const d of resolveTokens(cyclic.sets, 't').diagnostics) {
   console.log(d.code, d.message);
 }

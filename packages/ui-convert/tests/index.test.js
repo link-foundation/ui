@@ -120,7 +120,7 @@ describe('@link-foundation/ui-convert', () => {
 
   it('imports <p>Hi</p> as a text element (the manual check)', () => {
     expect(convert.importHtml('<p>Hi</p>').text).toBe(
-      '(p-0: text Hi\n  (tag p))\n'
+      'p-0: text Hi\n  tag p\n'
     );
   });
 });

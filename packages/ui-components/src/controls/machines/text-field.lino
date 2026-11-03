@@ -1,16 +1,26 @@
-(text-field-machine: machine
-  (initial idle)
-  (context (disabled false) (readonly false) (invalid false))
-  (state idle
-    (on focus (target editing)))
-  (state editing
-    (on blur (target idle))
-    (on commit (do read-value))
-    (on revert (do restore-value) (when editable)))
-  (part input
-    (attr aria-invalid (context invalid))
-    (attr data-state (state))
-    (on focusin focus)
-    (on focusout blur)
-    (on change commit)
-    (key Escape revert)))
+text-field-machine: machine
+  initial idle
+  context
+    disabled false
+    readonly false
+    invalid false
+  state idle
+    on focus
+      target editing
+  state editing
+    on blur
+      target idle
+    on commit
+      do read-value
+    on revert
+      do restore-value
+      when editable
+  part input
+    attr aria-invalid
+      context invalid
+    attr data-state
+      state
+    on focusin focus
+    on focusout blur
+    on change commit
+    key Escape revert

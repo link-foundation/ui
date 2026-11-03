@@ -1,11 +1,17 @@
-(radio-group-machine: machine
-  (initial ready)
-  (context (disabled false) (invalid false))
-  (state ready
-    (on select (do choose-radio) (when not-disabled)))
-  (part root
-    (attr role radiogroup)
-    (attr aria-disabled (context disabled))
-    (attr aria-invalid (context invalid))
-    (key Space select)
-    (on press select)))
+radio-group-machine: machine
+  initial ready
+  context
+    disabled false
+    invalid false
+  state ready
+    on select
+      do choose-radio
+      when not-disabled
+  part root
+    attr role radiogroup
+    attr aria-disabled
+      context disabled
+    attr aria-invalid
+      context invalid
+    key Space select
+    on press select

@@ -1,12 +1,13 @@
-(box-0: box
-  (style (p 2))
-  (button-0-0: button
-    (label Spread)
-    (variant text)
-    (unsupported jsx-expression {...buttonProps}))
-  (button-0-1: button
-    (label Save)
-    (variant filled)
-    (unsupported jsx-expression 'onClick={() => save(draft)}'))
-  (list-0-2: list
-    (unsupported jsx-expression '{items.map((item) => <ListItem key={item.id}>{item.name}</ListItem>)}')))
+box-0: box
+  style
+    p 2
+  button-0-0: button
+    label Spread
+    variant text
+    unsupported jsx-expression {...buttonProps}
+  button-0-1: button
+    label Save
+    variant filled
+    unsupported jsx-expression 'onClick={() => save(draft)}'
+  list-0-2: list
+    unsupported jsx-expression '{items.map((item) => <ListItem key={item.id}>{item.name}</ListItem>)}'

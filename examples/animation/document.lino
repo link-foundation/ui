@@ -1,14 +1,17 @@
-(animation-example: document
-  (title 'ui-animation example')
-  (theme material3)
-  (body: stack
-    (direction vertical)
-    (gap (token space.medium))
-    (sidebar: stack
-      (direction vertical)
-      (gap 8px)
-      (title: text 'Hello, links!')
-      (item-1: text 'Keyframes and easings')
-      (item-2: text 'Springs and timelines')
-      (item-3: text 'Effects and triggers'))
-    (ok: button (label 'OK') (variant filled))))
+animation-example: document
+  title 'ui-animation example'
+  theme material3
+  body: stack
+    direction vertical
+    gap
+      token space.medium
+    sidebar: stack
+      direction vertical
+      gap 8px
+      title: text 'Hello, links!'
+      item-1: text 'Keyframes and easings'
+      item-2: text 'Springs and timelines'
+      item-3: text 'Effects and triggers'
+    ok: button
+      label 'OK'
+      variant filled

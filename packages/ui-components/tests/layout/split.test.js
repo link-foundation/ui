@@ -5,7 +5,11 @@
  */
 
 import { describe, it, expect } from 'test-anywhere';
-import { splitSizes } from '@link-foundation/ui-components';
+import {
+  sizesFromLino,
+  sizesToLino,
+  splitSizes,
+} from '@link-foundation/ui-components';
 import { memoryStorage, mountLayout, press } from './helpers.js';
 
 // One sublink per line: two links on one indented line form a group.
@@ -105,10 +109,15 @@ describe('split kind', () => {
     const first = await mountLayout(CHAT, { storage });
     press(dividerOf(first.node('chat')), 'ArrowRight', { shiftKey: true });
     first.close();
-    expect(storage.map.get('gallery.chat')).toBe('(sizes 40 60)');
+    expect(storage.map.get('gallery.chat')).toBe('sizes 40 60');
     const second = await mountLayout(CHAT, { storage });
     expect(splitSizes(second.node('chat'))).toEqual([40, 60]);
     second.close();
+  });
+
+  it('reads the sizes stored in parentheses before #133', () => {
+    expect(sizesFromLino('(sizes 40 60)')).toEqual([40, 60]);
+    expect(sizesFromLino(sizesToLino([40, 60]))).toEqual([40, 60]);
   });
 
   it('does not collapse a pane when the other would pass its max', async () => {

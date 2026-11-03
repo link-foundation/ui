@@ -16,7 +16,10 @@ import {
   writeDocumentLinks,
 } from '@link-foundation/ui-store';
 
-const store = createStore({ text: "(ok: button (label 'OK'))" });
+const store = createStore({
+  text: `ok: button
+  label 'OK'`,
+});
 const links = createSqlLinks(new DatabaseSync(':memory:'));
 const names = createNames();
 const where = writeDocumentLinks(

@@ -1,5 +1,11 @@
-(accept: checkbox 'Accept the terms' (checked mixed) (required true))
-(docs: link Docs (href /docs))
-(back: link Back (href accept))
-(wifi: switch 'Wi-Fi' (checked maybe))
-(evil: link Evil (href 'javascript:alert(1)'))
+accept: checkbox 'Accept the terms'
+  checked mixed
+  required true
+docs: link Docs
+  href /docs
+back: link Back
+  href accept
+wifi: switch 'Wi-Fi'
+  checked maybe
+evil: link Evil
+  href 'javascript:alert(1)'

@@ -17,8 +17,8 @@ fi
 for f in $swift_files; do
   expected=$(git show "$ref:$swift/$f" | sed -E \
     -e 's/ ScrollView/ Column (scroll vertical)/; s/^ScrollView/Column (scroll vertical)/' \
-    -e 's/([ (])VStack/\1Column/; s/([ (])HStack/\1Row/; s/([ (])AsyncImage/\1Image/' \
-    -e 's/([ (])EmptyView/\1Box/' \
+    -e 's/(^|[ (])VStack/\1Column/; s/(^|[ (])HStack/\1Row/; s/(^|[ (])AsyncImage/\1Image/' \
+    -e 's/(^|[ (])EmptyView/\1Box/' \
     -e 's/\(alignment center\)/(alignment CenterHorizontally)/; s/\(alignment leading\)/(alignment Start)/; s/\(alignment trailing\)/(alignment End)/' \
     -e 's/\(alignment top\)/(alignment Top)/; s/\(alignment bottom\)/(alignment Bottom)/')
   if ! out=$(diff <(echo "$expected") "$kotlin/$f"); then

@@ -1,2 +1,2 @@
-(button.save: button 'Save')
-(save: text 'button is the kind of the first link, text of this one')
+button.save: button 'Save'
+save: text 'button is the kind of the first link, text of this one'

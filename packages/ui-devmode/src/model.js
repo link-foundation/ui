@@ -157,16 +157,18 @@ export function editorFor(type, values) {
 }
 
 /**
- * Raw values as Links Notation text, the way they are written in a
- * document (`'Hello, links'`, `(token space.medium)`). The text is written
- * by ui-core `formatLinks`, so all quoting is done by `links-notation`.
+ * Raw values as Links Notation text, the way they are written after a
+ * property name (`'Hello, links'`, `(token space.medium)`). The text is
+ * edited in a one-line field, so it is the inline form of the values. It is
+ * written by ui-core `formatLinks`, so all quoting is done by
+ * `links-notation`.
  * @param {readonly unknown[]|undefined} values
  */
 export function formatValues(values) {
   if (!Array.isArray(values) || values.length === 0) {
     return '';
   }
-  return formatLinks([/** @type {any} */ (values)])
+  return formatLinks([/** @type {any} */ (values)], { style: 'inline' })
     .trim()
     .slice(1, -1);
 }

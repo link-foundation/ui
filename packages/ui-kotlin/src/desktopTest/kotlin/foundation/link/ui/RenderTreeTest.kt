@@ -15,10 +15,10 @@ class RenderTreeTest {
         val tree = renderTree(sample.readText())
         assertEquals(
             """
-            (app: Column (scroll vertical)
-              (body: Column (spacing 16)
-                (greeting: Text 'Hello, links')
-                (ok: Button (label OK))))
+            app: Column (scroll vertical)
+              body: Column (spacing 16)
+                greeting: Text 'Hello, links'
+                ok: Button (label OK)
 
             """.trimIndent(),
             dumpLino(tree),
@@ -74,7 +74,7 @@ class RenderTreeTest {
         assertEquals("https://example.com/logo.png", image.prop("url"))
         assertEquals("64", image.prop("width"))
         assertEquals("32", image.prop("height"))
-        assertEquals("(logo: Image (url 'https://example.com/logo.png') (width 64) (height 32) (alt 'Company logo'))", dumpLino(image))
+        assertEquals("logo: Image (url 'https://example.com/logo.png') (width 64) (height 32) (alt 'Company logo')", dumpLino(image))
     }
 
     @Test
@@ -93,7 +93,7 @@ class RenderTreeTest {
         assertNull(tree.node("inner"))
         assertEquals("Text", tree.node("after")?.primitive)
         assertTrue(UiDiagnostic("unsupported-kind", Severity.WARNING, mapOf("element" to "chart-1", "kind" to "chart")) in tree.diagnostics)
-        assertEquals("(chart-1: Box)", dumpLino(chart))
+        assertEquals("chart-1: Box", dumpLino(chart))
     }
 
     @Test
@@ -110,7 +110,7 @@ class RenderTreeTest {
 
     @Test
     fun anonymousElementsAreRendered() {
-        assertEquals("(form: Column\n  (Text Name)\n  (Button (label Save)))\n", dumpLino(renderTree("(form: stack (text Name) (button Save))")))
+        assertEquals("form: Column\n  Text Name\n  Button (label Save)\n", dumpLino(renderTree("(form: stack (text Name) (button Save))")))
     }
 
     @Test

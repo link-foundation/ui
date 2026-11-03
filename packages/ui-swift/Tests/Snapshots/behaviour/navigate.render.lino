@@ -1,2 +1,2 @@
-(home-link: Button (label Home))
-(docs-link: Button (label Docs))
+home-link: Button (label Home)
+docs-link: Button (label Docs)

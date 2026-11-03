@@ -11,14 +11,31 @@ import {
 } from '@link-foundation/ui-components';
 import { memoryStorage, mountLayout, press, tabTitles } from './helpers.js';
 
-const DESIGNER = `(designer: dock (label Designer) (persist designer.layout)
-  (left: region (size 14rem) (panels toolbox outline))
-  (right: region (size 16rem) (panels properties))
-  (center: region (panels canvas))
-  (toolbox: panel (title Toolbox) (t: text 'Tools'))
-  (outline: panel (title Outline) (o: text 'Tree'))
-  (properties: panel (title Properties) (p: button 'Apply'))
-  (canvas: panel (title Canvas) (closable false) (c: text 'Canvas')))`;
+const DESIGNER = `designer: dock
+  label Designer
+  persist designer.layout
+  left: region
+    size 14rem
+    panels toolbox outline
+  right: region
+    size 16rem
+    panels properties
+  center: region
+    panels canvas
+  toolbox: panel
+    title Toolbox
+    t: text 'Tools'
+  outline: panel
+    title Outline
+    o: text 'Tree'
+  properties: panel
+    title Properties
+    p: button 'Apply'
+  canvas: panel
+    title Canvas
+    closable false
+    c: text 'Canvas'
+`;
 
 const regionOf = (dock, side) =>
   dock.querySelector(`.ui-dock-region[data-side=${side}]`);
@@ -252,8 +269,8 @@ describe('dock kind: closing, collapsing and keys', () => {
   it('puts a panel that no region lists in the center', async () => {
     const page = await mountLayout(
       DESIGNER.replace(
-        '(canvas: panel',
-        "(console: panel (title Console) (k: text 'Log'))\n  (canvas: panel"
+        '  canvas: panel',
+        "  console: panel\n    title Console\n    k: text 'Log'\n  canvas: panel"
       )
     );
     expect(regions(page.node('designer')).center).toEqual([

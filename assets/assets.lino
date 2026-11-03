@@ -1,197 +1,197 @@
-(links-ui-logo: asset
-  (kind image)
-  (files 'assets/links-ui-logo.svg')
-  (license CC0-1.0)
-  (copyright none))
+links-ui-logo: asset
+  kind image
+  files 'assets/links-ui-logo.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-attach: asset
-  (kind icon)
-  (files 'assets/icons/own/attach.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-attach: asset
+  kind icon
+  files 'assets/icons/own/attach.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-check: asset
-  (kind icon)
-  (files 'assets/icons/own/check.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-check: asset
+  kind icon
+  files 'assets/icons/own/check.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-chevron-down: asset
-  (kind icon)
-  (files 'assets/icons/own/chevron-down.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-chevron-down: asset
+  kind icon
+  files 'assets/icons/own/chevron-down.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-chevron-left: asset
-  (kind icon)
-  (files 'assets/icons/own/chevron-left.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-chevron-left: asset
+  kind icon
+  files 'assets/icons/own/chevron-left.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-chevron-right: asset
-  (kind icon)
-  (files 'assets/icons/own/chevron-right.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-chevron-right: asset
+  kind icon
+  files 'assets/icons/own/chevron-right.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-chevron-up: asset
-  (kind icon)
-  (files 'assets/icons/own/chevron-up.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-chevron-up: asset
+  kind icon
+  files 'assets/icons/own/chevron-up.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-close: asset
-  (kind icon)
-  (files 'assets/icons/own/close.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-close: asset
+  kind icon
+  files 'assets/icons/own/close.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-copy: asset
-  (kind icon)
-  (files 'assets/icons/own/copy.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-copy: asset
+  kind icon
+  files 'assets/icons/own/copy.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-dock-bottom: asset
-  (kind icon)
-  (files 'assets/icons/own/dock-bottom.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-dock-bottom: asset
+  kind icon
+  files 'assets/icons/own/dock-bottom.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-dock-left: asset
-  (kind icon)
-  (files 'assets/icons/own/dock-left.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-dock-left: asset
+  kind icon
+  files 'assets/icons/own/dock-left.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-dock-right: asset
-  (kind icon)
-  (files 'assets/icons/own/dock-right.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-dock-right: asset
+  kind icon
+  files 'assets/icons/own/dock-right.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-drag-handle: asset
-  (kind icon)
-  (files 'assets/icons/own/drag-handle.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-drag-handle: asset
+  kind icon
+  files 'assets/icons/own/drag-handle.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-error: asset
-  (kind icon)
-  (files 'assets/icons/own/error.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-error: asset
+  kind icon
+  files 'assets/icons/own/error.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-fit: asset
-  (kind icon)
-  (files 'assets/icons/own/fit.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-fit: asset
+  kind icon
+  files 'assets/icons/own/fit.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-float: asset
-  (kind icon)
-  (files 'assets/icons/own/float.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-float: asset
+  kind icon
+  files 'assets/icons/own/float.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-info: asset
-  (kind icon)
-  (files 'assets/icons/own/info.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-info: asset
+  kind icon
+  files 'assets/icons/own/info.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-link: asset
-  (kind icon)
-  (files 'assets/icons/own/link.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-link: asset
+  kind icon
+  files 'assets/icons/own/link.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-menu: asset
-  (kind icon)
-  (files 'assets/icons/own/menu.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-menu: asset
+  kind icon
+  files 'assets/icons/own/menu.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-minus: asset
-  (kind icon)
-  (files 'assets/icons/own/minus.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-minus: asset
+  kind icon
+  files 'assets/icons/own/minus.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-more: asset
-  (kind icon)
-  (files 'assets/icons/own/more.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-more: asset
+  kind icon
+  files 'assets/icons/own/more.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-paste: asset
-  (kind icon)
-  (files 'assets/icons/own/paste.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-paste: asset
+  kind icon
+  files 'assets/icons/own/paste.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-pause: asset
-  (kind icon)
-  (files 'assets/icons/own/pause.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-pause: asset
+  kind icon
+  files 'assets/icons/own/pause.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-play: asset
-  (kind icon)
-  (files 'assets/icons/own/play.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-play: asset
+  kind icon
+  files 'assets/icons/own/play.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-plus: asset
-  (kind icon)
-  (files 'assets/icons/own/plus.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-plus: asset
+  kind icon
+  files 'assets/icons/own/plus.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-record: asset
-  (kind icon)
-  (files 'assets/icons/own/record.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-record: asset
+  kind icon
+  files 'assets/icons/own/record.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-reset: asset
-  (kind icon)
-  (files 'assets/icons/own/reset.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-reset: asset
+  kind icon
+  files 'assets/icons/own/reset.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-search: asset
-  (kind icon)
-  (files 'assets/icons/own/search.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-search: asset
+  kind icon
+  files 'assets/icons/own/search.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-send: asset
-  (kind icon)
-  (files 'assets/icons/own/send.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-send: asset
+  kind icon
+  files 'assets/icons/own/send.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-settings: asset
-  (kind icon)
-  (files 'assets/icons/own/settings.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-settings: asset
+  kind icon
+  files 'assets/icons/own/settings.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-warning: asset
-  (kind icon)
-  (files 'assets/icons/own/warning.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-warning: asset
+  kind icon
+  files 'assets/icons/own/warning.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-zoom-in: asset
-  (kind icon)
-  (files 'assets/icons/own/zoom-in.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-zoom-in: asset
+  kind icon
+  files 'assets/icons/own/zoom-in.svg'
+  license CC0-1.0
+  copyright none
 
-(icon-zoom-out: asset
-  (kind icon)
-  (files 'assets/icons/own/zoom-out.svg')
-  (license CC0-1.0)
-  (copyright none))
+icon-zoom-out: asset
+  kind icon
+  files 'assets/icons/own/zoom-out.svg'
+  license CC0-1.0
+  copyright none

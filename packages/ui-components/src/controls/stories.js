@@ -18,8 +18,8 @@
  * of `e2e/pages/controls.html`.
  */
 
-import { projectLinks } from '@link-foundation/ui-core';
-import { Link, Parser } from 'links-notation';
+import { parseNested, projectLinks } from '@link-foundation/ui-core';
+import { Link } from 'links-notation';
 
 /** A bootstrap kind whose properties hold any values (`*`: multi). */
 const kindSpec = (names) => ({
@@ -45,10 +45,7 @@ const BOOTSTRAP = Object.freeze({
 
 /** Project a LiNo file of bootstrap elements; throws on a diagnostic. */
 function project(text, what) {
-  const { roots, diagnostics } = projectLinks(
-    new Parser().parse(text),
-    BOOTSTRAP
-  );
+  const { roots, diagnostics } = projectLinks(parseNested(text), BOOTSTRAP);
   if (diagnostics.length > 0) {
     throw new Error(
       `Invalid ${what}: ${diagnostics.map((d) => d.message).join('; ')}`

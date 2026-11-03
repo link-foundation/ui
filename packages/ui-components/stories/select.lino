@@ -1,8 +1,16 @@
-(select-stories: stories
-  (component select)
-  (story placeholder (select 'Fruit' (placeholder 'Choose a fruit')
-    (apple: option 'Apple' (value apple))
-    (pear: option 'Pear' (value pear))))
-  (story selected (select 'Language' (value ru)
-    (en: option 'English' (value en))
-    (ru: option 'Russian' (value ru)))))
+select-stories: stories
+  component select
+  story placeholder
+    select 'Fruit'
+      placeholder 'Choose a fruit'
+      apple: option 'Apple'
+        value apple
+      pear: option 'Pear'
+        value pear
+  story selected
+    select 'Language'
+      value ru
+      en: option 'English'
+        value en
+      ru: option 'Russian'
+        value ru

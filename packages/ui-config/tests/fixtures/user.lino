@@ -1,7 +1,7 @@
-(user-overrides: overrides
-  (layer user)
-  (base app)
-  (set greeting text 'Hello, agents')
-  (set body padding 16px)
-  (set material3 token color.primary '#00639B')
-  (unset ok label))
+user-overrides: overrides
+  layer user
+  base app
+  set greeting text 'Hello, agents'
+  set body padding 16px
+  set material3 token color.primary '#00639B'
+  unset ok label

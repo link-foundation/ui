@@ -1,1 +1,3 @@
-(draft: text (bind value (param draft.text)))
+draft: text
+  bind value
+    param draft.text

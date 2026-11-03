@@ -33,8 +33,20 @@ store.transaction(
 store.undo();
 
 console.log(logToLino(store.log()));
-// (tx 1 (origin devmode) (label 'Edit label') (setProp ok label Cancel) (move ok (parent main) (at 1)))
-// (tx 2 (origin undo) (undoes 1) (move ok (parent main) (at 0)) (setProp ok label OK))
+// tx 1
+//   origin devmode
+//   label 'Edit label'
+//   setProp ok label Cancel
+//   move ok
+//     parent main
+//     at 1
+// tx 2
+//   origin undo
+//   undoes 1
+//   move ok
+//     parent main
+//     at 0
+//   setProp ok label OK
 ```
 
 The complete example is `examples/ui-store-basics.mjs` in the repository.
@@ -188,13 +200,19 @@ to the starting document gives the same document with the same IDs:
 and label (`undoes` and `redoes` are not carried over: replayed transactions
 are plain changes).
 
-`logToLino(entries)` writes the log as Links Notation, one transaction per
-line, and `logFromLino(text)` reads it back (both through ui-core
+`logToLino(entries)` writes the log as Links Notation, one top-level link per
+transaction in the nested form, and `logFromLino(text)` reads it back (both through ui-core
 `formatLinks` and `parseLinks`, no regular expressions):
 
 ```lino
-(tx 4 (origin devmode) (label 'Edit label') (setProp ok label 'Cancel'))
-(tx 5 (origin undo) (undoes 4) (setProp ok label 'OK'))
+tx 4
+  origin devmode
+  label 'Edit label'
+  setProp ok label Cancel
+tx 5
+  origin undo
+  undoes 4
+  setProp ok label OK
 ```
 
 | Operation       | Links Notation                                                                                                                             |
@@ -301,12 +319,20 @@ children unknown)`. A property is `(point name, values)`.
 ### Bundles
 
 `exportBundle()` gives one Links Notation document: the header, the snapshot
-as Links Notation, and the transactions after it as `logToLino` lines:
+as Links Notation, and the transactions after it as `logToLino` links, all in
+the nested form:
 
 ```lino
-(ui_store_bundle (schema 1) (name demo) (snapshot_tx 12))
-(document (ok: button (label OK)))
-(tx 13 (origin devmode) (setProp ok label Cancel))
+ui_store_bundle
+  schema 1
+  name demo
+  snapshot_tx 12
+document
+  ok: button
+    label OK
+tx 13
+  origin devmode
+  setProp ok label Cancel
 ```
 
 Two more links follow `document` when they are needed:

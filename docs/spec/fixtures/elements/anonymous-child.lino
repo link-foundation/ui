@@ -1,1 +1,4 @@
-(list: stack (text 'First') (text 'Second') (separator: text '-'))
+list: stack
+  text 'First'
+  text 'Second'
+  separator: text '-'

@@ -6,10 +6,10 @@
  * problem, including parser errors and the limits, becomes a diagnostic.
  */
 
-import { Link, Parser } from 'links-notation';
+import { Parser } from 'links-notation';
 import { checkTree } from './check.js';
 import { diagnostic, diagnosticJson } from './diagnostics.js';
-import { valueJson } from './links.js';
+import { unindent, valueJson } from './links.js';
 import { projectLinks } from './project.js';
 import { defaultVocabulary } from './vocabulary.js';
 
@@ -19,19 +19,6 @@ export const SPEC_VERSION = 'ui-dialect/0';
 export const DEFAULT_MAX_DEPTH = 64;
 /** The largest accepted input, in characters (docs/spec/limits.md). */
 export const DEFAULT_MAX_INPUT_SIZE = 1024 * 1024;
-
-/**
- * A group of `Parser.parseGroups()` as one link: the indented lines are
- * appended to the values of the line they are indented under.
- * @param {import('links-notation').LinksGroup} group
- * @returns {Link}
- */
-function unindent(group) {
-  const { element, children } = group;
-  return children.length > 0
-    ? new Link(element.id, [...element.values, ...children.map(unindent)])
-    : element;
-}
 
 function readLinks(parser, text, mode) {
   return mode === 'fold'
@@ -138,8 +125,10 @@ export function parseOrThrow(text, options) {
  * Read Links Notation text into raw values (docs/spec/values.md) without the
  * element projection: an atom is a string, a link without an id is an array,
  * a link with an id is `{ id, values }`. Text is read only by the official
- * `links-notation` parser. Formats other than UI documents (such as the
- * `ui-store` operation log) use it; see {@link formatLinks} for the inverse.
+ * `links-notation` parser; lines indented under a line are values of the
+ * link of that line, as in the nested form. Formats other than UI documents
+ * (such as the `ui-store` operation log) use it; see {@link formatLinks} for
+ * the inverse.
  *
  * Throws a {@link UiParseError} (with one `syntax-error`, `depth-exceeded`
  * or `input-too-large` diagnostic) when the text cannot be read.
@@ -162,7 +151,9 @@ export function parseLinks(text, options = {}) {
   }
   try {
     const parser = new Parser({ maxDepth, maxInputSize: maxInputSize + 1 });
-    return parser.parse(text).map(valueJson);
+    // Indented lines belong to the line above them (#133): the nested form
+    // that `formatLinks` writes by default reads back as the same values.
+    return parser.parseGroups(text).map(unindent).map(valueJson);
   } catch (thrown) {
     throw linksError(parserDiagnostic(thrown));
   }

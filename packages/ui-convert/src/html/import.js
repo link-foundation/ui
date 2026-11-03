@@ -155,7 +155,7 @@ class Importer {
     const projected = projectLinks(links, this.vocabulary);
     const tree = { spec: SPEC_VERSION, ...projected };
     const text = format(tree, {
-      style: options.style ?? 'multiline',
+      style: options.style,
       indent: options.indent,
     });
     const result = {

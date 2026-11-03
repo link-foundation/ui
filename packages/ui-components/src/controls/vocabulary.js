@@ -11,8 +11,11 @@
  * that the two stay equal.
  */
 
-import { defaultVocabulary, projectLinks } from '@link-foundation/ui-core';
-import { Parser } from 'links-notation';
+import {
+  defaultVocabulary,
+  parseNested,
+  projectLinks,
+} from '@link-foundation/ui-core';
 import { CONTROL_KINDS_TEXT } from './kinds-text.js';
 
 export { CONTROL_KINDS_TEXT };
@@ -80,7 +83,7 @@ function read() {
   if (cached !== null) {
     return cached;
   }
-  const links = new Parser().parse(CONTROL_KINDS_TEXT);
+  const links = parseNested(CONTROL_KINDS_TEXT);
   const { roots, diagnostics } = projectLinks(links, BOOTSTRAP);
   if (diagnostics.length > 0) {
     throw new Error(

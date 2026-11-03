@@ -1,2 +1,2 @@
-(save: Button (label Save))
-(status: Text)
+save: Button (label Save)
+status: Text

@@ -52,6 +52,14 @@ and libraries, References). The sections below follow that template.
 
 - Every new format is Links Notation, parsed with the official
   `links-notation` package. Never parse LiNo with regular expressions.
+- Write Links Notation in the nested form by default (#133): the links of a
+  link's values go on their own lines, indented under it, with as few
+  parentheses as possible. Code writes it with `formatLinks` of ui-core;
+  `node scripts/lino-nest.mjs <file>` converts a file, and
+  `tests/lino-nested-form.test.js` keeps the repository in this form. The
+  one-line and parenthesized forms still read the same and stay for one-line
+  places only (a table cell, a URL, a form field). See
+  [conventions](conventions.md#links-notation-in-the-nested-form).
 - For any question about the UI dialect (elements, values, ordering, IDs,
   projection), read [`docs/spec/`](../spec/README.md) and its fixtures. If
   the specification does not answer the question, record it in
@@ -117,9 +125,10 @@ and libraries, References). The sections below follow that template.
 
 ## When stuck
 
-- Do not widen the scope of the pull request. Open a new issue with the
-  [Bug or Feature form](https://github.com/link-foundation/ui/issues/new/choose)
-  and link it from the pull request.
+- Do not widen the scope of the pull request. Open a
+  [new issue](https://github.com/link-foundation/ui/issues/new) of type Bug or
+  Feature, written as [writing-issues.md](writing-issues.md) describes, and
+  link it from the pull request.
 - If a blocker turns out to be missing, say so in the pull request and in the
   new issue, with the evidence (logs, failing command, CI run URL).
 - If the issue itself is unclear, write down the assumption you chose in the

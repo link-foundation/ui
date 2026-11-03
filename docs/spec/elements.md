@@ -6,18 +6,23 @@ An **element** is a link whose id is the element id and whose first value is
 its **kind**:
 
 ```lino
-(id: kind positional-values... (property ...)... child-elements...)
+id: kind positional-values...
+  property values...
+  child-element...
 ```
 
 For example:
 
 ```lino
-(app: document
-  (title 'Links UI demo')
-  (body: stack
-    (direction vertical)
-    (greeting: text 'Hello, links')
-    (ok: button (label 'OK') (on press (navigate home)))))
+app: document
+  title 'Links UI demo'
+  body: stack
+    direction vertical
+    greeting: text 'Hello, links'
+    ok: button
+      label 'OK'
+      on press
+        navigate home
 ```
 
 - The kind MUST be the first value of the element link, and it MUST be a

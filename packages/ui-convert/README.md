@@ -35,9 +35,9 @@ console.log(text);
 ```
 
 ```lino
-(ok: button
-  (label OK)
-  (attr class primary))
+ok: button
+  label OK
+  attr class primary
 ```
 
 `importDom(root, options)` does the same for a live DOM subtree (a browser
@@ -53,14 +53,14 @@ nodeMap.get('ok'); // the <button id="ok"> element itself
 
 Both give the same text for the same markup. The result is:
 
-| Field         | Content                                                                       |
-| ------------- | ----------------------------------------------------------------------------- |
-| `text`        | Links Notation text (`style: 'multiline'` by default, or `inline`/`indented`) |
-| `tree`        | The element tree of `text`, as `parse` of `@link-foundation/ui-core` gives it |
-| `links`       | The `Link` objects of `links-notation` the text was formatted from            |
-| `spans`       | `Map` link id -> `{ start, end }`: `html.slice(start, end)` is the element    |
-| `diagnostics` | Dropped unsafe content (`dropped-script`) and projection diagnostics          |
-| `nodeMap`     | `importDom` only: `Map` link id -> original DOM `Node`                        |
+| Field         | Content                                                                                         |
+| ------------- | ----------------------------------------------------------------------------------------------- |
+| `text`        | Links Notation text (`style: 'indented'`, the nested form, by default, or `multiline`/`inline`) |
+| `tree`        | The element tree of `text`, as `parse` of `@link-foundation/ui-core` gives it                   |
+| `links`       | The `Link` objects of `links-notation` the text was formatted from                              |
+| `spans`       | `Map` link id -> `{ start, end }`: `html.slice(start, end)` is the element                      |
+| `diagnostics` | Dropped unsafe content (`dropped-script`) and projection diagnostics                            |
+| `nodeMap`     | `importDom` only: `Map` link id -> original DOM `Node`                                          |
 
 Options: `vocabulary` (default `htmlVocabulary()`), `mapping` (default
 `HTML_MAPPING`), `comments` (keep HTML comments as `comment` elements),
@@ -170,15 +170,17 @@ importJsx(`
 ```
 
 ```lino
-(stack-0: stack
-  (direction vertical)
-  (gap (token space.2))
-  (text-field-0-0: text-field
-    (label Email))
-  (button-0-1: button
-    (label 'Sign in')
-    (variant filled)
-    (on press (action signIn))))
+stack-0: stack
+  direction vertical
+  gap
+    token space.2
+  text-field-0-0: text-field
+    label Email
+  button-0-1: button
+    label 'Sign in'
+    variant filled
+    on press
+      action signIn
 ```
 
 ```sh
@@ -194,9 +196,18 @@ Components are mapped by LiNo match / replace rules in the shape of
 (`src/rules.js`). The built-in MUI rules are in `src/mappings/mui.lino`:
 
 ```lino
-(mui-button-contained: rule
-  (match (Button (variant contained) (children $label) (optional (disabled $disabled))))
-  (replace (button (label $label) (variant filled) (disabled $disabled))))
+mui-button-contained: rule
+  match
+    Button
+      variant contained
+      children $label
+      optional
+        disabled $disabled
+  replace
+    button
+      label $label
+      variant filled
+      disabled $disabled
 ```
 
 - `$name` binds a value. It can also sit inside an atom: `space.$n`.
@@ -352,22 +363,23 @@ npx ui-convert import packages/ui-convert/tests/fixtures/interop/adaptive-cards/
 
 ```lino
 card: document
-  (source adaptive-cards 1.6)
-  (extra adaptive-cards '{"$schema":"http://adaptivecards.io/schemas/adaptive-card.json"}')
+  source adaptive-cards 1.6
+  extra adaptive-cards '{"$schema":"http://adaptivecards.io/schemas/adaptive-card.json"}'
   stack
-    (role body)
+    role body
     title: text Hello
-      (size Large)
-      (weight Bolder)
+      size Large
+      weight Bolder
     name: text-field
-      (bind name)
-      (label Name)
+      bind name
+      label Name
   stack
-    (direction horizontal)
-    (role actions)
+    direction horizontal
+    role actions
     submit: button
-      (on press (submit card))
-      (label OK)
+      on press
+        submit card
+      label OK
 ```
 
 ### API

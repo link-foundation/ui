@@ -1,2 +1,7 @@
-(box: stack (gap 16px) (padding 1.5rem))
-(hero: image 'hero.png' (width 50%) (height 40vh) (alt 'Hero'))
+box: stack
+  gap 16px
+  padding 1.5rem
+hero: image 'hero.png'
+  width 50%
+  height 40vh
+  alt 'Hero'

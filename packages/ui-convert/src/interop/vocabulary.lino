@@ -1,233 +1,233 @@
-(ui-convert: dialect
-  (version 'ui-dialect/0'))
+ui-convert: dialect
+  version 'ui-dialect/0'
 
-(common: kind
-  (description 'Properties every kind accepts in interop documents.')
-  (property extra any multi)
-  (property spacing any)
-  (property separator any)
-  (property visible any)
-  (property block-height any)
-  (property alignment any)
-  (property fallback any)
-  (property requires any)
-  (property rule any)
-  (property options any)
-  (property ref any)
-  (property flex any)
-  (property repeat any))
+common: kind
+  description 'Properties every kind accepts in interop documents.'
+  property extra any multi
+  property spacing any
+  property separator any
+  property visible any
+  property block-height any
+  property alignment any
+  property fallback any
+  property requires any
+  property rule any
+  property options any
+  property ref any
+  property flex any
+  property repeat any
 
-(document: kind
-  (property source any)
-  (property fallback-text any)
-  (property speak any)
-  (property rtl any)
-  (property metadata any)
-  (property refresh any)
-  (property authentication any)
-  (property container-style any)
-  (property bleed any)
-  (property min-height any)
-  (property vertical-alignment any)
-  (property background-image any)
-  (property select-action any)
-  (property spec-version any)
-  (property frame-rate any)
-  (property in-frame any)
-  (property out-frame any)
-  (property width any)
-  (property height any)
-  (property catalog any)
-  (property send-data-model any)
-  (property model any))
+document: kind
+  property source any
+  property fallback-text any
+  property speak any
+  property rtl any
+  property metadata any
+  property refresh any
+  property authentication any
+  property container-style any
+  property bleed any
+  property min-height any
+  property vertical-alignment any
+  property background-image any
+  property select-action any
+  property spec-version any
+  property frame-rate any
+  property in-frame any
+  property out-frame any
+  property width any
+  property height any
+  property catalog any
+  property send-data-model any
+  property model any
 
-(stack: kind
-  (property justify any)
-  (property role string)
-  (property width any)
-  (property rtl any)
-  (property container-style any)
-  (property bleed any)
-  (property min-height any)
-  (property vertical-alignment any)
-  (property background-image any)
-  (property select-action any))
+stack: kind
+  property justify any
+  property role string
+  property width any
+  property rtl any
+  property container-style any
+  property bleed any
+  property min-height any
+  property vertical-alignment any
+  property background-image any
+  property select-action any
 
-(text: kind
-  (property size any)
-  (property weight any)
-  (property color any)
-  (property subtle any)
-  (property wrap any)
-  (property max-lines any)
-  (property font-type any)
-  (property text-style any)
-  (property variant any))
+text: kind
+  property size any
+  property weight any
+  property color any
+  property subtle any
+  property wrap any
+  property max-lines any
+  property font-type any
+  property text-style any
+  property variant any
 
-(image: kind
-  (property fit any)
-  (property variant any)
-  (property image-size any)
-  (property image-style any)
-  (property background any)
-  (property select-action any))
+image: kind
+  property fit any
+  property variant any
+  property image-size any
+  property image-style any
+  property background any
+  property select-action any
 
-(button: kind
-  (property icon any)
-  (property action-style any)
-  (property tooltip any)
-  (property enabled any)
-  (property mode any)
-  (property data any)
-  (property associated-inputs any)
-  (property verb any))
+button: kind
+  property icon any
+  property action-style any
+  property tooltip any
+  property enabled any
+  property mode any
+  property data any
+  property associated-inputs any
+  property verb any
 
-(section: kind
-  (description 'A titled group of elements (JSON Forms Group).')
-  (property title any)
-  (property direction any))
+section: kind
+  description 'A titled group of elements (JSON Forms Group).'
+  property title any
+  property direction any
 
-(tabs: kind
-  (description 'Tabs; every child is a tab (JSON Forms Categorization), or the content of the matching (tab-title <title>) (A2UI Tabs).')
-  (property title any)
-  (property tab-title any multi))
+tabs: kind
+  description 'Tabs; every child is a tab (JSON Forms Categorization), or the content of the matching (tab-title <title>) (A2UI Tabs).'
+  property title any
+  property tab-title any multi
 
-(tab: kind
-  (description 'One tab of tabs (JSON Forms Category).')
-  (property title any))
+tab: kind
+  description 'One tab of tabs (JSON Forms Category).'
+  property title any
 
-(facts: kind
-  (description 'A list of title and value pairs.')
-  (property fact any multi)
-  (children none))
+facts: kind
+  description 'A list of title and value pairs.'
+  property fact any multi
+  children none
 
-(opaque: kind
-  (description 'An element outside the supported subset, kept whole in extra.')
-  (property source any)
-  (children none))
+opaque: kind
+  description 'An element outside the supported subset, kept whole in extra.'
+  property source any
+  children none
 
-(field: kind
-  (description 'Properties every form field kind accepts (see FIELD_KINDS in vocabulary.js).')
-  (property bind any)
-  (property label string)
-  (property title any)
-  (property description any)
-  (property placeholder any)
-  (property value any)
-  (property default any)
-  (property required any)
-  (property disabled any)
-  (property error-message any)
-  (property label-position any)
-  (property label-width any)
-  (property input-style any)
-  (property min any)
-  (property max any)
-  (property min-length any)
-  (property max-length any)
-  (property pattern any)
-  (property format any)
-  (property type any)
-  (property option any multi)
-  (property variant any)
-  (children none))
+field: kind
+  description 'Properties every form field kind accepts (see FIELD_KINDS in vocabulary.js).'
+  property bind any
+  property label string
+  property title any
+  property description any
+  property placeholder any
+  property value any
+  property default any
+  property required any
+  property disabled any
+  property error-message any
+  property label-position any
+  property label-width any
+  property input-style any
+  property min any
+  property max any
+  property min-length any
+  property max-length any
+  property pattern any
+  property format any
+  property type any
+  property option any multi
+  property variant any
+  children none
 
-(text-field: kind
-  (description 'A single or multi line text input; (type) holds the data type of the format, not the HTML input type.')
-  (property type any)
-  (property multiline any)
-  (property text-input-style any)
-  (property inline-action any))
+text-field: kind
+  description 'A single or multi line text input; (type) holds the data type of the format, not the HTML input type.'
+  property type any
+  property multiline any
+  property text-input-style any
+  property inline-action any
 
-(number-field: kind
-  (description 'A number input.'))
+number-field: kind
+  description 'A number input.'
 
-(date-field: kind
-  (description 'A date input; A2UI DateTimeInput sets (enable-date) and (enable-time).')
-  (property enable-date any)
-  (property enable-time any))
+date-field: kind
+  description 'A date input; A2UI DateTimeInput sets (enable-date) and (enable-time).'
+  property enable-date any
+  property enable-time any
 
-(time-field: kind
-  (description 'A time input.'))
+time-field: kind
+  description 'A time input.'
 
-(checkbox: kind
-  (description 'A boolean input.')
-  (property value-on any)
-  (property value-off any)
-  (property wrap any))
+checkbox: kind
+  description 'A boolean input.'
+  property value-on any
+  property value-off any
+  property wrap any
 
-(select: kind
-  (description 'A choice from options: (option <value> <title>).')
-  (property multiple any)
-  (property choice-style any)
-  (property filterable any)
-  (property wrap any))
+select: kind
+  description 'A choice from options: (option <value> <title>).'
+  property multiple any
+  property choice-style any
+  property filterable any
+  property wrap any
 
-(slider: kind
-  (description 'A number input on a track between (min) and (max).'))
+slider: kind
+  description 'A number input on a track between (min) and (max).'
 
-(icon: kind
-  (description 'A named icon.')
-  (property name any)
-  (children none))
+icon: kind
+  description 'A named icon.'
+  property name any
+  children none
 
-(divider: kind
-  (description 'A separating line; (axis horizontal|vertical).')
-  (property axis any)
-  (children none))
+divider: kind
+  description 'A separating line; (axis horizontal|vertical).'
+  property axis any
+  children none
 
-(submit: action
-  (description 'Submit the inputs of a card or form.')
-  (argument card element-ref))
+submit: action
+  description 'Submit the inputs of a card or form.'
+  argument card element-ref
 
-(execute: action
-  (description 'Submit the inputs with a verb (Adaptive Cards Action.Execute).')
-  (argument card element-ref))
+execute: action
+  description 'Submit the inputs with a verb (Adaptive Cards Action.Execute).'
+  argument card element-ref
 
-(open-url: action
-  (description 'Open a URL; unsafe schemes are dropped on import.')
-  (argument url url))
+open-url: action
+  description 'Open a URL; unsafe schemes are dropped on import.'
+  argument url url
 
-(show-card: action
-  (description 'Show the card with the given id.')
-  (argument card element-ref))
+show-card: action
+  description 'Show the card with the given id.'
+  argument card element-ref
 
-(toggle-visibility: action
-  (description 'Toggle elements, or set them with (<id> true|false).')
-  (argument target any))
+toggle-visibility: action
+  description 'Toggle elements, or set them with (<id> true|false).'
+  argument target any
 
-(call: action
-  (description 'A client function call, kept as its JSON text. It is data: no converter evaluates it.')
-  (argument call any))
+call: action
+  description 'A client function call, kept as its JSON text. It is data: no converter evaluates it.'
+  argument call any
 
-(theme: kind
-  (property source any)
-  (property unmapped any))
+theme: kind
+  property source any
+  property unmapped any
 
-(shape: kind
-  (description 'A vector shape (a Lottie shape layer): its transform and ordered shape items.')
-  (property name any)
-  (property index any)
-  (property parent-index any)
-  (property in-frame any)
-  (property out-frame any)
-  (property start-frame any)
-  (property anchor any)
-  (property translate any)
-  (property scale any)
-  (property rotate any)
-  (property opacity any)
-  (property skew any)
-  (property skew-axis any)
-  (property rect any multi)
-  (property ellipse any multi)
-  (property path any multi)
-  (property fill any multi)
-  (property stroke any multi)
-  (property group any multi)
-  (property transform any multi)
-  (property item any multi)
-  (children none))
+shape: kind
+  description 'A vector shape (a Lottie shape layer): its transform and ordered shape items.'
+  property name any
+  property index any
+  property parent-index any
+  property in-frame any
+  property out-frame any
+  property start-frame any
+  property anchor any
+  property translate any
+  property scale any
+  property rotate any
+  property opacity any
+  property skew any
+  property skew-axis any
+  property rect any multi
+  property ellipse any multi
+  property path any multi
+  property fill any multi
+  property stroke any multi
+  property group any multi
+  property transform any multi
+  property item any multi
+  children none
 
-(animation: kind
-  (property source any))
+animation: kind
+  property source any

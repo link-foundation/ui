@@ -1,5 +1,10 @@
-(radio-stories: stories
-  (component radio)
-  (story disabled (radio-group 'Delivery' (value post)
-    (post: radio 'Post' (value post))
-    (courier: radio 'Courier' (value courier) (disabled true)))))
+radio-stories: stories
+  component radio
+  story disabled
+    radio-group 'Delivery'
+      value post
+      post: radio 'Post'
+        value post
+      courier: radio 'Courier'
+        value courier
+        disabled true

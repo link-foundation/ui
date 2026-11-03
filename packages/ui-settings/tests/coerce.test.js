@@ -98,7 +98,7 @@ describe('defineFieldType', () => {
   it('writes and reads values of the type', () => {
     const values = { 'light.direction': [1, 0.5, 0] };
     const text = toLino(s, values);
-    expect(text).toBe('(settings (version 1) (light.direction 1 0.5 0))');
+    expect(text).toBe('settings\n  version 1\n  light.direction 1 0.5 0');
     expect(fromLino(s, text).values).toEqual(values);
   });
 

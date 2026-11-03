@@ -1,13 +1,18 @@
 /**
  * Values documents and share links.
  *
- * A values document stores only what differs from the defaults:
+ * A values document stores only what differs from the defaults, in the
+ * nested form:
  *
  * ```lino
- * (settings (version 2) (liquid.blur 24))
+ * settings
+ *   version 2
+ *   liquid.blur 24
  * ```
  *
- * A share link is `#settings=<encodeURIComponent(values document)>`. The
+ * A share link is `#settings=<encodeURIComponent(values document)>`, with
+ * the document written inline on one line so the link stays short:
+ * `(settings (version 2) (liquid.blur 24))`. The
  * readers also take the JSON links of the sites that came before:
  * `#ui=<JSON {v:2,…}>` (immortality) and `#settings=<JSON {"a.b":…}>`
  * (konard.github.io).
@@ -36,20 +41,23 @@ export const LEGACY_SHARE_PARAM = 'ui';
 
 /**
  * Write values as a values document: only the values that differ from the
- * defaults, in schema order.
+ * defaults, in schema order, in the nested form by default.
  * @param {SettingsSchema} schema
  * @param {SettingsValues} values
- * @returns {string} e.g. `(settings (version 2) (liquid.blur 24))`
+ * @param {{ style?: 'indented'|'inline' }} [options]
+ *   `inline` writes the one-line form of share links
+ * @returns {string} e.g. `settings\n  version 2\n  liquid.blur 24`
  */
-export function toLino(schema, values) {
+export function toLino(schema, values, options = {}) {
   const changed = diff(schema, values);
   const pairs = Object.entries(changed).map(([key, value]) => [
     key,
     ...formatValue(schema.fields.get(key), value),
   ]);
-  return formatLinks([
-    ['settings', ['version', String(schema.version)], ...pairs],
-  ]).trimEnd();
+  return formatLinks(
+    [['settings', ['version', String(schema.version)], ...pairs]],
+    { style: options.style ?? 'indented' }
+  ).trimEnd();
 }
 
 /** The `settings` record of a values document, or `null`. */
@@ -154,12 +162,15 @@ export function fromLegacyJson(schema, json, options = {}) {
 }
 
 /**
- * The share hash of values: `#settings=<encodeURIComponent(toLino(…))>`.
+ * The share hash of values:
+ * `#settings=<encodeURIComponent(toLino(…, { style: 'inline' }))>`.
  * @param {SettingsSchema} schema
  * @param {SettingsValues} values
  */
 export const toShareHash = (schema, values) =>
-  `#${SHARE_PARAM}=${encodeURIComponent(toLino(schema, values))}`;
+  `#${SHARE_PARAM}=${encodeURIComponent(
+    toLino(schema, values, { style: 'inline' })
+  )}`;
 
 /** The value of a hash parameter, or `undefined`. */
 function hashParam(hash, name) {

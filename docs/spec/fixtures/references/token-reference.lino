@@ -1,3 +1,10 @@
-(base: theme (token space.small 4px) (token space.medium (token space.small)))
-(m3: theme (extends base) (token color.primary '#6750A4'))
-(col: stack (gap (token space.medium)))
+base: theme
+  token space.small 4px
+  token space.medium
+    token space.small
+m3: theme
+  extends base
+  token color.primary '#6750A4'
+col: stack
+  gap
+    token space.medium

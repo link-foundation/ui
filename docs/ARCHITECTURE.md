@@ -97,51 +97,60 @@ links network.
 A document (structure, configuration and behaviour in one place):
 
 ```lino
-(app: document
-  (title 'Links UI demo')
-  (theme material3)
-  (body: stack
-    (direction vertical)
-    (gap (token space.medium))
-    (greeting: text 'Hello, links')
-    (ok: button
-      (label 'OK')
-      (variant filled)
-      (on press (navigate home)))))
+app: document
+  title 'Links UI demo'
+  theme material3
+  body: stack
+    direction vertical
+    gap
+      token space.medium
+    greeting: text 'Hello, links'
+    ok: button
+      label 'OK'
+      variant filled
+      on press
+        navigate home
 ```
 
 Tokens and themes:
 
 ```lino
-(material3: theme
-  (extends base)
-  (token color.primary '#6750A4')
-  (token space.medium 16px)
-  (token motion.duration.short 150ms))
+material3: theme
+  extends base
+  token color.primary '#6750A4'
+  token space.medium 16px
+  token motion.duration.short 150ms
 ```
 
 Animation and a recording:
 
 ```lino
-(press-feedback: animation
-  (target ok)
-  (duration (token motion.duration.short))
-  (track scale (key 0 1) (key 0.5 0.96) (key 1 1)))
-(recording-1: recording
-  (event 0ms (set ok label 'OK'))
-  (event 840ms (input pointer down ok))
-  (event 990ms (set ok label 'Saved')))
+press-feedback: animation
+  target ok
+  duration
+    token motion.duration.short
+  track scale
+    key 0 1
+    key 0.5 0.96
+    key 1 1
+recording-1: recording
+  event 0ms
+    set ok label 'OK'
+  event 840ms
+    input pointer down ok
+  event 990ms
+    set ok label 'Saved'
 ```
 
 Configuration overrides produced by the dev mode (what a user hands to an
 agent with "make these the defaults"):
 
 ```lino
-(user-overrides: overrides
-  (layer user)
-  (base app)
-  (set greeting text 'Hello, agents')
-  (set material3 token color.primary '#00639B'))
+user-overrides: overrides
+  layer user
+  base app
+  set greeting text 'Hello, agents'
+  set material3 token color.primary '#00639B'
 ```
 
 ### Links Notation parse shapes

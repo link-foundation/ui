@@ -1,2 +1,2 @@
-(greeting: Text 'Hello, links')
-(ok: Button (label OK))
+greeting: Text 'Hello, links'
+ok: Button (label OK)

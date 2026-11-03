@@ -1,4 +1,7 @@
-(progress-stories: stories
-  (component progress)
-  (story determinate (progress 'Upload' (value 60)))
-  (story indeterminate (progress 'Loading')))
+progress-stories: stories
+  component progress
+  story determinate
+    progress 'Upload'
+      value 60
+  story indeterminate
+    progress 'Loading'

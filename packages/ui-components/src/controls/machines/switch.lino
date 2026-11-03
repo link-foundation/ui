@@ -1,12 +1,19 @@
-(switch-machine: machine
-  (initial ready)
-  (context (checked false) (disabled false))
-  (state ready
-    (on toggle (do (toggle checked)) (when not-disabled)))
-  (part input
-    (attr role switch)
-    (attr aria-checked (context checked))
-    (attr data-state (context checked))
-    (key Enter toggle)
-    (key Space toggle)
-    (on press toggle)))
+switch-machine: machine
+  initial ready
+  context
+    checked false
+    disabled false
+  state ready
+    on toggle
+      do
+        toggle checked
+      when not-disabled
+  part input
+    attr role switch
+    attr aria-checked
+      context checked
+    attr data-state
+      context checked
+    key Enter toggle
+    key Space toggle
+    on press toggle

@@ -21,8 +21,17 @@ describe('log as Links Notation', () => {
     );
     store.undo();
     expect(logToLino(store.log())).toBe(
-      "(tx 1 (origin devmode) (label 'Edit label') (setProp ok label Cancel))\n" +
-        '(tx 2 (origin undo) (undoes 1) (setProp ok label OK))\n'
+      [
+        'tx 1',
+        '  origin devmode',
+        "  label 'Edit label'",
+        '  setProp ok label Cancel',
+        'tx 2',
+        '  origin undo',
+        '  undoes 1',
+        '  setProp ok label OK',
+        '',
+      ].join('\n')
     );
   });
 
@@ -44,13 +53,45 @@ describe('log as Links Notation', () => {
     store.remove('_1');
     expect(logToLino(store.log())).toBe(
       [
-        "(tx 1 (origin user) (insert (parent _1) (at 1) (ids n _4) (node (id n) (kind text) (positional 'x y') (properties (value v (a b))) (unknown (glow 2)) (children (node (kind text))))))",
-        '(tx 2 (origin user) (move n (at 0)))',
-        '(tx 3 (origin user) (removeProp ok label))',
-        '(tx 4 (origin undo) (undoes 3) (setProp (at 0) ok label OK))',
-        '(tx 5 (origin user) (rename ok (anonymous _5)))',
-        '(tx 6 (origin user) (rename _5 ok2))',
-        '(tx 7 (origin user) (remove _1))',
+        'tx 1',
+        '  origin user',
+        '  insert',
+        '    parent _1',
+        '    at 1',
+        '    ids n _4',
+        '    node',
+        '      id n',
+        '      kind text',
+        "      positional 'x y'",
+        '      properties',
+        '        value v',
+        '          a b',
+        '      unknown',
+        '        glow 2',
+        '      children',
+        '        node',
+        '          kind text',
+        'tx 2',
+        '  origin user',
+        '  move n',
+        '    at 0',
+        'tx 3',
+        '  origin user',
+        '  removeProp ok label',
+        'tx 4',
+        '  origin undo',
+        '  undoes 3',
+        '  setProp (at 0) ok label OK',
+        'tx 5',
+        '  origin user',
+        '  rename ok',
+        '    anonymous _5',
+        'tx 6',
+        '  origin user',
+        '  rename _5 ok2',
+        'tx 7',
+        '  origin user',
+        '  remove _1',
         '',
       ].join('\n')
     );

@@ -2,9 +2,16 @@
  * `split`: two or more panes with draggable dividers, after the WAI-ARIA
  * APG window splitter pattern.
  *
- *   (chat: split (direction row) (sizes 30 70) (min 20 40)
- *     (collapsible true false) (remember-size chat.split)
- *     (chat-list: stack ...) (chat-view: stack ...))
+ *   chat: split
+ *     direction row
+ *     sizes 30 70
+ *     min 20 40
+ *     collapsible true false
+ *     remember-size chat.split
+ *     chat-list: stack
+ *       ...
+ *     chat-view: stack
+ *       ...
  *
  * Each divider is a focusable `role="separator"` whose `aria-valuenow` is
  * the size of the pane before it, in percent. The arrow keys move it by
@@ -15,14 +22,14 @@
  * `sizes`, `min` and `max` are percentages, one value for every pane or one
  * per pane; `collapsible` likewise; `collapsed` names the panes that start
  * collapsed. With `remember-size KEY`, the sizes are kept as
- * `(sizes 30 70)` under KEY in the storage of the render options
+ * `sizes 30 70` under KEY in the storage of the render options
  * (`options.layout.storage`, an object with `getItem` and `setItem`, such
  * as `localStorage`) and read back on the next render. Every change sends a
  * `split-resize` event with `detail.sizes`.
  */
 
 import { defineKind } from '@link-foundation/ui-dom';
-import { Link, Parser } from 'links-notation';
+import { formatLinks, parseNested } from '@link-foundation/ui-core';
 import { bindKeys } from '../a11y/keys.js';
 import {
   atomOf,
@@ -70,20 +77,26 @@ function limitsOf(el) {
   };
 }
 
-/** The `(sizes ...)` text of remembered sizes. */
+/**
+ * The `sizes ...` text of remembered sizes: one link written without the
+ * parentheses it does not need (#133).
+ */
 export function sizesToLino(sizes) {
-  const values = sizes.map((s) => new Link(String(Math.round(s * 100) / 100)));
-  return new Link(null, [new Link('sizes'), ...values]).format();
+  const values = sizes.map((s) => String(Math.round(s * 100) / 100));
+  return formatLinks([['sizes', ...values]]).trimEnd();
 }
 
-/** The sizes of a `(sizes ...)` text; `null` when it is not one. */
+/**
+ * The sizes of a `sizes ...` text (also `(sizes ...)`, as written before
+ * #133); `null` when it is not one.
+ */
 export function sizesFromLino(text) {
   if (typeof text !== 'string' || text === '') {
     return null;
   }
   let links;
   try {
-    links = new Parser().parse(text);
+    links = parseNested(text);
   } catch {
     return null;
   }

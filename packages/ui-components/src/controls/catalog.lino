@@ -1,19 +1,76 @@
-(button: control (title 'Button') (stories button-stories) (apg button))
-(icon-button: control (title 'Icon button') (stories icon-button-stories) (apg button))
-(label: control (title 'Label') (stories label-stories) (apg none))
-(link: control (title 'Link') (stories link-stories) (apg link))
-(text-field: control (title 'Text field') (stories text-field-stories) (apg none))
-(text-area: control (title 'Text area') (stories text-area-stories) (apg none))
-(number-field: control (title 'Number field') (stories number-field-stories) (apg spinbutton))
-(color-field: control (title 'Colour field') (stories color-field-stories) (apg none))
-(checkbox: control (title 'Checkbox') (stories checkbox-stories) (apg checkbox))
-(radio-group: control (title 'Radio group') (stories radio-group-stories) (apg radio))
-(radio: control (title 'Radio') (stories radio-stories) (apg radio))
-(switch: control (title 'Switch') (stories switch-stories) (apg switch))
-(slider: control (title 'Slider') (stories slider-stories) (apg slider))
-(select: control (title 'Select') (stories select-stories) (apg combobox))
-(combobox: control (title 'Combobox') (stories combobox-stories) (apg combobox))
-(option: control (title 'Option') (stories option-stories) (apg listbox))
-(progress: control (title 'Progress') (stories progress-stories) (apg none))
-(badge: control (title 'Badge') (stories badge-stories) (apg none))
-(avatar: control (title 'Avatar') (stories avatar-stories) (apg none))
+button: control
+  title 'Button'
+  stories button-stories
+  apg button
+icon-button: control
+  title 'Icon button'
+  stories icon-button-stories
+  apg button
+label: control
+  title 'Label'
+  stories label-stories
+  apg none
+link: control
+  title 'Link'
+  stories link-stories
+  apg link
+text-field: control
+  title 'Text field'
+  stories text-field-stories
+  apg none
+text-area: control
+  title 'Text area'
+  stories text-area-stories
+  apg none
+number-field: control
+  title 'Number field'
+  stories number-field-stories
+  apg spinbutton
+color-field: control
+  title 'Colour field'
+  stories color-field-stories
+  apg none
+checkbox: control
+  title 'Checkbox'
+  stories checkbox-stories
+  apg checkbox
+radio-group: control
+  title 'Radio group'
+  stories radio-group-stories
+  apg radio
+radio: control
+  title 'Radio'
+  stories radio-stories
+  apg radio
+switch: control
+  title 'Switch'
+  stories switch-stories
+  apg switch
+slider: control
+  title 'Slider'
+  stories slider-stories
+  apg slider
+select: control
+  title 'Select'
+  stories select-stories
+  apg combobox
+combobox: control
+  title 'Combobox'
+  stories combobox-stories
+  apg combobox
+option: control
+  title 'Option'
+  stories option-stories
+  apg listbox
+progress: control
+  title 'Progress'
+  stories progress-stories
+  apg none
+badge: control
+  title 'Badge'
+  stories badge-stories
+  apg none
+avatar: control
+  title 'Avatar'
+  stories avatar-stories
+  apg none

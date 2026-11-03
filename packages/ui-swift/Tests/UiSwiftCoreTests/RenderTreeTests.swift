@@ -16,10 +16,10 @@ final class RenderTreeTests: XCTestCase {
         XCTAssertEqual(
             tree.dumpLino(),
             """
-            (app: ScrollView
-              (body: VStack (spacing 16)
-                (greeting: Text 'Hello, links')
-                (ok: Button (label OK))))
+            app: ScrollView
+              body: VStack (spacing 16)
+                greeting: Text 'Hello, links'
+                ok: Button (label OK)
 
             """)
         XCTAssertEqual(tree.diagnostics, [])
@@ -70,7 +70,7 @@ final class RenderTreeTests: XCTestCase {
         XCTAssertEqual(image.prop("width")?.number, 64)
         XCTAssertEqual(image.prop("height")?.number, 32)
         XCTAssertEqual(
-            image.dumpLino(), "(logo: AsyncImage (url 'https://example.com/logo.png') (width 64) (height 32) (alt 'Company logo'))")
+            image.dumpLino(), "logo: AsyncImage (url 'https://example.com/logo.png') (width 64) (height 32) (alt 'Company logo')")
     }
 
     func testImageWithAnUnsafeSourceHasNoURL() {
@@ -88,7 +88,7 @@ final class RenderTreeTests: XCTestCase {
         XCTAssertEqual(tree.node(id: "after")?.primitive, .text)
         XCTAssertTrue(tree.diagnostics.contains(
             UiDiagnostic(code: "unsupported-kind", severity: .warning, at: ["element": "chart-1", "kind": "chart"])))
-        XCTAssertEqual(chart.dumpLino(), "(chart-1: EmptyView)")
+        XCTAssertEqual(chart.dumpLino(), "chart-1: EmptyView")
     }
 
     func testKnownButUnrenderedKindIsAnEmptyView() {
@@ -108,6 +108,6 @@ final class RenderTreeTests: XCTestCase {
 
     func testAnonymousElementsAreRendered() {
         let tree = render("(form: stack (text Name) (button Save))")
-        XCTAssertEqual(tree.dumpLino(), "(form: VStack\n  (Text Name)\n  (Button (label Save)))\n")
+        XCTAssertEqual(tree.dumpLino(), "form: VStack\n  Text Name\n  Button (label Save)\n")
     }
 }

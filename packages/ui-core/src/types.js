@@ -68,7 +68,8 @@
  * @property {boolean} [checks]          value and behaviour checks (default true)
  *
  * @typedef {object} FormatOptions
- * @property {'inline'|'multiline'|'indented'} [style]  default `multiline`
+ * @property {'indented'|'multiline'|'inline'} [style]  default `indented`,
+ *   the nested form with as few parentheses as possible
  * @property {string} [indent]           default two spaces
  */
 

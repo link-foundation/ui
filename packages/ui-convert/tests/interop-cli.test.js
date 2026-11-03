@@ -116,8 +116,8 @@ describe('ui-convert import --from jsx|vue', () => {
       { 'a.jsx': login, 'own.lino': rules }
     );
     expect(out.code).toBe(0);
-    expect(out.stdout).toContain('(variant tonal)');
-    expect(out.stdout).toContain('(direction vertical)');
+    expect(out.stdout).toContain('\n    variant tonal\n');
+    expect(out.stdout).toContain('\n  direction vertical\n');
   });
 
   it('rejects an unknown --from', () => {

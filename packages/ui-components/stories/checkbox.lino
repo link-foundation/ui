@@ -1,6 +1,14 @@
-(checkbox-stories: stories
-  (component checkbox)
-  (story unchecked (checkbox 'Subscribe'))
-  (story checked (checkbox 'Remember me' (checked true)))
-  (story mixed (checkbox 'Select all' (checked mixed)))
-  (story disabled (checkbox 'Locked' (checked true) (disabled true))))
+checkbox-stories: stories
+  component checkbox
+  story unchecked
+    checkbox 'Subscribe'
+  story checked
+    checkbox 'Remember me'
+      checked true
+  story mixed
+    checkbox 'Select all'
+      checked mixed
+  story disabled
+    checkbox 'Locked'
+      checked true
+      disabled true

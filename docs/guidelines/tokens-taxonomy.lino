@@ -1,67 +1,425 @@
-(ref: token-layer (order 1) (prefix ref) (example ref.color.blue.40) (role 'raw palette and scales; never used by components directly'))
-(system: token-layer (order 2) (prefix '—') (example color.primary) (role 'semantic meaning; what themes remap'))
-(component: token-layer (order 3) (prefix 'component kind') (example button.container.color) (role 'per-component slots that point at system tokens'))
-(color: token-category (pattern 'color.X and color.on-X') (dtcg-type color))
-(space: token-category (pattern 'space.SIZE') (dtcg-type dimension))
-(size: token-category (pattern 'size.PURPOSE.SIZE') (dtcg-type dimension))
-(shape: token-category (pattern 'shape.corner.SIZE') (dtcg-type dimension))
-(type: token-category (pattern 'type.ROLE.SIZE.PROPERTY') (dtcg-type typography))
-(elevation: token-category (pattern 'elevation.levelN') (dtcg-type shadow))
-(motion: token-category (pattern 'motion.duration.SPEED and motion.easing.NAME') (dtcg-type 'duration or cubicBezier'))
-(opacity: token-category (pattern 'opacity.STATE') (dtcg-type number))
-(z: token-category (pattern 'z.LAYER') (dtcg-type number))
-(breakpoint: token-category (pattern 'breakpoint.CLASS') (dtcg-type dimension))
-(focus: token-category (pattern 'focus.ring.PROPERTY') (dtcg-type 'color or dimension'))
-(color.primary: token-entry (layer system) (category color) (dtcg-type color) (material3 'md.sys.color.primary') (fluent 'colorBrandBackground') (hig 'tint (accent) colour'))
-(color.on-primary: token-entry (layer system) (category color) (dtcg-type color) (material3 'md.sys.color.on-primary') (fluent 'colorNeutralForegroundOnBrand') (hig 'label colour on a tinted fill'))
-(color.primary-container: token-entry (layer system) (category color) (dtcg-type color) (material3 'md.sys.color.primary-container') (fluent 'colorBrandBackground2') (hig 'tint colour, subtle fill'))
-(color.on-primary-container: token-entry (layer system) (category color) (dtcg-type color) (material3 'md.sys.color.on-primary-container') (fluent 'colorBrandForeground2') (hig 'tint colour, text on subtle fill'))
-(color.secondary: token-entry (layer system) (category color) (dtcg-type color) (material3 'md.sys.color.secondary') (fluent '—') (hig '—'))
-(color.on-secondary: token-entry (layer system) (category color) (dtcg-type color) (material3 'md.sys.color.on-secondary') (fluent '—') (hig '—'))
-(color.tertiary: token-entry (layer system) (category color) (dtcg-type color) (material3 'md.sys.color.tertiary') (fluent '—') (hig '—'))
-(color.on-tertiary: token-entry (layer system) (category color) (dtcg-type color) (material3 'md.sys.color.on-tertiary') (fluent '—') (hig '—'))
-(color.error: token-entry (layer system) (category color) (dtcg-type color) (material3 'md.sys.color.error') (fluent 'colorPaletteRedBackground3') (hig 'system red'))
-(color.on-error: token-entry (layer system) (category color) (dtcg-type color) (material3 'md.sys.color.on-error') (fluent 'colorNeutralForegroundOnBrand') (hig 'label colour on system red') (verify fluent))
-(color.background: token-entry (layer system) (category color) (dtcg-type color) (material3 'md.sys.color.background') (fluent 'colorNeutralBackground1') (hig 'system background colour') (verify material3))
-(color.surface: token-entry (layer system) (category color) (dtcg-type color) (material3 'md.sys.color.surface') (fluent 'colorNeutralBackground1') (hig 'system background colour'))
-(color.on-surface: token-entry (layer system) (category color) (dtcg-type color) (material3 'md.sys.color.on-surface') (fluent 'colorNeutralForeground1') (hig 'label colour (primary)'))
-(color.on-surface-variant: token-entry (layer system) (category color) (dtcg-type color) (material3 'md.sys.color.on-surface-variant') (fluent 'colorNeutralForeground2') (hig 'secondary label colour'))
-(color.surface-container: token-entry (layer system) (category color) (dtcg-type color) (material3 'md.sys.color.surface-container') (fluent 'colorNeutralBackground2') (hig 'secondary system background colour'))
-(color.inverse-surface: token-entry (layer system) (category color) (dtcg-type color) (material3 'md.sys.color.inverse-surface') (fluent 'colorNeutralBackgroundInverted') (hig '—'))
-(color.outline: token-entry (layer system) (category color) (dtcg-type color) (material3 'md.sys.color.outline') (fluent 'colorNeutralStroke1') (hig 'separator colour (opaque)'))
-(color.outline-variant: token-entry (layer system) (category color) (dtcg-type color) (material3 'md.sys.color.outline-variant') (fluent 'colorNeutralStroke2') (hig 'separator colour'))
-(color.scrim: token-entry (layer system) (category color) (dtcg-type color) (material3 'md.sys.color.scrim') (fluent 'colorBackgroundOverlay') (hig 'dimming behind a modal'))
-(color.disabled: token-entry (layer system) (category color) (dtcg-type color) (material3 '—') (fluent 'colorNeutralForegroundDisabled') (hig 'tertiary label colour') (verify hig))
-(space.x-small: token-entry (layer system) (category space) (dtcg-type dimension) (material3 '—') (fluent 'spacingHorizontalXS') (hig 'layout margins (guidance only)'))
-(space.small: token-entry (layer system) (category space) (dtcg-type dimension) (material3 '—') (fluent 'spacingHorizontalS') (hig 'layout margins (guidance only)'))
-(space.medium: token-entry (layer system) (category space) (dtcg-type dimension) (material3 '—') (fluent 'spacingHorizontalM') (hig 'layout margins (guidance only)'))
-(space.large: token-entry (layer system) (category space) (dtcg-type dimension) (material3 '—') (fluent 'spacingHorizontalL') (hig 'layout margins (guidance only)'))
-(space.x-large: token-entry (layer system) (category space) (dtcg-type dimension) (material3 '—') (fluent 'spacingHorizontalXL') (hig 'layout margins (guidance only)'))
-(size.target.minimum: token-entry (layer system) (category size) (dtcg-type dimension) (material3 '—') (fluent '—') (hig 'minimum hit target'))
-(shape.corner.small: token-entry (layer system) (category shape) (dtcg-type dimension) (material3 'md.sys.shape.corner.small') (fluent 'borderRadiusSmall') (hig 'rounded corners (guidance only)'))
-(shape.corner.medium: token-entry (layer system) (category shape) (dtcg-type dimension) (material3 'md.sys.shape.corner.medium') (fluent 'borderRadiusMedium') (hig 'rounded corners (guidance only)'))
-(shape.corner.large: token-entry (layer system) (category shape) (dtcg-type dimension) (material3 'md.sys.shape.corner.large') (fluent 'borderRadiusLarge') (hig 'rounded corners (guidance only)'))
-(shape.corner.full: token-entry (layer system) (category shape) (dtcg-type dimension) (material3 'md.sys.shape.corner.full') (fluent 'borderRadiusCircular') (hig 'capsule shape'))
-(type.display.large: token-entry (layer system) (category type) (dtcg-type typography) (material3 'md.sys.typescale.display-large') (fluent '—') (hig 'Large Title text style'))
-(type.title.large: token-entry (layer system) (category type) (dtcg-type typography) (material3 'md.sys.typescale.title-large') (fluent '—') (hig 'Title 1 text style') (verify hig))
-(type.body.medium: token-entry (layer system) (category type) (dtcg-type typography) (material3 'md.sys.typescale.body-medium') (fluent '—') (hig 'Body text style'))
-(type.label.medium: token-entry (layer system) (category type) (dtcg-type typography) (material3 'md.sys.typescale.label-medium') (fluent '—') (hig 'Caption text style') (verify hig))
-(type.body.medium.size: token-entry (layer system) (category type) (dtcg-type dimension) (material3 'md.sys.typescale.body-medium.size') (fluent 'fontSizeBase300') (hig 'Dynamic Type size'))
-(type.body.medium.line-height: token-entry (layer system) (category type) (dtcg-type number) (material3 'md.sys.typescale.body-medium.line-height') (fluent 'lineHeightBase300') (hig '—'))
-(type.weight.strong: token-entry (layer system) (category type) (dtcg-type fontWeight) (material3 '—') (fluent 'fontWeightSemibold') (hig 'semibold weight'))
-(elevation.level1: token-entry (layer system) (category elevation) (dtcg-type shadow) (material3 'md.sys.elevation.level1') (fluent 'shadow4') (hig '—'))
-(elevation.level3: token-entry (layer system) (category elevation) (dtcg-type shadow) (material3 'md.sys.elevation.level3') (fluent 'shadow16') (hig '—'))
-(elevation.level5: token-entry (layer system) (category elevation) (dtcg-type shadow) (material3 'md.sys.elevation.level5') (fluent 'shadow64') (hig '—') (verify material3))
-(motion.duration.short: token-entry (layer system) (category motion) (dtcg-type duration) (material3 'md.sys.motion.duration.short2') (fluent 'durationFast') (hig '—'))
-(motion.duration.medium: token-entry (layer system) (category motion) (dtcg-type duration) (material3 'md.sys.motion.duration.medium2') (fluent 'durationNormal') (hig '—'))
-(motion.duration.long: token-entry (layer system) (category motion) (dtcg-type duration) (material3 'md.sys.motion.duration.long2') (fluent 'durationSlow') (hig '—'))
-(motion.easing.standard: token-entry (layer system) (category motion) (dtcg-type cubicBezier) (material3 'md.sys.motion.easing.standard') (fluent 'curveEasyEase') (hig '—'))
-(motion.easing.emphasized: token-entry (layer system) (category motion) (dtcg-type cubicBezier) (material3 'md.sys.motion.easing.emphasized') (fluent 'curveEasyEaseMax') (hig '—'))
-(motion.easing.decelerate: token-entry (layer system) (category motion) (dtcg-type cubicBezier) (material3 'md.sys.motion.easing.standard-decelerate') (fluent 'curveDecelerateMid') (hig '—'))
-(opacity.hover: token-entry (layer system) (category opacity) (dtcg-type number) (material3 'md.sys.state.hover.state-layer-opacity') (fluent '—') (hig '—'))
-(opacity.pressed: token-entry (layer system) (category opacity) (dtcg-type number) (material3 'md.sys.state.pressed.state-layer-opacity') (fluent '—') (hig '—'))
-(z.overlay: token-entry (layer system) (category z) (dtcg-type number) (material3 '—') (fluent '—') (hig '—'))
-(breakpoint.compact: token-entry (layer system) (category breakpoint) (dtcg-type dimension) (material3 '—') (fluent '—') (hig 'compact size class'))
-(breakpoint.expanded: token-entry (layer system) (category breakpoint) (dtcg-type dimension) (material3 '—') (fluent '—') (hig 'regular size class'))
-(focus.ring.color: token-entry (layer system) (category focus) (dtcg-type color) (material3 '—') (fluent 'colorStrokeFocus2') (hig 'keyboard focus ring'))
-(focus.ring.width: token-entry (layer system) (category focus) (dtcg-type dimension) (material3 'md.sys.state.focus-indicator.thickness') (fluent 'strokeWidthThick') (hig 'keyboard focus ring'))
+ref: token-layer
+  order 1
+  prefix ref
+  example ref.color.blue.40
+  role 'raw palette and scales; never used by components directly'
+system: token-layer
+  order 2
+  prefix '—'
+  example color.primary
+  role 'semantic meaning; what themes remap'
+component: token-layer
+  order 3
+  prefix 'component kind'
+  example button.container.color
+  role 'per-component slots that point at system tokens'
+color: token-category
+  pattern 'color.X and color.on-X'
+  dtcg-type color
+space: token-category
+  pattern 'space.SIZE'
+  dtcg-type dimension
+size: token-category
+  pattern 'size.PURPOSE.SIZE'
+  dtcg-type dimension
+shape: token-category
+  pattern 'shape.corner.SIZE'
+  dtcg-type dimension
+type: token-category
+  pattern 'type.ROLE.SIZE.PROPERTY'
+  dtcg-type typography
+elevation: token-category
+  pattern 'elevation.levelN'
+  dtcg-type shadow
+motion: token-category
+  pattern 'motion.duration.SPEED and motion.easing.NAME'
+  dtcg-type 'duration or cubicBezier'
+opacity: token-category
+  pattern 'opacity.STATE'
+  dtcg-type number
+z: token-category
+  pattern 'z.LAYER'
+  dtcg-type number
+breakpoint: token-category
+  pattern 'breakpoint.CLASS'
+  dtcg-type dimension
+focus: token-category
+  pattern 'focus.ring.PROPERTY'
+  dtcg-type 'color or dimension'
+color.primary: token-entry
+  layer system
+  category color
+  dtcg-type color
+  material3 'md.sys.color.primary'
+  fluent 'colorBrandBackground'
+  hig 'tint (accent) colour'
+color.on-primary: token-entry
+  layer system
+  category color
+  dtcg-type color
+  material3 'md.sys.color.on-primary'
+  fluent 'colorNeutralForegroundOnBrand'
+  hig 'label colour on a tinted fill'
+color.primary-container: token-entry
+  layer system
+  category color
+  dtcg-type color
+  material3 'md.sys.color.primary-container'
+  fluent 'colorBrandBackground2'
+  hig 'tint colour, subtle fill'
+color.on-primary-container: token-entry
+  layer system
+  category color
+  dtcg-type color
+  material3 'md.sys.color.on-primary-container'
+  fluent 'colorBrandForeground2'
+  hig 'tint colour, text on subtle fill'
+color.secondary: token-entry
+  layer system
+  category color
+  dtcg-type color
+  material3 'md.sys.color.secondary'
+  fluent '—'
+  hig '—'
+color.on-secondary: token-entry
+  layer system
+  category color
+  dtcg-type color
+  material3 'md.sys.color.on-secondary'
+  fluent '—'
+  hig '—'
+color.tertiary: token-entry
+  layer system
+  category color
+  dtcg-type color
+  material3 'md.sys.color.tertiary'
+  fluent '—'
+  hig '—'
+color.on-tertiary: token-entry
+  layer system
+  category color
+  dtcg-type color
+  material3 'md.sys.color.on-tertiary'
+  fluent '—'
+  hig '—'
+color.error: token-entry
+  layer system
+  category color
+  dtcg-type color
+  material3 'md.sys.color.error'
+  fluent 'colorPaletteRedBackground3'
+  hig 'system red'
+color.on-error: token-entry
+  layer system
+  category color
+  dtcg-type color
+  material3 'md.sys.color.on-error'
+  fluent 'colorNeutralForegroundOnBrand'
+  hig 'label colour on system red'
+  verify fluent
+color.background: token-entry
+  layer system
+  category color
+  dtcg-type color
+  material3 'md.sys.color.background'
+  fluent 'colorNeutralBackground1'
+  hig 'system background colour'
+  verify material3
+color.surface: token-entry
+  layer system
+  category color
+  dtcg-type color
+  material3 'md.sys.color.surface'
+  fluent 'colorNeutralBackground1'
+  hig 'system background colour'
+color.on-surface: token-entry
+  layer system
+  category color
+  dtcg-type color
+  material3 'md.sys.color.on-surface'
+  fluent 'colorNeutralForeground1'
+  hig 'label colour (primary)'
+color.on-surface-variant: token-entry
+  layer system
+  category color
+  dtcg-type color
+  material3 'md.sys.color.on-surface-variant'
+  fluent 'colorNeutralForeground2'
+  hig 'secondary label colour'
+color.surface-container: token-entry
+  layer system
+  category color
+  dtcg-type color
+  material3 'md.sys.color.surface-container'
+  fluent 'colorNeutralBackground2'
+  hig 'secondary system background colour'
+color.inverse-surface: token-entry
+  layer system
+  category color
+  dtcg-type color
+  material3 'md.sys.color.inverse-surface'
+  fluent 'colorNeutralBackgroundInverted'
+  hig '—'
+color.outline: token-entry
+  layer system
+  category color
+  dtcg-type color
+  material3 'md.sys.color.outline'
+  fluent 'colorNeutralStroke1'
+  hig 'separator colour (opaque)'
+color.outline-variant: token-entry
+  layer system
+  category color
+  dtcg-type color
+  material3 'md.sys.color.outline-variant'
+  fluent 'colorNeutralStroke2'
+  hig 'separator colour'
+color.scrim: token-entry
+  layer system
+  category color
+  dtcg-type color
+  material3 'md.sys.color.scrim'
+  fluent 'colorBackgroundOverlay'
+  hig 'dimming behind a modal'
+color.disabled: token-entry
+  layer system
+  category color
+  dtcg-type color
+  material3 '—'
+  fluent 'colorNeutralForegroundDisabled'
+  hig 'tertiary label colour'
+  verify hig
+space.x-small: token-entry
+  layer system
+  category space
+  dtcg-type dimension
+  material3 '—'
+  fluent 'spacingHorizontalXS'
+  hig 'layout margins (guidance only)'
+space.small: token-entry
+  layer system
+  category space
+  dtcg-type dimension
+  material3 '—'
+  fluent 'spacingHorizontalS'
+  hig 'layout margins (guidance only)'
+space.medium: token-entry
+  layer system
+  category space
+  dtcg-type dimension
+  material3 '—'
+  fluent 'spacingHorizontalM'
+  hig 'layout margins (guidance only)'
+space.large: token-entry
+  layer system
+  category space
+  dtcg-type dimension
+  material3 '—'
+  fluent 'spacingHorizontalL'
+  hig 'layout margins (guidance only)'
+space.x-large: token-entry
+  layer system
+  category space
+  dtcg-type dimension
+  material3 '—'
+  fluent 'spacingHorizontalXL'
+  hig 'layout margins (guidance only)'
+size.target.minimum: token-entry
+  layer system
+  category size
+  dtcg-type dimension
+  material3 '—'
+  fluent '—'
+  hig 'minimum hit target'
+shape.corner.small: token-entry
+  layer system
+  category shape
+  dtcg-type dimension
+  material3 'md.sys.shape.corner.small'
+  fluent 'borderRadiusSmall'
+  hig 'rounded corners (guidance only)'
+shape.corner.medium: token-entry
+  layer system
+  category shape
+  dtcg-type dimension
+  material3 'md.sys.shape.corner.medium'
+  fluent 'borderRadiusMedium'
+  hig 'rounded corners (guidance only)'
+shape.corner.large: token-entry
+  layer system
+  category shape
+  dtcg-type dimension
+  material3 'md.sys.shape.corner.large'
+  fluent 'borderRadiusLarge'
+  hig 'rounded corners (guidance only)'
+shape.corner.full: token-entry
+  layer system
+  category shape
+  dtcg-type dimension
+  material3 'md.sys.shape.corner.full'
+  fluent 'borderRadiusCircular'
+  hig 'capsule shape'
+type.display.large: token-entry
+  layer system
+  category type
+  dtcg-type typography
+  material3 'md.sys.typescale.display-large'
+  fluent '—'
+  hig 'Large Title text style'
+type.title.large: token-entry
+  layer system
+  category type
+  dtcg-type typography
+  material3 'md.sys.typescale.title-large'
+  fluent '—'
+  hig 'Title 1 text style'
+  verify hig
+type.body.medium: token-entry
+  layer system
+  category type
+  dtcg-type typography
+  material3 'md.sys.typescale.body-medium'
+  fluent '—'
+  hig 'Body text style'
+type.label.medium: token-entry
+  layer system
+  category type
+  dtcg-type typography
+  material3 'md.sys.typescale.label-medium'
+  fluent '—'
+  hig 'Caption text style'
+  verify hig
+type.body.medium.size: token-entry
+  layer system
+  category type
+  dtcg-type dimension
+  material3 'md.sys.typescale.body-medium.size'
+  fluent 'fontSizeBase300'
+  hig 'Dynamic Type size'
+type.body.medium.line-height: token-entry
+  layer system
+  category type
+  dtcg-type number
+  material3 'md.sys.typescale.body-medium.line-height'
+  fluent 'lineHeightBase300'
+  hig '—'
+type.weight.strong: token-entry
+  layer system
+  category type
+  dtcg-type fontWeight
+  material3 '—'
+  fluent 'fontWeightSemibold'
+  hig 'semibold weight'
+elevation.level1: token-entry
+  layer system
+  category elevation
+  dtcg-type shadow
+  material3 'md.sys.elevation.level1'
+  fluent 'shadow4'
+  hig '—'
+elevation.level3: token-entry
+  layer system
+  category elevation
+  dtcg-type shadow
+  material3 'md.sys.elevation.level3'
+  fluent 'shadow16'
+  hig '—'
+elevation.level5: token-entry
+  layer system
+  category elevation
+  dtcg-type shadow
+  material3 'md.sys.elevation.level5'
+  fluent 'shadow64'
+  hig '—'
+  verify material3
+motion.duration.short: token-entry
+  layer system
+  category motion
+  dtcg-type duration
+  material3 'md.sys.motion.duration.short2'
+  fluent 'durationFast'
+  hig '—'
+motion.duration.medium: token-entry
+  layer system
+  category motion
+  dtcg-type duration
+  material3 'md.sys.motion.duration.medium2'
+  fluent 'durationNormal'
+  hig '—'
+motion.duration.long: token-entry
+  layer system
+  category motion
+  dtcg-type duration
+  material3 'md.sys.motion.duration.long2'
+  fluent 'durationSlow'
+  hig '—'
+motion.easing.standard: token-entry
+  layer system
+  category motion
+  dtcg-type cubicBezier
+  material3 'md.sys.motion.easing.standard'
+  fluent 'curveEasyEase'
+  hig '—'
+motion.easing.emphasized: token-entry
+  layer system
+  category motion
+  dtcg-type cubicBezier
+  material3 'md.sys.motion.easing.emphasized'
+  fluent 'curveEasyEaseMax'
+  hig '—'
+motion.easing.decelerate: token-entry
+  layer system
+  category motion
+  dtcg-type cubicBezier
+  material3 'md.sys.motion.easing.standard-decelerate'
+  fluent 'curveDecelerateMid'
+  hig '—'
+opacity.hover: token-entry
+  layer system
+  category opacity
+  dtcg-type number
+  material3 'md.sys.state.hover.state-layer-opacity'
+  fluent '—'
+  hig '—'
+opacity.pressed: token-entry
+  layer system
+  category opacity
+  dtcg-type number
+  material3 'md.sys.state.pressed.state-layer-opacity'
+  fluent '—'
+  hig '—'
+z.overlay: token-entry
+  layer system
+  category z
+  dtcg-type number
+  material3 '—'
+  fluent '—'
+  hig '—'
+breakpoint.compact: token-entry
+  layer system
+  category breakpoint
+  dtcg-type dimension
+  material3 '—'
+  fluent '—'
+  hig 'compact size class'
+breakpoint.expanded: token-entry
+  layer system
+  category breakpoint
+  dtcg-type dimension
+  material3 '—'
+  fluent '—'
+  hig 'regular size class'
+focus.ring.color: token-entry
+  layer system
+  category focus
+  dtcg-type color
+  material3 '—'
+  fluent 'colorStrokeFocus2'
+  hig 'keyboard focus ring'
+focus.ring.width: token-entry
+  layer system
+  category focus
+  dtcg-type dimension
+  material3 'md.sys.state.focus-indicator.thickness'
+  fluent 'strokeWidthThick'
+  hig 'keyboard focus ring'

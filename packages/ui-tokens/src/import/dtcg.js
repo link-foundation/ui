@@ -212,7 +212,7 @@ function tokensOf(group, prefix, inherited, out) {
   return out;
 }
 
-/** One `(token PATH VALUE... (type T) (description '...'))` link. */
+/** One `token PATH VALUE...` link, with `type T` and `description '...'`. */
 function tokenLink({ path, type, value, description }) {
   const raw = tokenValueRaw(value);
   const spread =
@@ -224,19 +224,18 @@ function tokenLink({ path, type, value, description }) {
       : [];
   const describe =
     description === undefined ? [] : [['description', String(description)]];
-  return formatLinks([
-    ['token', path, ...(spread ? raw : [raw]), ...typeLink, ...describe],
-  ]).trimEnd();
+  return ['token', path, ...(spread ? raw : [raw]), ...typeLink, ...describe];
 }
 
 /**
- * A DTCG 2025.10 token file as a Links Notation token set:
+ * A DTCG 2025.10 token file as a Links Notation token set, written in the
+ * nested form (#133):
  *
  * ```lino
- * (material3: theme
- *   (token color.primary '#6750A4')
- *   (mode dark
- *     (token color.primary '#D0BCFF')))
+ * material3: theme
+ *   token color.primary '#6750A4'
+ *   mode dark
+ *     token color.primary '#D0BCFF'
  * ```
  * @param {string|Record<string, any>} json  the file text or its object
  * @param {{ id?: string }} [options]  `id` names the set (default `tokens`)
@@ -247,23 +246,13 @@ export function fromDtcg(json, { id = 'tokens' } = {}) {
   if (!isObject(root)) {
     throw new TypeError('A DTCG token file is a JSON object');
   }
-  const lines = tokensOf(root, '', undefined, []).map(
-    (token) => `  ${tokenLink(token)}`
-  );
-  const modes = root.$extensions?.[DTCG_EXTENSION]?.modes ?? {};
-  for (const [mode, group] of Object.entries(modes)) {
-    const tokens = tokensOf(group, '', undefined, []);
-    lines.push(
-      `  ${formatLinks([['mode', mode]])
-        .trimEnd()
-        .slice(0, -1)}`,
-      ...tokens.map((token) => `    ${tokenLink(token)}`)
-    );
-    lines[lines.length - 1] += ')';
-  }
-  const head = formatLinks([{ id, values: ['theme'] }]).trimEnd();
-  if (lines.length === 0) {
-    return `${head}\n`;
-  }
-  return `${head.slice(0, -1)}\n${lines.join('\n')})\n`;
+  const tokens = tokensOf(root, '', undefined, []).map(tokenLink);
+  const modes = Object.entries(
+    root.$extensions?.[DTCG_EXTENSION]?.modes ?? {}
+  ).map(([mode, group]) => [
+    'mode',
+    mode,
+    ...tokensOf(group, '', undefined, []).map(tokenLink),
+  ]);
+  return formatLinks([{ id, values: ['theme', ...tokens, ...modes] }]);
 }

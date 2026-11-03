@@ -1,38 +1,82 @@
-(combobox-machine: machine
-  (initial closed)
-  (context (disabled false) (readonly false) (invalid false))
-  (action close-list (activate none))
-  (state closed
-    (on type (target open) (do filter) (when editable))
-    (on next (target open) (do (filter all) (activate first)) (when editable))
-    (on previous (target open) (do (filter all) (activate last)) (when editable))
-    (on open (target open) (do (filter all)) (when editable))
-    (on commit (do read-value))
-    (on close (do clear-value) (when editable)))
-  (state open
-    (on type (do filter))
-    (on next (do (activate next)))
-    (on previous (do (activate previous)))
-    (on commit (target closed) (do select-active close-list))
-    (on pick (target closed) (do select-picked close-list))
-    (on close (target closed) (do close-list))
-    (on blur (target closed) (do read-value close-list)))
-  (part input
-    (attr role combobox)
-    (attr aria-autocomplete list)
-    (attr aria-expanded (in open))
-    (attr aria-activedescendant (context active))
-    (attr aria-invalid (context invalid))
-    (attr data-state (state))
-    (key ArrowDown next)
-    (key ArrowUp previous)
-    (key Alt+ArrowDown open)
-    (key Enter commit)
-    (key Escape close)
-    (on input type)
-    (on focusout blur))
-  (part listbox
-    (attr role listbox)
-    (attr hidden (present (in closed)))
-    (attr data-state (state))
-    (on click pick)))
+combobox-machine: machine
+  initial closed
+  context
+    disabled false
+    readonly false
+    invalid false
+  action close-list
+    activate none
+  state closed
+    on type
+      target open
+      do filter
+      when editable
+    on next
+      target open
+      do
+        filter all
+        activate first
+      when editable
+    on previous
+      target open
+      do
+        filter all
+        activate last
+      when editable
+    on open
+      target open
+      do
+        filter all
+      when editable
+    on commit
+      do read-value
+    on close
+      do clear-value
+      when editable
+  state open
+    on type
+      do filter
+    on next
+      do
+        activate next
+    on previous
+      do
+        activate previous
+    on commit
+      target closed
+      do select-active close-list
+    on pick
+      target closed
+      do select-picked close-list
+    on close
+      target closed
+      do close-list
+    on blur
+      target closed
+      do read-value close-list
+  part input
+    attr role combobox
+    attr aria-autocomplete list
+    attr aria-expanded
+      in open
+    attr aria-activedescendant
+      context active
+    attr aria-invalid
+      context invalid
+    attr data-state
+      state
+    key ArrowDown next
+    key ArrowUp previous
+    key Alt+ArrowDown open
+    key Enter commit
+    key Escape close
+    on input type
+    on focusout blur
+  part listbox
+    attr role listbox
+    attr hidden
+      present
+        in closed
+    attr data-state
+      state
+    on click pick

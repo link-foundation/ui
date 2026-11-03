@@ -1,2 +1,2 @@
-(s: Column
-  (Text y))
+s: Column
+  Text y

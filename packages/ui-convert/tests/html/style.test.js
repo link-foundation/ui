@@ -79,12 +79,14 @@ describe('style links', () => {
     const { text } = importHtml(
       '<div style="padding: 8px; color: #3390ec"></div>'
     );
-    expect(text.includes("(style (padding 8px) (color '#3390ec'))")).toBe(true);
+    expect(
+      text.includes("\n  style\n    padding 8px\n    color '#3390ec'\n")
+    ).toBe(true);
   });
 
   it('inline-styles.html parses and keeps #3390ec', () => {
     const { text } = importHtml(fixture('inline-styles').html);
-    expect(text.includes("(color '#3390ec')")).toBe(true);
+    expect(text.includes("color '#3390ec'\n")).toBe(true);
     const doc = parse(text, { vocabulary: htmlVocabulary() });
     expect(doc.diagnostics).toEqual([]);
     const card = doc.byId.get('div-1');

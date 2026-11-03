@@ -1,36 +1,36 @@
-(login: html
-  (tag form)
-  (attr class form)
-  (attr action /login)
-  (attr method post)
-  (h2-0-0: text 'Sign in'
-    (level 2))
-  (label-0-1: text Email
-    (tag label)
-    (attr for email))
-  (email: text-field
-    (attr type text)
-    (attr name email)
-    (attr placeholder you@example.com))
-  (label-0-3: html
-    (tag label)
-    (input-0-3-0: checkbox
-      (attr type checkbox)
-      (attr name remember)
-      (attr checked))
-    (text-0-3-1: text ' Remember me'))
-  (textarea-0-4: text-area
-    (value ~1{4c696e65206f6e650a20206c696e652074776f})
-    (attr name note)
-    (attr rows 2))
-  (ok: button
-    (label OK)
-    (attr class primary))
-  (button-0-6: button
-    (label Cancel)
-    (attr type reset)
-    (attr disabled))
-  (input-0-7: button
-    (label Send)
-    (tag input)
-    (attr type submit)))
+login: html
+  tag form
+  attr class form
+  attr action /login
+  attr method post
+  h2-0-0: text 'Sign in'
+    level 2
+  label-0-1: text Email
+    tag label
+    attr for email
+  email: text-field
+    attr type text
+    attr name email
+    attr placeholder you@example.com
+  label-0-3: html
+    tag label
+    input-0-3-0: checkbox
+      attr type checkbox
+      attr name remember
+      attr checked
+    text-0-3-1: text ' Remember me'
+  textarea-0-4: text-area
+    value ~1{4c696e65206f6e650a20206c696e652074776f}
+    attr name note
+    attr rows 2
+  ok: button
+    label OK
+    attr class primary
+  button-0-6: button
+    label Cancel
+    attr type reset
+    attr disabled
+  input-0-7: button
+    label Send
+    tag input
+    attr type submit

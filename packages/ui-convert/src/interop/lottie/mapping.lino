@@ -1,25 +1,33 @@
-(lottie: mapping
-  (description 'Lottie <-> ui-dialect. Keys and shape types are from the Lottie specification 1.0.')
-  (source 'https://lottie.github.io/lottie-spec/1.0/specs/schema/'))
+lottie: mapping
+  description 'Lottie <-> ui-dialect. Keys and shape types are from the Lottie specification 1.0.'
+  source 'https://lottie.github.io/lottie-spec/1.0/specs/schema/'
 
-(element animation document)
-(element layer-4 shape)
+element animation document
+element layer-4 shape
 
-(property animation nm title)
-(property animation ver spec-version)
-(property animation fr frame-rate)
-(property animation ip in-frame)
-(property animation op out-frame)
-(property animation w width)
-(property animation h height)
+property animation nm title
+property animation ver spec-version
+property animation fr frame-rate
+property animation ip in-frame
+property animation op out-frame
+property animation w width
+property animation h height
 
-(property layer-4 nm name)
-(property layer-4 ind index)
-(property layer-4 parent parent-index)
-(property layer-4 ip in-frame)
-(property layer-4 op out-frame)
-(property layer-4 st start-frame)
+property layer-4 nm name
+property layer-4 ind index
+property layer-4 parent parent-index
+property layer-4 ip in-frame
+property layer-4 op out-frame
+property layer-4 st start-frame
 
-(values fill-rule (1 nonzero) (2 evenodd))
-(values cap (1 butt) (2 round) (3 square))
-(values join (1 miter) (2 round) (3 bevel))
+values fill-rule
+  1 nonzero
+  2 evenodd
+values cap
+  1 butt
+  2 round
+  3 square
+values join
+  1 miter
+  2 round
+  3 bevel

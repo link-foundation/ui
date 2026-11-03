@@ -37,7 +37,7 @@ describe('importHtml', () => {
     const { text, diagnostics } = importHtml(
       '<button id="ok" class="primary">OK</button>'
     );
-    expect(text).toBe('(ok: button\n  (label OK)\n  (attr class primary))\n');
+    expect(text).toBe('ok: button\n  label OK\n  attr class primary\n');
     expect(diagnostics).toEqual([]);
   });
 
@@ -62,16 +62,16 @@ describe('importHtml', () => {
       '<!doctype html><html><head><title>T</title></head><body><p>Hi</p></body></html>',
       { document: true }
     );
-    expect(text.startsWith('(html-0: html\n  (tag html)')).toBe(true);
-    expect(text.includes('(p-0-1-0: text Hi')).toBe(true);
+    expect(text.startsWith('html-0: html\n  tag html\n')).toBe(true);
+    expect(text.includes('\n    p-0-1-0: text Hi\n')).toBe(true);
   });
 
   it('keeps comments only with options.comments', () => {
     const html = '<div><!-- note --><p>A</p></div>';
     expect(importHtml(html).text.includes('comment')).toBe(false);
     const { text } = importHtml(html, { comments: true });
-    expect(text.includes("(comment-0-0: comment ' note ')")).toBe(true);
-    expect(text.includes('(p-0-1: text A')).toBe(true);
+    expect(text.includes("\n  comment-0-0: comment ' note '\n")).toBe(true);
+    expect(text.includes('\n  p-0-1: text A\n')).toBe(true);
   });
 
   it('collapses whitespace except inside pre and textarea', () => {

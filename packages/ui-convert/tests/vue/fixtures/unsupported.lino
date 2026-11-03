@@ -1,19 +1,19 @@
-(card-0: card
-  (variant elevated)
-  (text-0-0: text Profile
-    (level 6)
-    (unsupported vue-directive 'v-show="visible"'))
-  (text-0-1: text Hello,
-    (variant body-large)
-    (unsupported vue-expression '{{ user.name }}'))
-  (text-field-0-2: text-field
-    (label Name)
-    (unsupported vue-directive 'v-model.trim="draft.name"'))
-  (button-0-3: button
-    (label Save)
-    (variant filled)
-    (unsupported vue-directive '@click="save(draft)"'))
-  (button-0-4: button
-    (label Cancel)
-    (variant text)
-    (unsupported vue-directive '@click.prevent="cancel"')))
+card-0: card
+  variant elevated
+  text-0-0: text Profile
+    level 6
+    unsupported vue-directive 'v-show="visible"'
+  text-0-1: text Hello,
+    variant body-large
+    unsupported vue-expression '{{ user.name }}'
+  text-field-0-2: text-field
+    label Name
+    unsupported vue-directive 'v-model.trim="draft.name"'
+  button-0-3: button
+    label Save
+    variant filled
+    unsupported vue-directive '@click="save(draft)"'
+  button-0-4: button
+    label Cancel
+    variant text
+    unsupported vue-directive '@click.prevent="cancel"'

@@ -59,9 +59,9 @@ describe('security', () => {
 
   it('keeps the safe content around the dropped items', () => {
     const { text } = importHtml(unsafe);
-    expect(text.includes("(alt 'Safe image')")).toBe(true);
-    expect(text.includes("(p-0-8: text 'Safe text'")).toBe(true);
-    expect(text.includes('(attr title Home)')).toBe(true);
+    expect(text.includes("\n    alt 'Safe image'\n")).toBe(true);
+    expect(text.includes("\n  p-0-8: text 'Safe text'\n")).toBe(true);
+    expect(text.includes('\n    attr title Home\n')).toBe(true);
   });
 
   it('drops script URLs in any attribute', () => {

@@ -1,75 +1,75 @@
-(header-0: html
-  (tag header)
-  (attr class site-header)
-  (main-nav: html
-    (tag nav)
-    (attr aria-label Main)
-    (a-0-0-0: html
-      (tag a)
-      (attr href /)
-      (attr class brand)
-      (img-0-0-0-0: image
-        (source /logo.svg)
-        (alt 'Links UI')
-        (attr width 32)
-        (attr height 32)))
-    (ul-0-0-1: html
-      (tag ul)
-      (attr class menu)
-      (li-0-0-1-0: html
-        (tag li)
-        (a-0-0-1-0-0: link
-          (label Docs)
-          (href /docs)))
-      (li-0-0-1-1: html
-        (tag li)
-        (a-0-0-1-1-0: link
-          (label GitHub)
-          (href 'https://github.com/link-foundation/ui'))))))
-(main-1: html
-  (tag main)
-  (section-1-0: html
-    (tag section)
-    (attr class hero)
-    (h1-1-0-0: text 'Every UI is a Links Notation document'
-      (level 1))
-    (p-1-0-1: text 'Import any page, edit it on the fly and export it again.'
-      (tag p))
-    (button-1-0-2: button
-      (label 'Get started')
-      (attr class cta)))
-  (section-1-1: html
-    (tag section)
-    (attr class cards)
-    (card: html
-      (tag article)
-      (attr class card)
-      (h3-1-1-0-0: text Associative
-        (level 3))
-      (p-1-1-0-1: html
-        (tag p)
-        (text-1-1-0-1-0: text 'Everything is a ')
-        (em-1-1-0-1-1: html
-          (tag em)
-          (text-1-1-0-1-1-0: text link))
-        (text-1-1-0-1-2: text .)))
-    (card-2: html
-      (tag article)
-      (attr class card)
-      (attr id card)
-      (h3-1-1-1-0: text Portable
-        (level 3))
-      (p-1-1-1-1: text 'One document for web, desktop and mobile.'
-        (tag p)))
-    (card-3: html
-      (tag article)
-      (attr class card)
-      (attr id card)
-      (h3-1-1-2-0: text Open
-        (level 3))
-      (p-1-1-2-1: text 'Public domain code.'
-        (tag p)))))
-(footer-2: html
-  (tag footer)
-  (p-2-0: text '© 2026 Link Foundation'
-    (tag p)))
+header-0: html
+  tag header
+  attr class site-header
+  main-nav: html
+    tag nav
+    attr aria-label Main
+    a-0-0-0: html
+      tag a
+      attr href /
+      attr class brand
+      img-0-0-0-0: image
+        source /logo.svg
+        alt 'Links UI'
+        attr width 32
+        attr height 32
+    ul-0-0-1: html
+      tag ul
+      attr class menu
+      li-0-0-1-0: html
+        tag li
+        a-0-0-1-0-0: link
+          label Docs
+          href /docs
+      li-0-0-1-1: html
+        tag li
+        a-0-0-1-1-0: link
+          label GitHub
+          href 'https://github.com/link-foundation/ui'
+main-1: html
+  tag main
+  section-1-0: html
+    tag section
+    attr class hero
+    h1-1-0-0: text 'Every UI is a Links Notation document'
+      level 1
+    p-1-0-1: text 'Import any page, edit it on the fly and export it again.'
+      tag p
+    button-1-0-2: button
+      label 'Get started'
+      attr class cta
+  section-1-1: html
+    tag section
+    attr class cards
+    card: html
+      tag article
+      attr class card
+      h3-1-1-0-0: text Associative
+        level 3
+      p-1-1-0-1: html
+        tag p
+        text-1-1-0-1-0: text 'Everything is a '
+        em-1-1-0-1-1: html
+          tag em
+          text-1-1-0-1-1-0: text link
+        text-1-1-0-1-2: text .
+    card-2: html
+      tag article
+      attr class card
+      attr id card
+      h3-1-1-1-0: text Portable
+        level 3
+      p-1-1-1-1: text 'One document for web, desktop and mobile.'
+        tag p
+    card-3: html
+      tag article
+      attr class card
+      attr id card
+      h3-1-1-2-0: text Open
+        level 3
+      p-1-1-2-1: text 'Public domain code.'
+        tag p
+footer-2: html
+  tag footer
+  p-2-0: text '© 2026 Link Foundation'
+    tag p

@@ -1,14 +1,25 @@
-(toggle-machine: machine
-  (initial off)
-  (context (pressed false) (disabled false))
-  (action set-pressed (set pressed true))
-  (action clear-pressed (set pressed false))
-  (state off
-    (on toggle (target on) (do set-pressed) (when not-disabled)))
-  (state on
-    (on toggle (target off) (do clear-pressed) (when not-disabled)))
-  (part root
-    (attr aria-pressed (context pressed))
-    (key Enter toggle)
-    (key Space toggle)
-    (on press toggle)))
+toggle-machine: machine
+  initial off
+  context
+    pressed false
+    disabled false
+  action set-pressed
+    set pressed true
+  action clear-pressed
+    set pressed false
+  state off
+    on toggle
+      target on
+      do set-pressed
+      when not-disabled
+  state on
+    on toggle
+      target off
+      do clear-pressed
+      when not-disabled
+  part root
+    attr aria-pressed
+      context pressed
+    key Enter toggle
+    key Space toggle
+    on press toggle

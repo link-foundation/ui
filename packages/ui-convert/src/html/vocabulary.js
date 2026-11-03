@@ -18,62 +18,62 @@
 
 import { defaultVocabulary, loadVocabulary } from '@link-foundation/ui-core';
 
-export const HTML_VOCABULARY_TEXT = `(html: kind
-  (description 'An HTML element without a dialect kind; keeps its tag and every attribute.')
-  (property tag string)
-  (property attr any multi)
-  (property style any)
-  (property raw-css string multi)
-  (children any))
+export const HTML_VOCABULARY_TEXT = `html: kind
+  description 'An HTML element without a dialect kind; keeps its tag and every attribute.'
+  property tag string
+  property attr any multi
+  property style any
+  property raw-css string multi
+  children any
 
-(comment: kind
-  (description 'An HTML comment.')
-  (positional value)
-  (property value string)
-  (children none))
+comment: kind
+  description 'An HTML comment.'
+  positional value
+  property value string
+  children none
 
-(text: kind
-  (property tag string)
-  (property level number)
-  (property attr any multi)
-  (property style any)
-  (property raw-css string multi))
+text: kind
+  property tag string
+  property level number
+  property attr any multi
+  property style any
+  property raw-css string multi
 
-(button: kind
-  (property tag string)
-  (property attr any multi)
-  (property style any)
-  (property raw-css string multi))
+button: kind
+  property tag string
+  property attr any multi
+  property style any
+  property raw-css string multi
 
-(image: kind
-  (property tag string)
-  (property attr any multi)
-  (property style any)
-  (property raw-css string multi))
+image: kind
+  property tag string
+  property attr any multi
+  property style any
+  property raw-css string multi
 
-(link: kind
-  (property tag string)
-  (property attr any multi)
-  (property style any)
-  (property raw-css string multi))
+link: kind
+  property tag string
+  property attr any multi
+  property style any
+  property raw-css string multi
 
-(checkbox: kind
-  (property tag string)
-  (property attr any multi)
-  (property style any)
-  (property raw-css string multi))
+checkbox: kind
+  property tag string
+  property attr any multi
+  property style any
+  property raw-css string multi
 
-(text-field: kind
-  (property tag string)
-  (property attr any multi)
-  (property style any)
-  (property raw-css string multi))
+text-field: kind
+  property tag string
+  property attr any multi
+  property style any
+  property raw-css string multi
 
-(text-area: kind
-  (property tag string)
-  (property attr any multi)
-  (property style any)
-  (property raw-css string multi))
+text-area: kind
+  property tag string
+  property attr any multi
+  property style any
+  property raw-css string multi
 `;
 
 /**

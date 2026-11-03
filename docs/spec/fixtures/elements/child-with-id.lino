@@ -1,1 +1,5 @@
-(page: document (title 'Children') (main: stack (intro: text 'One') (outro: text 'Two')))
+page: document
+  title 'Children'
+  main: stack
+    intro: text 'One'
+    outro: text 'Two'

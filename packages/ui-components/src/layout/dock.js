@@ -2,14 +2,30 @@
  * `dock`: panels docked in the regions left, right, top, bottom and center,
  * each region showing its panels as tabs.
  *
- *   (designer-shell: dock (label Designer) (persist designer.layout)
- *     (left: region (size 16rem) (panels toolbox outline))
- *     (right: region (size 20rem) (panels properties))
- *     (center: region (panels canvas))
- *     (toolbox: panel (title Toolbox) ...)
- *     (outline: panel (title Outline) ...)
- *     (properties: panel (title Properties) ...)
- *     (canvas: panel (title Canvas) (closable false) ...))
+ *   designer-shell: dock
+ *     label Designer
+ *     persist designer.layout
+ *     left: region
+ *       size 16rem
+ *       panels toolbox outline
+ *     right: region
+ *       size 20rem
+ *       panels properties
+ *     center: region
+ *       panels canvas
+ *     toolbox: panel
+ *       title Toolbox
+ *       ...
+ *     outline: panel
+ *       title Outline
+ *       ...
+ *     properties: panel
+ *       title Properties
+ *       ...
+ *     canvas: panel
+ *       title Canvas
+ *       closable false
+ *       ...
  *
  * The layout is the model of `dock-model.js`, read from the `region`
  * children and the `float` and `closed` properties. A panel that no region

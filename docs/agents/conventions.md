@@ -20,7 +20,8 @@ is in [`docs/ARCHITECTURE.md`](../ARCHITECTURE.md).
   tokens, styles, animations, recordings, asset records) is Links Notation
   parsed with the official `links-notation` package (or the official port for
   Swift and Kotlin). Never hand-write a LiNo parser with regular expressions.
-  JSON, CSS, JSX and so on are only import or export formats.
+  JSON, CSS, JSX and so on are only import or export formats. Write it in the
+  [nested form](#links-notation-in-the-nested-form).
 - **JavaScript first.** Plain ES modules (`.js`/`.mjs`) with JSDoc types;
   TypeScript declaration files (`.d.ts`) are allowed for public APIs. Swift and
   Kotlin ports must pass the same shared fixtures as the JavaScript code.
@@ -48,3 +49,41 @@ is in [`docs/ARCHITECTURE.md`](../ARCHITECTURE.md).
 - **Done means:** every acceptance criterion is checked, CI is green, and the
   pull request description says `Fixes #<issue>` and shows how each
   criterion was verified (command output or screenshots for UI).
+
+## Links Notation in the nested form
+
+Links Notation is written in the **nested form** by default, in documents,
+examples and code ([#133](https://github.com/link-foundation/ui/issues/133)).
+A link goes on one line with its atom values. Each value that is itself a
+link with values goes on its own line, indented two spaces under it.
+Parentheses are left out wherever indentation makes them unneeded:
+
+```lino
+ok: button
+  label OK
+  on press
+    navigate home
+```
+
+and not the multi-line parenthesized form
+
+```text
+(ok: button
+  (label OK)
+  (on press (navigate home)))
+```
+
+- All forms read the same, and ui-core keeps reading the one-line and
+  parenthesized forms. Only the form that is written changes.
+- Code writes Links Notation with `formatLinks` of ui-core, whose default
+  style is the nested form. It takes raw values and `links-notation` links.
+  Do not call `Link.format()` or join parentheses by hand.
+- A link of links with no head, such as one tooltip field, needs
+  parentheses: `(field product) (type nominal)`. Parentheses also stay
+  wherever the text must fit on one line: a Markdown table cell, a URL, a
+  one-line form field or a diagnostic message.
+- `node scripts/lino-nest.mjs <file.lino|file.md>...` rewrites a file in the
+  nested form (`--check` only reports). `tests/lino-nested-form.test.js`
+  checks every `.lino` file and every ` ```lino ` block. Its allowlist
+  covers the files that keep the other forms on purpose: the spec fixtures,
+  the reader fixtures and the history.

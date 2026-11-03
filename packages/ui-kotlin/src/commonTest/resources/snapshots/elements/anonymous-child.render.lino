@@ -1,4 +1,4 @@
-(list: Column
-  (Text First)
-  (Text Second)
-  (separator: Text -))
+list: Column
+  Text First
+  Text Second
+  separator: Text -

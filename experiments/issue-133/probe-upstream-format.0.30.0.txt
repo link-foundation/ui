@@ -1,0 +1,16 @@
+options {"lessParentheses":true}
+form: stack (direction vertical) (gap 8px) (title: text 'Sign in') (save: button Save (on press (emit save) (navigate home)))
+nested ((b c))
+  reads back as the same links: true
+options {"lessParentheses":true,"maxInlineRefs":1}
+form: stack (direction vertical) (gap 8px) (title: text 'Sign in') (save: button Save (on press (emit save) (navigate home)))
+nested ((b c))
+  reads back as the same links: true
+options {"lessParentheses":true,"indentLongLines":true,"maxLineLength":20}
+form: stack (direction vertical) (gap 8px) (title: text 'Sign in') (save: button Save (on press (emit save) (navigate home)))
+nested ((b c))
+  reads back as the same links: true
+options {"lessParentheses":true,"maxInlineRefs":2,"indentLongLines":true,"maxLineLength":20}
+form: stack (direction vertical) (gap 8px) (title: text 'Sign in') (save: button Save (on press (emit save) (navigate home)))
+nested ((b c))
+  reads back as the same links: true
