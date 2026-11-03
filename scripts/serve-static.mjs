@@ -7,6 +7,8 @@
  *   /packages/<name>/e2e/pages/ -> packages/<name>/e2e/pages/ (when present)
  *   /example-app/             -> examples/universal-app/dist/
  *   /examples/ui-dom/         -> examples/ui-dom/ (the ui-dom example page)
+ *   /packages/<name>/examples/ -> packages/<name>/examples/ (package
+ *                                example pages, when present)
  *   /packages/<name>/src/     -> packages/<name>/src/ (ES modules of the
  *                                import map of the example pages)
  *   /node_modules/links-notation/dist/ -> the browser build of links-notation
