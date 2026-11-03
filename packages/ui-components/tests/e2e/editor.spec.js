@@ -17,6 +17,61 @@ async function start(page, query = '') {
     .toBe(true);
 }
 
+for (const engine of ['codemirror', 'monaco']) {
+  test(`${engine} read-only mode keeps keyboard selection and survives document changes`, async ({
+    page,
+  }) => {
+    await start(page, engine === 'monaco' ? '?engine=monaco' : '');
+    await page.evaluate(async (name) => {
+      const { createEditorEngine } =
+        await import('/packages/ui-components/src/editor/index.js');
+      window.editor.remove();
+      const host = document.createElement('div');
+      host.className = 'ui-editor-area';
+      document.querySelector('#editor-host').append(host);
+      window.readOnlyChanges = [];
+      window.readOnlyEditor = await createEditorEngine(name, host, {
+        label: 'Read-only Source',
+        loadMonaco: async () => window.monaco,
+        onChange: (text) => window.readOnlyChanges.push(text),
+      });
+      window.readOnlyEditor.setReadOnly(true);
+      await window.readOnlyEditor.setDocument({
+        id: 'one',
+        text: 'app: document',
+        language: 'lino',
+      });
+    }, engine);
+    const field = page.getByRole('textbox', {
+      name: 'Read-only Source',
+      exact: true,
+    });
+    await field.focus();
+    await expect(field).toBeFocused();
+    await page.keyboard.press('ControlOrMeta+a');
+    await page.keyboard.type('Blocked');
+    expect(await page.evaluate(() => window.readOnlyChanges)).toEqual([]);
+    await page.evaluate(async () => {
+      await window.readOnlyEditor.setDocument({
+        id: 'two',
+        text: 'app: document\n  title Second',
+        language: 'lino',
+      });
+    });
+    await field.focus();
+    await page.keyboard.type('Still blocked');
+    expect(await page.evaluate(() => window.readOnlyChanges)).toEqual([]);
+    await page.evaluate(() => window.readOnlyEditor.setReadOnly(false));
+    await field.focus();
+    await page.keyboard.press('ControlOrMeta+a');
+    await page.keyboard.type('app: document\n  title Allowed');
+    await expect
+      .poll(() => page.evaluate(() => window.readOnlyChanges.at(-1)))
+      .toContain('Allowed');
+    await page.evaluate(() => window.readOnlyEditor.destroy());
+  });
+}
+
 test('switching tabs preserves unsaved text and undo history; reload restores drafts', async ({
   page,
 }) => {

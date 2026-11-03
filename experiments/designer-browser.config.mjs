@@ -6,6 +6,10 @@ export default {
   testDir: '..',
   outputDir: new URL('../test-results/', import.meta.url).pathname,
   reporter: [['list']],
+  webServer: {
+    ...base.webServer,
+    cwd: new URL('../', import.meta.url).pathname,
+  },
   projects: [
     { name: 'chromium', use: { ...base.projects[0].use, channel: 'chrome' } },
   ],

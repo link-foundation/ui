@@ -33,7 +33,6 @@ export function createEditing(context) {
     session,
     policy,
     source,
-    error,
     shellStore,
     shell,
     options,
@@ -47,11 +46,8 @@ export function createEditing(context) {
     context.canvasController?.update();
     shellStore.setProp('undo', 'disabled', [String(!store.canUndo())]);
     shellStore.setProp('redo', 'disabled', [String(!store.canRedo())]);
-    if (
-      source.getAttribute('aria-invalid') !== 'true' &&
-      source.value !== session.getText()
-    ) {
-      source.value = session.getText();
+    if (!source.invalid()) {
+      source.setText(session.getText());
     }
   }
   function choose(id, event = {}) {
@@ -101,24 +97,22 @@ export function createEditing(context) {
     }
     context.modeValue = mode;
     root.dataset.mode = mode;
-    source.readOnly = mode === 'run';
+    source.setReadOnly(mode === 'run' || !policy.writeLayers.length);
     shellStore.setProp('mode', 'label', [mode === 'design' ? 'Run' : 'Design']);
     context.canvasController.update();
     report(`${mode === 'design' ? 'Design' : 'Run'} mode`);
   }
   function editSource(text) {
+    source.setText(text);
     const result =
       !policy.writeLayers.length || context.mode() !== 'design'
         ? { error: { line: 1, column: 1, message: 'Editing is disabled' } }
         : session.editSource(text, (ops) => validatePolicy(context, ops));
-    source.setAttribute('aria-invalid', String(!!result.error));
-    error.textContent = result.error
-      ? `Line ${result.error.line}, column ${result.error.column}: ${result.error.message}`
-      : '';
+    source.setError(result.error);
     if (result.error) {
       options.trace?.('source-error', result.error);
     } else {
-      source.value = session.getText();
+      source.setText(session.getText());
     }
     return result;
   }

@@ -51,17 +51,16 @@ test('mounting and destroying a designer preserves the host control renderer', (
 });
 test('an invalid Source draft remains visible when selection changes, and can be corrected', async () => {
   const page = setup({ storage: null });
-  const source = page.root.querySelector('textarea');
-  source.value = `${TEXT}\n(`;
-  source.dispatchEvent(new page.dom.window.Event('input', { bubbles: true }));
-  assert.equal(source.getAttribute('aria-invalid'), 'true');
+  page.designer.editSource(`${TEXT}\n(`);
+  const error = page.root.querySelector('[role=alert]');
+  const message = error.textContent;
+  assert.match(message, /Line \d+, column \d+/);
   page.designer.select('public');
-  assert.equal(source.value, `${TEXT}\n(`);
+  assert.equal(error.textContent, message);
   assert.equal(page.designer.getText(), TEXT);
   page.designer.editSource(TEXT.replace('Public', 'Corrected'));
   await Promise.resolve();
-  assert.equal(source.getAttribute('aria-invalid'), 'false');
-  assert.match(source.value, /Corrected/);
+  assert.equal(error.textContent, '');
   assert.equal(
     page.root.querySelector('.designer-canvas [data-link-id=public]')
       .textContent,

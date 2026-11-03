@@ -14,6 +14,7 @@ import { createEditing } from './editing.js';
 import { createActions, keyboard } from './actions.js';
 import { element, listen } from './dom.js';
 import { DESIGNER_LAYOUT } from './layout-text.js';
+import { mountSourcePanel } from './source-panel.js';
 
 function browserStorage(window) {
   try {
@@ -120,12 +121,16 @@ function mountPanels(context) {
     role: 'alert',
     id: `${storageKey}-error`,
   });
-  const source = element(document, 'textarea', {
-    'aria-label': 'LiNo source',
-    spellcheck: false,
-    'aria-describedby': error.id,
+  const report = (message) => {
+    status.textContent = message;
+  };
+  const source = mountSourcePanel(shell.nodeFor('source'), {
+    text: session.getText(),
+    error,
+    onChange: (text) => context.editSource(text),
+    readOnly: !context.policy.writeLayers.length,
+    report,
   });
-  source.value = session.getText();
   const file = element(document, 'input', {
     type: 'file',
     accept: '.lino,text/plain',
@@ -139,7 +144,6 @@ function mountPanels(context) {
     'aria-label': 'Design canvas',
   });
   shell.nodeFor('canvas').append(canvas);
-  shell.nodeFor('source').append(source, error);
   root.append(status, file);
   const handle = render(canvas, store, {
     kinds: CONTROL_KIND_SPECS,
@@ -153,9 +157,7 @@ function mountPanels(context) {
     file,
     canvas,
     handle,
-    report: (message) => {
-      status.textContent = message;
-    },
+    report,
   };
 }
 
@@ -164,7 +166,7 @@ function mountPanels(context) {
  *   storageKey?: string, catalog?: Map<string, object>, policy?: object|string,
  *   layoutText?: string, snapThreshold?: number, onAction?: Function,
  *   trace?: (event: string, detail: object) => void}} options
- * @returns {{getText: () => string, undo: () => boolean, redo: () => boolean,
+ * @returns {{ready: Promise<void>, getText: () => string, undo: () => boolean, redo: () => boolean,
  *   destroy: () => void, store: object, select: (id: string) => void,
  *   setMode: (mode: 'design'|'run') => void, editSource: (text: string) => object}}
  */
@@ -197,7 +199,6 @@ export function mountDesigner(options) {
     }
     refresh();
   });
-  listen(source, 'input', () => editSource(source.value), controller);
   listen(
     file,
     'change',
@@ -205,7 +206,6 @@ export function mountDesigner(options) {
       const opened = file.files[0];
       if (opened) {
         const text = await opened.text();
-        source.value = text;
         editSource(text);
         file.value = '';
       }
@@ -215,6 +215,7 @@ export function mountDesigner(options) {
   listen(root, 'keydown', (event) => keyboard(event, context), controller);
   refresh();
   return {
+    ready: source.ready,
     getText: session.getText,
     store: session.store,
     select: (id) => context.choose(id),
@@ -226,11 +227,11 @@ export function mountDesigner(options) {
       controller.abort();
       unsubscribe();
       context.canvasController.destroy();
+      source.destroy();
       context.handle.destroy();
       context.shell.destroy();
       context.persistence?.stop();
       session.destroy();
-      source.remove();
       context.status.remove();
       file.remove();
       root.classList.remove('ui-designer');

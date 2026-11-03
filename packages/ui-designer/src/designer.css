@@ -134,15 +134,22 @@
 .ui-designer [data-link-id='source'][hidden] {
   display: none;
 }
-.ui-designer textarea {
+.designer-source {
   width: 100%;
   min-height: 110px;
   flex: 1;
-  resize: none;
   box-sizing: border-box;
   font:
     13px/1.5 ui-monospace,
     monospace;
+  background: Canvas;
+  color: CanvasText;
+}
+.ui-designer .designer-source .cm-editor {
+  min-height: 110px;
+  height: 100%;
+}
+.designer-source .cm-gutters {
   background: Canvas;
   color: CanvasText;
 }

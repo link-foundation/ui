@@ -34,7 +34,11 @@ async function drag(page, from, to, fraction = 0.5) {
 }
 async function shot(page, info, name) {
   await info.attach(name, {
-    body: await page.screenshot(),
+    body: await page.screenshot(
+      process.env.DESIGNER_SCREENSHOTS === '1'
+        ? { path: `docs/screenshots/designer/${name.toLowerCase()}.png` }
+        : {}
+    ),
     contentType: 'image/png',
   });
 }
@@ -52,6 +56,36 @@ test.beforeEach(async ({ page }) => {
   });
   await page.goto(PAGE);
   await expect(canvasNode(page, 'ok')).toBeVisible();
+});
+
+test('Source uses the shared LiNo editor, retains invalid drafts, escapes by keyboard and is read-only in Run mode', async ({
+  page,
+}) => {
+  await expect(page.locator('.designer-source .cm-editor')).toBeVisible();
+  await expect(
+    page.locator('.designer-source .ui-lino-id').first()
+  ).toBeVisible();
+  const valid = await text(page);
+  const invalid = `${valid}\n(`;
+  await source(page).fill(invalid);
+  await canvasNode(page, 'greeting').click();
+  await expect(source(page)).toHaveAttribute('aria-invalid', 'true');
+  await expect(source(page).locator('.cm-line').last()).toHaveText('(');
+  expect(await text(page)).toBe(valid);
+  await source(page).fill(valid);
+  await source(page).press('Escape');
+  await page.keyboard.press('Tab');
+  await expect(source(page)).not.toBeFocused();
+  await page.getByRole('button', { name: 'Run', exact: true }).click();
+  await expect(source(page)).toHaveAttribute('aria-readonly', 'true');
+  await expect(source(page)).toHaveAttribute('contenteditable', 'false');
+  await source(page).focus();
+  await expect(source(page)).toBeFocused();
+  await page.keyboard.press('End');
+  await page.keyboard.type('Cannot edit');
+  expect(await text(page)).toBe(valid);
+  await page.getByRole('button', { name: 'Design', exact: true }).click();
+  await expect(source(page)).toHaveAttribute('aria-readonly', 'false');
 });
 
 test('M1: dock layout resizes, collapses and persists in the user layer; design/run dispatch', async ({
@@ -327,6 +361,20 @@ test('keyboard-only insert, Outline reorder, resize, clipboard, open, save and s
   expect(await readFile(await saved.path(), 'utf8')).toBe(upload);
   await page.getByRole('button', { name: 'Copy source', exact: true }).click();
   expect(await page.evaluate(() => window.designerClipboard)).toBe(upload);
+  await page.evaluate(() => {
+    window.navigator.clipboard.writeText = async () => {
+      throw new Error('Clipboard unavailable');
+    };
+    document.addEventListener('copy', (event) => {
+      window.copiedSource = event.clipboardData.getData('text/plain');
+    });
+  });
+  await page.getByRole('button', { name: 'Run', exact: true }).click();
+  await page.getByRole('button', { name: 'Copy source', exact: true }).click();
+  await expect(source(page)).toBeFocused();
+  await page.keyboard.press('ControlOrMeta+a');
+  await page.keyboard.press('ControlOrMeta+c');
+  expect(await page.evaluate(() => window.copiedSource)).toBe(upload);
 });
 
 for (const scheme of ['light', 'dark']) {

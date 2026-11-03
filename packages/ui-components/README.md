@@ -1304,8 +1304,10 @@ source: code-editor
 ```
 
 `mountCodeEditor(host, options)` supports imperative mounting and explicit
-teardown. Engine adapters implement `setDocument`, `setDiagnostics`, `focus`
-and `destroy`; `createEditorEngine` loads only the selected engine. CodeMirror
+teardown. Engine adapters implement `setDocument`, `setDiagnostics`,
+`setReadOnly`, `focus` and `destroy`; `createEditorEngine` loads only the
+selected engine. Read-only mode preserves keyboard focus, selection and copying,
+including after switching documents. CodeMirror
 is the default. Its JavaScript, CSS, JSON and Markdown support loads from the
 corresponding language package when selected. Sessions retain selection and
 undo history across tab switches. LiNo validation uses the official parser,

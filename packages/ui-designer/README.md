@@ -14,6 +14,7 @@ import { mountDesigner } from '@link-foundation/ui-designer';
 import '@link-foundation/ui-components/layout';
 import '@link-foundation/ui-components/layout.css';
 import '@link-foundation/ui-components/controls.css';
+import '@link-foundation/ui-components/editor.css';
 import '@link-foundation/ui-designer/designer.css';
 
 const designer = mountDesigner({ root, documentText });
@@ -50,7 +51,8 @@ The draft is the current document text, persisted after each transaction under
 saved as LiNo through ui-config's `user` layer under `<storageKey>.user`.
 Unavailable or full storage does not prevent editing. Open uses a file input;
 Save downloads the current `.lino` text; Copy source uses the clipboard (or
-selects the Source text when clipboard permission is unavailable). Fragment
+focuses Source with Select All/Copy instructions when clipboard permission is
+unavailable). Fragment
 copy/paste also has an internal clipboard fallback.
 
 ## Editing
@@ -95,8 +97,12 @@ Addressed anonymous nodes receive source names derived from their stable store
 IDs; other anonymous nodes remain untouched. The official formatter and source
 index determine those prefixes. Clipboard fragments use the nested form.
 
-The code editor dependency #46 is still open, so Source is the explicitly
-allowed plain `textarea` fallback.
+Source uses the lazy CodeMirror LiNo engine from `ui-components/editor`, with
+syntax highlighting, line numbers and inline diagnostics. Include
+`@link-foundation/ui-components/editor.css` alongside the designer stylesheet.
+Press Escape then Tab to leave the editor; Tab itself indents. Run mode makes
+Source read-only while retaining selection and copying. The mount's `ready`
+promise resolves when Source is initialized.
 
 The designer's exported `designerVocabulary()` extends the layout vocabulary
 with `x`/`y` (numbers in CSS pixels) and `width`/`height` (dimensions) on visual
@@ -120,5 +126,7 @@ npm run check:duplication
 Browser scenarios cover the four milestones, pointer cancellation, refusal,
 transaction history, keyboard paths, file/clipboard operations and axe WCAG
 2.2 AA in both light and dark modes. They attach milestone screenshots.
+Set `DESIGNER_SCREENSHOTS=1` when running the Chromium scenarios to refresh
+the four committed milestone screenshots in `docs/screenshots/designer/`.
 All runtime dependencies are existing permissively licensed framework packages;
 the designer adds no third-party runtime library or asset.

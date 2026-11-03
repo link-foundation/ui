@@ -21,7 +21,9 @@ try {
       name: 'LiNo source',
       exact: true,
     });
-    await source.fill(`${await source.inputValue()}\n(`);
+    await source.fill(
+      `${await page.evaluate(() => globalThis.designer.getText())}\n(`
+    );
     const { violations } = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
       .analyze();

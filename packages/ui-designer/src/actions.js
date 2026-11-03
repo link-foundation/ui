@@ -91,9 +91,9 @@ export function createActions(context) {
         await window.navigator.clipboard.writeText(session.getText());
         report('Source copied');
       } catch {
+        await source.ready;
         source.focus();
-        source.select();
-        report('Source selected; press Ctrl/Cmd+C to copy');
+        report('Press Ctrl/Cmd+A, then Ctrl/Cmd+C to copy Source');
       }
     },
   };
@@ -130,7 +130,11 @@ const arrowDelta = (key, step) =>
 
 /** Outline arrows navigate; canvas arrows nudge; Alt+arrows reorder from either. */
 export function keyboard(event, context) {
-  if (editable(event.target) || isEditableTarget(event.target)) {
+  if (
+    context.source.contains(event.target) ||
+    editable(event.target) ||
+    isEditableTarget(event.target)
+  ) {
     return;
   }
   const key = event.key.toLowerCase();
