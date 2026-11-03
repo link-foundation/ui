@@ -7,6 +7,7 @@
  *   /packages/<name>/e2e/pages/ -> packages/<name>/e2e/pages/ (when present)
  *   /example-app/             -> examples/universal-app/dist/
  *   /examples/ui-dom/         -> examples/ui-dom/ (the ui-dom example page)
+ *   /examples/animation/      -> examples/animation/ (the ui-animation example)
  *   /packages/<name>/src/     -> packages/<name>/src/ (ES modules of the
  *                                import map of the example pages)
  *   /packages/<name>/examples/ -> packages/<name>/examples/ (when present;
@@ -64,6 +65,7 @@ export function defaultMounts(root) {
   ];
   for (const parts of [
     ['examples', 'ui-dom'],
+    ['examples', 'animation'],
     ['node_modules', 'links-notation', 'dist'],
     ...BROWSER_MODULES.map((name) => ['node_modules', name]),
     ['node_modules', 'echarts', 'dist'],

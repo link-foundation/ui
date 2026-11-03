@@ -101,6 +101,11 @@ describe('shared static server', () => {
     const served = normaliseMounts(defaultMounts(repoRoot));
     for (const [url, file] of [
       ['/examples/ui-dom/', 'examples/ui-dom/index.html'],
+      ['/examples/animation/', 'examples/animation/index.html'],
+      [
+        '/packages/ui-animation/src/index.js',
+        'packages/ui-animation/src/index.js',
+      ],
       ['/packages/ui-dom/src/index.js', 'packages/ui-dom/src/index.js'],
       ['/packages/ui-core/src/index.js', 'packages/ui-core/src/index.js'],
       [
