@@ -1,0 +1,7 @@
+# document header
+app: document
+  body: stack
+    # action
+    ok: button
+      label Save # keep this
+      variant filled

@@ -23,6 +23,35 @@ const ids = (node) =>
   [...node.children].map((child) => child.getAttribute('data-link-id'));
 
 describe('incremental updates', () => {
+  it('patches positional edits, insertion defaults and undo without replacing nodes or explicit properties', () => {
+    const { store, handle } = mountSample();
+    const greeting = handle.nodeFor('greeting');
+    store.setPositional('greeting', ['Edited']);
+    handle.flush();
+    expect(greeting.textContent).toBe('Edited');
+    expect(handle.nodeFor('greeting')).toBe(greeting);
+    store.undo();
+    handle.flush();
+    expect(greeting.textContent).toBe('Hello, links');
+    store.redo();
+    store.setProp('greeting', 'value', ['Override']);
+    store.setPositional('greeting', ['Hidden']);
+    handle.flush();
+    expect(greeting.textContent).toBe('Override');
+    store.removeProp('greeting', 'value');
+    handle.flush();
+    expect(greeting.textContent).toBe('Hidden');
+    store.transaction('Insert with defaults', () => {
+      store.insert('body', 0, { id: 'new', kind: 'text' });
+      store.setPositional('new', ['New text']);
+    });
+    handle.flush();
+    expect(handle.nodeFor('new').textContent).toBe('New text');
+    store.setPositional('new', []);
+    handle.flush();
+    expect(handle.nodeFor('new').textContent).toBe('');
+  });
+
   it('changes the greeting by mutating only the ui-text node', async () => {
     const { window, container, store, handle } = mountSample();
     const greeting = handle.nodeFor('greeting');

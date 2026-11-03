@@ -1,3 +1,5 @@
+/// <reference lib="dom" />
+
 /**
  * Type declarations of `@link-foundation/ui-devmode` (see README.md).
  */
