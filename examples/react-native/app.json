@@ -1,0 +1,9 @@
+{
+  "expo": {
+    "name": "Links UI Native",
+    "slug": "links-ui-native",
+    "version": "1.0.0",
+    "platforms": ["ios", "android", "web"],
+    "web": { "bundler": "metro", "output": "single" }
+  }
+}
