@@ -27,3 +27,12 @@ export interface MuiMappingRow {
   }>;
 }
 export function getMuiMapping(): Promise<MuiMappingRow[]>;
+
+export interface MappingRow {
+  name: string;
+  kind: string | null;
+  status: 'mapped' | 'partial' | 'none';
+  props: { property: string; value: string; target: string[] }[];
+}
+export function readMapping(text: string): MappingRow[];
+export function getSwiftuiMapping(): Promise<MappingRow[]>;

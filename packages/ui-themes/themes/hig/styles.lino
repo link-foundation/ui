@@ -1,0 +1,143 @@
+hig-styles: theme
+  style
+    selector
+      data-part root
+      within
+        type button
+    min-width
+      token size.target.min
+    min-height
+      token size.target.min
+  style
+    selector
+      data-part input
+      within
+        type switch
+    min-width
+      token size.target.min
+    min-height
+      token size.target.min
+  style
+    selector
+      data-part input
+      within
+        type text-field
+    min-width
+      token size.target.min
+    min-height
+      token size.target.min
+  style
+    selector
+      data-part thumb
+      within
+        type slider
+    min-width
+      token size.target.min
+    min-height
+      token size.target.min
+  style
+    selector
+      data-part input
+      within
+        type number-field
+    min-width
+      token size.target.min
+    min-height
+      token size.target.min
+  style
+    selector
+      data-part input
+      within
+        type radio
+    min-width
+      token size.target.min
+    min-height
+      token size.target.min
+  style
+    selector
+      data-part input
+      within
+        type select
+    min-width
+      token size.target.min
+    min-height
+      token size.target.min
+  style
+    selector
+      data-part root
+      within
+        type button
+    radius
+      token shape.corner.small
+  style
+    selector
+      data-part input
+      within
+        type text-field
+    radius
+      token shape.corner.small
+  style
+    selector
+      data-part input
+      within
+        type number-field
+    radius
+      token shape.corner.small
+  style
+    selector
+      data-part input
+      within
+        type select
+    radius
+      token shape.corner.small
+  style
+    selector
+      data-part root
+      within
+        type button
+        variant bordered
+    background
+      token color.grouped-background
+    color
+      token color.primary
+    border-color
+      token color.separator
+    border-width 1px
+  style
+    selector
+      data-part root
+      within
+        type button
+        variant borderless
+    background
+      token color.surface
+    color
+      token color.primary
+    border-color
+      token color.separator
+    border-width 0px
+  style
+    selector
+      data-part root
+      within
+        type button
+        variant prominent
+    background
+      token color.primary
+    color
+      token color.on-primary
+    border-color
+      token color.separator
+    border-width 0px
+  style
+    selector
+      material regular
+    material regular
+  style
+    selector
+      material thin
+    material thin
+  style
+    selector
+      material thick
+    material thick

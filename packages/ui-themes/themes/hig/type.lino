@@ -1,0 +1,26 @@
+hig-type: theme
+  token font.family.text 'system-ui, -apple-system, BlinkMacSystemFont, sans-serif'
+  token font.family.mono 'ui-monospace, monospace'
+  token text.base.size 1rem
+  token text.large-title.size 2rem
+  token text.large-title.weight 400
+  token text.title-1.size 1.647059rem
+  token text.title-1.weight 400
+  token text.title-2.size 1.294118rem
+  token text.title-2.weight 400
+  token text.title-3.size 1.176471rem
+  token text.title-3.weight 400
+  token text.headline.size 1rem
+  token text.headline.weight 600
+  token text.body.size 1rem
+  token text.body.weight 400
+  token text.callout.size 0.941176rem
+  token text.callout.weight 400
+  token text.subheadline.size 0.882353rem
+  token text.subheadline.weight 400
+  token text.footnote.size 0.764706rem
+  token text.footnote.weight 400
+  token text.caption-1.size 0.705882rem
+  token text.caption-1.weight 400
+  token text.caption-2.size 0.647059rem
+  token text.caption-2.weight 400
