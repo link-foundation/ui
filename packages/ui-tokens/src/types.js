@@ -29,6 +29,7 @@
  * @property {string} [sourceValue] original exchange value
  * @property {string} [fluent] original Fluent alias name
  * @property {string} [description]
+ * @property {string} [m3] original Material 3 token name
  * @property {string} [mode]  the mode of a `(mode NAME ...)` token
  */
 
@@ -50,6 +51,7 @@
  * @property {string} [sourceValue] original exchange value
  * @property {string} [fluent] original Fluent alias name
  * @property {string} [description]
+ * @property {string} [m3] original Material 3 token name
  * @property {string} set  the set that defines the token
  * @property {string} [mode]  the mode whose override defines the token
  */

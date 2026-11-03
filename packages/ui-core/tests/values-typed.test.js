@@ -78,7 +78,8 @@ describe('values: typing', () => {
         severity: 'error',
         message: diagnostics[1].message,
         at: { element: 'ok', property: 'variant' },
-        expected: '(enum filled tonal outlined text secondary transparent)',
+        expected:
+          '(enum filled tonal outlined text elevated secondary transparent)',
       },
     ]);
     expect(diagnostics[0].message).toContain('gap');

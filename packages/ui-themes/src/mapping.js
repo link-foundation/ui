@@ -1,5 +1,25 @@
+/* global URL */
 import { parseNested } from '@link-foundation/ui-core';
+/** Read package data in browsers and Node without a build. */
+export async function readThemeFile(path) {
+  const url = new URL(`../themes/${path}`, import.meta.url);
+  if (url.protocol === 'file:') {
+    return (await import('node:fs/promises')).readFile(url, 'utf8');
+  }
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Cannot load theme data: ${response.status} ${path}`);
+  }
+  return response.text();
+}
 const raw = (link) => (link.values.length ? link.values.map(raw) : link.id);
+function hasKind(fields, kind, status) {
+  return (
+    (typeof kind === 'string' || status === 'none') &&
+    fields.filter((field) => field[0] === 'kind').length ===
+      (status === 'none' ? 0 : 1)
+  );
+}
 /** Shared LiNo migration rows. Unknown statuses or malformed rows fail closed. */
 export function loadMapping(text) {
   const seen = new Set();
@@ -11,10 +31,9 @@ export function loadMapping(text) {
       head !== 'map' ||
       typeof component !== 'string' ||
       seen.has(component) ||
-      typeof kind !== 'string' ||
-      !['mapped', 'partial', 'unsupported'].includes(status) ||
+      !hasKind(fields, kind, status) ||
+      !['mapped', 'partial', 'unsupported', 'none'].includes(status) ||
       fields.some((field) => !Array.isArray(field)) ||
-      fields.filter((field) => field[0] === 'kind').length !== 1 ||
       fields.filter((field) => field[0] === 'status').length !== 1 ||
       fields.some(
         (field) =>
@@ -31,7 +50,7 @@ export function loadMapping(text) {
     seen.add(component);
     return {
       component,
-      kind,
+      kind: kind ?? null,
       status,
       props: fields
         .filter((f) => f[0] === 'prop')
@@ -40,19 +59,27 @@ export function loadMapping(text) {
     };
   });
 }
-const cell = (text) =>
-  String(text)
-    .replaceAll('|', '\\|')
-    .replaceAll('\n', ' ')
-    .replaceAll('*', '\\*');
-/** Deterministic Markdown used by every design-system mapping. */
+const cell = (text) => String(text).replaceAll('*', '\\*');
+/** Shared table writer; callers can retain their own columns and inline markup. */
+export function mappingTable(headers, rows) {
+  const row = (cells) =>
+    `| ${cells.map((value) => String(value).replaceAll('|', '\\|').replaceAll('\n', ' ')).join(' | ')} |`;
+  return `${[row(headers), row(headers.map(() => '---')), ...rows.map(row)].join('\n')}\n`;
+}
+/** Deterministic Markdown used by design-system mappings. */
 export function mappingMarkdown(rows) {
-  return `${[
-    '| Component | Kind | Props | Status | Notes |',
-    '| --- | --- | --- | --- | --- |',
-    ...rows.map(
-      (row) =>
-        `| ${[row.component, row.kind, row.props.map((p) => `${p.name}=${p.value} → ${p.target.join(' ')}`).join('; '), row.status, row.note].map(cell).join(' | ')} |`
-    ),
-  ].join('\n')}\n`;
+  return mappingTable(
+    ['Component', 'Kind', 'Props', 'Status', 'Notes'],
+    rows.map((row) =>
+      [
+        row.component,
+        row.kind ?? '—',
+        row.props
+          .map((p) => `${p.name}=${p.value} → ${p.target.join(' ')}`)
+          .join('; '),
+        row.status,
+        row.note,
+      ].map((text) => cell(text))
+    )
+  );
 }

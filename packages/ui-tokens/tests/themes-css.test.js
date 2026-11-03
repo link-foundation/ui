@@ -22,7 +22,7 @@ it('matches the base CSS snapshot with every preference, scoped styles and no im
     'Highlight',
     'data-motion="reduced"',
     'prefers-reduced-motion: reduce',
-    ':scope ui-button',
+    '@scope ([data-theme="base"]) to ([data-theme])',
   ]) {
     assert.ok(css.includes(text), text);
   }

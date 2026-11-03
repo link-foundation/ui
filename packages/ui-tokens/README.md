@@ -249,3 +249,7 @@ usage.
 `themeBootScript` and `exportThemeResolver`. See the
 [theme contract](../../docs/spec/themes.md) and
 [base theme package](../ui-themes/README.md).
+
+Material 3 theme tokens may include `m3 md.sys.color.primary` metadata. The
+loader preserves this original source name as `token.m3` for reverse exporters;
+it does not participate in value typing or alias resolution.

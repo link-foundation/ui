@@ -43,8 +43,9 @@ An unreachable target emits an error. Collect diagnostics with
 Forced colors map semantic tokens to system colors. A theme can add inherited
 `(forced-color token.path CanvasText)` rows for namespaced aliases. Values are
 restricted to Canvas, CanvasText, Highlight, HighlightText, GrayText, ButtonText
-and ButtonFace. Theme styles use an explicit `:scope` prefix inside an
-`@scope` boundary that stops at nested themes. CSS nesting scopes require a browser supporting `@scope`.
+and ButtonFace. Theme styles stay inside an
+`@scope` boundary that stops at nested themes. Root selectors also match a
+control or ancestor at the scope boundary. CSS nesting scopes require a browser supporting `@scope`.
 
 Any UI element may carry `theme`, `scheme`, `contrast` or `motion` properties:
 

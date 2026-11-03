@@ -170,6 +170,7 @@ function resolveAll(defs, diagnostics) {
             ...(token.description === undefined
               ? {}
               : { description: token.description }),
+            ...(token.m3 === undefined ? {} : { m3: token.m3 }),
             set: def.set,
             ...(token.mode === undefined ? {} : { mode: token.mode }),
           };

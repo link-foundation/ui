@@ -9,10 +9,37 @@ export function fluentThemeFromBrand(
 ): string;
 export interface MappingRow {
   component: string;
-  kind: string;
-  status: 'mapped' | 'partial' | 'unsupported';
+  kind: string | null;
+  status: 'mapped' | 'partial' | 'unsupported' | 'none';
   props: { name: string; value: string; target: string[] }[];
   note: string;
 }
 export function loadMapping(text: string): MappingRow[];
 export function mappingMarkdown(rows: MappingRow[]): string;
+
+export function materialThemeFromSeed(
+  seed: string,
+  options?: {
+    id?: string;
+    contrast?: number;
+    variant?: 'tonal-spot' | 'vibrant' | 'neutral';
+  }
+): string;
+export function muiThemeToLino(
+  themeOptions: object,
+  options?: { id?: string }
+): {
+  lino: string;
+  unmapped: string[];
+};
+export interface MuiMappingRow {
+  component: string;
+  kind: string | null;
+  status: 'mapped' | 'partial' | 'none';
+  props: Array<{
+    name: string;
+    value: string;
+    target: { name: string; value: string };
+  }>;
+}
+export function getMuiMapping(): Promise<MuiMappingRow[]>;

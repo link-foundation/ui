@@ -16,10 +16,12 @@ import { flatten } from './match.js';
 import { PROPERTIES, declarationCss } from './properties.js';
 
 /** A theme boundary can itself be the selected control. */
-function scopedSelector(selector, scope, boundary) {
-  return scope
-    ? `${scope} ${selector}, :where(:scope)${scope}${boundary}`
-    : selector;
+function scopedSelector(selector, scope, atRoot) {
+  // The enclosing @scope bounds descendants, including ancestors at its root.
+  if (scope === ':scope') {
+    return `${selector}, ${atRoot}`;
+  }
+  return scope ? `${scope} ${selector}, ${atRoot}` : selector;
 }
 
 /**
@@ -123,13 +125,33 @@ function compound(selector, tagFor, hostStates = '') {
  * @param {string} [suffix]  pseudo-classes of the states
  * @returns {string}
  */
-function selectorCss(selector, tagFor, suffix = '', hostStates = '') {
+function selectorCss(
+  selector,
+  tagFor,
+  suffix = '',
+  hostStates = '',
+  atRoot = ''
+) {
   const [first, ...rest] = selector.within;
   const own =
     compound(selector, tagFor, hostStates) +
     rest.map((ancestor) => `:is(${selectorCss(ancestor, tagFor)} *)`).join('') +
     suffix;
-  return first === undefined ? own : `${selectorCss(first, tagFor)} ${own}`;
+  if (first !== undefined) {
+    return `${selectorCss(first, tagFor, '', '', atRoot)} ${own}`;
+  }
+  if (!atRoot) {
+    return own;
+  }
+  const part = selector.props.find(({ name }) => name === 'part');
+  if (!part) {
+    return `${atRoot}:is(${own})`;
+  }
+  const host = {
+    ...selector,
+    props: selector.props.filter(({ name }) => name !== 'part'),
+  };
+  return `${atRoot}:is(${compound(host, tagFor, hostStates)}) [data-part=${quoteString(part.value)}]${suffix}`;
 }
 
 /** Keep only the last declaration of each property, at its position. */
@@ -180,14 +202,13 @@ export function compileCss(rules, options = {}) {
       partStates,
       hostStates
     );
-    const host = {
-      ...entry.selector,
-      props: entry.selector.props.filter(({ name }) => name !== 'part'),
-    };
-    const boundary =
-      part && entry.selector.within.length === 0
-        ? `:is(${compound(host, tagFor, hostStates)}) [data-part=${quoteString(part.value)}]${partStates}`
-        : `:is(${selector})`;
+    const atRoot = selectorCss(
+      entry.selector,
+      tagFor,
+      partStates,
+      hostStates,
+      `:where(:scope)${options.scope === ':scope' ? '' : (options.scope ?? '')}`
+    );
     const depth = entry.at.length;
     const pad = '  '.repeat(depth);
     const lines = [
@@ -195,7 +216,7 @@ export function compileCss(rules, options = {}) {
         ({ kind, conditions }, i) =>
           `${'  '.repeat(i)}@${kind} ${conditionsCss(conditions)} {`
       ),
-      `${pad}${scopedSelector(selector, options.scope, boundary)} {`,
+      `${pad}${scopedSelector(selector, options.scope, atRoot)} {`,
       ...lastDeclarations(entry.declarations).map(
         (decl) =>
           `${pad}  ${PROPERTIES[decl.property].css}: ${declarationCss(decl, ctx)};`

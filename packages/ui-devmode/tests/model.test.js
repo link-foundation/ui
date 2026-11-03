@@ -101,6 +101,7 @@ describe('property rows', () => {
       'tonal',
       'outlined',
       'text',
+      'elevated',
       'secondary',
       'transparent',
     ]);

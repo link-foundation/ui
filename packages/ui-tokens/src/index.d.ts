@@ -66,6 +66,7 @@ export interface Token {
   type: TokenType | null;
   value: TokenValue;
   description?: string;
+  m3?: string;
   fluent?: string;
   sourceValue?: string;
   mode?: string;
@@ -88,6 +89,7 @@ export interface ResolvedToken {
   /** The target of a whole-token alias. */
   alias?: string;
   description?: string;
+  m3?: string;
   fluent?: string;
   sourceValue?: string;
   /** The set that defines the token. */

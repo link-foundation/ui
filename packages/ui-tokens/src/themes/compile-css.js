@@ -176,7 +176,7 @@ export function compileThemeCss(theme, options = {}) {
     scope: ':scope',
   });
   if (style) {
-    css.push(`@scope (${root}) to (:scope [data-theme]) {\n${style}\n}`);
+    css.push(`@scope (${root}) to ([data-theme]) {\n${style}\n}`);
   }
   return css.join('\n');
 }
