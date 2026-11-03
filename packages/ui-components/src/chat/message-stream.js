@@ -116,6 +116,15 @@ function renderStatus(snapshot, root, older, newer, status, options) {
         : (options.labels?.empty ?? 'No messages'));
 }
 
+function sameRowContent(row, message, previous, state) {
+  return (
+    row._message === message &&
+    row._version === state.version &&
+    row._previous === previous?.id &&
+    row._unread === (state.unread === message.id)
+  );
+}
+
 function rowDrawer(state, ctx, options) {
   return (row, message, index) => {
     const { selection, runStarts, highlighted, unread, version } = state;
@@ -133,12 +142,7 @@ function rowDrawer(state, ctx, options) {
     );
     row.classList.toggle('ui-chat-highlighted', highlighted === message.id);
     const previous = state.messages[index - 1];
-    if (
-      row._message === message &&
-      row._version === version &&
-      row._previous === previous?.id &&
-      row._unread === (unread === message.id)
-    ) {
+    if (sameRowContent(row, message, previous, state)) {
       return;
     }
     const children = [];
