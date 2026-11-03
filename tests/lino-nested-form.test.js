@@ -77,3 +77,17 @@ test('the check sees a parenthesized multi-line link', () => {
   const markdown = `# A\n\n\`\`\`lino\n${parens}\`\`\`\n`;
   assert.notEqual(nestMarkdown(markdown), markdown);
 });
+
+test('the debug trace reports every group (off by default)', () => {
+  const seen = [];
+  nestLino(
+    '(a: b\n  (c d))\n\n# a comment\nx y\n\nk: v\n  w 1\n',
+    () => {},
+    (status) => seen.push(status)
+  );
+  assert.deepEqual(seen, [
+    'nested',
+    'kept (it holds a comment line)',
+    'already nested',
+  ]);
+});

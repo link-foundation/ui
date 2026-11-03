@@ -7,6 +7,11 @@
  *
  *   node scripts/lino-nest.mjs <file.lino|file.md>...          # rewrite
  *   node scripts/lino-nest.mjs --check <file.lino|file.md>...  # exit 1 when a file would change
+ *   node scripts/lino-nest.mjs --verbose ...                   # also trace every group
+ *
+ * `--verbose` (or `LINO_NEST_DEBUG=1`) writes one line per group of lines to
+ * stderr: whether it was nested, already nested or kept, and the values it
+ * read. It is off by default; use it to see why a file is (not) rewritten.
  *
  * Text is read only by the official `links-notation` parser (through
  * `parseNested` of ui-core) and written by `formatLinks` of ui-core. Each
@@ -192,9 +197,10 @@ export function nestGroup(text) {
  * The nested text of a whole LiNo text: each group between blank lines on
  * its own.
  * @param {string} text
- * @param {(reason: string, group: string) => void} [note]
+ * @param {(reason: string, group: string) => void} [note] told why a group is kept
+ * @param {(status: string, group: string) => void} [trace] told about every group (debug)
  */
-export function nestLino(text, note = () => {}) {
+export function nestLino(text, note = () => {}, trace = () => {}) {
   const groups = text.replace(/\n+$/u, '').split(/\n[ \t]*\n/u);
   return `${groups
     .map((group) => {
@@ -204,8 +210,10 @@ export function nestLino(text, note = () => {}) {
       const result = nestGroup(group);
       if ('reason' in result) {
         note(result.reason, group);
+        trace(`kept (${result.reason})`, group);
         return group;
       }
+      trace(result.text === group ? 'already nested' : 'nested', group);
       return result.text.replace(/\n$/u, '');
     })
     .join('\n\n')}\n`;
@@ -215,10 +223,10 @@ const FENCE =
   /^(?<indent>[ \t]*)```lino[ \t]*\n(?<body>[\s\S]*?)^\k<indent>```[ \t]*$/gmu;
 
 /** The text of a Markdown file with its ```lino blocks nested. */
-export function nestMarkdown(text, note = () => {}) {
+export function nestMarkdown(text, note = () => {}, trace = () => {}) {
   return text.replace(FENCE, (block, indent, body) => {
     const lines = body.split('\n').map((line) => line.slice(indent.length));
-    const nested = nestLino(lines.join('\n'), note).replace(/\n$/u, '');
+    const nested = nestLino(lines.join('\n'), note, trace).replace(/\n$/u, '');
     const indented = nested
       .split('\n')
       .map((line) => (line === '' ? '' : `${indent}${line}`))
@@ -227,9 +235,20 @@ export function nestMarkdown(text, note = () => {}) {
   });
 }
 
+/** The values a group reads as, for the debug trace. */
+function traceValues(group) {
+  try {
+    return JSON.stringify(parseLinks(group, unlimited).map(fold));
+  } catch (error) {
+    return error.message;
+  }
+}
+
 function main(argv) {
   const check = argv.includes('--check');
-  const files = argv.filter((arg) => arg !== '--check');
+  const verbose =
+    argv.includes('--verbose') || process.env.LINO_NEST_DEBUG === '1';
+  const files = argv.filter((arg) => arg !== '--check' && arg !== '--verbose');
   let changed = 0;
   for (const file of files) {
     const text = readFileSync(file, 'utf8');
@@ -237,9 +256,15 @@ function main(argv) {
       console.error(
         `${file}: kept as written, ${reason}: ${group.split('\n')[0]}`
       );
+    const trace = verbose
+      ? (status, group) =>
+          console.error(
+            `${file}: ${status}: ${group.split('\n')[0]} -> ${traceValues(group)}`
+          )
+      : undefined;
     const nested = file.endsWith('.md')
-      ? nestMarkdown(text, note)
-      : nestLino(text, note);
+      ? nestMarkdown(text, note, trace)
+      : nestLino(text, note, trace);
     if (nested !== text) {
       changed++;
       if (check) {
