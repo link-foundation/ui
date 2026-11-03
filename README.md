@@ -94,6 +94,26 @@ npx link-ui-tokens build tokens.lino --set material3 \
   --css tokens.css --dtcg tokens.json --swift Tokens.swift --kotlin Tokens.kt
 ```
 
+### Charts
+
+[`@link-foundation/ui-components`](packages/ui-components/README.md)
+renders charts written in Links Notation with `data`, `mark` and
+`encoding` as deterministic, accessible SVG: `<ui-chart>` has a data table
+twin and arrow-key navigation between points. ECharts is loaded only for
+`(renderer echarts)`:
+
+```html
+<ui-chart>
+  <script type="text/lino">
+    (sales: chart
+      (description 'Sales grew from 12 to 30 thousand')
+      (data (row (month 2026-01) (value 12)) (row (month 2026-02) (value 30)))
+      (mark bar)
+      (encoding (x (field month) (type ordinal)) (y (field value) (type quantitative))))
+  </script>
+</ui-chart>
+```
+
 ### DOM renderer
 
 [`@link-foundation/ui-dom`](packages/ui-dom/README.md) renders a document as
@@ -250,7 +270,7 @@ npm run example:desktop:package
 │   └── universal-app/    # React + GitHub Pages + Electron + Capacitor app
 ├── scripts/              # Build and release scripts
 ├── packages/             # npm workspaces (see docs/monorepo.md)
-│   ├── ui-components/    # @link-foundation/ui-components (LiNo state machines, actions registry, a11y helpers, diagrams with Dagre layout, SVG and Mermaid, layout and windowing)
+│   ├── ui-components/    # @link-foundation/ui-components (LiNo state machines, actions registry, a11y helpers, charts, diagrams with Dagre layout, SVG and Mermaid, layout and windowing)
 │   ├── ui-config/        # @link-foundation/ui-config (layered configuration, overrides patches)
 │   ├── ui-convert/       # @link-foundation/ui-convert (HTML/DOM, A2UI, Adaptive Cards, JSON Forms, Lottie <-> LiNo)
 │   ├── ui-core/          # @link-foundation/ui-core

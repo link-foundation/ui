@@ -34,10 +34,11 @@ and `deno test` never pick them up. Playwright discovers
 `tests/e2e/**/*.spec.js` and `packages/*/tests/e2e/**/*.spec.js`. The
 `tests/e2e` specs test packages together (for example
 `interop-lottie.spec.js` plays a ui-convert export in lottie-web), and a
-package's own specs test its gallery page (for example
-`packages/ui-components/tests/e2e/layout.spec.js` opens
-`/packages/ui-components/examples/layout.html`); `bunfig.toml` keeps them out
-of `bun test`, and `node --test` and `deno test` do not match `.spec.js`.
+package's own specs test its gallery pages (for example
+`packages/ui-components/tests/e2e/charts.spec.js` and `layout.spec.js`, which
+opens `/packages/ui-components/examples/layout.html`); `bunfig.toml` keeps
+them out of `bun test`, and `node --test` and `deno test` do not match
+`.spec.js`.
 
 The configuration fixes the viewport (1280×800, scale 1), `locale: 'en-US'`,
 `timezoneId: 'UTC'`, `colorScheme: 'light'` and reduced motion. Screenshots

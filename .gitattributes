@@ -31,6 +31,10 @@ packages/ui-links/tests/fixtures/** text eol=lf
 # the tests compare them byte for byte.
 packages/ui-dom/tests/__snapshots__/** text eol=lf
 
+# The chart SVG snapshots are the exact output of renderChartSvg (always LF),
+# and the tests compare them byte for byte.
+packages/ui-components/tests/charts/__snapshots__/** text eol=lf
+
 # The ui-components diagram fixtures: login-flow.mmd is the exact text toMermaid
 # writes (always LF, no trailing newline), compared byte for byte.
 packages/ui-components/tests/diagrams/fixtures/** text eol=lf

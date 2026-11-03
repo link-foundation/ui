@@ -1,0 +1,16 @@
+(cars: chart
+  (title 'Weight and fuel use')
+  (description 'Heavier cars use more fuel; the electric cars are the exception')
+  (data
+    (row (model A) (weight 1.1) (fuel 5.2) (drive petrol) (seats 4))
+    (row (model B) (weight 1.4) (fuel 6.8) (drive petrol) (seats 5))
+    (row (model C) (weight 1.9) (fuel 9.1) (drive petrol) (seats 7))
+    (row (model D) (weight 1.6) (fuel 1.5) (drive electric) (seats 5))
+    (row (model E) (weight 2.2) (fuel 2.1) (drive electric) (seats 7))
+    (row (model F) (weight 1.3) (fuel 4.4) (drive hybrid) (seats 5)))
+  (mark point)
+  (encoding
+    (x (field weight) (type quantitative) (title 'Weight, t'))
+    (y (field fuel) (type quantitative) (title 'Fuel, l/100 km'))
+    (color (field drive) (type nominal))
+    (size (field seats) (type quantitative))))

@@ -1,0 +1,4 @@
+(broken: chart
+  (data (row (a 1) (b 2)))
+  (mark pie)
+  (encoding (x (field a)) (y (field b))))

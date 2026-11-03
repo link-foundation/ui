@@ -9,8 +9,12 @@
  *   /examples/ui-dom/         -> examples/ui-dom/ (the ui-dom example page)
  *   /packages/<name>/src/     -> packages/<name>/src/ (ES modules of the
  *                                import map of the example pages)
- *   /packages/<name>/examples/ -> packages/<name>/examples/ (when present)
+ *   /packages/<name>/examples/ -> packages/<name>/examples/ (when present;
+ *                                the ui-components chart gallery)
  *   /node_modules/links-notation/dist/ -> the browser build of links-notation
+ *   /node_modules/<d3 package>/ -> the ES modules of d3-scale, d3-shape and
+ *                                their dependencies (the chart gallery)
+ *   /node_modules/echarts/dist/ -> the optional ECharts build
  *   /node_modules/@dagrejs/dagre/dist/ -> the browser build of Dagre
  *   /node_modules/mermaid/dist/ -> the browser build of Mermaid (the optional
  *                                peer of ui-components, loaded on demand)
@@ -28,6 +32,20 @@ const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '..'
 );
+
+/** The npm packages the chart gallery loads as ES modules (no bundler). */
+export const BROWSER_MODULES = [
+  'd3-array',
+  'd3-color',
+  'd3-format',
+  'd3-interpolate',
+  'd3-path',
+  'd3-scale',
+  'd3-shape',
+  'd3-time',
+  'd3-time-format',
+  'internmap',
+];
 
 /**
  * @param {string} root repository root
@@ -47,6 +65,8 @@ export function defaultMounts(root) {
   for (const parts of [
     ['examples', 'ui-dom'],
     ['node_modules', 'links-notation', 'dist'],
+    ...BROWSER_MODULES.map((name) => ['node_modules', name]),
+    ['node_modules', 'echarts', 'dist'],
     ['node_modules', '@dagrejs', 'dagre', 'dist'],
     ['node_modules', 'mermaid', 'dist'],
     ['docs', 'case-studies', 'issue-1', 'samples'],
