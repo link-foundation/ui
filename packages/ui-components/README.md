@@ -812,23 +812,35 @@ import {
   movePanel,
 } from '@link-foundation/ui-components/layout';
 
-const layout = dockLayoutFromLinks(`(designer: dock
-  (persist designer.layout)
-  (left: region (size 16rem) (panels toolbox outline))
-  (right: region (size 20rem) (panels properties))
-  (center: region (panels canvas)))`);
+const layout = dockLayoutFromLinks(`designer: dock
+  persist designer.layout
+  left: region
+    size 16rem
+    panels toolbox outline
+  right: region
+    size 20rem
+    panels properties
+  center: region
+    panels canvas`);
 dockLayoutToLino(movePanel(layout, 'outline', 'right'));
-// (designer: dock
-//   (persist designer.layout)
-//   (left: region (size 16rem) (panels toolbox))
-//   (right: region (size 20rem) (panels properties outline))
-//   (center: region (panels canvas)))
+// designer: dock
+//   persist designer.layout
+//   left: region
+//     size 16rem
+//     panels toolbox
+//   right: region
+//     size 20rem
+//     panels properties outline
+//   center: region
+//     panels canvas
 ```
 
 `movePanel`, `floatPanel`, `closePanel`, `restorePanel`, `activatePanel` and
-`updateRegion` change a layout. Floating and closed panels are written as
-`(float PANEL (x ...) (y ...) (width ...) (height ...) (region SIDE))` and
-`(closed PANEL SIDE)`. Reading the written text gives the same layout back.
+`updateRegion` change a layout. The layout is written in the nested form;
+a floating panel is a `float PANEL` line with the indented lines `x ...`,
+`y ...`, `width ...`, `height ...` and `region SIDE`, and a closed panel is a
+`closed PANEL SIDE` line. Reading the written text gives the same layout
+back, and the parenthesized form reads the same.
 
 ## Icons
 

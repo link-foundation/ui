@@ -5,7 +5,7 @@
 
 import { describe, it, expect } from 'test-anywhere';
 import { Parser } from 'links-notation';
-import { parse } from '@link-foundation/ui-core';
+import { parse, parseNested } from '@link-foundation/ui-core';
 import {
   activatePanel,
   closePanel,
@@ -20,7 +20,24 @@ import {
   updateRegion,
 } from '@link-foundation/ui-components';
 
-const DESIGNER = `(designer-shell: dock
+const DESIGNER = `designer-shell: dock
+  persist 'designer.layout'
+  left: region
+    size 16rem
+    panels toolbox outline
+  right: region
+    size 20rem
+    panels properties
+  center: region
+    panels canvas
+  bottom: region
+    size 12rem
+    collapsed true
+    panels problems
+`;
+
+// The same dock in the multi-line parenthesized form, which still reads.
+const DESIGNER_PARENS = `(designer-shell: dock
   (persist 'designer.layout')
   (left: region (size 16rem) (panels toolbox outline))
   (right: region (size 20rem) (panels properties))
@@ -49,12 +66,20 @@ describe('dockLayoutFromLinks', () => {
 
   it('reads links-notation links and ui-core documents the same way', () => {
     const fromText = dockLayoutFromLinks(DESIGNER);
-    expect(dockLayoutFromLinks(new Parser().parse(DESIGNER))).toEqual(fromText);
-    const doc = parse(`(page: document ${DESIGNER})`, {
-      vocabulary: layoutVocabulary(),
-    });
+    expect(dockLayoutFromLinks(parseNested(DESIGNER))).toEqual(fromText);
+    expect(dockLayoutFromLinks(new Parser().parse(DESIGNER_PARENS))).toEqual(
+      fromText
+    );
+    const nestedPage = `page: document\n${DESIGNER.replace(/^/gmu, '  ')}`;
+    const doc = parse(nestedPage, { vocabulary: layoutVocabulary() });
     expect(doc.diagnostics).toEqual([]);
     expect(dockLayoutFromLinks(doc)).toEqual(fromText);
+  });
+
+  it('reads the parenthesized form the same (#133)', () => {
+    expect(dockLayoutFromLinks(DESIGNER_PARENS)).toEqual(
+      dockLayoutFromLinks(DESIGNER)
+    );
   });
 
   it('throws without a dock', () => {
@@ -68,15 +93,25 @@ describe('dockLayoutToLino', () => {
     const moved = movePanel(dockLayoutFromLinks(DESIGNER), 'outline', 'right');
     const text = dockLayoutToLino(moved);
     expect(text).toContain(
-      '(right: region (size 20rem) (panels properties outline))'
+      '  right: region\n    size 20rem\n    panels properties outline\n'
     );
-    expect(text).toContain('(left: region (size 16rem) (panels toolbox))');
-    expect(text).toBe(`(designer-shell: dock
-  (persist designer.layout)
-  (left: region (size 16rem) (panels toolbox))
-  (right: region (size 20rem) (panels properties outline))
-  (center: region (panels canvas))
-  (bottom: region (size 12rem) (collapsed true) (panels problems)))
+    expect(text).toContain(
+      '  left: region\n    size 16rem\n    panels toolbox\n'
+    );
+    expect(text).toBe(`designer-shell: dock
+  persist designer.layout
+  left: region
+    size 16rem
+    panels toolbox
+  right: region
+    size 20rem
+    panels properties outline
+  center: region
+    panels canvas
+  bottom: region
+    size 12rem
+    collapsed true
+    panels problems
 `);
   });
 
@@ -105,11 +140,11 @@ describe('dockLayoutToLino', () => {
     };
     const text = dockLayoutToLino(layout);
     expect(text).toContain(
-      '(float toolbox (x 40) (y 60) (width 320) (height 240) (region left))'
+      '  float toolbox\n    x 40\n    y 60\n    width 320\n    height 240\n    region left\n'
     );
-    expect(text).toContain('(closed properties right)');
-    expect(text).toContain("(panels outline canvas 'my panel')");
-    expect(text).toContain('(active canvas)');
+    expect(text).toContain('  closed properties right\n');
+    expect(text).toContain("    panels outline canvas 'my panel'\n");
+    expect(text).toContain('    active canvas\n');
     expect(roundTrip(layout)).toEqual(layout);
   });
 });
