@@ -1,9 +1,16 @@
 /** A network keeps link IDs distinct from implicit endpoint point IDs. */
 export function buildNetwork(input) {
   const links = new Map();
+  const points = new Map();
+  const seen = new Set();
   for (const value of input) {
-    if (value.id === 0 || value.id === '0' || links.has(value.id)) {
+    if (value.id === 0 || value.id === '0' || seen.has(value.id)) {
       throw new TypeError(`Duplicate or reserved link ID: ${value.id}`);
+    }
+    seen.add(value.id);
+    if (value.kind === 'point' || value.kind === 'value') {
+      points.set(value.id, { ...value });
+      continue;
     }
     links.set(value.id, {
       ...value,
@@ -11,10 +18,9 @@ export function buildNetwork(input) {
       target: free(value.target),
     });
   }
-  const points = new Map();
   for (const link of links.values()) {
     for (const id of [link.source, link.target]) {
-      if (id !== 0 && !links.has(id)) {
+      if (id !== 0 && !links.has(id) && !points.has(id)) {
         points.set(id, { id });
       }
     }
@@ -35,6 +41,9 @@ export function networkIds(network) {
     if (network.points.has(link.target)) {
       ids.add(link.target);
     }
+  }
+  for (const id of network.points.keys()) {
+    ids.add(id);
   }
   return [...ids];
 }
@@ -65,4 +74,12 @@ export function networkNeighbours(network, id) {
   }
   neighbours.delete(id);
   return [...neighbours];
+}
+
+/** Include explicit value/isolated points when sending a network to a worker. */
+export function networkInput(network) {
+  return [
+    ...network.links.values(),
+    ...[...network.points.values()].filter((point) => point.kind),
+  ];
 }
