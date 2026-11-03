@@ -15,8 +15,7 @@ and the template is described in the
 
 ## Required sections
 
-Feature issues use these sections, in this order. The Feature form produces
-them with the same headings.
+Feature issues use these sections, in this order, with the same headings.
 
 | Section                   | Purpose                                                                     |
 | ------------------------- | --------------------------------------------------------------------------- |
@@ -97,6 +96,9 @@ rules in [`docs/spec/values.md`](../spec/values.md) apply:
 - quote hex colours: `'#6750A4'`, because a bare `#` starts a comment;
 - quote URLs: `'https://example.com/logo.svg'`, because a bare value must not
   contain `:`;
+- write the nested form: one link per line, with the links of its values
+  indented under it and no parentheses that the indentation makes unneeded
+  ([`docs/agents/conventions.md`](conventions.md#links-notation-in-the-nested-form));
 - use a `lino` code block, so the example can be copied into a fixture:
 
   ```lino

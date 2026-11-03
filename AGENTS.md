@@ -31,6 +31,9 @@ npm run check:duplication
   stub the blocked API as the issue says; never fake it in tests.
 - Parse LiNo with the official `links-notation` package, never with regular
   expressions.
+- Write LiNo in the nested (indented) form with as few parentheses as
+  possible, in code (`formatLinks` of ui-core) and in docs; see
+  [`docs/agents/conventions.md`](docs/agents/conventions.md#links-notation-in-the-nested-form).
 - Do only what the issue asks; open a
   [new issue](https://github.com/link-foundation/ui/issues/new) (type Bug or
   Feature, see `docs/agents/writing-issues.md`) for anything else.
