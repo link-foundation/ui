@@ -214,22 +214,39 @@ test.describe('link-view zoom and pan', () => {
     const first = view(page, 'simple');
     const second = view(page, 'free-end');
     const before = await second.screenshot();
-    const drawnK = () => first.evaluate((el) => el.drawn.view.k);
-    const fitK = await drawnK();
+    const fitK = await first.evaluate((el) => el.drawn.view.k);
+    const userView = () => first.evaluate((el) => el.view);
     const box = await first.boundingBox();
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    const middle = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+    // The wheel zooms by 0.999 ** -300 ≈ 1.35 around the pointer.
+    await page.mouse.move(middle.x, middle.y);
     await page.mouse.wheel(0, -300);
+    await expect.poll(async () => (await userView()).k).toBeGreaterThan(1.2);
+    const wheeled = await userView();
     await page.mouse.down();
-    await page.mouse.move(box.x + box.width / 2 + 40, box.y + box.height / 2);
+    await page.mouse.move(middle.x + 40, middle.y, { steps: 4 });
     await page.mouse.up();
+    await expect
+      .poll(async () => (await userView()).x)
+      .toBeGreaterThan(wheeled.x + 30);
     await first.focus();
     await page.keyboard.press('+');
-    expect(await drawnK()).toBeGreaterThan(1.5 * fitK);
+    await expect
+      .poll(async () => (await userView()).k)
+      .toBeGreaterThan(1.2 * wheeled.k);
+    // The next draw (synchronous or on the next frame) shows the user zoom
+    // on top of the fit.
+    await expect
+      .poll(() =>
+        first.evaluate(
+          (el, fit) => Math.abs(el.drawn.view.k - el.view.k * fit),
+          fitK
+        )
+      )
+      .toBeLessThan(1e-6);
     const views = await page.evaluate(() =>
       [...document.querySelectorAll('link-view')].map((el) => el.view)
     );
-    expect(views[0].k).toBeGreaterThan(1.5);
-    expect(views[0].x).not.toBe(0);
     for (const other of views.slice(1)) {
       expect(other).toEqual({ x: 0, y: 0, k: 1 });
     }
