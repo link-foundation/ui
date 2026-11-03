@@ -254,3 +254,25 @@ describe('readStyles: diagnostics', () => {
     expect(anonymous.rules[0].id).toBe('style-1');
   });
 });
+
+it('keeps min-width media features separate from minimum target declarations', () => {
+  const result = readStyles(`target: style
+  selector
+    type button
+  min-width 44px
+  min-height 44px
+  media
+    min-width 40rem
+    opacity 0.5
+    min-width 48px
+`);
+  expect(result.diagnostics).toEqual([]);
+  expect(result.rules[0].declarations.map((d) => d.property)).toEqual([
+    'min-width',
+    'min-height',
+  ]);
+  expect(result.rules[0].blocks[0].condition[0].feature).toBe('min-width');
+  expect(
+    result.rules[0].blocks[0].rule.declarations.map((d) => d.property)
+  ).toEqual(['opacity', 'min-width']);
+});

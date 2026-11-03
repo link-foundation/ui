@@ -1,0 +1,3 @@
+hig: theme
+  extends hig-colors hig-type hig-shape hig-spacing hig-motion hig-materials hig-styles hig-templates
+  transparency on

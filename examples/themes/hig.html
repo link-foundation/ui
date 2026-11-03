@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="data:," />
+    <title>HIG-guided themes</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "@floating-ui/dom": "/node_modules/@floating-ui/dom/dist/floating-ui.dom.browser.mjs",
+          "@floating-ui/core": "/node_modules/@floating-ui/core/dist/floating-ui.core.browser.mjs",
+          "@link-foundation/ui-config": "/packages/ui-config/src/index.js",
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "@link-foundation/ui-store": "/packages/ui-store/src/index.js",
+          "@link-foundation/ui-style": "/packages/ui-style/src/index.js",
+          "@link-foundation/ui-tokens": "/packages/ui-tokens/src/index.js",
+          "@link-foundation/ui-tokens/themes": "/packages/ui-tokens/src/themes/index.js",
+          "@link-foundation/ui-themes": "/packages/ui-themes/src/index.js",
+          "@link-foundation/ui-dom": "/packages/ui-dom/src/index.js",
+          "links-notation": "/node_modules/links-notation/dist/index.js"
+        }
+      }
+    </script>
+    <link
+      rel="stylesheet"
+      href="../../packages/ui-components/src/controls/styles.css"
+    />
+    <link rel="stylesheet" href="./hig.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Make yourself at home</h1>
+      <p>HIG-guided themes · system fonts · accessible controls</p>
+      <p>Independent design, not affiliated with or endorsed by Apple.</p>
+      <div id="gallery"></div>
+    </main>
+    <script type="module" src="./hig.js"></script>
+  </body>
+</html>

@@ -1,3 +1,4 @@
+import { themeExtrasCss } from './extras-css.js';
 import { values } from '@link-foundation/ui-core';
 import { compileCss } from '@link-foundation/ui-style';
 import { toCss } from '../export/css.js';
@@ -175,10 +176,13 @@ export function compileThemeCss(theme, options = {}) {
   // @scope's lower boundary stops an outer theme's style rules at nested themes.
   const style = compileCss(theme.styles, {
     prefix: options.prefix,
-    scope: `:where(${root})`,
+    scope: ':scope',
+    transparency: options.transparency,
+    reducedTransparency: options.reducedTransparency,
   });
   if (style) {
     css.push(`@scope (${root}) to (:scope [data-theme]) {\n${style}\n}`);
   }
+  css.push(themeExtrasCss(theme, root, options));
   return css.join('\n');
 }

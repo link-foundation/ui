@@ -1,0 +1,5 @@
+hig-macos: theme
+  extends hig
+  token text.base.size .8125rem
+  token size.control.height 32px
+  token size.list-row.height 36px

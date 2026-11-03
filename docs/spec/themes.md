@@ -86,3 +86,17 @@ choices is the host application's responsibility.
 Its `mode` modifier has eight complete contexts for the combined scheme,
 contrast and motion states, so overlapping token overrides stay deterministic.
 The test validates against a vendored copy of the official current schema.
+
+HIG theme extensions use `material regular`, `material thin` or `material thick`
+on elements and style rules. The compiler emits an opaque surface, with blur
+only under supported backdrop filtering, normal transparency and normal forced
+colours. `compileThemeCss`/`compileCss` accept `transparency: 'off'` and
+`reducedTransparency: true` to omit translucent rules. The DOM mirrors
+`material`, `text-style` and `appearance` for scoped theme selectors.
+
+`token motion.spring.default` accepts a nested `spring` value with `response`
+(seconds in (0,10]) and `damping` (ratio in (0,1)). These theme-specific values
+are exposed as `theme.springs` metadata and compiled to bounded CSS `linear()`
+samples; they are separate from DTCG primitive tokens. Themes with
+`text.base.size` use their `text.<style>.size` rem ratios and weights on
+`ui-text[text-style]`, with base size controlling platform density.

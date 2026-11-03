@@ -1,0 +1,76 @@
+demo-content: stack
+  gap 16px
+  demo-body: text 'Make yourself at home.'
+    text-style body
+  demo-caption: text 'System fonts, your preferred size.'
+    text-style caption-1
+  demo-buttons: stack
+    direction horizontal
+    gap 8px
+    demo-bordered: button Bordered
+      variant bordered
+    demo-borderless: button Borderless
+      variant borderless
+    demo-prominent: button Continue
+      variant prominent
+  demo-toggle: switch
+    label 'Allow notifications'
+    checked true
+  demo-name: text-field
+    label Name
+    value Ada
+  demo-slider: slider
+    label Volume
+    min 0
+    max 100
+    value 40
+  demo-stepper: stack
+    direction horizontal
+    gap 8px
+    demo-decrease: button '−'
+      label 'Decrease guests'
+      variant bordered
+      on press
+        emit decrease
+    demo-guests: number-field
+      label Guests
+      min 0
+      max 10
+      value 2
+    demo-increase: button '+'
+      label 'Increase guests'
+      variant bordered
+      on press
+        emit increase
+  demo-segments: radio-group
+    label View
+    appearance segmented
+    value day
+    demo-day: radio Day
+      value day
+    demo-week: radio Week
+      value week
+    demo-month: radio Month
+      value month
+  demo-picker: select
+    label Destination
+    value coast
+    demo-coast: option Coast
+      value coast
+    demo-hills: option Hills
+      value hills
+  demo-materials: stack
+    direction horizontal
+    gap 8px
+    demo-regular: stack
+      material regular
+      padding 16px
+      demo-regular-text: text Regular
+    demo-thin: stack
+      material thin
+      padding 16px
+      demo-thin-text: text Thin
+    demo-thick: stack
+      material thick
+      padding 16px
+      demo-thick-text: text Thick

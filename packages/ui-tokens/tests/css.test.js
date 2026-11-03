@@ -76,3 +76,15 @@ describe('toCss: every type and the options', () => {
     expect(cssVariable('space.2xl', 'md')).toBe('--md-space-2xl');
   });
 });
+
+describe('quoted system font stacks', () => {
+  it('exports the comma-separated stack as individual system families', () => {
+    const tokens = resolveText(
+      "system: theme\n  token font.family.text 'system-ui, -apple-system, BlinkMacSystemFont, sans-serif'",
+      'system'
+    );
+    expect(toCss(tokens)).toContain(
+      '--font-family-text: system-ui, "-apple-system", "BlinkMacSystemFont", sans-serif;'
+    );
+  });
+});
