@@ -2,10 +2,12 @@ import js from '@eslint/js';
 import prettierConfig from 'eslint-config-prettier';
 import prettierPlugin from 'eslint-plugin-prettier';
 import noChangelogCommentsRule from './eslint-rules/no-changelog-comments.js';
+import noModuleStateRule from './eslint-rules/no-module-state.js';
 
 const localPlugin = {
   rules: {
     'no-changelog-comments': noChangelogCommentsRule,
+    'no-module-state': noModuleStateRule,
   },
 };
 
@@ -106,8 +108,12 @@ export default [
     },
   },
   {
-    // The ui-dom example page runs in the browser only.
-    files: ['examples/ui-dom/**/*.js'],
+    // The ui-dom, ui-animation and package example pages run in the browser only.
+    files: [
+      'examples/ui-dom/**/*.js',
+      'examples/animation/**/*.js',
+      'packages/*/examples/**/*.{js,mjs}',
+    ],
     languageOptions: {
       globals: {
         document: 'readonly',
@@ -117,9 +123,33 @@ export default [
     },
   },
   {
+    // The links-view modules keep no state of their own: every instance
+    // (element, zoom, animator) owns its state, so two views never share it.
+    files: ['packages/ui-components/src/links-view/**/*.js'],
+    rules: {
+      'local/no-module-state': 'error',
+    },
+  },
+  {
+    // Package demo pages (such as the icon gallery) run in the browser only.
+    files: ['packages/*/examples/**/*.js'],
+    languageOptions: {
+      globals: {
+        document: 'readonly',
+        window: 'readonly',
+        location: 'readonly',
+        CSS: 'readonly',
+      },
+    },
+  },
+  {
     // Playwright UI tests: callbacks passed to page.evaluate run in the
     // browser, so browser globals are available there.
-    files: ['**/*.e2e.mjs', 'tests/e2e/**/*.spec.js'],
+    files: [
+      '**/*.e2e.mjs',
+      'tests/e2e/**/*.spec.js',
+      'packages/*/tests/e2e/**/*.spec.js',
+    ],
     languageOptions: {
       globals: {
         document: 'readonly',
@@ -154,6 +184,17 @@ export default [
             'No regular expressions in src/html/: read HTML with parse5 or the DOM.',
         },
       ],
+    },
+  },
+  {
+    // Behaviour is data: an action or guard name selects a registered
+    // function and is never evaluated, so no source file may turn text
+    // into code (tests/behavior/lint-rules.test.js checks the rules).
+    files: ['packages/ui-components/src/**/*.js'],
+    rules: {
+      'no-eval': 'error',
+      'no-new-func': 'error',
+      'no-implied-eval': 'error',
     },
   },
   {

@@ -1,0 +1,9 @@
+(links-model: diagram
+  (kind class)
+  (direction right)
+  (renderer mermaid)
+  (link: node (label 'Link'))
+  (doublet: node (label 'Doublet'))
+  (triplet: node (label 'Triplet'))
+  (edge (from doublet) (to link) (label 'is a'))
+  (edge (from triplet) (to link) (label 'is a')))

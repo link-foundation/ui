@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'test-anywhere';
 import { spawnSync } from 'node:child_process';
 import {
+  existsSync,
   mkdtempSync,
   mkdirSync,
   readFileSync,
@@ -101,15 +102,48 @@ describe('shared static server', () => {
     const served = normaliseMounts(defaultMounts(repoRoot));
     for (const [url, file] of [
       ['/examples/ui-dom/', 'examples/ui-dom/index.html'],
+      ['/examples/animation/', 'examples/animation/index.html'],
+      [
+        '/packages/ui-animation/src/index.js',
+        'packages/ui-animation/src/index.js',
+      ],
       ['/packages/ui-dom/src/index.js', 'packages/ui-dom/src/index.js'],
+      [
+        '/packages/ui-components/examples/layout.html',
+        'packages/ui-components/examples/layout.html',
+      ],
       ['/packages/ui-core/src/index.js', 'packages/ui-core/src/index.js'],
       [
         '/node_modules/links-notation/dist/index.js',
         'node_modules/links-notation/dist/index.js',
       ],
       [
+        '/packages/ui-components/examples/charts.html',
+        'packages/ui-components/examples/charts.html',
+      ],
+      [
+        '/node_modules/d3-scale/src/index.js',
+        'node_modules/d3-scale/src/index.js',
+      ],
+      [
+        '/node_modules/d3-shape/src/index.js',
+        'node_modules/d3-shape/src/index.js',
+      ],
+      [
+        '/node_modules/echarts/dist/echarts.esm.min.mjs',
+        'node_modules/echarts/dist/echarts.esm.min.mjs',
+      ],
+      [
         '/docs/case-studies/issue-1/samples/document.lino',
         'docs/case-studies/issue-1/samples/document.lino',
+      ],
+      [
+        '/packages/ui-components/examples/link-view.html',
+        'packages/ui-components/examples/link-view.html',
+      ],
+      [
+        '/packages/ui-components/src/index.js',
+        'packages/ui-components/src/index.js',
       ],
     ]) {
       expect(resolveRequestPath(served, url)).toEqual({
@@ -117,9 +151,71 @@ describe('shared static server', () => {
         file: path.resolve(repoRoot, file),
       });
     }
-    // Only src/ of a package is served, not its tests or package.json.
+    // Only src/ and examples/ of a package are served, not its tests or
+    // package.json.
+    expect(
+      resolveRequestPath(
+        served,
+        '/packages/ui-components/tests/icons/helpers.js'
+      ).status
+    ).toBe(404);
     expect(
       resolveRequestPath(served, '/packages/ui-dom/package.json').status
+    ).toBe(404);
+  });
+
+  it('serves package examples and build output (the icon gallery)', () => {
+    const mounted = defaultMounts(repoRoot).map((mount) => mount.prefix);
+    expect(mounted).toContain('/packages/ui-components/examples/');
+    const served = normaliseMounts(defaultMounts(repoRoot));
+    expect(
+      resolveRequestPath(served, '/packages/ui-components/examples/icons.html')
+    ).toEqual({
+      status: 200,
+      file: path.resolve(
+        repoRoot,
+        'packages/ui-components/examples/icons.html'
+      ),
+    });
+    // dist/ (the output of `node scripts/build-icons.mjs`) is mounted
+    // when it exists.
+    const dist = path.join(repoRoot, 'packages/ui-components/dist');
+    expect(mounted.includes('/packages/ui-components/dist/')).toBe(
+      existsSync(dist)
+    );
+  });
+
+  it('serves the diagrams example with Dagre and the lazily loaded Mermaid', () => {
+    const served = normaliseMounts(defaultMounts(repoRoot));
+    for (const [url, file] of [
+      [
+        '/packages/ui-components/examples/diagrams.html',
+        'packages/ui-components/examples/diagrams.html',
+      ],
+      [
+        '/packages/ui-components/src/index.js',
+        'packages/ui-components/src/index.js',
+      ],
+      [
+        '/node_modules/@dagrejs/dagre/dist/dagre.esm.js',
+        'node_modules/@dagrejs/dagre/dist/dagre.esm.js',
+      ],
+      [
+        '/node_modules/mermaid/dist/mermaid.esm.min.mjs',
+        'node_modules/mermaid/dist/mermaid.esm.min.mjs',
+      ],
+    ]) {
+      expect(resolveRequestPath(served, url)).toEqual({
+        status: 200,
+        file: path.resolve(repoRoot, file),
+      });
+    }
+    // The tests and fixtures of a package stay unserved.
+    expect(
+      resolveRequestPath(
+        served,
+        '/packages/ui-components/tests/diagrams/fixtures/login-flow.lino'
+      ).status
     ).toBe(404);
   });
 
@@ -158,19 +254,21 @@ describe('Playwright e2e files stay out of unit test runners', () => {
     'utf8'
   );
 
-  it('discovers *.e2e.mjs in tests/ui and packages/*/e2e, *.spec.js in tests/e2e', () => {
+  it('discovers *.e2e.mjs in tests/ui and packages/*/e2e, *.spec.js in tests/e2e and packages/*/tests/e2e', () => {
     for (const pattern of [
       "'tests/ui/**/*.e2e.mjs'",
       "'packages/*/e2e/**/*.e2e.mjs'",
       "'tests/e2e/**/*.spec.js'",
+      "'packages/*/tests/e2e/**/*.spec.js'",
     ]) {
       expect(config).toContain(pattern);
     }
   });
 
-  it('keeps tests/e2e specs out of bun test', () => {
+  it('keeps tests/e2e and packages/*/tests/e2e specs out of bun test', () => {
     const bunfig = readFileSync(path.join(repoRoot, 'bunfig.toml'), 'utf8');
     expect(bunfig).toContain('"tests/e2e/**"');
+    expect(bunfig).toContain('"packages/*/tests/e2e/**"');
   });
 
   it('uses a suffix that node, bun and deno default patterns do not match', () => {

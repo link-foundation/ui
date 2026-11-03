@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Diagrams written in Links Notation</title>
+    <!--
+      No bundler: the package loads as ES modules from its src/ folder.
+      Serve the repository with `node scripts/serve-static.mjs` and open
+      http://127.0.0.1:4173/packages/ui-components/examples/diagrams.html
+      (add ?mermaid to draw the Mermaid examples at once).
+
+      Mermaid is only downloaded when a Mermaid diagram is shown: press
+      "Show the Mermaid examples" and watch the network panel.
+    -->
+    <script type="importmap">
+      {
+        "imports": {
+          "@link-foundation/ui-components": "/packages/ui-components/src/diagrams/index.js",
+          "links-notation": "/node_modules/links-notation/dist/index.js",
+          "@dagrejs/dagre": "/node_modules/@dagrejs/dagre/dist/dagre.esm.js",
+          "mermaid": "/node_modules/mermaid/dist/mermaid.esm.min.mjs"
+        }
+      }
+    </script>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --color-surface: #fffbfe;
+        --color-on-surface: #1d1b20;
+        --color-on-surface-variant: #49454f;
+        --color-surface-container: #f3edf7;
+        --color-outline: #79747e;
+        --color-primary: #6750a4;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --color-surface: #141218;
+          --color-on-surface: #e6e0e9;
+          --color-on-surface-variant: #cac4d0;
+          --color-surface-container: #211f26;
+          --color-outline: #938f99;
+          --color-primary: #d0bcff;
+        }
+      }
+      body {
+        margin: 0;
+        padding: 24px;
+        font-family: system-ui, sans-serif;
+        color: var(--color-on-surface);
+        background: var(--color-surface);
+      }
+      section {
+        margin-block: 24px;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 24px;
+        align-items: flex-start;
+      }
+      ui-diagram,
+      ui-mermaid-view {
+        display: block;
+        max-width: 100%;
+        overflow-x: auto;
+      }
+      .ui-diagram-source {
+        margin: 0;
+        padding: 12px;
+        border: 1px solid var(--color-outline);
+        border-radius: 8px;
+        background: var(--color-surface-container);
+        white-space: pre-wrap;
+      }
+      .ui-diagram-error {
+        margin: 0 0 8px;
+        font-weight: 600;
+      }
+      button {
+        font: inherit;
+        padding: 8px 16px;
+      }
+      #mermaid-examples[hidden] {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Diagrams written in Links Notation</h1>
+      <p>
+        A <code>diagram</code> link with <code>node</code>,
+        <code>edge</code> and <code>group</code> links, laid out by Dagre and
+        drawn by our SVG renderer. Every drawing is followed by a list of its
+        nodes and connections for screen readers.
+      </p>
+
+      <section aria-labelledby="ours">
+        <h2 id="ours">Drawn by our SVG renderer</h2>
+        <div class="row">
+          <!-- prettier-ignore -->
+          <ui-diagram id="login-svg">
+            (login-flow: diagram
+              (kind flowchart)
+              (direction down)
+              (start: node (label Start))
+              (check: node (label 'Signed in?') (shape diamond))
+              (home: node (label Home))
+              (edge (from start) (to check))
+              (edge (from check) (to home) (label yes)))
+          </ui-diagram>
+          <!-- prettier-ignore -->
+          <ui-diagram id="order-state">
+            (order: diagram
+              (kind state)
+              (direction right)
+              (label 'Order lifecycle')
+              (active: group (label Active))
+              (begin: node (shape start))
+              (cart: node (label 'In cart') (group active))
+              (paid: node (label Paid) (shape stadium) (group active))
+              (shipped: node (label Shipped))
+              (done: node (shape end))
+              (edge (from begin) (to cart))
+              (edge (from cart) (to paid) (label 'check out'))
+              (edge (from paid) (to shipped))
+              (edge (from shipped) (to done)))
+          </ui-diagram>
+        </div>
+      </section>
+
+      <section aria-labelledby="mermaid">
+        <h2 id="mermaid">Drawn by Mermaid, on demand</h2>
+        <p>
+          <code>(renderer mermaid)</code>, the <code>renderer</code> attribute
+          and the sequence and class kinds use Mermaid, imported the first time
+          such a diagram is shown. If Mermaid cannot be loaded, the source text
+          is shown with an error.
+        </p>
+        <button
+          id="show-mermaid"
+          type="button"
+          aria-controls="mermaid-examples"
+        >
+          Show the Mermaid examples
+        </button>
+        <div id="mermaid-examples" class="row" hidden></div>
+      </section>
+    </main>
+
+    <!-- prettier-ignore -->
+    <template id="mermaid-template">
+      <ui-diagram id="login-mermaid" renderer="mermaid">
+        (login-flow: diagram
+          (kind flowchart)
+          (direction down)
+          (start: node (label Start))
+          (check: node (label 'Signed in?') (shape diamond))
+          (home: node (label Home))
+          (edge (from start) (to check))
+          (edge (from check) (to home) (label yes)))
+      </ui-diagram>
+      <ui-diagram id="sign-in-sequence">
+        (sign-in: diagram
+          (kind sequence)
+          (user: node (label User))
+          (app: node (label App))
+          (edge (from user) (to app) (label 'types a password'))
+          (edge (from app) (to user) (label 'shows home')))
+      </ui-diagram>
+      <ui-mermaid-view id="raw-mermaid" label="A raw Mermaid flowchart">
+        flowchart LR
+          links[Links] --> notation[Notation]
+      </ui-mermaid-view>
+    </template>
+
+    <script type="module">
+      import { defineDiagram } from '@link-foundation/ui-components';
+
+      defineDiagram();
+
+      // data-ready: every diagram on the page left the loading state (the
+      // Playwright tests wait for it).
+      function markReady() {
+        const pending = [
+          ...document.querySelectorAll('ui-diagram, ui-mermaid-view'),
+        ].filter((element) => {
+          const state = element.dataset.state;
+          return state === undefined || state === 'loading';
+        });
+        document.body.dataset.ready = String(pending.length === 0);
+      }
+      document.addEventListener('ui-diagram-state', markReady);
+      markReady();
+
+      const button = document.getElementById('show-mermaid');
+      const examples = document.getElementById('mermaid-examples');
+      function showMermaid() {
+        if (!examples.hidden) {
+          return;
+        }
+        examples.append(
+          document.getElementById('mermaid-template').content.cloneNode(true)
+        );
+        examples.hidden = false;
+        button.disabled = true;
+        markReady();
+      }
+      button.addEventListener('click', showMermaid);
+      if (new URLSearchParams(location.search).has('mermaid')) {
+        showMermaid();
+      }
+    </script>
+  </body>
+</html>

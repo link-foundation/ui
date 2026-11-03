@@ -1,0 +1,21 @@
+(regions: chart
+  (title 'Sales by region')
+  (description 'Stacked monthly sales of the North and South regions in the first half of 2026')
+  (data
+    (row (month 2026-01) (region North) (value 7))
+    (row (month 2026-01) (region South) (value 5))
+    (row (month 2026-02) (region North) (value 9))
+    (row (month 2026-02) (region South) (value 9))
+    (row (month 2026-03) (region North) (value 8))
+    (row (month 2026-03) (region South) (value 7))
+    (row (month 2026-04) (region North) (value 12))
+    (row (month 2026-04) (region South) (value 9))
+    (row (month 2026-05) (region North) (value 14))
+    (row (month 2026-05) (region South) (value 11))
+    (row (month 2026-06) (region North) (value 17))
+    (row (month 2026-06) (region South) (value 13)))
+  (mark area (interpolate monotone))
+  (encoding
+    (x (field month) (type temporal))
+    (y (field value) (type quantitative))
+    (color (field region) (type nominal))))

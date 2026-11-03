@@ -23,7 +23,7 @@ jobs:
   licensing:
     name: Asset records and REUSE
     runs-on: ubuntu-24.04
-    # Typical run: <1min (npm ci, two node scripts, reuse lint). 10min stops
+    # Typical run: <1min (npm ci, three node scripts, reuse lint). 10min stops
     # a hung pipx download from blocking the run.
     timeout-minutes: 10
     concurrency:
@@ -49,6 +49,11 @@ jobs:
 
       - name: Check assets/ATTRIBUTIONS.md is up to date
         run: node scripts/render-attributions.mjs --check
+
+      # Every used icon has a record with an allowed licence, no source is on
+      # the avoid list, and src/icons/own-icons.js matches assets/icons/own/.
+      - name: Check icon records and the own icon module
+        run: node scripts/build-icons.mjs --check
 
       # reuse is GPL-3.0: it runs in CI only and is never shipped or imported.
       - name: REUSE lint
