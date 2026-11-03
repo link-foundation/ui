@@ -18,7 +18,7 @@ import {
 
 const { defineComponent, h, nextTick, ref } = Vue;
 const { mount } = TestUtils;
-const { UiView } = UiVue;
+const { UiView, useUiProp } = UiVue;
 
 useDom();
 
@@ -115,18 +115,32 @@ describe('UiView', () => {
     expect(second.listenerCount()).toBe(0);
   });
 
-  it('leaves no store listeners and no ui-* nodes after 100 mounts', () => {
+  it('leaves no store listeners and no ui-* nodes after 100 mounts', async () => {
     const store = countedStore(sample('document'));
+    store.insert('app', undefined, {
+      id: 'sales',
+      kind: 'chart',
+      properties: [{ name: 'title', values: ['Q1'] }],
+    });
+    // A teleported component with a store listener of its own.
     const Chart = defineComponent({
       props: { id: String },
-      setup: (props) => () => h('span', props.id),
+      setup(props) {
+        const title = useUiProp(() => props.id, 'title');
+        return () => h('span', { class: 'chart' }, title.value?.[0]);
+      },
     });
     for (let i = 0; i < 100; i += 1) {
       const wrapper = mount(UiView, {
         props: { store, components: { chart: Chart } },
         attachTo: container(),
       });
-      expect(store.listenerCount()).toBe(1);
+      await nextTick();
+      expect(
+        wrapper.find('ui-vue-host[data-link-id="sales"] .chart').text()
+      ).toBe('Q1');
+      // The view's listener and the chart's useUiProp listener.
+      expect(store.listenerCount()).toBe(2);
       wrapper.unmount();
     }
     expect(store.listenerCount()).toBe(0);
