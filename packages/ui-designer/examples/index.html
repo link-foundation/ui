@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Links UI designer</title>
+    <!--
+      No bundler: the workspace packages load as ES modules from their src/
+      folders. Serve the repository with `node scripts/serve-static.mjs` and
+      open http://127.0.0.1:4173/packages/ui-designer/examples/index.html
+    -->
+    <script type="importmap">
+      {
+        "imports": {
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "@link-foundation/ui-store": "/packages/ui-store/src/index.js",
+          "@link-foundation/ui-style": "/packages/ui-style/src/index.js",
+          "@link-foundation/ui-tokens": "/packages/ui-tokens/src/index.js",
+          "@link-foundation/ui-tokens/themes": "/packages/ui-tokens/src/themes/index.js",
+          "@link-foundation/ui-dom": "/packages/ui-dom/src/index.js",
+          "@link-foundation/ui-components/layout": "/packages/ui-components/src/layout/index.js",
+          "@link-foundation/ui-core/source": "/packages/ui-core/src/source.js",
+          "@link-foundation/ui-config": "/packages/ui-config/src/index.js",
+          "@link-foundation/ui-devmode": "/packages/ui-devmode/src/index.js",
+          "@link-foundation/ui-devmode/model": "/packages/ui-devmode/src/model.js",
+          "@link-foundation/ui-devmode/views": "/packages/ui-devmode/src/views.js",
+          "@link-foundation/ui-devmode/overlay": "/packages/ui-devmode/src/overlay.js",
+          "@link-foundation/ui-components/controls": "/packages/ui-components/src/controls/index.js",
+          "@floating-ui/core": "/node_modules/@floating-ui/core/dist/floating-ui.core.browser.mjs",
+          "@floating-ui/dom": "/node_modules/@floating-ui/dom/dist/floating-ui.dom.browser.mjs",
+          "links-notation": "/node_modules/links-notation/dist/index.js",
+          "@marijn/find-cluster-break": "/node_modules/@marijn/find-cluster-break/src/index.js",
+          "@codemirror/commands": "/node_modules/@codemirror/commands/dist/index.js",
+          "@codemirror/language": "/node_modules/@codemirror/language/dist/index.js",
+          "@codemirror/state": "/node_modules/@codemirror/state/dist/index.js",
+          "@codemirror/streamparser": "/node_modules/@codemirror/streamparser/dist/index.js",
+          "@codemirror/view": "/node_modules/@codemirror/view/dist/index.js",
+          "crelt": "/node_modules/crelt/index.js",
+          "style-mod": "/node_modules/style-mod/src/style-mod.js",
+          "w3c-keyname": "/node_modules/w3c-keyname/index.js",
+          "@lezer/common": "/node_modules/@lezer/common/dist/index.js",
+          "@lezer/highlight": "/node_modules/@lezer/highlight/dist/index.js",
+          "@lezer/lr": "/node_modules/@lezer/lr/dist/index.js",
+          "@codemirror/lang-css": "/node_modules/@codemirror/lang-css/dist/index.js",
+          "@codemirror/autocomplete": "/node_modules/@codemirror/autocomplete/dist/index.js",
+          "@lezer/css": "/node_modules/@lezer/css/dist/index.js",
+          "@codemirror/lang-javascript": "/node_modules/@codemirror/lang-javascript/dist/index.js",
+          "@codemirror/lint": "/node_modules/@codemirror/lint/dist/index.js",
+          "@lezer/javascript": "/node_modules/@lezer/javascript/dist/index.js",
+          "@codemirror/lang-json": "/node_modules/@codemirror/lang-json/dist/index.js",
+          "@lezer/json": "/node_modules/@lezer/json/dist/index.js",
+          "@codemirror/lang-markdown": "/node_modules/@codemirror/lang-markdown/dist/index.js",
+          "@codemirror/lang-html": "/node_modules/@codemirror/lang-html/dist/index.js",
+          "@lezer/html": "/node_modules/@lezer/html/dist/index.js",
+          "@lezer/markdown": "/node_modules/@lezer/markdown/dist/index.js",
+          "@floating-ui/utils": "/node_modules/@floating-ui/utils/dist/floating-ui.utils.mjs",
+          "@floating-ui/utils/dom": "/node_modules/@floating-ui/utils/dist/floating-ui.utils.dom.mjs",
+          "@link-foundation/ui-components/editor": "/packages/ui-components/src/editor/index.js"
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="../../ui-components/src/layout/layout.css" />
+    <link rel="stylesheet" href="../../ui-components/src/controls/styles.css" />
+    <link rel="stylesheet" href="../../ui-components/src/editor/editor.css" />
+    <link rel="stylesheet" href="../src/designer.css" />
+    <style>
+      body {
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <main id="app" aria-label="Links UI designer"></main>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

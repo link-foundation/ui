@@ -33,6 +33,8 @@ const KEEP = [
   'packages/ui-core/README.md',
   // Reader fixtures of ui-core in the one-line, multi-line and mixed forms.
   'packages/ui-core/tests/fixtures/',
+  // Designer preservation fixtures intentionally exercise the reader's inline form.
+  'packages/ui-designer/tests/fixtures/inline.',
   // Converter fixtures deliberately compare equivalent parser forms.
   'packages/ui-components/tests/links-view/fixtures/',
   // Probes keep the text they probed.

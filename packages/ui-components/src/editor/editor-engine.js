@@ -3,6 +3,7 @@
  * @typedef {object} EditorEngine
  * @property {(document: {id: string, text: string, language: string}) => (void|Promise<void>)} setDocument
  * @property {(diagnostics: object[]) => void} setDiagnostics
+ * @property {(readOnly: boolean) => void} setReadOnly
  * @property {(offset?: number) => void} focus
  * @property {() => void} destroy
  */

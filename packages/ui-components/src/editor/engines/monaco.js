@@ -152,6 +152,9 @@ export async function createMonacoEngine(
     }
   });
   return {
+    setReadOnly(readOnly) {
+      editor.updateOptions({ readOnly, domReadOnly: readOnly });
+    },
     setDocument(doc) {
       applying = true;
       try {

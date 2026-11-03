@@ -29,7 +29,10 @@ export function applyEvents(tree, events, report) {
         }
         break;
       case 'update':
-        ok = tree.update(event.id, event.props ?? [], [event.prop]);
+        ok =
+          event.prop === undefined
+            ? tree.updatePositional(event.id, event.after)
+            : tree.update(event.id, event.props ?? [], [event.prop]);
         break;
       case 'move':
         ok = tree.move(

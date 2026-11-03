@@ -181,3 +181,17 @@ Owner: #44 for the kind as declared. Deciding the core vocabulary is left to
 a later dialect version. v0 rule: documents that use `(icon ...)` are parsed
 with `iconVocabulary()`. With the default vocabulary, `icon` is an unknown
 kind and a warning is reported.
+
+## Designer geometry
+
+`@link-foundation/ui-designer` (#56) needs explicit size and pixel positioning
+for resize handles, nudging and snaplines. The core vocabulary has no general
+geometry properties. Its `designerVocabulary()` extends the layout vocabulary
+with `x` and `y` (`number`, CSS pixels) and `width` and `height` (`dimension`)
+on visual elements. The designer canvas renders x/y as translation relative to
+the element's flow position, and width/height as explicit dimensions.
+
+Should a later dialect version adopt these properties, or represent geometry
+through named style links? Owner: the geometry/style dialect. v0 rule: parse
+designer documents with `designerVocabulary()`; other renderers retain the
+extension as unknown properties until they opt into that vocabulary.

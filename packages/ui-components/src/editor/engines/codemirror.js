@@ -87,6 +87,10 @@ export async function createCodeMirrorEngine(
   let current = null;
   let revision = 0;
   let destroyed = false;
+  let readOnly = false;
+  const access = new state.Compartment();
+  // Keep the DOM focusable and copyable in Safari; the state facet blocks input.
+  const accessExtensions = () => EditorState.readOnly.of(readOnly);
   const lino = ViewPlugin.fromClass(
     class {
       constructor(view) {
@@ -108,7 +112,8 @@ export async function createCodeMirrorEngine(
       ...language.foldKeymap,
       commands.indentWithTab,
     ]),
-    EditorView.contentAttributes.of({ 'aria-label': label }),
+    EditorView.contentAttributes.of({ 'aria-label': label, tabindex: '0' }),
+    access.of(accessExtensions()),
     EditorView.lineWrapping,
     viewApi.lineNumbers(),
     language.foldGutter(),
@@ -128,7 +133,14 @@ export async function createCodeMirrorEngine(
     parent,
     state: EditorState.create({ extensions: base }),
   });
+  function setReadOnly(enabled) {
+    readOnly = enabled;
+    if (view.state.facet(EditorState.readOnly) !== enabled) {
+      view.dispatch({ effects: access.reconfigure(accessExtensions()) });
+    }
+  }
   return {
+    setReadOnly,
     async setDocument(doc) {
       if (
         current?.id === doc.id &&
@@ -172,6 +184,7 @@ export async function createCodeMirrorEngine(
           ? previous.state
           : EditorState.create({ doc: doc.text, extensions: [...base, extras] })
       );
+      setReadOnly(readOnly);
     },
     setDiagnostics(diagnostics) {
       const text = view.state.doc.toString();
