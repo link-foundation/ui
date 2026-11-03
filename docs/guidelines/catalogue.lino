@@ -1,38 +1,571 @@
-(button: component-entry (group actions) (open-ui Button) (open-ui-url 'https://open-ui.org/components/button') (aria button) (apg 'https://www.w3.org/WAI/ARIA/apg/patterns/button/') (material3 Buttons) (material3-url 'https://m3.material.io/components/buttons') (fluent Button) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/button/usage') (hig Buttons) (hig-url 'https://developer.apple.com/design/human-interface-guidelines/buttons') (mui Button) (mui-url 'https://mui.com/material-ui/react-button/') (keyboard 'Enter or Space activates; focus stays on the button.') (owner '#34'))
-(icon-button: component-entry (group actions) (open-ui Button) (open-ui-url 'https://open-ui.org/components/button') (aria button) (apg 'https://www.w3.org/WAI/ARIA/apg/patterns/button/') (material3 'Icon buttons') (material3-url 'https://m3.material.io/components/icon-buttons') (fluent Button) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/button/usage') (hig Buttons) (hig-url 'https://developer.apple.com/design/human-interface-guidelines/buttons') (mui IconButton) (mui-url 'https://mui.com/material-ui/react-button/') (keyboard 'Same as button; needs an accessible name because there is no visible text.') (owner '#34'))
-(toggle-button: component-entry (group actions) (open-ui Button) (open-ui-url 'https://open-ui.org/components/button') (aria 'button (aria-pressed)') (apg 'https://www.w3.org/WAI/ARIA/apg/patterns/button/') (material3 Buttons) (material3-url 'https://m3.material.io/components/buttons') (fluent ToggleButton) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/button/usage') (hig Toggles) (hig-url 'https://developer.apple.com/design/human-interface-guidelines/toggles') (mui ToggleButton) (mui-url 'https://mui.com/material-ui/react-toggle-button/') (keyboard 'Enter or Space flips the pressed state.') (owner '#34'))
-(link: component-entry (group actions) (open-ui '—') (aria link) (apg 'https://www.w3.org/WAI/ARIA/apg/patterns/link/') (material3 '—') (fluent Link) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/link/usage') (hig '—') (mui Link) (mui-url 'https://mui.com/material-ui/react-link/') (keyboard 'Enter follows the link; Space does not.') (owner '#34'))
-(checkbox: component-entry (group selection) (open-ui Checkbox) (open-ui-url 'https://open-ui.org/components/checkbox') (aria checkbox) (apg 'https://www.w3.org/WAI/ARIA/apg/patterns/checkbox/') (material3 Checkbox) (material3-url 'https://m3.material.io/components/checkbox') (fluent Checkbox) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/checkbox/usage') (hig Toggles) (hig-url 'https://developer.apple.com/design/human-interface-guidelines/toggles') (mui Checkbox) (mui-url 'https://mui.com/material-ui/react-checkbox/') (keyboard 'Space toggles the checked state.') (owner '#34'))
-(radio-group: component-entry (group selection) (open-ui 'Radio button') (open-ui-url 'https://open-ui.org/components/radio-button.research') (aria radiogroup) (apg 'https://www.w3.org/WAI/ARIA/apg/patterns/radio/') (material3 'Radio button') (material3-url 'https://m3.material.io/components/radio-button') (fluent RadioGroup) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/radiogroup/usage') (hig '—') (mui RadioGroup) (mui-url 'https://mui.com/material-ui/react-radio-button/') (keyboard 'Tab enters the group; arrow keys move and select; Space selects.') (owner '#34'))
-(switch: component-entry (group selection) (open-ui Switch) (open-ui-url 'https://open-ui.org/components/switch') (aria switch) (apg 'https://www.w3.org/WAI/ARIA/apg/patterns/switch/') (material3 Switch) (material3-url 'https://m3.material.io/components/switch') (fluent Switch) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/switch/usage') (hig Toggles) (hig-url 'https://developer.apple.com/design/human-interface-guidelines/toggles') (mui Switch) (mui-url 'https://mui.com/material-ui/react-switch/') (keyboard 'Space flips between on and off.') (owner '#34'))
-(slider: component-entry (group selection) (open-ui Slider) (open-ui-url 'https://open-ui.org/components/slider.research') (aria slider) (apg 'https://www.w3.org/WAI/ARIA/apg/patterns/slider/') (material3 Sliders) (material3-url 'https://m3.material.io/components/sliders') (fluent Slider) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/slider/usage') (hig Sliders) (hig-url 'https://developer.apple.com/design/human-interface-guidelines/sliders') (mui Slider) (mui-url 'https://mui.com/material-ui/react-slider/') (keyboard 'Arrows nudge the value; Page keys jump; Home and End reach limits.') (owner '#34'))
-(select: component-entry (group selection) (open-ui Select) (open-ui-url 'https://open-ui.org/components/select.research') (aria 'combobox (select-only)') (apg 'https://www.w3.org/WAI/ARIA/apg/patterns/combobox/') (material3 Menus) (material3-url 'https://m3.material.io/components/menus') (fluent Dropdown) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/dropdown/usage') (hig 'Pop-up buttons') (hig-url 'https://developer.apple.com/design/human-interface-guidelines/pop-up-buttons') (mui Select) (mui-url 'https://mui.com/material-ui/react-select/') (keyboard 'Enter, Space or Down opens the list; arrows move; Enter picks; Escape closes.') (owner '#34'))
-(combobox: component-entry (group selection) (open-ui Combobox) (open-ui-url 'https://open-ui.org/components/combobox.research') (aria combobox) (apg 'https://www.w3.org/WAI/ARIA/apg/patterns/combobox/') (material3 '—') (fluent Combobox) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/combobox/usage') (hig 'Combo boxes') (hig-url 'https://developer.apple.com/design/human-interface-guidelines/combo-boxes') (mui Autocomplete) (mui-url 'https://mui.com/material-ui/react-autocomplete/') (keyboard 'Typing filters; Down opens suggestions; Enter accepts; Escape closes or clears.') (owner '#34'))
-(text-field: component-entry (group text) (open-ui 'Input text') (open-ui-url 'https://open-ui.org/components/inputtext.research') (aria textbox) (apg '—') (material3 'Text fields') (material3-url 'https://m3.material.io/components/text-fields') (fluent Input) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/input/usage') (hig 'Text fields') (hig-url 'https://developer.apple.com/design/human-interface-guidelines/text-fields') (mui TextField) (mui-url 'https://mui.com/material-ui/react-text-field/') (keyboard 'Native text editing; Tab leaves the field.') (owner '#34'))
-(text-area: component-entry (group text) (open-ui '—') (aria 'textbox (aria-multiline)') (apg '—') (material3 'Text fields') (material3-url 'https://m3.material.io/components/text-fields') (fluent Textarea) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/textarea/usage') (hig 'Text views') (hig-url 'https://developer.apple.com/design/human-interface-guidelines/text-views') (mui TextareaAutosize) (mui-url 'https://mui.com/material-ui/react-textarea-autosize/') (keyboard 'Native multi-line editing; Enter adds a line; Tab leaves.') (owner '#34'))
-(dialog: component-entry (group containers) (open-ui Dialog) (open-ui-url 'https://open-ui.org/components/dialog.research') (aria dialog) (apg 'https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/') (material3 Dialogs) (material3-url 'https://m3.material.io/components/dialogs') (fluent Dialog) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/dialog/usage') (hig Alerts) (hig-url 'https://developer.apple.com/design/human-interface-guidelines/alerts') (mui Dialog) (mui-url 'https://mui.com/material-ui/react-dialog/') (keyboard 'Focus moves inside and is trapped; Tab cycles; Escape closes and restores focus.') (owner '#35'))
-(popover: component-entry (group containers) (open-ui Popover) (open-ui-url 'https://open-ui.org/components/popover.research.explainer') (aria 'dialog (non-modal)') (apg 'https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/') (material3 '—') (fluent Popover) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/popover/usage') (hig Popovers) (hig-url 'https://developer.apple.com/design/human-interface-guidelines/popovers') (mui Popover) (mui-url 'https://mui.com/material-ui/react-popover/') (keyboard 'Escape closes and returns focus to the trigger.') (owner '#35') (verify apg))
-(menu: component-entry (group containers) (open-ui Menu) (open-ui-url 'https://open-ui.org/components/menu.research') (aria menu) (apg 'https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/') (material3 Menus) (material3-url 'https://m3.material.io/components/menus') (fluent Menu) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/menu/usage') (hig Menus) (hig-url 'https://developer.apple.com/design/human-interface-guidelines/menus') (mui Menu) (mui-url 'https://mui.com/material-ui/react-menu/') (keyboard 'Arrows move between items; Enter activates; Escape closes; typing jumps.') (owner '#35'))
-(menubar: component-entry (group containers) (open-ui '—') (aria menubar) (apg 'https://www.w3.org/WAI/ARIA/apg/patterns/menubar/') (material3 '—') (fluent '—') (hig 'The menu bar') (hig-url 'https://developer.apple.com/design/human-interface-guidelines/the-menu-bar') (mui '—') (keyboard 'Left and Right move across menus; Down opens one; Escape backs out.') (owner '#35'))
-(tabs: component-entry (group containers) (open-ui Tabs) (open-ui-url 'https://open-ui.org/components/tabs.research') (aria tablist) (apg 'https://www.w3.org/WAI/ARIA/apg/patterns/tabs/') (material3 Tabs) (material3-url 'https://m3.material.io/components/tabs') (fluent TabList) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/tablist/usage') (hig 'Tab views') (hig-url 'https://developer.apple.com/design/human-interface-guidelines/tab-views') (mui Tabs) (mui-url 'https://mui.com/material-ui/react-tabs/') (keyboard 'Tab enters the active tab; arrows switch tabs; Home and End jump.') (owner '#35'))
-(toast: component-entry (group containers) (open-ui Toast) (open-ui-url 'https://open-ui.org/components/toast.research') (aria 'status or alert') (apg 'https://www.w3.org/WAI/ARIA/apg/patterns/alert/') (material3 Snackbar) (material3-url 'https://m3.material.io/components/snackbar') (fluent Toast) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/toast/usage') (hig '—') (mui Snackbar) (mui-url 'https://mui.com/material-ui/react-snackbar/') (keyboard 'Announced without stealing focus; actions reachable by Tab; never auto-hides an action.') (owner '#35'))
-(tooltip: component-entry (group containers) (open-ui Tooltip) (open-ui-url 'https://open-ui.org/components/tooltip.research') (aria tooltip) (apg 'https://www.w3.org/WAI/ARIA/apg/patterns/tooltip/') (material3 Tooltips) (material3-url 'https://m3.material.io/components/tooltips') (fluent Tooltip) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/tooltip/usage') (hig '—') (mui Tooltip) (mui-url 'https://mui.com/material-ui/react-tooltip/') (keyboard 'Shows on focus as well as hover; Escape hides it.') (owner '#35'))
-(accordion: component-entry (group containers) (open-ui Accordion) (open-ui-url 'https://open-ui.org/components/accordion.research') (aria 'button + region') (apg 'https://www.w3.org/WAI/ARIA/apg/patterns/accordion/') (material3 '—') (fluent Accordion) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/accordion/usage') (hig '—') (mui Accordion) (mui-url 'https://mui.com/material-ui/react-accordion/') (keyboard 'Enter or Space expands a header; Tab moves between headers and content.') (owner '#35'))
-(disclosure: component-entry (group containers) (open-ui Disclosure) (open-ui-url 'https://open-ui.org/components/disclosure.research') (aria 'button (aria-expanded)') (apg 'https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/') (material3 '—') (fluent '—') (hig 'Disclosure controls') (hig-url 'https://developer.apple.com/design/human-interface-guidelines/disclosure-controls') (mui Collapse) (mui-url 'https://mui.com/material-ui/transitions/') (keyboard 'Enter or Space shows or hides the content.') (owner '#35'))
-(card: component-entry (group containers) (open-ui Card) (open-ui-url 'https://open-ui.org/components/card.research') (aria 'group or article') (apg '—') (material3 Cards) (material3-url 'https://m3.material.io/components/cards') (fluent Card) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/card/usage') (hig '—') (mui Card) (mui-url 'https://mui.com/material-ui/react-card/') (keyboard 'No own keys; inner controls follow their patterns.') (owner '#37'))
-(list: component-entry (group data-and-navigation) (open-ui List) (open-ui-url 'https://open-ui.org/components/list.research') (aria 'list or listbox') (apg 'https://www.w3.org/WAI/ARIA/apg/patterns/listbox/') (material3 Lists) (material3-url 'https://m3.material.io/components/lists') (fluent List) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/list/usage') (hig 'Lists and tables') (hig-url 'https://developer.apple.com/design/human-interface-guidelines/lists-and-tables') (mui List) (mui-url 'https://mui.com/material-ui/react-list/') (keyboard 'Interactive lists: arrows move, Space or Enter selects, Home and End jump.') (owner '#37'))
-(tree: component-entry (group data-and-navigation) (open-ui '—') (aria tree) (apg 'https://www.w3.org/WAI/ARIA/apg/patterns/treeview/') (material3 '—') (fluent Tree) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/tree/usage') (hig 'Outline views') (hig-url 'https://developer.apple.com/design/human-interface-guidelines/outline-views') (mui SimpleTreeView) (mui-url 'https://mui.com/x/react-tree-view/') (keyboard 'Up and Down move; Right expands or enters; Left collapses or goes up.') (owner '#37'))
-(table: component-entry (group data-and-navigation) (open-ui Table) (open-ui-url 'https://open-ui.org/components/table.research') (aria table) (apg 'https://www.w3.org/WAI/ARIA/apg/patterns/table/') (material3 '—') (fluent Table) (fluent-url 'https://storybooks.fluentui.dev/react/?path=/docs/components-table--docs') (hig 'Lists and tables') (hig-url 'https://developer.apple.com/design/human-interface-guidelines/lists-and-tables') (mui Table) (mui-url 'https://mui.com/material-ui/react-table/') (keyboard 'Static: no own keys. Sortable headers act as buttons.') (owner '#37') (verify fluent))
-(grid: component-entry (group data-and-navigation) (open-ui '—') (aria grid) (apg 'https://www.w3.org/WAI/ARIA/apg/patterns/grid/') (material3 '—') (fluent DataGrid) (fluent-url 'https://storybooks.fluentui.dev/react/?path=/docs/components-table--docs') (hig Collections) (hig-url 'https://developer.apple.com/design/human-interface-guidelines/collections') (mui DataGrid) (mui-url 'https://mui.com/x/react-data-grid/') (keyboard 'One tab stop; arrows move between cells; Enter edits; Escape leaves edit.') (owner '#37') (verify fluent))
-(breadcrumb: component-entry (group data-and-navigation) (open-ui Breadcrumb) (open-ui-url 'https://open-ui.org/components/breadcrumb') (aria 'navigation landmark') (apg 'https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/') (material3 '—') (fluent Breadcrumb) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/breadcrumb/usage') (hig 'Path controls') (hig-url 'https://developer.apple.com/design/human-interface-guidelines/path-controls') (mui Breadcrumbs) (mui-url 'https://mui.com/material-ui/react-breadcrumbs/') (keyboard 'Ordinary links; the current page is marked, not focusable twice.') (owner '#35'))
-(navigation-bar: component-entry (group data-and-navigation) (open-ui 'Navigation bar') (open-ui-url 'https://open-ui.org/components/navigation-bar.explainer') (aria 'navigation landmark') (apg 'https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/') (material3 'Navigation bar') (material3-url 'https://m3.material.io/components/navigation-bar') (fluent Nav) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/nav/usage') (hig 'Tab bars') (hig-url 'https://developer.apple.com/design/human-interface-guidelines/tab-bars') (mui BottomNavigation) (mui-url 'https://mui.com/material-ui/react-bottom-navigation/') (keyboard 'Tab reaches each destination; Enter goes there.') (owner '#35'))
-(navigation-rail: component-entry (group data-and-navigation) (open-ui '—') (aria 'navigation landmark') (apg 'https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/') (material3 'Navigation rail') (material3-url 'https://m3.material.io/components/navigation-rail') (fluent Nav) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/nav/usage') (hig Sidebars) (hig-url 'https://developer.apple.com/design/human-interface-guidelines/sidebars') (mui Drawer) (mui-url 'https://mui.com/material-ui/react-drawer/') (keyboard 'Tab reaches each destination; Enter goes there.') (owner '#35'))
-(toolbar: component-entry (group data-and-navigation) (open-ui Toolbar) (open-ui-url 'https://open-ui.org/components/toolbar.explainer') (aria toolbar) (apg 'https://www.w3.org/WAI/ARIA/apg/patterns/toolbar/') (material3 Toolbars) (material3-url 'https://m3.material.io/components/toolbars') (fluent Toolbar) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/toolbar/usage') (hig Toolbars) (hig-url 'https://developer.apple.com/design/human-interface-guidelines/toolbars') (mui Toolbar) (mui-url 'https://mui.com/material-ui/react-app-bar/') (keyboard 'One tab stop; Left and Right move between controls; Home and End jump.') (owner '#35'))
-(progress: component-entry (group feedback) (open-ui '—') (aria progressbar) (apg 'https://www.w3.org/WAI/ARIA/apg/patterns/meter/') (material3 'Progress indicators') (material3-url 'https://m3.material.io/components/progress-indicators') (fluent ProgressBar) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/progressbar/usage') (hig 'Progress indicators') (hig-url 'https://developer.apple.com/design/human-interface-guidelines/progress-indicators') (mui LinearProgress) (mui-url 'https://mui.com/material-ui/react-progress/') (keyboard 'Not focusable; value changes are announced politely.') (owner '#34') (verify apg))
-(spinner: component-entry (group feedback) (open-ui '—') (aria progressbar) (apg '—') (material3 'Loading indicator') (material3-url 'https://m3.material.io/components/loading-indicator') (fluent Spinner) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/spinner/usage') (hig 'Progress indicators') (hig-url 'https://developer.apple.com/design/human-interface-guidelines/progress-indicators') (mui CircularProgress) (mui-url 'https://mui.com/material-ui/react-progress/') (keyboard 'Not focusable; busy state is announced once.') (owner '#34'))
-(badge: component-entry (group feedback) (open-ui Badge) (open-ui-url 'https://open-ui.org/components/badge.research') (aria '— (text in the accessible name)') (apg '—') (material3 Badges) (material3-url 'https://m3.material.io/components/badges') (fluent Badge) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/badge/usage') (hig '—') (mui Badge) (mui-url 'https://mui.com/material-ui/react-badge/') (keyboard 'Not focusable; its meaning joins the owner name.') (owner '#34'))
-(avatar: component-entry (group feedback) (open-ui Avatar) (open-ui-url 'https://open-ui.org/components/avatar.research') (aria img) (apg '—') (material3 '—') (fluent Avatar) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/avatar/usage') (hig '—') (mui Avatar) (mui-url 'https://mui.com/material-ui/react-avatar/') (keyboard 'Not focusable unless it is also a button.') (owner '#34'))
-(divider: component-entry (group feedback) (open-ui '—') (aria separator) (apg '—') (material3 Divider) (material3-url 'https://m3.material.io/components/divider') (fluent Divider) (fluent-url 'https://fluent2.microsoft.design/components/web/react/core/divider/usage') (hig '—') (mui Divider) (mui-url 'https://mui.com/material-ui/react-divider/') (keyboard 'Not focusable; a draggable divider is a split-pane.') (owner '#34'))
-(stack: component-entry (group layout) (open-ui Flex) (open-ui-url 'https://open-ui.org/components/flex.research') (aria '—') (apg '—') (material3 '—') (fluent '—') (hig Layout) (hig-url 'https://developer.apple.com/design/human-interface-guidelines/layout') (mui Stack) (mui-url 'https://mui.com/material-ui/react-stack/') (keyboard 'No own keys; reading order follows source order.') (owner '#36'))
-(grid-layout: component-entry (group layout) (open-ui '—') (aria '—') (apg '—') (material3 '—') (fluent '—') (hig Layout) (hig-url 'https://developer.apple.com/design/human-interface-guidelines/layout') (mui Grid) (mui-url 'https://mui.com/material-ui/react-grid/') (keyboard 'No own keys; reading order follows source order.') (owner '#36'))
-(split-pane: component-entry (group layout) (open-ui '—') (aria separator) (apg 'https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/') (material3 '—') (fluent '—') (hig 'Split views') (hig-url 'https://developer.apple.com/design/human-interface-guidelines/split-views') (mui '—') (keyboard 'Focus the splitter; arrows resize; Enter collapses or restores.') (owner '#36'))
+button: component-entry
+  group actions
+  open-ui Button
+  open-ui-url 'https://open-ui.org/components/button'
+  aria button
+  apg 'https://www.w3.org/WAI/ARIA/apg/patterns/button/'
+  material3 Buttons
+  material3-url 'https://m3.material.io/components/buttons'
+  fluent Button
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/button/usage'
+  hig Buttons
+  hig-url 'https://developer.apple.com/design/human-interface-guidelines/buttons'
+  mui Button
+  mui-url 'https://mui.com/material-ui/react-button/'
+  keyboard 'Enter or Space activates; focus stays on the button.'
+  owner '#34'
+icon-button: component-entry
+  group actions
+  open-ui Button
+  open-ui-url 'https://open-ui.org/components/button'
+  aria button
+  apg 'https://www.w3.org/WAI/ARIA/apg/patterns/button/'
+  material3 'Icon buttons'
+  material3-url 'https://m3.material.io/components/icon-buttons'
+  fluent Button
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/button/usage'
+  hig Buttons
+  hig-url 'https://developer.apple.com/design/human-interface-guidelines/buttons'
+  mui IconButton
+  mui-url 'https://mui.com/material-ui/react-button/'
+  keyboard 'Same as button; needs an accessible name because there is no visible text.'
+  owner '#34'
+toggle-button: component-entry
+  group actions
+  open-ui Button
+  open-ui-url 'https://open-ui.org/components/button'
+  aria 'button (aria-pressed)'
+  apg 'https://www.w3.org/WAI/ARIA/apg/patterns/button/'
+  material3 Buttons
+  material3-url 'https://m3.material.io/components/buttons'
+  fluent ToggleButton
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/button/usage'
+  hig Toggles
+  hig-url 'https://developer.apple.com/design/human-interface-guidelines/toggles'
+  mui ToggleButton
+  mui-url 'https://mui.com/material-ui/react-toggle-button/'
+  keyboard 'Enter or Space flips the pressed state.'
+  owner '#34'
+link: component-entry
+  group actions
+  open-ui '—'
+  aria link
+  apg 'https://www.w3.org/WAI/ARIA/apg/patterns/link/'
+  material3 '—'
+  fluent Link
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/link/usage'
+  hig '—'
+  mui Link
+  mui-url 'https://mui.com/material-ui/react-link/'
+  keyboard 'Enter follows the link; Space does not.'
+  owner '#34'
+checkbox: component-entry
+  group selection
+  open-ui Checkbox
+  open-ui-url 'https://open-ui.org/components/checkbox'
+  aria checkbox
+  apg 'https://www.w3.org/WAI/ARIA/apg/patterns/checkbox/'
+  material3 Checkbox
+  material3-url 'https://m3.material.io/components/checkbox'
+  fluent Checkbox
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/checkbox/usage'
+  hig Toggles
+  hig-url 'https://developer.apple.com/design/human-interface-guidelines/toggles'
+  mui Checkbox
+  mui-url 'https://mui.com/material-ui/react-checkbox/'
+  keyboard 'Space toggles the checked state.'
+  owner '#34'
+radio-group: component-entry
+  group selection
+  open-ui 'Radio button'
+  open-ui-url 'https://open-ui.org/components/radio-button.research'
+  aria radiogroup
+  apg 'https://www.w3.org/WAI/ARIA/apg/patterns/radio/'
+  material3 'Radio button'
+  material3-url 'https://m3.material.io/components/radio-button'
+  fluent RadioGroup
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/radiogroup/usage'
+  hig '—'
+  mui RadioGroup
+  mui-url 'https://mui.com/material-ui/react-radio-button/'
+  keyboard 'Tab enters the group; arrow keys move and select; Space selects.'
+  owner '#34'
+switch: component-entry
+  group selection
+  open-ui Switch
+  open-ui-url 'https://open-ui.org/components/switch'
+  aria switch
+  apg 'https://www.w3.org/WAI/ARIA/apg/patterns/switch/'
+  material3 Switch
+  material3-url 'https://m3.material.io/components/switch'
+  fluent Switch
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/switch/usage'
+  hig Toggles
+  hig-url 'https://developer.apple.com/design/human-interface-guidelines/toggles'
+  mui Switch
+  mui-url 'https://mui.com/material-ui/react-switch/'
+  keyboard 'Space flips between on and off.'
+  owner '#34'
+slider: component-entry
+  group selection
+  open-ui Slider
+  open-ui-url 'https://open-ui.org/components/slider.research'
+  aria slider
+  apg 'https://www.w3.org/WAI/ARIA/apg/patterns/slider/'
+  material3 Sliders
+  material3-url 'https://m3.material.io/components/sliders'
+  fluent Slider
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/slider/usage'
+  hig Sliders
+  hig-url 'https://developer.apple.com/design/human-interface-guidelines/sliders'
+  mui Slider
+  mui-url 'https://mui.com/material-ui/react-slider/'
+  keyboard 'Arrows nudge the value; Page keys jump; Home and End reach limits.'
+  owner '#34'
+select: component-entry
+  group selection
+  open-ui Select
+  open-ui-url 'https://open-ui.org/components/select.research'
+  aria 'combobox (select-only)'
+  apg 'https://www.w3.org/WAI/ARIA/apg/patterns/combobox/'
+  material3 Menus
+  material3-url 'https://m3.material.io/components/menus'
+  fluent Dropdown
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/dropdown/usage'
+  hig 'Pop-up buttons'
+  hig-url 'https://developer.apple.com/design/human-interface-guidelines/pop-up-buttons'
+  mui Select
+  mui-url 'https://mui.com/material-ui/react-select/'
+  keyboard 'Enter, Space or Down opens the list; arrows move; Enter picks; Escape closes.'
+  owner '#34'
+combobox: component-entry
+  group selection
+  open-ui Combobox
+  open-ui-url 'https://open-ui.org/components/combobox.research'
+  aria combobox
+  apg 'https://www.w3.org/WAI/ARIA/apg/patterns/combobox/'
+  material3 '—'
+  fluent Combobox
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/combobox/usage'
+  hig 'Combo boxes'
+  hig-url 'https://developer.apple.com/design/human-interface-guidelines/combo-boxes'
+  mui Autocomplete
+  mui-url 'https://mui.com/material-ui/react-autocomplete/'
+  keyboard 'Typing filters; Down opens suggestions; Enter accepts; Escape closes or clears.'
+  owner '#34'
+text-field: component-entry
+  group text
+  open-ui 'Input text'
+  open-ui-url 'https://open-ui.org/components/inputtext.research'
+  aria textbox
+  apg '—'
+  material3 'Text fields'
+  material3-url 'https://m3.material.io/components/text-fields'
+  fluent Input
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/input/usage'
+  hig 'Text fields'
+  hig-url 'https://developer.apple.com/design/human-interface-guidelines/text-fields'
+  mui TextField
+  mui-url 'https://mui.com/material-ui/react-text-field/'
+  keyboard 'Native text editing; Tab leaves the field.'
+  owner '#34'
+text-area: component-entry
+  group text
+  open-ui '—'
+  aria 'textbox (aria-multiline)'
+  apg '—'
+  material3 'Text fields'
+  material3-url 'https://m3.material.io/components/text-fields'
+  fluent Textarea
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/textarea/usage'
+  hig 'Text views'
+  hig-url 'https://developer.apple.com/design/human-interface-guidelines/text-views'
+  mui TextareaAutosize
+  mui-url 'https://mui.com/material-ui/react-textarea-autosize/'
+  keyboard 'Native multi-line editing; Enter adds a line; Tab leaves.'
+  owner '#34'
+dialog: component-entry
+  group containers
+  open-ui Dialog
+  open-ui-url 'https://open-ui.org/components/dialog.research'
+  aria dialog
+  apg 'https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/'
+  material3 Dialogs
+  material3-url 'https://m3.material.io/components/dialogs'
+  fluent Dialog
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/dialog/usage'
+  hig Alerts
+  hig-url 'https://developer.apple.com/design/human-interface-guidelines/alerts'
+  mui Dialog
+  mui-url 'https://mui.com/material-ui/react-dialog/'
+  keyboard 'Focus moves inside and is trapped; Tab cycles; Escape closes and restores focus.'
+  owner '#35'
+popover: component-entry
+  group containers
+  open-ui Popover
+  open-ui-url 'https://open-ui.org/components/popover.research.explainer'
+  aria 'dialog (non-modal)'
+  apg 'https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/'
+  material3 '—'
+  fluent Popover
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/popover/usage'
+  hig Popovers
+  hig-url 'https://developer.apple.com/design/human-interface-guidelines/popovers'
+  mui Popover
+  mui-url 'https://mui.com/material-ui/react-popover/'
+  keyboard 'Escape closes and returns focus to the trigger.'
+  owner '#35'
+  verify apg
+menu: component-entry
+  group containers
+  open-ui Menu
+  open-ui-url 'https://open-ui.org/components/menu.research'
+  aria menu
+  apg 'https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/'
+  material3 Menus
+  material3-url 'https://m3.material.io/components/menus'
+  fluent Menu
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/menu/usage'
+  hig Menus
+  hig-url 'https://developer.apple.com/design/human-interface-guidelines/menus'
+  mui Menu
+  mui-url 'https://mui.com/material-ui/react-menu/'
+  keyboard 'Arrows move between items; Enter activates; Escape closes; typing jumps.'
+  owner '#35'
+menubar: component-entry
+  group containers
+  open-ui '—'
+  aria menubar
+  apg 'https://www.w3.org/WAI/ARIA/apg/patterns/menubar/'
+  material3 '—'
+  fluent '—'
+  hig 'The menu bar'
+  hig-url 'https://developer.apple.com/design/human-interface-guidelines/the-menu-bar'
+  mui '—'
+  keyboard 'Left and Right move across menus; Down opens one; Escape backs out.'
+  owner '#35'
+tabs: component-entry
+  group containers
+  open-ui Tabs
+  open-ui-url 'https://open-ui.org/components/tabs.research'
+  aria tablist
+  apg 'https://www.w3.org/WAI/ARIA/apg/patterns/tabs/'
+  material3 Tabs
+  material3-url 'https://m3.material.io/components/tabs'
+  fluent TabList
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/tablist/usage'
+  hig 'Tab views'
+  hig-url 'https://developer.apple.com/design/human-interface-guidelines/tab-views'
+  mui Tabs
+  mui-url 'https://mui.com/material-ui/react-tabs/'
+  keyboard 'Tab enters the active tab; arrows switch tabs; Home and End jump.'
+  owner '#35'
+toast: component-entry
+  group containers
+  open-ui Toast
+  open-ui-url 'https://open-ui.org/components/toast.research'
+  aria 'status or alert'
+  apg 'https://www.w3.org/WAI/ARIA/apg/patterns/alert/'
+  material3 Snackbar
+  material3-url 'https://m3.material.io/components/snackbar'
+  fluent Toast
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/toast/usage'
+  hig '—'
+  mui Snackbar
+  mui-url 'https://mui.com/material-ui/react-snackbar/'
+  keyboard 'Announced without stealing focus; actions reachable by Tab; never auto-hides an action.'
+  owner '#35'
+tooltip: component-entry
+  group containers
+  open-ui Tooltip
+  open-ui-url 'https://open-ui.org/components/tooltip.research'
+  aria tooltip
+  apg 'https://www.w3.org/WAI/ARIA/apg/patterns/tooltip/'
+  material3 Tooltips
+  material3-url 'https://m3.material.io/components/tooltips'
+  fluent Tooltip
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/tooltip/usage'
+  hig '—'
+  mui Tooltip
+  mui-url 'https://mui.com/material-ui/react-tooltip/'
+  keyboard 'Shows on focus as well as hover; Escape hides it.'
+  owner '#35'
+accordion: component-entry
+  group containers
+  open-ui Accordion
+  open-ui-url 'https://open-ui.org/components/accordion.research'
+  aria 'button + region'
+  apg 'https://www.w3.org/WAI/ARIA/apg/patterns/accordion/'
+  material3 '—'
+  fluent Accordion
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/accordion/usage'
+  hig '—'
+  mui Accordion
+  mui-url 'https://mui.com/material-ui/react-accordion/'
+  keyboard 'Enter or Space expands a header; Tab moves between headers and content.'
+  owner '#35'
+disclosure: component-entry
+  group containers
+  open-ui Disclosure
+  open-ui-url 'https://open-ui.org/components/disclosure.research'
+  aria 'button (aria-expanded)'
+  apg 'https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/'
+  material3 '—'
+  fluent '—'
+  hig 'Disclosure controls'
+  hig-url 'https://developer.apple.com/design/human-interface-guidelines/disclosure-controls'
+  mui Collapse
+  mui-url 'https://mui.com/material-ui/transitions/'
+  keyboard 'Enter or Space shows or hides the content.'
+  owner '#35'
+card: component-entry
+  group containers
+  open-ui Card
+  open-ui-url 'https://open-ui.org/components/card.research'
+  aria 'group or article'
+  apg '—'
+  material3 Cards
+  material3-url 'https://m3.material.io/components/cards'
+  fluent Card
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/card/usage'
+  hig '—'
+  mui Card
+  mui-url 'https://mui.com/material-ui/react-card/'
+  keyboard 'No own keys; inner controls follow their patterns.'
+  owner '#37'
+list: component-entry
+  group data-and-navigation
+  open-ui List
+  open-ui-url 'https://open-ui.org/components/list.research'
+  aria 'list or listbox'
+  apg 'https://www.w3.org/WAI/ARIA/apg/patterns/listbox/'
+  material3 Lists
+  material3-url 'https://m3.material.io/components/lists'
+  fluent List
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/list/usage'
+  hig 'Lists and tables'
+  hig-url 'https://developer.apple.com/design/human-interface-guidelines/lists-and-tables'
+  mui List
+  mui-url 'https://mui.com/material-ui/react-list/'
+  keyboard 'Interactive lists: arrows move, Space or Enter selects, Home and End jump.'
+  owner '#37'
+tree: component-entry
+  group data-and-navigation
+  open-ui '—'
+  aria tree
+  apg 'https://www.w3.org/WAI/ARIA/apg/patterns/treeview/'
+  material3 '—'
+  fluent Tree
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/tree/usage'
+  hig 'Outline views'
+  hig-url 'https://developer.apple.com/design/human-interface-guidelines/outline-views'
+  mui SimpleTreeView
+  mui-url 'https://mui.com/x/react-tree-view/'
+  keyboard 'Up and Down move; Right expands or enters; Left collapses or goes up.'
+  owner '#37'
+table: component-entry
+  group data-and-navigation
+  open-ui Table
+  open-ui-url 'https://open-ui.org/components/table.research'
+  aria table
+  apg 'https://www.w3.org/WAI/ARIA/apg/patterns/table/'
+  material3 '—'
+  fluent Table
+  fluent-url 'https://storybooks.fluentui.dev/react/?path=/docs/components-table--docs'
+  hig 'Lists and tables'
+  hig-url 'https://developer.apple.com/design/human-interface-guidelines/lists-and-tables'
+  mui Table
+  mui-url 'https://mui.com/material-ui/react-table/'
+  keyboard 'Static: no own keys. Sortable headers act as buttons.'
+  owner '#37'
+  verify fluent
+grid: component-entry
+  group data-and-navigation
+  open-ui '—'
+  aria grid
+  apg 'https://www.w3.org/WAI/ARIA/apg/patterns/grid/'
+  material3 '—'
+  fluent DataGrid
+  fluent-url 'https://storybooks.fluentui.dev/react/?path=/docs/components-table--docs'
+  hig Collections
+  hig-url 'https://developer.apple.com/design/human-interface-guidelines/collections'
+  mui DataGrid
+  mui-url 'https://mui.com/x/react-data-grid/'
+  keyboard 'One tab stop; arrows move between cells; Enter edits; Escape leaves edit.'
+  owner '#37'
+  verify fluent
+breadcrumb: component-entry
+  group data-and-navigation
+  open-ui Breadcrumb
+  open-ui-url 'https://open-ui.org/components/breadcrumb'
+  aria 'navigation landmark'
+  apg 'https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/'
+  material3 '—'
+  fluent Breadcrumb
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/breadcrumb/usage'
+  hig 'Path controls'
+  hig-url 'https://developer.apple.com/design/human-interface-guidelines/path-controls'
+  mui Breadcrumbs
+  mui-url 'https://mui.com/material-ui/react-breadcrumbs/'
+  keyboard 'Ordinary links; the current page is marked, not focusable twice.'
+  owner '#35'
+navigation-bar: component-entry
+  group data-and-navigation
+  open-ui 'Navigation bar'
+  open-ui-url 'https://open-ui.org/components/navigation-bar.explainer'
+  aria 'navigation landmark'
+  apg 'https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/'
+  material3 'Navigation bar'
+  material3-url 'https://m3.material.io/components/navigation-bar'
+  fluent Nav
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/nav/usage'
+  hig 'Tab bars'
+  hig-url 'https://developer.apple.com/design/human-interface-guidelines/tab-bars'
+  mui BottomNavigation
+  mui-url 'https://mui.com/material-ui/react-bottom-navigation/'
+  keyboard 'Tab reaches each destination; Enter goes there.'
+  owner '#35'
+navigation-rail: component-entry
+  group data-and-navigation
+  open-ui '—'
+  aria 'navigation landmark'
+  apg 'https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/'
+  material3 'Navigation rail'
+  material3-url 'https://m3.material.io/components/navigation-rail'
+  fluent Nav
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/nav/usage'
+  hig Sidebars
+  hig-url 'https://developer.apple.com/design/human-interface-guidelines/sidebars'
+  mui Drawer
+  mui-url 'https://mui.com/material-ui/react-drawer/'
+  keyboard 'Tab reaches each destination; Enter goes there.'
+  owner '#35'
+toolbar: component-entry
+  group data-and-navigation
+  open-ui Toolbar
+  open-ui-url 'https://open-ui.org/components/toolbar.explainer'
+  aria toolbar
+  apg 'https://www.w3.org/WAI/ARIA/apg/patterns/toolbar/'
+  material3 Toolbars
+  material3-url 'https://m3.material.io/components/toolbars'
+  fluent Toolbar
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/toolbar/usage'
+  hig Toolbars
+  hig-url 'https://developer.apple.com/design/human-interface-guidelines/toolbars'
+  mui Toolbar
+  mui-url 'https://mui.com/material-ui/react-app-bar/'
+  keyboard 'One tab stop; Left and Right move between controls; Home and End jump.'
+  owner '#35'
+progress: component-entry
+  group feedback
+  open-ui '—'
+  aria progressbar
+  apg 'https://www.w3.org/WAI/ARIA/apg/patterns/meter/'
+  material3 'Progress indicators'
+  material3-url 'https://m3.material.io/components/progress-indicators'
+  fluent ProgressBar
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/progressbar/usage'
+  hig 'Progress indicators'
+  hig-url 'https://developer.apple.com/design/human-interface-guidelines/progress-indicators'
+  mui LinearProgress
+  mui-url 'https://mui.com/material-ui/react-progress/'
+  keyboard 'Not focusable; value changes are announced politely.'
+  owner '#34'
+  verify apg
+spinner: component-entry
+  group feedback
+  open-ui '—'
+  aria progressbar
+  apg '—'
+  material3 'Loading indicator'
+  material3-url 'https://m3.material.io/components/loading-indicator'
+  fluent Spinner
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/spinner/usage'
+  hig 'Progress indicators'
+  hig-url 'https://developer.apple.com/design/human-interface-guidelines/progress-indicators'
+  mui CircularProgress
+  mui-url 'https://mui.com/material-ui/react-progress/'
+  keyboard 'Not focusable; busy state is announced once.'
+  owner '#34'
+badge: component-entry
+  group feedback
+  open-ui Badge
+  open-ui-url 'https://open-ui.org/components/badge.research'
+  aria '— (text in the accessible name)'
+  apg '—'
+  material3 Badges
+  material3-url 'https://m3.material.io/components/badges'
+  fluent Badge
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/badge/usage'
+  hig '—'
+  mui Badge
+  mui-url 'https://mui.com/material-ui/react-badge/'
+  keyboard 'Not focusable; its meaning joins the owner name.'
+  owner '#34'
+avatar: component-entry
+  group feedback
+  open-ui Avatar
+  open-ui-url 'https://open-ui.org/components/avatar.research'
+  aria img
+  apg '—'
+  material3 '—'
+  fluent Avatar
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/avatar/usage'
+  hig '—'
+  mui Avatar
+  mui-url 'https://mui.com/material-ui/react-avatar/'
+  keyboard 'Not focusable unless it is also a button.'
+  owner '#34'
+divider: component-entry
+  group feedback
+  open-ui '—'
+  aria separator
+  apg '—'
+  material3 Divider
+  material3-url 'https://m3.material.io/components/divider'
+  fluent Divider
+  fluent-url 'https://fluent2.microsoft.design/components/web/react/core/divider/usage'
+  hig '—'
+  mui Divider
+  mui-url 'https://mui.com/material-ui/react-divider/'
+  keyboard 'Not focusable; a draggable divider is a split-pane.'
+  owner '#34'
+stack: component-entry
+  group layout
+  open-ui Flex
+  open-ui-url 'https://open-ui.org/components/flex.research'
+  aria '—'
+  apg '—'
+  material3 '—'
+  fluent '—'
+  hig Layout
+  hig-url 'https://developer.apple.com/design/human-interface-guidelines/layout'
+  mui Stack
+  mui-url 'https://mui.com/material-ui/react-stack/'
+  keyboard 'No own keys; reading order follows source order.'
+  owner '#36'
+grid-layout: component-entry
+  group layout
+  open-ui '—'
+  aria '—'
+  apg '—'
+  material3 '—'
+  fluent '—'
+  hig Layout
+  hig-url 'https://developer.apple.com/design/human-interface-guidelines/layout'
+  mui Grid
+  mui-url 'https://mui.com/material-ui/react-grid/'
+  keyboard 'No own keys; reading order follows source order.'
+  owner '#36'
+split-pane: component-entry
+  group layout
+  open-ui '—'
+  aria separator
+  apg 'https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/'
+  material3 '—'
+  fluent '—'
+  hig 'Split views'
+  hig-url 'https://developer.apple.com/design/human-interface-guidelines/split-views'
+  mui '—'
+  keyboard 'Focus the splitter; arrows resize; Enter collapses or restores.'
+  owner '#36'
