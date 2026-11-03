@@ -10,7 +10,7 @@ import {
   container,
   countedStore,
   installDom,
-  removeDom,
+  hideDom,
   sample,
   useDom,
 } from './setup-dom.js';
@@ -23,7 +23,7 @@ useDom();
 
 /** Render an app to a string with no window globals. */
 async function renderWithoutWindow(app) {
-  removeDom();
+  hideDom();
   try {
     expect(typeof window).toBe('undefined');
     expect(typeof document).toBe('undefined');

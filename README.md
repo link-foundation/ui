@@ -129,6 +129,23 @@ const { store } = mountDocument(app, text, { tokens, styles, onAction });
 store.setProp('greeting', 'value', ['Hello again']); // one patch
 ```
 
+### React
+
+[`@link-foundation/ui-react`](packages/ui-react/README.md) mounts the ui-dom
+renderer in a React tree. Store changes patch the DOM without re-rendering
+`<UiView>`; hooks such as `useUiProp` read the store, actions call host
+functions, and custom kinds can be React components:
+
+```jsx
+import { UiView } from '@link-foundation/ui-react';
+
+<UiView
+  source="(ok: button (label 'OK') (on press (emit save)))"
+  actions={{ save: () => console.log('saved') }}
+  components={{ chart: Chart }}
+/>;
+```
+
 ### Vue
 
 [`@link-foundation/ui-vue`](packages/ui-vue/README.md) mounts ui-dom in a Vue 3
@@ -318,6 +335,7 @@ npm run example:desktop:package
 ├── examples/             # Usage examples
 │   ├── animation/        # ui-animation page: plays a LiNo timeline on ui-dom nodes
 │   ├── kotlin/           # Compose Desktop window for ui-kotlin (Gradle build)
+│   ├── react/            # Vite + React app of ui-react (sample document, counter, chart kind)
 │   ├── ui-dom/           # ui-dom page served with an import map (scripts/serve-static.mjs)
 │   ├── universal-app/    # React + GitHub Pages + Electron + Capacitor app
 │   └── vue/              # Vite + Vue 3 app for ui-vue (own package.json)
@@ -333,6 +351,7 @@ npm run example:desktop:package
 │   ├── ui-i18n/          # @link-foundation/ui-i18n (localisation with lino-i18n, (t KEY) messages)
 │   ├── ui-kotlin/        # Jetpack Compose renderer (Gradle Kotlin Multiplatform, see build.gradle.kts)
 │   ├── ui-links/         # @link-foundation/ui-links (associative links storages, queries, permissions, links server, synced client)
+│   ├── ui-react/         # @link-foundation/ui-react (React adapter: UiView, hooks, React-rendered kinds)
 │   ├── ui-settings/      # @link-foundation/ui-settings (settings schemas, presets, share links)
 │   ├── ui-store/         # @link-foundation/ui-store
 │   ├── ui-style/         # @link-foundation/ui-style (style rules, states, media and container conditions)
