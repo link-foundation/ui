@@ -24,6 +24,8 @@ import { importHtml } from './html/import.js';
 import { importJsx } from './jsx/import.js';
 import { importVue } from './vue/import.js';
 import { MAPPINGS } from './mappings/index.js';
+import { TARGETS } from './export/index.js';
+import { exportCommand } from './export/cli.js';
 
 /** The component importers of `import --from`. */
 export const SOURCES = {
@@ -51,6 +53,8 @@ export const USAGE = `Usage:
   ui-convert import --from jsx|vue|html <file> [--mapping <name|file.lino>] [--style <style>]
   ui-convert export <file.lino> --format <name> [--id <id>] [--target-version <version>]
 
+  ui-convert export --target react|vue|swiftui|compose [--mode wrapper|eject] [--component-name App] [--out <dir>] <file.lino>
+
 Formats: ${FORMATS.join(', ')}. A file named - is read from stdin.
 import detects the format when --format is missing.
 --from reads component markup (.jsx, .tsx, .vue, .html files need no --from);
@@ -59,6 +63,10 @@ import detects the format when --format is missing.
 --style is one of indented (default), multiline, inline.`;
 
 const OPTIONS = {
+  '--target': 'target',
+  '--mode': 'mode',
+  '--out': 'out',
+  '--component-name': 'componentName',
   '--format': 'format',
   '--style': 'style',
   '--id': 'id',
@@ -122,10 +130,40 @@ function checkArgs(args) {
   if (args.from !== undefined && !(args.from in SOURCES)) {
     throw new UsageError(`Unknown --from "${args.from}".`);
   }
-  if (command === 'export' && args.format === undefined) {
+  checkSourceArgs(args);
+  if (
+    command === 'export' &&
+    args.format === undefined &&
+    args.target === undefined
+  ) {
     throw new UsageError('export needs --format.');
   }
   return args;
+}
+
+/** Validate source-export flags separately from interop flags. */
+function checkSourceArgs(args) {
+  const { command } = args;
+  if (args.target !== undefined) {
+    if (
+      command !== 'export' ||
+      args.format !== undefined ||
+      !TARGETS.includes(args.target)
+    ) {
+      throw new UsageError(
+        'Use export --target react|vue|swiftui|compose without --format.'
+      );
+    }
+    if (args.mode !== undefined && !['wrapper', 'eject'].includes(args.mode)) {
+      throw new UsageError('Unknown --mode.');
+    }
+  } else if (
+    args.mode !== undefined ||
+    args.out !== undefined ||
+    args.componentName !== undefined
+  ) {
+    throw new UsageError('--mode, --out and --component-name need --target.');
+  }
 }
 
 /**
@@ -213,6 +251,12 @@ export function main(argv, io) {
       MAPPINGS.includes(mapping) ? mapping : readFile(mapping)
     );
     const text = readFile(args.file === '-' ? 0 : args.file);
+    if (args.target !== undefined) {
+      return exportCommand(args, text, io, formatDiagnostic).catch((error) => {
+        io.stderr.write(`ui-convert: ${error.message}\n`);
+        return 2;
+      });
+    }
     const { output, diagnostics } = convert(args, text);
     io.stdout.write(output);
     for (const diagnostic of diagnostics) {
@@ -242,5 +286,5 @@ function isProgram() {
 }
 
 if (isProgram()) {
-  process.exitCode = main(process.argv.slice(2), process);
+  process.exitCode = await main(process.argv.slice(2), process);
 }

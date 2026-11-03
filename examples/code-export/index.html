@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LiNo source exports</title>
+    <style>
+      :root {
+        --space-medium: 16px;
+        font: 18px system-ui;
+        color: #202124;
+        background: #f5f5fa;
+      }
+      body {
+        max-width: 900px;
+        margin: 48px auto;
+        padding: 24px;
+      }
+      main {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 24px;
+      }
+      section {
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 12px;
+        padding: 24px;
+      }
+      button {
+        border-radius: 6px;
+        padding: 12px 24px;
+        font: inherit;
+        cursor: pointer;
+      }
+      h2 {
+        font-size: 1.2rem;
+      }
+      #status {
+        min-height: 2em;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>LiNo → editable source</h1>
+    <p>One document, exported to semantic HTML with CSS and action handlers.</p>
+    <main>
+      <section aria-labelledby="react-heading">
+        <h2 id="react-heading">React eject</h2>
+        <div id="react"></div>
+      </section>
+      <section aria-labelledby="vue-heading">
+        <h2 id="vue-heading">Vue eject</h2>
+        <div id="vue"></div>
+      </section>
+    </main>
+    <p id="status" role="status">Press OK to call the generated action.</p>
+    <script type="module">
+      import React from 'react';
+      import { createRoot } from 'react-dom/client';
+      import { createApp } from 'vue';
+      import { ReactExample } from './dist/ReactExample.jsx';
+      import VueExample from './dist/VueExample.vue';
+      const actions = {
+        navigate: (destination) => {
+          document.getElementById('status').textContent =
+            `navigate(${destination}) called`;
+        },
+      };
+      createRoot(document.getElementById('react')).render(
+        React.createElement(ReactExample, { actions })
+      );
+      createApp(VueExample, { actions }).mount('#vue');
+    </script>
+  </body>
+</html>
