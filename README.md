@@ -199,11 +199,17 @@ adds the layout kinds `stack`, `grid`, `split`, `tab-group`, `dock`, `window` an
 Notation:
 
 ```lino
-(designer-shell: dock (persist designer.layout)
-  (left: region (size 16rem) (panels toolbox outline))
-  (right: region (size 20rem) (panels properties))
-  (center: region (panels canvas))
-  ...)
+designer-shell: dock
+  persist designer.layout
+  left: region
+    size 16rem
+    panels toolbox outline
+  right: region
+    size 20rem
+    panels properties
+  center: region
+    panels canvas
+  ...
 ```
 
 ### SwiftUI

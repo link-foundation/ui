@@ -83,19 +83,19 @@ licence-string heuristics.
 A record is third-party when its `copyright` is not `none`.
 
 ```lino
-(lucide-check: asset
-  (kind icon)
-  (files 'assets/icons/lucide/check.svg')
-  (source 'https://lucide.dev/icons/check')
-  (license ISC)
-  (copyright 'Lucide Contributors')
-  (notice 'https://github.com/lucide-icons/lucide/blob/main/LICENSE'))
+lucide-check: asset
+  kind icon
+  files 'assets/icons/lucide/check.svg'
+  source 'https://lucide.dev/icons/check'
+  license ISC
+  copyright 'Lucide Contributors'
+  notice 'https://github.com/lucide-icons/lucide/blob/main/LICENSE'
 
-(links-ui-logo: asset
-  (kind image)
-  (files 'assets/links-ui-logo.svg')
-  (license CC0-1.0)
-  (copyright none))
+links-ui-logo: asset
+  kind image
+  files 'assets/links-ui-logo.svg'
+  license CC0-1.0
+  copyright none
 ```
 
 ## Checks

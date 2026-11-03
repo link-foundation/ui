@@ -45,12 +45,15 @@ A token set is a `theme` element with an id. It contains tokens, at most one
 `extends` link and any number of modes:
 
 ```lino
-(brand: theme
-  (extends base)
-  (token PATH VALUE (type TYPE) (description 'text'))
-  (token color.action (token color.primary))
-  (mode dark
-    (token color.primary '#D0BCFF')))
+brand: theme
+  extends base
+  token PATH VALUE
+    type TYPE
+    description 'text'
+  token color.action
+    token color.primary
+  mode dark
+    token color.primary '#D0BCFF'
 ```
 
 | Link                          | Meaning                                                                                                      |
@@ -85,9 +88,14 @@ alias: `(color (token color.scrim))`. A layered shadow lists its layers, and
 each layer is a `(shadow ...)` or an alias to a shadow token:
 
 ```lino
-(token elevation.high
-  (token elevation.low)
-  (shadow (color '#0000004D') (offset-x 0px) (offset-y 4px) (blur 8px) (spread 3px)))
+token elevation.high
+  token elevation.low
+  shadow
+    color '#0000004D'
+    offset-x 0px
+    offset-y 4px
+    blur 8px
+    spread 3px
 ```
 
 ## API

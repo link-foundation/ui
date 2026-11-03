@@ -100,8 +100,10 @@ rules in [`docs/spec/values.md`](../spec/values.md) apply:
 - use a `lino` code block, so the example can be copied into a fixture:
 
   ```lino
-  (chip: style (background '#6750A4'))
-  (logo: image 'https://example.com/logo.svg' (aspect 16 9))
+  chip: style
+    background '#6750A4'
+  logo: image 'https://example.com/logo.svg'
+    aspect 16 9
   ```
 
 ## No copyrighted text

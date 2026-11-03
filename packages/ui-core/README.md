@@ -159,9 +159,9 @@ A `#` comment carries no meaning, so a tool that writes the document from its
 tree drops it. Write what must survive as a `note`, a property of every kind:
 
 ```lino
-(ok: button
-  (label OK)
-  (note 'Why this is red'))
+ok: button
+  label OK
+  note 'Why this is red'
 ```
 
 `parse` keeps it in `properties` and `format` writes it back in all three

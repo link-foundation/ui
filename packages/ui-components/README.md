@@ -56,20 +56,31 @@ npm install @link-foundation/ui-components
 ## A machine in LiNo
 
 ```lino
-(toggle-machine: machine
-  (initial off)
-  (context (pressed false) (disabled false))
-  (action set-pressed (set pressed true))
-  (action clear-pressed (set pressed false))
-  (state off
-    (on toggle (target on) (do set-pressed) (when not-disabled)))
-  (state on
-    (on toggle (target off) (do clear-pressed) (when not-disabled)))
-  (part root
-    (attr aria-pressed (context pressed))
-    (key Enter toggle)
-    (key Space toggle)
-    (on press toggle)))
+toggle-machine: machine
+  initial off
+  context
+    pressed false
+    disabled false
+  action set-pressed
+    set pressed true
+  action clear-pressed
+    set pressed false
+  state off
+    on toggle
+      target on
+      do set-pressed
+      when not-disabled
+  state on
+    on toggle
+      target off
+      do clear-pressed
+      when not-disabled
+  part root
+    attr aria-pressed
+      context pressed
+    key Enter toggle
+    key Space toggle
+    on press toggle
 ```
 
 | Form                                               | Meaning                                                                                                                                                                     |
@@ -421,14 +432,23 @@ renderer draws it. It can also be written out as Mermaid text, or drawn by
 shows a Mermaid diagram.
 
 ```lino
-(login-flow: diagram
-  (kind flowchart)
-  (direction down)
-  (start: node (label 'Start'))
-  (check: node (label 'Signed in?') (shape diamond))
-  (home: node (label 'Home'))
-  (edge (from start) (to check))
-  (edge (from check) (to home) (label 'yes')))
+login-flow: diagram
+  kind flowchart
+  direction down
+  start: node
+    label 'Start'
+  check: node
+    label 'Signed in?'
+    shape diamond
+  home: node
+    label 'Home'
+  edge
+    from start
+    to check
+  edge
+    from check
+    to home
+    label 'yes'
 ```
 
 ```js
@@ -576,11 +596,16 @@ no animation frame while nothing moves.
 The model, as LiNo:
 
 ```lino
-(simple: link-view
-  (link (id 1) (source 1) (target 2))
-  (markers (source bar) (target arrow))
-  (blueprint true)
-  (grid true))
+simple: link-view
+  link
+    id 1
+    source 1
+    target 2
+  markers
+    source bar
+    target arrow
+  blueprint true
+  grid true
 ```
 
 - **Ends.** A `source` or `target` that is missing or `0` is a free end, drawn
@@ -833,9 +858,12 @@ await resolveIcon({ set: 'lucide', name: 'check' }); // record: ISC, Lucide
 ```
 
 ```lino
-(app: document
-  (icon close)
-  (ok: icon (set lucide) (name check) (label 'Done')))
+app: document
+  icon close
+  ok: icon
+    set lucide
+    name check
+    label 'Done'
 ```
 
 The complete example is `examples/ui-components-icons.mjs`. The gallery
