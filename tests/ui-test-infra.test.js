@@ -103,6 +103,10 @@ describe('shared static server', () => {
     for (const [url, file] of [
       ['/examples/ui-dom/', 'examples/ui-dom/index.html'],
       ['/packages/ui-dom/src/index.js', 'packages/ui-dom/src/index.js'],
+      [
+        '/packages/ui-components/examples/layout.html',
+        'packages/ui-components/examples/layout.html',
+      ],
       ['/packages/ui-core/src/index.js', 'packages/ui-core/src/index.js'],
       [
         '/node_modules/links-notation/dist/index.js',
