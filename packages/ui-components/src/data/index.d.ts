@@ -71,7 +71,10 @@ export interface DataOptions {
     item: DataItem,
     context: { signal: AbortSignal }
   ): Promise<DataItem[]>;
-  clock?: import('../behavior/index.js').Clock;
+  clock?: {
+    setTimeout(fn: () => void, ms: number): unknown;
+    clearTimeout(handle: unknown): void;
+  };
 }
 declare module '@link-foundation/ui-dom' {
   interface RenderOptions {
