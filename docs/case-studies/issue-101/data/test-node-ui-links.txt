@@ -1,0 +1,94 @@
+▶ synced client
+  ✔ writes optimistically and moves temporary addresses (19.891887ms)
+  ✔ receives what other clients change in a subscription (26.849211ms)
+  ✔ queues writes offline and sends them on connect (4.033281ms)
+  ✔ keeps writes when the transport fails (2.176729ms)
+  ✔ rolls back what the server refuses (27.917203ms)
+  ✔ runs queries on the server and reads names in the reply (8.056866ms)
+✔ synced client (92.385033ms)
+▶ link-cli client against the server
+  ✔ works through createWasmClient (5.771473ms)
+  ✔ works over TCP, with pushes to a synced client (57.858032ms)
+✔ link-cli client against the server (64.775992ms)
+▶ decorators
+  ✔ observe reports create, update and delete (3.068894ms)
+  ✔ deletes the links that use a deleted link (1.604812ms)
+  ✔ netChanges folds the changes of each link (1.091976ms)
+✔ decorators (8.148517ms)
+▶ names
+  ✔ keeps one name per link and one link per name (0.928383ms)
+  ✔ refuses what reads as something else in a query (0.577547ms)
+✔ names (2.323784ms)
+▶ Links Notation
+  ✔ exports and imports links with names (17.08348ms)
+  ✔ refuses lines that are not links (1.794727ms)
+  ✔ round-trips the binary form (11.868053ms)
+✔ Links Notation (31.796559ms)
+▶ types
+  ✔ follows sub-types and multiple inheritance (6.126846ms)
+  ✔ checks a link that is not stored yet (0.695227ms)
+  ✔ needs an Extends marker for more parents (0.655632ms)
+✔ types (9.350788ms)
+▶ permissions
+  ✔ answers by type (rules with the data) (3.854177ms)
+  ✔ answers by type (rules apart) (3.37332ms)
+  ✔ shows a subject only what it may read (29.964753ms)
+  ✔ refuses writes, the storage unchanged (9.983899ms)
+  ✔ keeps the hierarchy from who may write its values (4.608836ms)
+  ✔ refuses a marker as a subject (1.887681ms)
+✔ permissions (56.494148ms)
+▶ persistence
+  ✔ keeps links in localStorage, one key per link (13.05109ms)
+  ✔ keeps links in IndexedDB (51.74421ms)
+  ✔ keeps links as Links Notation text (3.419268ms)
+  ✔ keeps links in a SQLite file (53.831582ms)
+✔ persistence (125.31803ms)
+▶ substitution queries
+  ✔ creates, reads, updates and deletes by address (24.003194ms)
+  ✔ swaps with variables and deletes with wildcards (11.198484ms)
+  ✔ creates nested links and names with autoCreate (13.291748ms)
+  ✔ changes nothing when a query fails (6.863791ms)
+✔ substitution queries (59.461051ms)
+▶ links server
+  ✔ replays link-cli's protocol conversation (20.92345ms)
+  ✔ answers a binary request in binary (21.943113ms)
+  ✔ runs substitution queries and answers with names (13.998575ms)
+  ✔ authenticates and pushes changes to subscribers (2.637759ms)
+  ✔ serves each subject what its permissions allow (17.050327ms)
+✔ links server (78.955707ms)
+▶ links server and the links a subject creates
+  ✔ lets a subject type the links it creates, as types it may not read (3.157017ms)
+  ✔ undoes a failed request and reports its own error (3.234522ms)
+  ✔ does not give a subject a link made where its own was deleted (2.968156ms)
+✔ links server and the links a subject creates (11.070747ms)
+(node:119324) ExperimentalWarning: Importing WebAssembly module instances is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+▶ storage: memory
+  ✔ creates, updates, reads and deletes links (3.820936ms)
+  ✔ stops each() at BREAK (1.001708ms)
+  ✔ throws not-found and bad-reference with a code (0.646226ms)
+  ✔ ensureCreated makes the link at an address (0.616961ms)
+✔ storage: memory (8.436553ms)
+▶ storage: SQLite
+  ✔ creates, updates, reads and deletes links (2.847771ms)
+  ✔ stops each() at BREAK (0.955822ms)
+  ✔ throws not-found and bad-reference with a code (1.127623ms)
+  ✔ ensureCreated makes the link at an address (1.002058ms)
+✔ storage: SQLite (6.610648ms)
+▶ storage: doublets-web
+  ✔ creates, updates, reads and deletes links (40.464393ms)
+  ✔ stops each() at BREAK (53.793251ms)
+  ✔ throws not-found and bad-reference with a code (70.264099ms)
+  ✔ ensureCreated makes the link at an address (93.176889ms)
+✔ storage: doublets-web (258.752909ms)
+▶ storage: memory addresses
+  ✔ reuses freed addresses and takes far ones with createAt (0.771148ms)
+✔ storage: memory addresses (1.06126ms)
+ℹ tests 54
+ℹ suites 15
+ℹ pass 54
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 841.166642

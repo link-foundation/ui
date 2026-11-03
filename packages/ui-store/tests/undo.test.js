@@ -31,7 +31,7 @@ describe('undo / redo', () => {
       for (let n = 0; n < 200; n++) {
         kinds.add(randomOp(store, rand, n));
       }
-      expect(kinds.size).toBe(6);
+      expect(kinds.size).toBe(7);
       const final = store.toLino();
       expect(final === initial).toBe(false);
       let undone = 0;

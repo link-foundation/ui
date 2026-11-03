@@ -35,8 +35,10 @@ describe('bundle', () => {
     const source = await open(freshIndexedDB());
     seededEdits(source.store, 3, 30);
     await source.persistence.compact();
-    source.store.insert(null, 0, { kind: 'text', positional: ['late'] });
-    source.store.setProp('ok', 'label', ['After compact']);
+    // A named element: the seeded edits may have removed or renamed `ok`.
+    source.store.insert(null, 0, { id: 'late', kind: 'text' });
+    source.store.setPositional('late', ['late']);
+    source.store.setProp('late', 'style', ['After compact']);
     const text = await source.persistence.exportBundle();
     expect(
       text.startsWith(`(${BUNDLE_HEAD} (schema 1) (name demo) (snapshot_tx `)
@@ -56,7 +58,7 @@ describe('bundle', () => {
     );
     expect(reloads).toBe(1);
     // Edits after the import continue the transaction numbers.
-    target.store.setProp('ok', 'variant', ['imported']);
+    target.store.setProp('late', 'variant', ['imported']);
     const edited = target.store.toLino();
     await target.persistence.close();
     const again = await open(targetDB, { name: 'copy' });

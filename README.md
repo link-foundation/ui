@@ -150,6 +150,33 @@ const { rules } = readStyles(`(button-style: style
 compileCss(rules); // ui-button[variant='filled'] { ... } and ui-button[variant='filled']:hover { ... }
 ```
 
+### Associative links, permissions and sync
+
+[`@link-foundation/ui-links`](packages/ui-links/README.md) keeps links
+(doublets) behind one storage interface: memory, SQLite, `doublets-web`, and
+IndexedDB, `localStorage` or Links Notation text through persistence
+adapters. It runs link-cli's substitution queries on any of them, keeps types
+and permissions as links, and serves the `clink --serve` protocol. A synced
+client keeps the part of the data a user may read and stays up to date:
+
+```js
+import {
+  connectInProcess,
+  createLinksServer,
+  createMemoryLinks,
+  createSyncedLinks,
+  linksToLino,
+} from '@link-foundation/ui-links';
+
+const server = createLinksServer({
+  links: createMemoryLinks(),
+  autoCreate: true,
+});
+const client = createSyncedLinks({ transport: connectInProcess(server) });
+await client.query('() ((p: x y))');
+linksToLino(client); // (1: 2 3)\n(2: 2 2)\n(3: 3 3)
+```
+
 ### Development
 
 ```bash
@@ -197,6 +224,7 @@ npm run example:desktop:package
 │   ├── ui-dom/           # @link-foundation/ui-dom (DOM renderer, plain custom elements)
 │   ├── ui-i18n/          # @link-foundation/ui-i18n (localisation with lino-i18n, (t KEY) messages)
 │   ├── ui-kotlin/        # Jetpack Compose renderer (Gradle Kotlin Multiplatform, see build.gradle.kts)
+│   ├── ui-links/         # @link-foundation/ui-links (associative links storages, queries, permissions, links server, synced client)
 │   ├── ui-settings/      # @link-foundation/ui-settings (settings schemas, presets, share links)
 │   ├── ui-store/         # @link-foundation/ui-store
 │   ├── ui-style/         # @link-foundation/ui-style (style rules, states, media and container conditions)

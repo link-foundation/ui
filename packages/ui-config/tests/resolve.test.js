@@ -122,6 +122,20 @@ describe('createConfig: edits', () => {
     expect(errorCode(() => config.set('user', 'ok', 'label', [1]))).toBe(
       'bad-value'
     );
+    // Positional values are atoms: a link is a property, not a value.
+    expect(
+      errorCode(() => config.set('user', 'greeting', 'text', ['x', ['a']]))
+    ).toBe('bad-value');
+    expect(config.resolve('greeting', 'text').layer).toBe('site');
+    expect(
+      config
+        .loadLayer(
+          'session',
+          '(s: overrides (layer session) (set greeting text x (a b)))'
+        )
+        .diagnostics.map((d) => [d.code, d.severity])
+    ).toEqual([['bad-value', 'error']]);
+    expect(config.resolve('greeting', 'text').layer).toBe('site');
     expect(config.resolve('nope', 'label')).toBeUndefined();
     expect(config.explain('material3', 'token')).toEqual([]);
   });

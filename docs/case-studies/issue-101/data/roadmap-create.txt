@@ -1,0 +1,66 @@
+18 issue files are valid.
+created T01 -> link-foundation/ui#109
+created T02 -> link-foundation/link-cli#147
+created U01 -> link-foundation/ui#110
+created U02 -> link-foundation/ui#111
+created U03 -> link-foundation/ui#112
+created U04 -> link-foundation/ui#113
+created U05 -> link-foundation/ui#114
+created U06 -> link-foundation/ui#115
+created U07 -> link-foundation/ui#116
+created U08 -> link-foundation/ui#117
+created U09 -> link-foundation/ui#118
+created U10 -> link-foundation/ui#119
+created L01 -> link-foundation/link-cli#148
+created L02 -> link-foundation/link-cli#149
+created L03 -> link-foundation/link-cli#150
+created L04 -> link-foundation/link-cli#151
+created L05 -> link-foundation/link-cli#152
+created L06 -> link-foundation/link-cli#153
+updated T01 (link-foundation/ui#109)
+updated T02 (link-foundation/link-cli#147)
+updated U01 (link-foundation/ui#110)
+updated U02 (link-foundation/ui#111)
+updated U03 (link-foundation/ui#112)
+updated U04 (link-foundation/ui#113)
+updated U05 (link-foundation/ui#114)
+updated U06 (link-foundation/ui#115)
+updated U07 (link-foundation/ui#116)
+updated U08 (link-foundation/ui#117)
+updated U09 (link-foundation/ui#118)
+updated U10 (link-foundation/ui#119)
+updated L01 (link-foundation/link-cli#148)
+updated L02 (link-foundation/link-cli#149)
+updated L03 (link-foundation/link-cli#150)
+updated L04 (link-foundation/link-cli#151)
+updated L05 (link-foundation/link-cli#152)
+updated L06 (link-foundation/link-cli#153)
+  link-foundation/ui#110 is a sub-issue of link-foundation/ui#109
+  link-foundation/ui#111 is a sub-issue of link-foundation/ui#109
+  link-foundation/ui#112 is a sub-issue of link-foundation/ui#109
+  link-foundation/ui#113 is a sub-issue of link-foundation/ui#109
+  link-foundation/ui#114 is a sub-issue of link-foundation/ui#109
+  link-foundation/ui#115 blocked by link-foundation/ui#114
+  link-foundation/ui#115 is a sub-issue of link-foundation/ui#109
+  link-foundation/ui#116 blocked by link-foundation/link-cli#149
+  link-foundation/ui#116 blocked by link-foundation/link-cli#150
+  link-foundation/ui#116 is a sub-issue of link-foundation/ui#109
+  link-foundation/ui#117 blocked by link-foundation/link-cli#151
+  link-foundation/ui#117 blocked by link-foundation/link-cli#152
+  link-foundation/ui#117 is a sub-issue of link-foundation/ui#109
+  link-foundation/ui#118 blocked by link-foundation/ui#117
+  link-foundation/ui#118 blocked by link-foundation/link-cli#153
+  link-foundation/ui#118 is a sub-issue of link-foundation/ui#109
+  link-foundation/ui#119 is a sub-issue of link-foundation/ui#109
+  link-foundation/link-cli#148 is a sub-issue of link-foundation/link-cli#147
+  link-foundation/link-cli#149 blocked by link-foundation/link-cli#148
+  link-foundation/link-cli#149 is a sub-issue of link-foundation/link-cli#147
+  link-foundation/link-cli#150 is a sub-issue of link-foundation/link-cli#147
+  link-foundation/link-cli#151 is a sub-issue of link-foundation/link-cli#147
+  link-foundation/link-cli#152 blocked by link-foundation/link-cli#151
+  link-foundation/link-cli#152 is a sub-issue of link-foundation/link-cli#147
+  link-foundation/link-cli#153 blocked by link-foundation/link-cli#149
+  link-foundation/link-cli#153 blocked by link-foundation/link-cli#150
+  link-foundation/link-cli#153 blocked by link-foundation/link-cli#151
+  link-foundation/link-cli#153 is a sub-issue of link-foundation/link-cli#147
+wrote docs/ROADMAP.md

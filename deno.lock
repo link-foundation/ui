@@ -5,6 +5,7 @@
     "npm:@babel/parser@^7.29.12": "7.29.12",
     "npm:@changesets/cli@^3.0.3": "3.0.3",
     "npm:@eslint/js@^10.0.1": "10.0.1_eslint@10.13.0",
+    "npm:@link-foundation/link-cli-client@0.1": "0.1.0",
     "npm:@lottie-animation-community/lottie-specs@~0.3.2": "0.3.2",
     "npm:@playwright/test@1.59.1": "1.59.1",
     "npm:@vue/compiler-dom@^3.5.44": "3.5.44",
@@ -464,6 +465,9 @@
     },
     "@keyv/serialize@1.1.1": {
       "integrity": "sha512-dXn3FZhPv0US+7dtJsIi2R+c7qWYiReoEh5zUntWCf4oSpMNib8FDhSoed6m3QyZdx5hK7iLFkYk3rNxwt8vTA=="
+    },
+    "@link-foundation/link-cli-client@0.1.0": {
+      "integrity": "sha512-Uv0HQyCCgB401mL6bH6C9AWCTkXWccIRWwe8R0a9fKY+da2Hzc6skRWH/Xm1H5I8O6CpPBfs/X/iWpo1Cp0olQ=="
     },
     "@lottie-animation-community/lottie-specs@0.3.2": {
       "integrity": "sha512-riB112WfFOGSk/jssZqDxTMIofB67zOh+lEoJYvmuhOLcsBr94Lghm3saihsrcZ33lk1z5hyiE09l0DB4bs6qg==",
@@ -1828,10 +1832,22 @@
           ]
         }
       },
+      "packages/ui-links": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@link-foundation/link-cli-client@0.1",
+            "npm:doublets-web@~0.1.3",
+            "npm:fake-indexeddb@^6.2.7",
+            "npm:links-notation@~0.27.1",
+            "npm:test-anywhere@~0.8.48"
+          ]
+        }
+      },
       "packages/ui-store": {
         "packageJson": {
           "dependencies": [
             "npm:@link-foundation/ui-core@^0.0.0",
+            "npm:@link-foundation/ui-links@^0.0.0",
             "npm:doublets-web@~0.1.3",
             "npm:fake-indexeddb@^6.2.7",
             "npm:test-anywhere@~0.8.48"

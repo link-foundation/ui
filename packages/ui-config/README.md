@@ -69,7 +69,8 @@ yet, so `defaults` and `theme` start empty and are filled from patches
 `set(layer, id, name, values, key?)` names a property of the element `id`:
 
 - if `name` is the element's kind (`text` of `(greeting: text 'Hello')`), the
-  values replace its positional values;
+  values replace its positional values, which are atoms only (a link throws
+  `bad-value`, and is a `bad-value` error diagnostic in a patch);
 - if `name` is a keyed prop (`token` and `state` by default, see
   `keyedProps`), `key` selects the one prop with that first value:
   `set('user', 'material3', 'token', ['#00639B'], 'color.primary')` changes
@@ -111,6 +112,7 @@ loaded or imported, and no change event is sent.
 | `unknown-layer`, `unknown-op`                                        | error    | A layer or link the patch format does not have                       |
 | `missing-id`, `missing-name`, `missing-key`, `missing-value`         | error    | An incomplete op                                                     |
 | `unknown-id`                                                         | error    | The document has no element with that id (config only)               |
+| `bad-value`                                                          | error    | A link among the positional values of an element (config only)       |
 | `missing-layer`, `read-only-layer`                                   | error    | `importPatch` into no layer or into a layer below `user`             |
 | `extra-links`, `unexpected-value`, `base-mismatch`, `layer-mismatch` | warning  | Ignored extra links or values; a patch for another document/layer    |
 
@@ -155,9 +157,9 @@ Writes the resolved value of every overridden property into the store now and
 after each config change, as **one** store transaction with the origin
 `config` (`CONFIG_ORIGIN`), so `store.undo()` undoes a whole config change.
 When an override goes away the store gets the value of the next lower layer.
-A change of positional values replaces the element with a copy that keeps
-its IDs and children, because ui-store has no operation for positional
-values yet. Returns a function that stops following the config.
+A change of positional values is one ui-store `setPositional` operation (one
+`update` event without `prop`); IDs, properties and children are kept.
+Returns a function that stops following the config.
 
 ### `describeChanges(config, layers?)`
 

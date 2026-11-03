@@ -64,24 +64,25 @@ flowchart TB
   Dev --> Export["export overrides as LiNo<br/>(agent hand-off, share URL)"]
 ```
 
-| Layer                 | Package (working name)                         | Responsibility                                                                                                                     |
-| --------------------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Dialect specification | `docs/spec/`                                   | Vocabulary, grammar of the UI dialect on top of LiNo, conformance fixtures shared by every implementation.                         |
-| Core                  | `@link-foundation/ui-core`                     | Parse LiNo (via `links-notation`), project links into an element tree, validate against the dialect, format back, diff and patch.  |
-| Store                 | `@link-foundation/ui-store`                    | Mutable links network with stable IDs, change events, transactions, undo/redo, persistence (IndexedDB; `doublets-web` compatible). |
-| Configuration         | `@link-foundation/ui-config`                   | Layered configuration and overrides; export of overrides as LiNo patches.                                                          |
-| Settings              | `@link-foundation/ui-settings`                 | Settings schemas in LiNo: validation, presets, migrations, diff-only values documents and share links, before-paint application.   |
-| Tokens and themes     | `@link-foundation/ui-tokens`                   | Design tokens in LiNo; export to CSS custom properties, DTCG 2025.10 JSON, Swift and Kotlin.                                       |
-| Styles                | `@link-foundation/ui-style`                    | Style rules as links (selectors, states, responsive conditions) resolved against tokens.                                           |
-| DOM renderer          | `@link-foundation/ui-dom`                      | Reference renderer with custom elements and incremental updates.                                                                   |
-| Framework adapters    | `ui-react`, `ui-vue`, `ui-react-native`        | Thin bindings over the core and DOM renderer (React Native renders natively).                                                      |
-| Native ports          | `ui-swift` (SwiftPM), `ui-kotlin` (Gradle/KMP) | SwiftUI and Jetpack Compose renderers of the same dialect.                                                                         |
-| Components            | `@link-foundation/ui-components`               | Controls, layout, chat, charts, diagrams, links-network visualisation; behaviour as state machines described in LiNo.              |
-| Animation             | `@link-foundation/ui-animation`                | Keyframe/spring/timeline model, player (Web Animations API), recorder (timestamped LiNo events).                                   |
-| Dev mode              | `@link-foundation/ui-devmode`                  | Runtime inspector overlay, property editing, persistence, "make these the defaults" export.                                        |
-| Designer              | `@link-foundation/ui-designer`                 | Visual Studio-like WYSIWYG designer built with the framework itself.                                                               |
-| Converters            | `@link-foundation/ui-convert`                  | Importers (HTML/DOM, JSX/MUI, Vue SFC, Mermaid, Vega-Lite, Lottie, DTCG) and exporters.                                            |
-| Assets                | `assets/` + `assets.lino`                      | Own CC0 assets and third-party asset records with SPDX licences.                                                                   |
+| Layer                 | Package (working name)                         | Responsibility                                                                                                                                  |
+| --------------------- | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Dialect specification | `docs/spec/`                                   | Vocabulary, grammar of the UI dialect on top of LiNo, conformance fixtures shared by every implementation.                                      |
+| Core                  | `@link-foundation/ui-core`                     | Parse LiNo (via `links-notation`), project links into an element tree, validate against the dialect, format back, diff and patch.               |
+| Store                 | `@link-foundation/ui-store`                    | Mutable links network with stable IDs, change events, transactions, undo/redo, persistence (IndexedDB; `doublets-web` compatible).              |
+| Links                 | `@link-foundation/ui-links`                    | Associative doublets storages behind one interface, link-cli substitution queries, types and permissions as links, links server, synced client. |
+| Configuration         | `@link-foundation/ui-config`                   | Layered configuration and overrides; export of overrides as LiNo patches.                                                                       |
+| Settings              | `@link-foundation/ui-settings`                 | Settings schemas in LiNo: validation, presets, migrations, diff-only values documents and share links, before-paint application.                |
+| Tokens and themes     | `@link-foundation/ui-tokens`                   | Design tokens in LiNo; export to CSS custom properties, DTCG 2025.10 JSON, Swift and Kotlin.                                                    |
+| Styles                | `@link-foundation/ui-style`                    | Style rules as links (selectors, states, responsive conditions) resolved against tokens.                                                        |
+| DOM renderer          | `@link-foundation/ui-dom`                      | Reference renderer with custom elements and incremental updates.                                                                                |
+| Framework adapters    | `ui-react`, `ui-vue`, `ui-react-native`        | Thin bindings over the core and DOM renderer (React Native renders natively).                                                                   |
+| Native ports          | `ui-swift` (SwiftPM), `ui-kotlin` (Gradle/KMP) | SwiftUI and Jetpack Compose renderers of the same dialect.                                                                                      |
+| Components            | `@link-foundation/ui-components`               | Controls, layout, chat, charts, diagrams, links-network visualisation; behaviour as state machines described in LiNo.                           |
+| Animation             | `@link-foundation/ui-animation`                | Keyframe/spring/timeline model, player (Web Animations API), recorder (timestamped LiNo events).                                                |
+| Dev mode              | `@link-foundation/ui-devmode`                  | Runtime inspector overlay, property editing, persistence, "make these the defaults" export.                                                     |
+| Designer              | `@link-foundation/ui-designer`                 | Visual Studio-like WYSIWYG designer built with the framework itself.                                                                            |
+| Converters            | `@link-foundation/ui-convert`                  | Importers (HTML/DOM, JSX/MUI, Vue SFC, Mermaid, Vega-Lite, Lottie, DTCG) and exporters.                                                         |
+| Assets                | `assets/` + `assets.lino`                      | Own CC0 assets and third-party asset records with SPDX licences.                                                                                |
 
 Package names are working names; the monorepo issue decides the final ones.
 

@@ -68,6 +68,10 @@ export function createStore(options = {}) {
     removeProp: (id, name) => {
       apply({ op: 'removeProp', id, name });
     },
+    /** Replace the positional values of an element. */
+    setPositional: (id, values) => {
+      apply({ op: 'setPositional', id, values });
+    },
     /** Give an element a new ID; returns it. */
     rename: (id, to) => {
       const op = apply({ op: 'rename', id, to });

@@ -43,6 +43,7 @@ on:
           - '@link-foundation/ui-convert'
           - '@link-foundation/ui-dom'
           - '@link-foundation/ui-i18n'
+          - '@link-foundation/ui-links'
           - '@link-foundation/ui-settings'
           - '@link-foundation/ui-store'
           - '@link-foundation/ui-style'
