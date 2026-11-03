@@ -20,7 +20,7 @@ Behaviour and components for the associative UI framework, written in
   diagrams laid out by Dagre, drawn as accessible SVG, exported to Mermaid
   text or drawn by a lazily loaded Mermaid adapter. See [Diagrams](#diagrams).
 - **One link** (`./links-view`): `link-view` draws a single link from LiNo
-  with the [links-visuals](https://github.com/link-foundation/links-visuals)
+  with the [links-visuals](https://github.com/konard/links-visuals)
   geometry, as SVG or on a canvas, with its own zoom and pan.
 
 ```sh
@@ -342,7 +342,7 @@ that no package of this repository lists an EPL package in its
 ## One link: `link-view`
 
 `link-view` draws a single link. The geometry, markers and colours follow
-[links-visuals](https://github.com/link-foundation/links-visuals) (Unlicense).
+[links-visuals](https://github.com/konard/links-visuals) (Unlicense).
 The element reads its model from Links Notation through the official parser
 (`@link-foundation/ui-core` over `links-notation`) and draws it as SVG (the
 default) or on a canvas. Each element has its own zoom and pan, and asks for
