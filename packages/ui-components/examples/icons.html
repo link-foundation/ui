@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Icons · @link-foundation/ui-components</title>
+    <!--
+      The icon gallery: every icon name of the own set (CC0-1.0) and of the
+      optional Lucide, Tabler and Material Symbols sets.
+
+        node scripts/build-icons.mjs        # writes dist/icons/<set>.js
+        node scripts/serve-static.mjs       # then open
+        http://127.0.0.1:4173/packages/ui-components/examples/icons.html
+
+      Query parameters: ?set=lucide&theme=dark&dir=rtl
+    -->
+    <script type="importmap">
+      {
+        "imports": {
+          "@link-foundation/ui-components/icons": "/packages/ui-components/src/icons/index.js",
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "@link-foundation/ui-store": "/packages/ui-store/src/index.js",
+          "@link-foundation/ui-style": "/packages/ui-style/src/index.js",
+          "@link-foundation/ui-tokens": "/packages/ui-tokens/src/index.js",
+          "@link-foundation/ui-dom": "/packages/ui-dom/src/index.js",
+          "links-notation": "/node_modules/links-notation/dist/index.js"
+        }
+      }
+    </script>
+    <style>
+      :root {
+        color-scheme: light;
+        --text: #1d1b20;
+        --muted: #49454f;
+        --surface: #fffbfe;
+        --card: #f3edf7;
+        --line: #cac4d0;
+        --accent: #6750a4;
+      }
+      :root[data-theme='dark'] {
+        color-scheme: dark;
+        --text: #e6e0e9;
+        --muted: #cac4d0;
+        --surface: #141218;
+        --card: #211f26;
+        --line: #49454f;
+        --accent: #d0bcff;
+      }
+      body {
+        margin: 0;
+        padding: 24px;
+        font-family: system-ui, sans-serif;
+        color: var(--text);
+        background: var(--surface);
+      }
+      h1 {
+        margin: 0 0 4px;
+        font-size: 1.5rem;
+      }
+      p {
+        margin: 0 0 16px;
+        color: var(--muted);
+      }
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+      fieldset {
+        display: flex;
+        gap: 4px;
+        margin: 0;
+        padding: 4px 8px 6px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+      }
+      legend {
+        padding: 0 4px;
+        color: var(--muted);
+        font-size: 0.8rem;
+      }
+      label {
+        display: inline-flex;
+        gap: 4px;
+        align-items: center;
+        padding: 2px 6px;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      label:has(input:checked) {
+        color: var(--accent);
+        font-weight: 600;
+      }
+      button {
+        display: inline-flex;
+        gap: 6px;
+        align-items: center;
+        padding: 6px 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: inherit;
+        background: var(--card);
+        font: inherit;
+        cursor: pointer;
+      }
+      #status {
+        min-height: 1.25em;
+        margin: 0 0 12px;
+      }
+      #status[data-error] {
+        color: #b3261e;
+      }
+      :root[data-theme='dark'] #status[data-error] {
+        color: #f2b8b5;
+      }
+      ul.grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+        gap: 8px;
+        margin: 0 0 16px;
+        padding: 0;
+        list-style: none;
+      }
+      ul.grid li {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        align-items: center;
+        padding: 12px 4px;
+        border-radius: 8px;
+        background: var(--card);
+        font-size: 0.75rem;
+        text-align: center;
+        --ui-icon-size: 28px;
+      }
+      ul.grid li code {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+      }
+      .samples {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+      .accent {
+        color: var(--accent);
+      }
+      #credits {
+        color: var(--muted);
+        font-size: 0.8rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Icons</h1>
+      <p>
+        <code>&lt;ui-icon name="…" set="…"&gt;</code> draws in
+        <code>currentColor</code>: every icon follows the text colour.
+      </p>
+      <div class="controls">
+        <fieldset id="sets">
+          <legend>Icon set</legend>
+          <label
+            ><input type="radio" name="set" value="own" checked /> Own</label
+          >
+          <label><input type="radio" name="set" value="lucide" /> Lucide</label>
+          <label><input type="radio" name="set" value="tabler" /> Tabler</label>
+          <label
+            ><input type="radio" name="set" value="material-symbols" /> Material
+            Symbols</label
+          >
+        </fieldset>
+        <fieldset id="themes">
+          <legend>Theme</legend>
+          <label
+            ><input type="radio" name="theme" value="light" checked />
+            Light</label
+          >
+          <label><input type="radio" name="theme" value="dark" /> Dark</label>
+        </fieldset>
+        <fieldset id="dirs">
+          <legend>Direction</legend>
+          <label
+            ><input type="radio" name="dir" value="ltr" checked /> LTR</label
+          >
+          <label><input type="radio" name="dir" value="rtl" /> RTL</label>
+        </fieldset>
+      </div>
+      <p id="status" role="status"></p>
+      <div class="samples">
+        <button type="button">
+          <ui-icon name="close" label="Close"></ui-icon>
+        </button>
+        <button type="button"><ui-icon name="send"></ui-icon> Send</button>
+        <button type="button" class="accent">
+          <ui-icon name="check"></ui-icon> Accent colour
+        </button>
+        <span><ui-icon name="warning" label="Warning"></ui-icon> labelled</span>
+      </div>
+      <ul class="grid" id="grid" aria-label="Icons"></ul>
+      <p id="credits"></p>
+    </main>
+    <script type="module" src="./icons.js"></script>
+  </body>
+</html>

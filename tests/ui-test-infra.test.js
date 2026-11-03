@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'test-anywhere';
 import { spawnSync } from 'node:child_process';
 import {
+  existsSync,
   mkdtempSync,
   mkdirSync,
   readFileSync,
@@ -131,16 +132,52 @@ describe('shared static server', () => {
         '/docs/case-studies/issue-1/samples/document.lino',
         'docs/case-studies/issue-1/samples/document.lino',
       ],
+      [
+        '/packages/ui-components/examples/link-view.html',
+        'packages/ui-components/examples/link-view.html',
+      ],
+      [
+        '/packages/ui-components/src/index.js',
+        'packages/ui-components/src/index.js',
+      ],
     ]) {
       expect(resolveRequestPath(served, url)).toEqual({
         status: 200,
         file: path.resolve(repoRoot, file),
       });
     }
-    // Only src/ of a package is served, not its tests or package.json.
+    // Only src/ and examples/ of a package are served, not its tests or
+    // package.json.
+    expect(
+      resolveRequestPath(
+        served,
+        '/packages/ui-components/tests/icons/helpers.js'
+      ).status
+    ).toBe(404);
     expect(
       resolveRequestPath(served, '/packages/ui-dom/package.json').status
     ).toBe(404);
+  });
+
+  it('serves package examples and build output (the icon gallery)', () => {
+    const mounted = defaultMounts(repoRoot).map((mount) => mount.prefix);
+    expect(mounted).toContain('/packages/ui-components/examples/');
+    const served = normaliseMounts(defaultMounts(repoRoot));
+    expect(
+      resolveRequestPath(served, '/packages/ui-components/examples/icons.html')
+    ).toEqual({
+      status: 200,
+      file: path.resolve(
+        repoRoot,
+        'packages/ui-components/examples/icons.html'
+      ),
+    });
+    // dist/ (the output of `node scripts/build-icons.mjs`) is mounted
+    // when it exists.
+    const dist = path.join(repoRoot, 'packages/ui-components/dist');
+    expect(mounted.includes('/packages/ui-components/dist/')).toBe(
+      existsSync(dist)
+    );
   });
 
   it('serves the diagrams example with Dagre and the lazily loaded Mermaid', () => {
@@ -223,7 +260,7 @@ describe('Playwright e2e files stay out of unit test runners', () => {
     }
   });
 
-  it('keeps tests/e2e specs out of bun test', () => {
+  it('keeps tests/e2e and packages/*/tests/e2e specs out of bun test', () => {
     const bunfig = readFileSync(path.join(repoRoot, 'bunfig.toml'), 'utf8');
     expect(bunfig).toContain('"tests/e2e/**"');
     expect(bunfig).toContain('"packages/*/tests/e2e/**"');
