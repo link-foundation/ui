@@ -5,6 +5,10 @@
  * them (`(greeting: text 'Hello')` has `value`), and an explicit property of
  * the same name wins, as does the last of repeated properties: the same
  * model ui-dom renders from.
+ *
+ * A custom kind (`(sales: chart (series 3 5 8))`) is not in the vocabulary,
+ * so ui-core keeps its links in `unknown`: a link with a name head counts
+ * as a property of that name, below the properties of the element.
  */
 
 import { defaultVocabulary } from '@link-foundation/ui-core';
@@ -17,10 +21,17 @@ function positionalNames(kind) {
   return vocabulary.kinds.get(kind)?.positional ?? [];
 }
 
+/** The `[name, ...values]` links of `unknown`. */
+const unknownLinks = (view) =>
+  (view.unknown ?? []).filter(
+    (link) => Array.isArray(link) && typeof link[0] === 'string'
+  );
+
 /**
  * The values of every property of an element view, by name.
  * @param {{kind: string|null, positional?: readonly any[],
- *   properties?: readonly {name: string, values: readonly any[]}[]}} view
+ *   properties?: readonly {name: string, values: readonly any[]}[],
+ *   unknown?: readonly any[]}} view
  * @returns {Record<string, readonly any[]>}
  */
 export function propsOf(view) {
@@ -30,6 +41,9 @@ export function propsOf(view) {
   (view.positional ?? []).slice(0, names.length).forEach((value, i) => {
     props[names[i]] = Object.freeze([value]);
   });
+  for (const [name, ...values] of unknownLinks(view)) {
+    props[name] = Object.freeze(values);
+  }
   for (const { name, values } of view.properties ?? []) {
     props[name] = values;
   }
@@ -47,6 +61,14 @@ export function propOf(view, name) {
   for (const property of view.properties ?? []) {
     if (property.name === name) {
       found = property.values;
+    }
+  }
+  if (found !== undefined) {
+    return found;
+  }
+  for (const [head, ...values] of unknownLinks(view)) {
+    if (head === name) {
+      found = values;
     }
   }
   if (found !== undefined) {

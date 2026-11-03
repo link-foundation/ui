@@ -29,10 +29,13 @@ UiContext.displayName = 'UiContext';
 
 /**
  * `useLayoutEffect` in a browser, `useEffect` on the server (where neither
- * runs, but `useLayoutEffect` would warn on React 18).
+ * runs, but `useLayoutEffect` warns on React 18). Decided per call, so a
+ * DOM that appears after this module loads (tests, workers) is honoured.
+ * @param {import('react').EffectCallback} effect
+ * @param {import('react').DependencyList} [deps]
  */
-export const useIsomorphicLayoutEffect =
-  typeof window === 'undefined' ? useEffect : useLayoutEffect;
+export const useIsomorphicLayoutEffect = (effect, deps) =>
+  (typeof window === 'undefined' ? useEffect : useLayoutEffect)(effect, deps);
 
 /** The store and the action registry of the closest provider. */
 export const useUiContext = () => useContext(UiContext);
