@@ -4,21 +4,44 @@ import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { build } from 'vite';
+import { execFile } from 'node:child_process';
+import { createRequire } from 'node:module';
+import { promisify } from 'node:util';
 import { JSDOM } from 'jsdom';
+import { getKind } from '@link-foundation/ui-dom';
 import { readDocument } from '../pages.js';
 
 const site = fileURLToPath(new globalThis.URL('../', import.meta.url));
+const vite = path.join(
+  path.dirname(createRequire(import.meta.url).resolve('vite/package.json')),
+  'bin/vite.js'
+);
 
 test('Vite emits all pre-rendered entries and deployable assets for /ui/', async () => {
   const output = await mkdtemp(path.join(tmpdir(), 'ui-site-build-'));
+  const environment = process.env.NODE_ENV;
+  const button = getKind('button');
   try {
-    await build({
-      configFile: path.join(site, 'vite.config.js'),
-      base: '/ui/',
-      logLevel: 'silent',
-      build: { outDir: output },
-    });
+    // Vite changes NODE_ENV and the site registers kinds. Keep both out of
+    // Bun/Deno's shared test process so other renderer tests retain defaults.
+    await promisify(execFile)(
+      'node',
+      [
+        vite,
+        'build',
+        '--config',
+        path.join(site, 'vite.config.js'),
+        '--base',
+        '/ui/',
+        '--outDir',
+        output,
+        '--logLevel',
+        'silent',
+      ],
+      { cwd: site, env: { ...process.env, NODE_ENV: 'production' } }
+    );
+    assert.equal(process.env.NODE_ENV, environment);
+    assert.equal(getKind('button'), button);
     for (const language of ['en', 'ru']) {
       for (const page of [
         '',

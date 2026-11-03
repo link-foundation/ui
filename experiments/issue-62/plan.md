@@ -17,6 +17,7 @@ No required sub-issues or issue/PR feedback existed when work started.
 | Sole Pages publisher                       | `site.yml`; examples retain build artifacts      | Workflow tests and both workflow check scripts                       |
 | Release preparation                        | Changeset consumed by existing release workflow  | Changeset validation in CI                                           |
 | Repository gates                           | Existing npm scripts                             | Test, lint, format and duplication checks on the pushed revision     |
+| Build test isolation across runtimes       | Child-process Vite build                         | Parent environment and kind registry unchanged; Node/Bun/Deno checks |
 | Live documentation after merge             | Main-only Pages deployment                       | Pending merge/deploy; do not mark complete from the old live example |
 
 Use one local browser worker and serial Node tests for the container budget.
