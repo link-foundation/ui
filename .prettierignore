@@ -36,3 +36,5 @@ packages/ui-dom/tests/__snapshots__/
 packages/ui-components/src/icons/own-icons.js
 # The chart SVG snapshots are compared byte for byte (packages/ui-components/tests)
 packages/ui-components/tests/charts/__snapshots__/
+# Code exporter golden files are checked byte for byte by the export tests.
+packages/ui-convert/tests/export/fixtures/

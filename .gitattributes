@@ -13,6 +13,7 @@ docs/spec/parser-vectors.json text eol=lf
 # use LF, and the tests compare them byte for byte.
 packages/ui-tokens/tests/golden/** text eol=lf
 packages/ui-style/tests/golden/** text eol=lf
+packages/ui-convert/tests/export/fixtures/** text eol=lf
 
 # UiSwiftUI vendors the ui-tokens Swift output, and tests/ui-swift-tokens.test.js
 # compares it byte for byte with what ui-tokens writes (always LF).

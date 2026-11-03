@@ -221,3 +221,51 @@ site is sorted by element ID, property and token key. The codec exports
 The runnable example is `packages/ui-devmode/examples/?ui-dev`.
 `packages/ui-devmode/e2e/defaults.e2e.mjs` covers label editing, share preview,
 Keep/Discard, clipboard fallback, modal keyboard use, axe and URL budgets.
+
+## Foreign pages: bookmarklet and extension
+
+Dev mode also works on pages that do not use ui-dom. The foreign adapter uses
+`importDom` from ui-convert, keeps node mappings in a WeakMap, and never adds
+mapping attributes to the page. The same inspector lives in a fixed shadow host.
+Pick an element, open Properties, and edit leaf `text`, `attr <name>` or
+`style <property>` rows. Existing attributes and inline declarations are listed;
+`attr title` and `style color` are available even when absent. Arbitrary safe
+properties can also be set with
+`linkUiForeignDevMode.setProperty(id, 'style background-color', '#eef')`.
+Event attributes, script URLs, `srcdoc`, and whole-style attribute writes are
+refused. Text edits cannot replace an element's children. Closed shadow roots
+stay opaque; cross-origin iframe contents are not inspected.
+
+Changes write the session configuration layer and are automatically persisted
+per origin and pathname as LiNo under `link-ui-devmode:<origin>:<pathname>`.
+Reopening restores them; Save promotes the session to user and Discard removes
+session edits. Reset restores the previous value, including an absent attribute.
+DOM changes re-import after 200 ms; stable IDs keep their selection. Structural
+IDs may change when siblings are inserted; use existing HTML IDs when possible.
+Copy overrides as LiNo exports one `set` per changed property; Copy subtree as
+LiNo exports the selected live subtree for migration. Clipboard denial presents
+a selected textarea for manual copying. `whenSaved()` waits for pending writes;
+`storageError` and `restoreError` expose unavailable storage or invalid data.
+
+Build with `npm run build --workspace @link-foundation/ui-devmode`. It writes
+`dist/foreign.js` (one ES module), `dist/devmode.js` (the extension bundle) and
+`dist/bookmarklet.txt`. Set `UI_DEVMODE_BUNDLE_URL=https://your-host/foreign.js`
+at build time to configure the bookmarklet loader. Host the ES module with a
+JavaScript content type and CORS permission for the inspected origin. The default
+URL reserves the future documentation hosting location; self-host the bundle
+until that location is deployed. Drag a bookmark whose URL is the contents of
+`bookmarklet.txt` into the bookmarks bar, then click it on the page to toggle.
+
+**Strict Content Security Policy (CSP) blocks the bookmarklet**, including the
+loader or its module request. Use the browser extension on these pages. The
+`tests/fixtures/foreign-csp.html` fixture checks this with `script-src 'none'`.
+The extension injects a packaged script in Chrome's isolated world and uses
+`chrome.storage.local`; it does not fetch executable code from the web.
+See [extension instructions](../ui-devmode-extension/README.md). Restricted
+browser pages cannot be inspected. No Firefox support is claimed.
+
+For programmatic use, import `mountForeignDevMode` from
+`@link-foundation/ui-devmode/foreign`; pass an optional `window`, inspector
+`layout` LiNo, or async `{ getItem, setItem }` storage wrapper. The returned
+controller supports select, exportOverrides, exportSubtree, close/toggle and
+async destroy. Repeated mounting toggles the existing controller.

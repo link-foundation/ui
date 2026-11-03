@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'none'; style-src 'unsafe-inline'; img-src data:; form-action 'none'"
+    />
+    <title>Foreign page fixture</title>
+    <style>
+      body {
+        margin: 32px;
+        max-width: 680px;
+        font: 18px system-ui;
+        color: #172235;
+        background: #f5f7fb;
+      }
+      nav {
+        display: flex;
+        gap: 24px;
+      }
+      a {
+        color: #174e98;
+      }
+      article {
+        margin: 24px 0;
+        padding: 24px;
+        background: white;
+        border: 1px solid #bbc8da;
+        border-radius: 12px;
+      }
+      h2 {
+        margin-top: 0;
+      }
+      input,
+      button {
+        font: inherit;
+        padding: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <nav aria-label="Main">
+      <a href="#cards">Cards</a><a href="#contact">Contact</a>
+    </nav>
+    <main>
+      <h1>A site ready for migration</h1>
+      <section id="cards" aria-label="Cards">
+        <article>
+          <h2 id="card-title" style="color: #174e98">First card</h2>
+          <p>Edit this live page with Links UI dev mode.</p>
+        </article>
+        <article>
+          <h2>Second card</h2>
+          <p>Structural IDs work without page annotations.</p>
+        </article>
+      </section>
+      <form id="contact">
+        <label>Email <input type="email" name="email" /></label
+        ><button type="submit">Subscribe</button>
+      </form>
+    </main>
+  </body>
+</html>
