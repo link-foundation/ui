@@ -36,6 +36,11 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     emptyOutDir: true,
+    rollupOptions: {
+      // The optional peer of ui-store's doublets storage, which this app
+      // does not open: a runtime import, never bundled.
+      external: ['doublets-web'],
+    },
   },
   server: {
     fs: {
