@@ -1,22 +1,16 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { writeFile } from 'node:fs/promises';
+import { Buffer } from 'node:buffer';
 import { fileURLToPath } from 'node:url';
 import { build } from 'vite';
 
 const root = fileURLToPath(new globalThis.URL('..', import.meta.url));
-const bundleUrl =
+const bundleUrl = new globalThis.URL(
   process.env.UI_DEVMODE_BUNDLE_URL ??
-  'https://link-foundation.github.io/ui/devmode/foreign.js';
-if (!['http:', 'https:'].includes(new globalThis.URL(bundleUrl).protocol)) {
+    'https://link-foundation.github.io/ui/devmode/foreign.js'
+);
+if (!['http:', 'https:'].includes(bundleUrl.protocol)) {
   throw new Error('Bundle URL must use HTTP(S)');
 }
-const template = await readFile(
-  new globalThis.URL('../src/agent-instruction.txt', import.meta.url),
-  'utf8'
-);
-const layout = await readFile(
-  new globalThis.URL('../src/inspector.lino', import.meta.url),
-  'utf8'
-);
 // Inline the template: an injected bundle cannot fetch assets through the page CSP.
 const plugins = [
   {
@@ -38,21 +32,20 @@ const plugins = [
     name: 'inline-agent-template',
     transform(code, id) {
       if (id.endsWith('/agent-instruction.js')) {
-        return code
+        const transformed = code
           .replace(
             /export async function loadAgentTemplate\(\) \{[\s\S]*?\n\}/,
-            `export async function loadAgentTemplate() { return await Promise.resolve(${JSON.stringify(template)}); }`
+            'export async function loadAgentTemplate() { return await Promise.resolve(template); }'
           )
-          .replace(
-            'const template = await loadAgentTemplate();',
-            `const template = ${JSON.stringify(template)};`
-          );
+          .replace('const template = await loadAgentTemplate();', '');
+        return `import template from './agent-instruction.txt?raw';\n${transformed}`;
       }
       if (id.endsWith('/inspector.js')) {
-        return code.replace(
+        const transformed = code.replace(
           /export async function loadLayout\(\) \{[\s\S]*?\n\}/,
-          `export async function loadLayout() { return await Promise.resolve(${JSON.stringify(layout)}); }`
+          'export async function loadLayout() { return await Promise.resolve(foreignLayout); }'
         );
+        return `import foreignLayout from './inspector.lino?raw';\n${transformed}`;
       }
     },
   },
@@ -84,5 +77,7 @@ for (const [format, fileName, emptyOutDir] of [
     },
   });
 }
-const loader = `javascript:(()=>{const s=document.createElement('script');s.type='module';s.src=${JSON.stringify(bundleUrl)}+'?load='+Date.now();s.onload=()=>s.remove();s.onerror=()=>{s.remove();alert('Dev mode could not load. A strict CSP may block bookmarklets; use the Links UI extension.');};document.documentElement.append(s)})()`;
+// Base64 keeps the configurable address out of JavaScript source syntax.
+const address = Buffer.from(bundleUrl.href, 'utf8').toString('base64');
+const loader = `javascript:(()=>{const s=document.createElement('script');s.type='module';s.src=atob('${address}')+'?load='+Date.now();s.onload=()=>s.remove();s.onerror=()=>{s.remove();alert('Dev mode could not load. A strict CSP may block bookmarklets; use the Links UI extension.');};document.documentElement.append(s)})()`;
 await writeFile(`${root}/dist/bookmarklet.txt`, `${loader}\n`);

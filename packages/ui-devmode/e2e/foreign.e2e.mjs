@@ -1,6 +1,7 @@
 /* global chrome, activateTab */
 import { mkdir, mkdtemp, readFile, writeFile, cp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
+import { URL } from 'node:url';
 import path from 'node:path';
 import { test, expect, chromium } from '@playwright/test';
 import { expectAccessible } from '../../../tests/ui/helpers.mjs';
@@ -124,7 +125,7 @@ test('bookmarklet emits javascript URL and strict CSP blocks loader', async ({
     'packages/ui-devmode/dist/bookmarklet.txt',
     'utf8'
   );
-  expect(loader.startsWith('javascript:')).toBe(true);
+  expect(new URL(loader).protocol).toBe('javascript:');
   await page.goto(FIXTURE);
   await page.addScriptTag({
     type: 'module',
