@@ -430,13 +430,22 @@ export function registerLinkViewKind(
 // --------------------------------------------------------- links network
 export type NetworkId = string | number;
 export interface NetworkLink {
+  lino?: LinoNetworkMetadata;
   id: NetworkId;
   source: NetworkId | 0;
   target: NetworkId | 0;
   label?: string;
 }
 export interface Network {
-  points: Map<NetworkId, { id: NetworkId }>;
+  points: Map<
+    NetworkId,
+    {
+      id: NetworkId;
+      label?: string;
+      kind?: 'point' | 'value';
+      lino?: LinoNetworkMetadata;
+    }
+  >;
   links: Map<NetworkId, NetworkLink>;
 }
 export type NetworkPositions = Map<NetworkId, LinkPoint>;
@@ -458,7 +467,7 @@ export type NetworkLayout = (
   network: Network,
   options?: NetworkLayoutOptions
 ) => NetworkPositions;
-export function buildNetwork(links: Iterable<NetworkLink>): Network;
+export function buildNetwork(links: Iterable<NetworkLinkInput>): Network;
 export function networkIds(network: Network): NetworkId[];
 export function networkEdges(
   network: Network
@@ -496,7 +505,7 @@ export function visibleLabels(
 ): NetworkId[];
 export interface LayoutJob {
   layout: NetworkLayoutName;
-  links: NetworkLink[];
+  links: NetworkLinkInput[];
   options?: NetworkLayoutOptions;
 }
 export interface LayoutResult {
@@ -545,7 +554,7 @@ export interface NetworkStore {
   ): () => void;
 }
 export interface LinksNetworkElement extends HTMLElement {
-  items: NetworkLink[];
+  items: NetworkLinkInput[];
   store: NetworkStore | null;
   links: { raw: readonly RawValue[] };
   readonly network: Network;
@@ -583,3 +592,69 @@ export function registerLinksNetworkKind(
 ): Readonly<KindSpec>;
 
 export function networkVocabulary(): import('@link-foundation/ui-core').Vocabulary;
+
+// ----------------------------------------------------- LiNo network converter
+export interface LinoSourcePosition {
+  line: number;
+  column: number;
+}
+export interface LinoNetworkDiagnostic extends LinoSourcePosition {
+  code: string;
+  severity: 'error' | 'warning';
+  message: string;
+}
+export interface LinoNetworkSource {
+  id: string | null;
+  values: LinoNetworkSource[];
+  definition?: boolean;
+  quote?: string;
+}
+export interface LinoNetworkMetadata {
+  roots: LinoNetworkSource[];
+}
+export interface NetworkPointInput {
+  id: NetworkId;
+  kind: 'point' | 'value';
+  label: string;
+  lino?: LinoNetworkMetadata;
+}
+export type NetworkLinkInput = NetworkLink | NetworkPointInput;
+export type LinoNetworkInput = NetworkLinkInput;
+export interface LinoNetworkResult {
+  links: LinoNetworkInput[];
+  diagnostics: LinoNetworkDiagnostic[];
+  sourceMap: Map<string, LinoSourcePosition>;
+}
+export interface LinoNetworkOptions {
+  maxInputSize?: number;
+  maxDepth?: number;
+}
+export function linoToNetwork(
+  text: string,
+  options?: LinoNetworkOptions
+): LinoNetworkResult;
+export function networkToLino(
+  network: Network | LinoNetworkResult | LinoNetworkInput[]
+): string;
+export function networkInput(network: Network): NetworkLinkInput[];
+export interface LinoNetworkElement extends HTMLElement {
+  lino: string;
+  readonly ready: Promise<void>;
+  readonly diagnostics: LinoNetworkDiagnostic[];
+  readonly sourceMap: Map<string, LinoSourcePosition>;
+  readonly network: Network;
+  readonly networkView: LinksNetworkElement;
+  select(id: NetworkId | null): void;
+  toSvg(): string;
+  toPng(scale?: number): Promise<Blob>;
+}
+export interface LinoNetworkElementOptions extends LinoNetworkOptions {
+  tag?: string;
+  createWorker?: () => Worker;
+  fetch?: typeof fetch;
+}
+export const LINO_NETWORK_TAG: 'lino-network';
+export function defineLinoNetwork(
+  win?: Window & typeof globalThis,
+  options?: LinoNetworkElementOptions
+): { new (): LinoNetworkElement; prototype: LinoNetworkElement };

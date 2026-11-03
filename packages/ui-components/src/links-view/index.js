@@ -73,6 +73,7 @@ export {
 export {
   buildNetwork,
   networkIds,
+  networkInput,
   networkEdges,
   networkNeighbours,
 } from './network-model.js';
@@ -97,3 +98,6 @@ export {
 } from './links-network.js';
 
 export { networkVocabulary } from './network-vocabulary.js';
+
+export { linoToNetwork, networkToLino } from './lino-to-network.js';
+export { LINO_NETWORK_TAG, defineLinoNetwork } from './lino-network.js';

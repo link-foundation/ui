@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Links Notation network</title>
+    <link rel="icon" href="data:," />
+    <script type="importmap">
+      {
+        "imports": {
+          "@link-foundation/ui-store": "/packages/ui-store/src/index.js",
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "@link-foundation/ui-core/source": "/packages/ui-core/src/source.js",
+          "@link-foundation/ui-style": "/packages/ui-style/src/index.js",
+          "@link-foundation/ui-tokens": "/packages/ui-tokens/src/index.js",
+          "@link-foundation/ui-dom": "/packages/ui-dom/src/index.js",
+          "@dagrejs/dagre": "/node_modules/@dagrejs/dagre/dist/dagre.esm.js",
+          "d3-force": "/node_modules/d3-force/src/index.js",
+          "d3-dispatch": "/node_modules/d3-dispatch/dist/d3-dispatch.mjs",
+          "d3-quadtree": "/node_modules/d3-quadtree/dist/d3-quadtree.mjs",
+          "d3-timer": "/node_modules/d3-timer/dist/d3-timer.mjs",
+          "links-notation": "/node_modules/links-notation/dist/index.js"
+        }
+      }
+    </script>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: system-ui, sans-serif;
+      }
+      body {
+        max-width: 1050px;
+        margin: auto;
+        padding: 24px;
+      }
+      h1 {
+        margin-top: 0;
+      }
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-block: 20px;
+      }
+      lino-network {
+        border-radius: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Links Notation → network</h1>
+      <p>
+        Open any LiNo document as a network. Select a point or link to highlight
+        its source below the view.
+      </p>
+      <p>
+        Keyboard: Home selects the first point, arrows move between neighbours,
+        Escape clears selection. Use +/− to zoom, 0 to reset and Alt+arrows to
+        pan.
+      </p>
+      <div class="controls">
+        <label
+          >Sample
+          <select id="sample">
+            <option value="document.lino">Document</option>
+            <option value="tokens.lino">Tokens</option>
+            <option value="animation.lino">Animation</option>
+            <option value="assets.lino">Assets</option>
+            <option value="overrides.lino">Overrides</option>
+            <option value="styles.lino">Styles</option>
+            <option value="syntax-error">Syntax error</option>
+          </select></label
+        >
+        <label
+          >Layout
+          <select id="layout">
+            <option>circle</option>
+            <option>grid</option>
+            <option>hex</option>
+            <option>spiral</option>
+            <option>force</option>
+            <option>layered</option>
+          </select></label
+        >
+        <label
+          >Theme
+          <select id="theme">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select></label
+        >
+        <button id="svg" type="button">Export SVG</button>
+      </div>
+      <p id="selection" role="status">Select a point to locate its source.</p>
+      <lino-network
+        id="network"
+        label="Links Notation network"
+        theme="light"
+        src="/docs/case-studies/issue-1/samples/document.lino"
+      ></lino-network>
+    </main>
+    <script type="module" src="./lino-network.js"></script>
+  </body>
+</html>

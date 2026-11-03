@@ -91,7 +91,8 @@
     "dist/",
     "stories/",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "bin/"
   ],
   "scripts": {
     "prepack": "node ../../scripts/build-icons.mjs --root ../.. && node ../../scripts/build-network-worker.mjs"
@@ -189,5 +190,8 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "bin": {
+    "lino-network": "./bin/lino-network.mjs"
   }
 }
