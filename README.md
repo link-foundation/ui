@@ -109,6 +109,20 @@ const { store } = mountDocument(app, text, { tokens, styles, onAction });
 store.setProp('greeting', 'value', ['Hello again']); // one patch
 ```
 
+### Link view
+
+[`@link-foundation/ui-components`](packages/ui-components/README.md) draws one
+link from Links Notation with `link-view`, using the links-visuals geometry.
+The SVG and Canvas renderers share one set of marker shapes. Each element has
+its own zoom and pan and asks for no animation frame while idle. The gallery
+is `packages/ui-components/examples/link-view.html`:
+
+```html
+<link-view
+  lino="(simple: link-view (link (id 1) (source 1) (target 2)) (markers (source bar) (target arrow)))"
+></link-view>
+```
+
 ### SwiftUI
 
 [`ui-swift`](packages/ui-swift/README.md) draws a LiNo document with native
