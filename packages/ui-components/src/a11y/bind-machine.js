@@ -19,8 +19,7 @@ const DOM_EVENTS = {
 
 /**
  * The part elements: the `parts` given, else `[data-part="NAME"]` in the
- * root; the part `root` (and any part without an element when `parts` is
- * not given) is the root itself.
+ * root; the part `root` defaults to the root itself.
  */
 function resolveParts(root, service, parts) {
   const resolved = {};

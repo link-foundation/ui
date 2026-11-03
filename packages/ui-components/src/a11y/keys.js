@@ -14,6 +14,29 @@ const MODIFIERS = [
 ];
 
 /** Whether a key is a printable character (one code point, not a space). */
+/** Modifier names as written (lower case) → their canonical names. */
+const MODIFIER_ALIASES = {
+  ctrl: 'Ctrl',
+  control: 'Ctrl',
+  alt: 'Alt',
+  option: 'Alt',
+  shift: 'Shift',
+  meta: 'Meta',
+  cmd: 'Meta',
+  command: 'Meta',
+};
+
+/** Key names as written (lower case) → `KeyboardEvent.key` names. */
+const KEY_ALIASES = {
+  space: 'Space',
+  spacebar: 'Space',
+  esc: 'Escape',
+  escape: 'Escape',
+  enter: 'Enter',
+  return: 'Enter',
+  tab: 'Tab',
+};
+
 const isCharacter = (key) => [...key].length === 1 && key !== ' ';
 
 /**
@@ -31,7 +54,8 @@ export function keyOf(event) {
 }
 
 /**
- * A key combination written by hand in its canonical form: modifier order,
+ * `Control` → `Ctrl`, `Cmd` → `Meta`, `space` and `' '` → `Space`, `esc` →
+ * `Escape` (modifier and key names in any case).
  * `Control` → `Ctrl`, `Cmd` → `Meta`, `' '` → `Space`.
  * @param {string} combo
  */
@@ -41,15 +65,11 @@ export function normalizeKey(combo) {
   }
   const names = combo.split('+');
   const key = names.pop();
-  const aliases = {
-    Control: 'Ctrl',
-    Option: 'Alt',
-    Cmd: 'Meta',
-    Command: 'Meta',
-  };
-  const flags = new Set(names.map((name) => aliases[name] ?? name));
+  const flags = new Set(
+    names.map((name) => MODIFIER_ALIASES[name.toLowerCase()] ?? name)
+  );
   return keyOf({
-    key: key === '' ? '+' : key,
+    key: key === '' ? '+' : (KEY_ALIASES[key.toLowerCase()] ?? key),
     ctrlKey: flags.has('Ctrl'),
     altKey: flags.has('Alt'),
     shiftKey: flags.has('Shift'),
@@ -77,6 +97,21 @@ const TEXT_INPUTS = new Set([
  * `<textarea>`, a `<select>` or an editable element.
  * @param {EventTarget|null|undefined} element
  */
+/**
+ * Whether an element is editable content: `isContentEditable`, or (where
+ * the DOM has no such property, as in jsdom) the closest `contenteditable`
+ * attribute.
+ */
+function isEditable(element) {
+  if (typeof element.isContentEditable === 'boolean') {
+    return element.isContentEditable;
+  }
+  const value = element
+    .closest?.('[contenteditable]')
+    ?.getAttribute('contenteditable');
+  return value !== undefined && value !== null && value !== 'false';
+}
+
 export function isTextField(element) {
   if (!element || element.nodeType !== 1) {
     return false;
@@ -87,9 +122,7 @@ export function isTextField(element) {
       (element.getAttribute('type') ?? 'text').toLowerCase()
     );
   }
-  return (
-    tag === 'textarea' || tag === 'select' || element.isContentEditable === true
-  );
+  return tag === 'textarea' || tag === 'select' || isEditable(element);
 }
 
 /** Keys a text field does not use for typing: they fire there too. */
