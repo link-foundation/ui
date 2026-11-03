@@ -39,8 +39,7 @@
     "npm:prettier@^3.6.2": "3.8.4",
     "npm:svgo@^4.1.0": "4.1.0",
     "npm:test-anywhere@~0.8.48": "0.8.50",
-    "npm:vue@^3.5.44": "3.5.44",
-    "npm:yaml@^2.9.1": "2.9.1"
+    "npm:vue@^3.5.44": "3.5.44"
   },
   "npm": {
     "@antfu/install-pkg@2.1.0": {
