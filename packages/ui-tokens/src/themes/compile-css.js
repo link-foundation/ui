@@ -2,12 +2,15 @@ import { values } from '@link-foundation/ui-core';
 import { compileCss } from '@link-foundation/ui-style';
 import { toCss } from '../export/css.js';
 import { cssVariable } from '../names.js';
+import { resolveTokens } from '../resolve.js';
 import { resolveThemeTokens, themeDiagnostic } from './model.js';
-import { ensureContrast } from './contrast.js';
+import { contrastRatio, ensureContrast } from './contrast.js';
+
+const colorPair = (fg, bg) => fg?.type === 'color' && bg?.type === 'color';
 
 /** Check every pair after aliases and all active modes have resolved. */
 export function checkedTokens(theme, modes, options = {}) {
-  const tokens = resolveThemeTokens(theme, modes);
+  let tokens = resolveThemeTokens(theme, modes);
   const report = (d) => {
     options.diagnostics?.push(d);
     options.onDiagnostic?.(d);
@@ -16,7 +19,7 @@ export function checkedTokens(theme, modes, options = {}) {
   for (const [on, fill] of theme.pairs) {
     const fg = tokens.get(on),
       bg = tokens.get(fill);
-    if (fg?.type !== 'color' || bg?.type !== 'color') {
+    if (!colorPair(fg, bg)) {
       report(
         themeDiagnostic(
           'invalid-pair',
@@ -35,6 +38,25 @@ export function checkedTokens(theme, modes, options = {}) {
     if (result.adjusted) {
       const value = values.parseColor(result.color);
       tokens.set(fill, { ...bg, raw: value, value });
+      // Reuse the token resolver so direct, chained and composite aliases all
+      // see the corrected fill before checking subsequent pairs or exporting.
+      tokens = resolveTokens(
+        new Map([
+          [
+            theme.id,
+            {
+              id: theme.id,
+              extends: [],
+              modes: {},
+              tokens: [...tokens.values()].map((token) => ({
+                ...token,
+                value: token.raw,
+              })),
+            },
+          ],
+        ]),
+        theme.id
+      );
       report(
         themeDiagnostic(
           'contrast-adjusted',
@@ -43,13 +65,24 @@ export function checkedTokens(theme, modes, options = {}) {
           { theme: theme.id, on, fill, modes, ratio: result.ratio }
         )
       );
-    } else if (result.ratio < (options.minContrast ?? 4.5)) {
+    }
+  }
+  // A later correction can affect an earlier pair through an alias. Check
+  // the final output too, including conflicting pairs that cannot be met.
+  for (const [on, fill] of theme.pairs) {
+    const fg = tokens.get(on),
+      bg = tokens.get(fill);
+    if (!colorPair(fg, bg)) {
+      continue;
+    }
+    const ratio = contrastRatio(fg.value, bg.value);
+    if (ratio < (options.minContrast ?? 4.5)) {
       report(
         themeDiagnostic(
           'contrast-unreachable',
           'error',
           'The declared foreground cannot reach the requested contrast',
-          { theme: theme.id, on, fill, modes, ratio: result.ratio }
+          { theme: theme.id, on, fill, modes, ratio }
         )
       );
     }
