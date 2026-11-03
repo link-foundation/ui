@@ -81,6 +81,26 @@ describe('icon adapters', () => {
     });
   }
 
+  // Material names docks by the action ("dock to left" draws the panel on
+  // the right); the logical names say where the panel is.
+  it('draws the dock panel on the side the name says', async () => {
+    /** x of the panel divider: a vertical line, or a Material panel edge. */
+    const dividerX = (body) =>
+      Number((/M(\d+) \d+(?:v|l0 )/.exec(body) ?? /H(\d+)v600/.exec(body))[1]);
+    const middle = { '0 0 24 24': 12, '0 -960 960 960': 480 };
+    for (const [adapter, create, , viewBox] of ADAPTERS) {
+      const source = create();
+      const left = dividerX((await source.resolve('dock-left')).body);
+      const right = dividerX((await source.resolve('dock-right')).body);
+      expect(`${adapter.set} left ${left < middle[viewBox]}`).toBe(
+        `${adapter.set} left true`
+      );
+      expect(`${adapter.set} right ${right > middle[viewBox]}`).toBe(
+        `${adapter.set} right true`
+      );
+    }
+  });
+
   it('lets the loader be replaced', async () => {
     const source = createLucideSource({
       load: () =>

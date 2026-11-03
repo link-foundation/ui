@@ -36,8 +36,9 @@ export const MATERIAL_SYMBOLS_NAMES = Object.freeze({
   send: 'send',
   attach: 'attach_file',
   'drag-handle': 'drag_indicator',
-  'dock-left': 'dock_to_left',
-  'dock-right': 'dock_to_right',
+  // Material names the action: dock_to_right draws the panel on the left.
+  'dock-left': 'dock_to_right',
+  'dock-right': 'dock_to_left',
   'dock-bottom': 'dock_to_bottom',
   float: 'picture_in_picture',
   'zoom-in': 'zoom_in',
