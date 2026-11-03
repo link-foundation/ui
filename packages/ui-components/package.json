@@ -94,7 +94,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "prepack": "node ../../scripts/build-icons.mjs --root ../.."
+    "prepack": "node ../../scripts/build-icons.mjs --root ../.. && node ../../scripts/build-network-worker.mjs"
   },
   "keywords": [
     "ui",
@@ -146,6 +146,7 @@
     "@link-foundation/ui-dom": "^0.0.0",
     "@link-foundation/ui-style": "^0.0.0",
     "@link-foundation/ui-tokens": "^0.0.0",
+    "d3-force": "3.0.0",
     "d3-scale": "4.0.2",
     "d3-shape": "3.2.0",
     "links-notation": "^0.27.1",
