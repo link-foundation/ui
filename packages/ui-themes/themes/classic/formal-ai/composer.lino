@@ -29,6 +29,8 @@ composer-flat: theme
       type composer
     radius
       token composer.radius
+    surface-opacity
+      token composer.opacity
 composer-glass-soft: theme
   token composer.opacity 0.78
   token composer.radius 12px
@@ -60,6 +62,8 @@ composer-glass-soft: theme
       type composer
     radius
       token composer.radius
+    surface-opacity
+      token composer.opacity
 composer-glass-clear: theme
   token composer.opacity 0.6
   token composer.radius 12px
@@ -91,6 +95,8 @@ composer-glass-clear: theme
       type composer
     radius
       token composer.radius
+    surface-opacity
+      token composer.opacity
 composer-bubble: theme
   token composer.opacity 1
   token composer.radius 24px
@@ -122,3 +128,5 @@ composer-bubble: theme
       type composer
     radius
       token composer.radius
+    surface-opacity
+      token composer.opacity

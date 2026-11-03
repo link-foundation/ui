@@ -106,6 +106,7 @@ export function defaultMounts(root) {
     ['examples', 'ui-dom'],
     ['examples', 'animation'],
     ['examples', 'themes'],
+    ['assets', 'classic-themes'],
     ['node_modules', 'links-notation', 'dist'],
     ...BROWSER_MODULES.map((name) => ['node_modules', name]),
     ...EDITOR_BROWSER_MODULES.map((name) => [
