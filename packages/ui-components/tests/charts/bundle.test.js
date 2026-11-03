@@ -72,12 +72,14 @@ describe('the bundle of the chart entries', () => {
       const { modules, packages } = staticGraph(new URL(entry, SRC));
       expect(modules.has(new URL('charts/chart.js', SRC).href)).toBe(true);
       expect(modules.has(ADAPTER)).toBe(false);
-      expect([...packages].sort()).toEqual([
-        'd3-scale',
-        'd3-shape',
-        'links-notation',
-      ]);
+      expect(packages.has('echarts')).toBe(false);
     }
+    const { packages } = staticGraph(new URL('charts/index.js', SRC));
+    expect([...packages].sort()).toEqual([
+      'd3-scale',
+      'd3-shape',
+      'links-notation',
+    ]);
   });
 
   it('loads the adapter and echarts only through dynamic imports', () => {

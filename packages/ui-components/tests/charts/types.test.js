@@ -1,6 +1,7 @@
 /**
- * The type declarations cover the runtime exports of every entry of the
- * package (`.` and `./charts` share src/index.d.ts).
+ * The type declarations cover the runtime exports of the chart entries and
+ * of the root entry, whose declarations re-export the entries'
+ * (`export * from '@link-foundation/ui-components/charts'`).
  */
 
 import { describe, it, expect } from 'test-anywhere';
@@ -14,16 +15,31 @@ const pkg = JSON.parse(
   readFileSync(new URL('../../package.json', import.meta.url), 'utf8')
 );
 
-/** The names a declaration file exports. */
-const declared = (path) =>
-  new Set(
+const SELF = `${pkg.name}/`;
+
+/**
+ * The names a declaration file exports, following `export * from` the
+ * package's own entries.
+ */
+function declared(path) {
+  const text = readFileSync(new URL(`../../${path}`, import.meta.url), 'utf8');
+  const names = new Set(
     [
-      ...readFileSync(
-        new URL(`../../${path}`, import.meta.url),
-        'utf8'
-      ).matchAll(/^export (?:declare )?(?:const|function|class) (\w+)/gmu),
+      ...text.matchAll(
+        /^export (?:declare )?(?:const|function|class) (\w+)/gmu
+      ),
     ].map((match) => match[1])
   );
+  for (const [, specifier] of text.matchAll(/^export \* from '([^']+)';/gmu)) {
+    if (specifier.startsWith(SELF)) {
+      const entry = `./${specifier.slice(SELF.length)}`;
+      for (const name of declared(pkg.exports[entry].types)) {
+        names.add(name);
+      }
+    }
+  }
+  return names;
+}
 
 describe('type declarations', () => {
   for (const [entry, module] of [

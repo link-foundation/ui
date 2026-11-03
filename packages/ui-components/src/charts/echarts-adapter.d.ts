@@ -1,4 +1,4 @@
-import type { ChartSpec } from '../index.js';
+import type { ChartSpec } from './index.js';
 
 export interface EChartsOptions {
   theme?: 'light' | 'dark';

@@ -1853,6 +1853,8 @@
       "packages/ui-components": {
         "packageJson": {
           "dependencies": [
+            "npm:@link-foundation/ui-core@^0.0.0",
+            "npm:@link-foundation/ui-dom@^0.0.0",
             "npm:@link-foundation/ui-tokens@^0.0.0",
             "npm:d3-scale@4.0.2",
             "npm:d3-shape@3.2.0",
