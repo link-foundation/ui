@@ -248,7 +248,7 @@ Check the target lockfile first. Chakra v2 uses
 with token values wrapped in `{ value: ... }`. These are distinct source
 shapes; migrating to this framework does not require a v2-to-v3 upgrade.
 See Chakra's official [migration guide](https://chakra-ui.com/docs/get-started/migration)
-and [semantic tokens](https://chakra-ui.com/docs/styling/semantic-tokens).
+and [semantic tokens](https://chakra-ui.com/docs/theming/semantic-tokens).
 
 | Chakra source                    | Framework target                          | Notes                                      |
 | -------------------------------- | ----------------------------------------- | ------------------------------------------ |
