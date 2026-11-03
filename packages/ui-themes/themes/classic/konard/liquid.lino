@@ -18,6 +18,11 @@ liquid: theme
   token surface.opacity 0.65
   token surface.radius 24px
   token surface.blur 24px
+  token shape.corner.full 24px
+  token shape.corner.small 24px
+  token ui.control.corner 24px
+  token chat.style.radius 24px
+  token chat.bubble.tail 24px
   mode dark
     token chat.text '#E9F2FA'
     token chat.sidebar '#0B1626'
@@ -37,6 +42,11 @@ liquid: theme
     token surface.opacity 0.65
     token surface.radius 24px
     token surface.blur 24px
+    token shape.corner.full 24px
+    token shape.corner.small 24px
+    token ui.control.corner 24px
+    token chat.style.radius 24px
+    token chat.bubble.tail 24px
   mode high-contrast
     token chat.text '#000000'
     token chat.sidebar '#FFFFFF'
@@ -70,5 +80,10 @@ liquid: theme
   style
     selector
       type button
+    radius
+      token surface.radius
+  style
+    selector
+      type composer
     radius
       token surface.radius

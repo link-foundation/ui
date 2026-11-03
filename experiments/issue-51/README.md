@@ -35,3 +35,11 @@ ports select palette/surface/frame and static effects; source animations and
 sound are outside these theme packs. Poseidon uses a blue HUD, Arwes a cut frame
 with 70% glass, and Quiet a plain solid panel. Full/reduced comfort combinations
 are verified by compilation and browser computed styles.
+
+Implemented requirements are mapped to the four `classic-*.test.js` files and
+`tests/e2e/theme-classic.spec.js`. Focused theme/style tests and all three Chromium
+checks pass after merging main. Screenshot evidence is in
+`docs/screenshots/issue-51/` (38 packs, both historical comparisons, chrome,
+windows, nested axes and all 35 frames). `update-frame-snapshots.mjs` regenerates
+the frame fixture. Remaining release review uses the four repository gates and
+same-revision CI, recorded in PR #160.

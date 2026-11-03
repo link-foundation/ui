@@ -57,6 +57,13 @@ test('every pack renders real controls in family tabs with accessible contrast',
       await expect(panel.locator('ui-message-bubble')).toHaveCount(2);
       if (id === 'futuristic') {
         await expect(panel).toHaveCSS('border-radius', '0px');
+        await expect(
+          panel.getByRole('button', { name: 'Primary action' })
+        ).toHaveCSS('border-radius', '0px');
+        await expect(panel.locator('ui-composer')).toHaveCSS(
+          'border-radius',
+          '0px'
+        );
       }
       if (id === 'glass') {
         expect(

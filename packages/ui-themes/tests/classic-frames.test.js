@@ -15,6 +15,7 @@ it('all 35 frames match the reviewed LiNo snapshot and share one opacity layer',
       assert.equal(result.rules.length, 1);
       const css = compileCss(result.rules);
       assert.match(css, /clip-path:/u);
+      assert.match(css, /border-radius: 0px/u);
       assert.equal((css.match(/opacity:/gu) ?? []).length, 1);
       assert.match(css, /opacity: var\(--surface-opacity\)/u);
       assert.doesNotMatch(css, /::before|::after/u);

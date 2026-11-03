@@ -117,6 +117,7 @@ ui-panel[data-theme]::before {
 #gallery ui-composer textarea,
 #axes ui-composer textarea {
   background: transparent;
+  border-radius: var(--shape-corner-small, 8px);
   color: var(--color-on-surface);
 }
 #gallery ui-stack {
@@ -147,4 +148,5 @@ ui-panel[data-theme]::before {
 .ui-chat-shell ui-button > [data-part='root'] {
   background: var(--color-primary);
   color: var(--color-on-primary);
+  border-radius: var(--shape-corner-full, 8px);
 }

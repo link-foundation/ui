@@ -16,7 +16,7 @@ const raw = (link) =>
   link.values.length === 0 ? link.id : link.values.map(raw);
 const values = (tokens) =>
   new Map([...tokens].map(([path, token]) => [path, token.value]));
-const defaults = new Set(['motion', 'sound', 'volume', 'transparency']);
+const defaults = new Set(['motion', 'sound', 'volume', 'transparency', 'menu']);
 
 /** Inspect every value, including nested template/style links, before interpreting it. */
 function safe(link, diagnostics, id) {

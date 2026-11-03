@@ -50,3 +50,19 @@ it('historical radii, opacity and reduced effects survive resolution', async () 
     }
   }
 });
+
+it('dark radial-menu preference survives theme loading', async () => {
+  assert.equal((await loadTheme('deepcase-dark')).defaults.menu, 'radial');
+});
+
+it('chat and composer axes preserve the enclosing skin semantic tokens', async () => {
+  for (const { id } of classicThemes.filter(
+    (t) =>
+      t.id.startsWith('composer-') ||
+      ['chat-cards', 'chat-compact', 'chat-bubbles'].includes(t.id)
+  )) {
+    const theme = await loadTheme(id);
+    assert.equal(theme.tokens.has('color.primary'), false, id);
+    assert.equal(theme.modes.dark.has('color.primary'), false, id);
+  }
+});

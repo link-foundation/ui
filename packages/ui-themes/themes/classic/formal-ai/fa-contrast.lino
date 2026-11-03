@@ -72,3 +72,8 @@ fa-contrast: theme
       type button
     radius
       token surface.radius
+  style
+    selector
+      type composer
+    radius
+      token surface.radius

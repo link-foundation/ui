@@ -24,7 +24,7 @@ export interface Theme {
   templates: Map<string, TemplateNode>;
   pairs: [string, string][];
   defaults: Partial<
-    Record<'motion' | 'sound' | 'volume' | 'transparency', string>
+    Record<'motion' | 'sound' | 'volume' | 'transparency' | 'menu', string>
   >;
   diagnostics: ThemeDiagnostic[];
   set: TokenSet;

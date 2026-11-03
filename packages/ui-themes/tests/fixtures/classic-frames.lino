@@ -2,6 +2,7 @@ frame-square-none: style
   selector
     type panel
   clip-path 'inset(0px)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -15,6 +16,7 @@ frame-square-gap: style
   selector
     type panel
   clip-path 'inset(0px)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -28,6 +30,7 @@ frame-square-line: style
   selector
     type panel
   clip-path 'inset(0px)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -41,6 +44,7 @@ frame-square-accent: style
   selector
     type panel
   clip-path 'inset(0px)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -54,6 +58,7 @@ frame-square-bracket: style
   selector
     type panel
   clip-path 'inset(0px)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -67,6 +72,7 @@ frame-cut-none: style
   selector
     type panel
   clip-path 'polygon(12% 0%, 88% 0%, 100% 12%, 100% 88%, 88% 100%, 12% 100%, 0% 88%, 0% 12%)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -80,6 +86,7 @@ frame-cut-gap: style
   selector
     type panel
   clip-path 'polygon(12% 0%, 88% 0%, 100% 12%, 100% 88%, 88% 100%, 12% 100%, 0% 88%, 0% 12%)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -93,6 +100,7 @@ frame-cut-line: style
   selector
     type panel
   clip-path 'polygon(12% 0%, 88% 0%, 100% 12%, 100% 88%, 88% 100%, 12% 100%, 0% 88%, 0% 12%)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -106,6 +114,7 @@ frame-cut-accent: style
   selector
     type panel
   clip-path 'polygon(12% 0%, 88% 0%, 100% 12%, 100% 88%, 88% 100%, 12% 100%, 0% 88%, 0% 12%)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -119,6 +128,7 @@ frame-cut-bracket: style
   selector
     type panel
   clip-path 'polygon(12% 0%, 88% 0%, 100% 12%, 100% 88%, 88% 100%, 12% 100%, 0% 88%, 0% 12%)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -132,6 +142,7 @@ frame-tall-none: style
   selector
     type panel
   clip-path 'polygon(6% 0%, 94% 0%, 100% 12%, 100% 88%, 94% 100%, 6% 100%, 0% 88%, 0% 12%)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -145,6 +156,7 @@ frame-tall-gap: style
   selector
     type panel
   clip-path 'polygon(6% 0%, 94% 0%, 100% 12%, 100% 88%, 94% 100%, 6% 100%, 0% 88%, 0% 12%)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -158,6 +170,7 @@ frame-tall-line: style
   selector
     type panel
   clip-path 'polygon(6% 0%, 94% 0%, 100% 12%, 100% 88%, 94% 100%, 6% 100%, 0% 88%, 0% 12%)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -171,6 +184,7 @@ frame-tall-accent: style
   selector
     type panel
   clip-path 'polygon(6% 0%, 94% 0%, 100% 12%, 100% 88%, 94% 100%, 6% 100%, 0% 88%, 0% 12%)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -184,6 +198,7 @@ frame-tall-bracket: style
   selector
     type panel
   clip-path 'polygon(6% 0%, 94% 0%, 100% 12%, 100% 88%, 94% 100%, 6% 100%, 0% 88%, 0% 12%)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -197,6 +212,7 @@ frame-wide-none: style
   selector
     type panel
   clip-path 'polygon(12% 0%, 88% 0%, 100% 6%, 100% 94%, 88% 100%, 12% 100%, 0% 94%, 0% 6%)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -210,6 +226,7 @@ frame-wide-gap: style
   selector
     type panel
   clip-path 'polygon(12% 0%, 88% 0%, 100% 6%, 100% 94%, 88% 100%, 12% 100%, 0% 94%, 0% 6%)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -223,6 +240,7 @@ frame-wide-line: style
   selector
     type panel
   clip-path 'polygon(12% 0%, 88% 0%, 100% 6%, 100% 94%, 88% 100%, 12% 100%, 0% 94%, 0% 6%)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -236,6 +254,7 @@ frame-wide-accent: style
   selector
     type panel
   clip-path 'polygon(12% 0%, 88% 0%, 100% 6%, 100% 94%, 88% 100%, 12% 100%, 0% 94%, 0% 6%)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -249,6 +268,7 @@ frame-wide-bracket: style
   selector
     type panel
   clip-path 'polygon(12% 0%, 88% 0%, 100% 6%, 100% 94%, 88% 100%, 12% 100%, 0% 94%, 0% 6%)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -262,6 +282,7 @@ frame-round-none: style
   selector
     type panel
   clip-path 'inset(0px round 12px)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -275,6 +296,7 @@ frame-round-gap: style
   selector
     type panel
   clip-path 'inset(0px round 12px)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -288,6 +310,7 @@ frame-round-line: style
   selector
     type panel
   clip-path 'inset(0px round 12px)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -301,6 +324,7 @@ frame-round-accent: style
   selector
     type panel
   clip-path 'inset(0px round 12px)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -314,6 +338,7 @@ frame-round-bracket: style
   selector
     type panel
   clip-path 'inset(0px round 12px)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -327,6 +352,7 @@ frame-scoop-none: style
   selector
     type panel
   clip-path 'polygon(12% 0%, 88% 0%, 88% 12%, 100% 12%, 100% 88%, 88% 88%, 88% 100%, 12% 100%, 12% 88%, 0% 88%, 0% 12%, 12% 12%)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -340,6 +366,7 @@ frame-scoop-gap: style
   selector
     type panel
   clip-path 'polygon(12% 0%, 88% 0%, 88% 12%, 100% 12%, 100% 88%, 88% 88%, 88% 100%, 12% 100%, 12% 88%, 0% 88%, 0% 12%, 12% 12%)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -353,6 +380,7 @@ frame-scoop-line: style
   selector
     type panel
   clip-path 'polygon(12% 0%, 88% 0%, 88% 12%, 100% 12%, 100% 88%, 88% 88%, 88% 100%, 12% 100%, 12% 88%, 0% 88%, 0% 12%, 12% 12%)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -366,6 +394,7 @@ frame-scoop-accent: style
   selector
     type panel
   clip-path 'polygon(12% 0%, 88% 0%, 88% 12%, 100% 12%, 100% 88%, 88% 88%, 88% 100%, 12% 100%, 12% 88%, 0% 88%, 0% 12%, 12% 12%)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -379,6 +408,7 @@ frame-scoop-bracket: style
   selector
     type panel
   clip-path 'polygon(12% 0%, 88% 0%, 88% 12%, 100% 12%, 100% 88%, 88% 88%, 88% 100%, 12% 100%, 12% 88%, 0% 88%, 0% 12%, 12% 12%)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -392,6 +422,7 @@ frame-notch-none: style
   selector
     type panel
   clip-path 'polygon(0% 0%, 12% 0%, 12% 6%, 24% 6%, 24% 0%, 100% 0%, 100% 100%, 0% 100%)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -405,6 +436,7 @@ frame-notch-gap: style
   selector
     type panel
   clip-path 'polygon(0% 0%, 12% 0%, 12% 6%, 24% 6%, 24% 0%, 100% 0%, 100% 100%, 0% 100%)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -418,6 +450,7 @@ frame-notch-line: style
   selector
     type panel
   clip-path 'polygon(0% 0%, 12% 0%, 12% 6%, 24% 6%, 24% 0%, 100% 0%, 100% 100%, 0% 100%)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -431,6 +464,7 @@ frame-notch-accent: style
   selector
     type panel
   clip-path 'polygon(0% 0%, 12% 0%, 12% 6%, 24% 6%, 24% 0%, 100% 0%, 100% 100%, 0% 100%)'
+  radius 0px
   background
     token color.surface
   border-color
@@ -444,6 +478,7 @@ frame-notch-bracket: style
   selector
     type panel
   clip-path 'polygon(0% 0%, 12% 0%, 12% 6%, 24% 6%, 24% 0%, 100% 0%, 100% 100%, 0% 100%)'
+  radius 0px
   background
     token color.surface
   border-color

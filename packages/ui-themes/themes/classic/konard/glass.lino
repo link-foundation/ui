@@ -18,6 +18,11 @@ glass: theme
   token surface.opacity 0.78
   token surface.radius 12px
   token surface.blur 16px
+  token shape.corner.full 12px
+  token shape.corner.small 12px
+  token ui.control.corner 12px
+  token chat.style.radius 12px
+  token chat.bubble.tail 12px
   mode dark
     token chat.text '#E9F2FA'
     token chat.sidebar '#0B1626'
@@ -37,6 +42,11 @@ glass: theme
     token surface.opacity 0.78
     token surface.radius 12px
     token surface.blur 16px
+    token shape.corner.full 12px
+    token shape.corner.small 12px
+    token ui.control.corner 12px
+    token chat.style.radius 12px
+    token chat.bubble.tail 12px
   mode high-contrast
     token chat.text '#000000'
     token chat.sidebar '#FFFFFF'
@@ -70,5 +80,10 @@ glass: theme
   style
     selector
       type button
+    radius
+      token surface.radius
+  style
+    selector
+      type composer
     radius
       token surface.radius

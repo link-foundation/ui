@@ -26,5 +26,6 @@ it('every classic LiNo file parses and every registered theme compiles strictly 
     assert.deepEqual(diagnostics, [], id);
     assert.ok(theme.modes.dark.size > 0, id);
     assert.ok(css.includes('forced-colors'), id);
+    assert.doesNotMatch(css, /steps\(1\)/u, id);
   }
 });

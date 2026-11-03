@@ -172,6 +172,11 @@ for (const [id, opacity, radius, blur] of [
     'surface.opacity': opacity,
     'surface.radius': radius,
     'surface.blur': blur,
+    'shape.corner.full': radius,
+    'shape.corner.small': radius,
+    'ui.control.corner': radius,
+    'chat.style.radius': radius,
+    'chat.bubble.tail': radius,
   };
   await pack(
     'konard',
@@ -186,6 +191,7 @@ for (const [id, opacity, radius, blur] of [
         blur: ['token', 'surface.blur'],
       }),
       style('button', { radius: ['token', 'surface.radius'] }),
+      style('composer', { radius: ['token', 'surface.radius'] }),
     ]
   );
 }
@@ -312,6 +318,7 @@ for (const [id, bg, fg, accent, opacity, radius] of [
         blur: ['token', 'surface.blur'],
       }),
       style('button', { radius: ['token', 'surface.radius'] }),
+      style('composer', { radius: ['token', 'surface.radius'] }),
     ]
   );
 }

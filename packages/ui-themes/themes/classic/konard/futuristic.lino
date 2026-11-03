@@ -18,6 +18,11 @@ futuristic: theme
   token surface.opacity 0.9
   token surface.radius 0px
   token surface.blur 0px
+  token shape.corner.full 0px
+  token shape.corner.small 0px
+  token ui.control.corner 0px
+  token chat.style.radius 0px
+  token chat.bubble.tail 0px
   mode dark
     token chat.text '#E9F2FA'
     token chat.sidebar '#0B1626'
@@ -37,6 +42,11 @@ futuristic: theme
     token surface.opacity 0.9
     token surface.radius 0px
     token surface.blur 0px
+    token shape.corner.full 0px
+    token shape.corner.small 0px
+    token ui.control.corner 0px
+    token chat.style.radius 0px
+    token chat.bubble.tail 0px
   mode high-contrast
     token chat.text '#000000'
     token chat.sidebar '#FFFFFF'
@@ -70,5 +80,10 @@ futuristic: theme
   style
     selector
       type button
+    radius
+      token surface.radius
+  style
+    selector
+      type composer
     radius
       token surface.radius

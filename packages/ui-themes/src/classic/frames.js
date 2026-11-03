@@ -44,6 +44,7 @@ export function frameStyle({
         'style',
         ['selector', ['type', 'panel']],
         ['clip-path', polygons[corner]],
+        ['radius', '0px'],
         ['background', ['token', 'color.surface']],
         ['border-color', ['token', 'color.primary']],
         [
