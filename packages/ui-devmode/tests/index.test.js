@@ -199,7 +199,7 @@ describe('mountDevMode edits', () => {
     const { dev, $ } = await openPage();
     globalThis[GLOBAL_NAME].select('ok');
     expect($('[role="tabpanel"][data-view="source"] pre').textContent).toBe(
-      '(ok: button\n  (label OK)\n  (variant filled)\n  (on press (navigate home)))'
+      'ok: button\n  label OK\n  variant filled\n  on press\n    navigate home'
     );
     expect(
       $('[role="tabpanel"][data-view="styles"]').textContent.length > 0

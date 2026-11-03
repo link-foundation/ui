@@ -92,11 +92,11 @@ export function animationsOf(id, nodes) {
 
 /**
  * The Links Notation source of one element (with its children), written by
- * ui-core `format`.
+ * ui-core `format` in the nested form.
  * @param {object} node  a ui-core node
  */
 export const sourceOf = (node) =>
-  format({ roots: [node], unknown: [] }, { style: 'multiline' }).trimEnd();
+  format({ roots: [node], unknown: [] }).trimEnd();
 
 /**
  * The tokens an element uses: the token references of its properties, of
