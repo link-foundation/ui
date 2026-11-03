@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { URL } from 'node:url';
 import { JSDOM } from 'jsdom';
+import { getKind } from '@link-foundation/ui-dom';
 import { mountDesigner } from '../src/designer.js';
 import { DESIGNER_LAYOUT } from '../src/layout-text.js';
 
@@ -30,6 +31,23 @@ test('the embedded shell is the exact LiNo file', () => {
     DESIGNER_LAYOUT,
     readFileSync(new URL('../src/designer.lino', import.meta.url), 'utf8')
   );
+});
+test('mounting and destroying a designer preserves the host control renderer', () => {
+  const button = getKind('button');
+  const page = setup({
+    documentText: `${TEXT}    action: button Act\n`,
+  });
+  try {
+    assert.equal(getKind('button'), button);
+    assert.ok(
+      page.root.querySelector(
+        '.designer-canvas [data-link-id=action] [data-part=root]'
+      )
+    );
+  } finally {
+    page.close();
+  }
+  assert.equal(getKind('button'), button);
 });
 test('an invalid Source draft remains visible when selection changes, and can be corrected', async () => {
   const page = setup({ storage: null });

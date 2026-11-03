@@ -2,7 +2,7 @@
 import { parseOrThrow } from '@link-foundation/ui-core';
 import { createStore } from '@link-foundation/ui-store';
 import { render } from '@link-foundation/ui-dom';
-import { registerControls } from '@link-foundation/ui-components/controls';
+import { CONTROL_KIND_SPECS } from '@link-foundation/ui-components/controls';
 import { createConfig, persistUserLayer } from '@link-foundation/ui-config';
 import { defaultPolicy, parseDevModePolicy } from '@link-foundation/ui-devmode';
 import { createCatalog, designerVocabulary } from './catalog.js';
@@ -91,6 +91,7 @@ function mountShell(context) {
     setItem: (key, text) => config.set('user', key, 'note', [text]),
   };
   const shell = render(root, shellStore, {
+    kinds: CONTROL_KIND_SPECS,
     setTitle: false,
     layout: { storage: layoutStorage },
     isAction: (name) => name === 'designer',
@@ -141,6 +142,7 @@ function mountPanels(context) {
   shell.nodeFor('source').append(source, error);
   root.append(status, file);
   const handle = render(canvas, store, {
+    kinds: CONTROL_KIND_SPECS,
     setTitle: false,
     onAction: options.onAction,
   });
@@ -167,7 +169,6 @@ function mountPanels(context) {
  *   setMode: (mode: 'design'|'run') => void, editSource: (text: string) => object}}
  */
 export function mountDesigner(options) {
-  registerControls();
   const context = createContext(options);
   Object.assign(context, mountShell(context));
   Object.assign(context, mountPanels(context));
