@@ -10,7 +10,10 @@
  *   /packages/<name>/src/     -> packages/<name>/src/ (ES modules of the
  *                                import map of the example pages)
  *   /packages/<name>/examples/ -> packages/<name>/examples/ (when present;
- *                                the ui-components chart gallery)
+ *                                the ui-components chart, diagram and icon
+ *                                galleries)
+ *   /packages/<name>/dist/    -> packages/<name>/dist/ (build output, such
+ *                                as the icon modules of build-icons.mjs)
  *   /node_modules/links-notation/dist/ -> the browser build of links-notation
  *   /node_modules/<d3 package>/ -> the ES modules of d3-scale, d3-shape and
  *                                their dependencies (the chart gallery)
@@ -79,7 +82,7 @@ export function defaultMounts(root) {
   const packagesDir = path.join(root, 'packages');
   if (existsSync(packagesDir)) {
     for (const name of readdirSync(packagesDir).sort()) {
-      for (const sub of [['e2e', 'pages'], ['src'], ['examples']]) {
+      for (const sub of [['e2e', 'pages'], ['src'], ['examples'], ['dist']]) {
         const dir = path.join(packagesDir, name, ...sub);
         if (existsSync(dir)) {
           mounts.push({ prefix: `/packages/${name}/${sub.join('/')}/`, dir });

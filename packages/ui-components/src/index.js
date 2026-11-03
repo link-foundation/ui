@@ -12,6 +12,8 @@
  *   drawn as accessible SVG or by a lazily loaded Mermaid adapter;
  * - `./layout`: the layout elements rendered by ui-dom (it registers its
  *   kinds when imported);
+ * - `./icons`: the own CC0-1.0 set, the icon registry and `ui-icon` (the
+ *   icon set adapters are `./icons/adapters/<set>`);
  * - `./links-view`: `link-view`, one link drawn from links-visuals geometry.
  *
  * See README.md.
@@ -23,3 +25,4 @@ export * from './charts/index.js';
 export * from './diagrams/index.js';
 export * from './layout/index.js';
 export * from './links-view/index.js';
+export * from './icons/index.js';

@@ -127,6 +127,18 @@ export default [
     },
   },
   {
+    // Package demo pages (such as the icon gallery) run in the browser only.
+    files: ['packages/*/examples/**/*.js'],
+    languageOptions: {
+      globals: {
+        document: 'readonly',
+        window: 'readonly',
+        location: 'readonly',
+        CSS: 'readonly',
+      },
+    },
+  },
+  {
     // Playwright UI tests: callbacks passed to page.evaluate run in the
     // browser, so browser globals are available there.
     files: [

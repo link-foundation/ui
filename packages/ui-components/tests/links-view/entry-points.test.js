@@ -1,8 +1,8 @@
 /**
  * Behaviour: the package root re-exports every entry point (`behavior`,
- * `a11y`, `charts`, `diagrams`, `layout` and `links-view`), so no two of
- * them may export the same name, either as a value or in their `.d.ts`
- * declarations. TypeScript reports a name declared by two `export *` sources
+ * `a11y`, `charts`, `diagrams`, `layout`, `links-view` and `icons`), so no
+ * two of them may export the same name, either as a value or in their
+ * `.d.ts` declarations. TypeScript reports a name declared by two `export *` sources
  * as ambiguous (TS2308), which is how `Point` of `diagrams` and `links-view`
  * once clashed.
  */
@@ -18,6 +18,7 @@ const ENTRY_POINTS = [
   'diagrams',
   'layout',
   'links-view',
+  'icons',
 ];
 const SRC = new URL('../../src/', import.meta.url);
 
