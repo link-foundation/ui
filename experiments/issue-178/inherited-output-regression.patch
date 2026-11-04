@@ -1,0 +1,71 @@
+diff --git a/tests/bounded-run.test.js b/tests/bounded-run.test.js
+index cda70a9..53483ac 100644
+--- a/tests/bounded-run.test.js
++++ b/tests/bounded-run.test.js
+@@ -1,5 +1,8 @@
+ import assert from 'node:assert/strict';
+ import { URL } from 'node:url';
++import { mkdtempSync, rmSync } from 'node:fs';
++import { tmpdir } from 'node:os';
++import { join } from 'node:path';
+ import { describe, it, expect } from 'test-anywhere';
+ import {
+   HANG_GUARD_MS,
+@@ -70,6 +73,57 @@ describe('killTree', () => {
+ });
+ 
+ describe('runBounded', () => {
++  itUnless(sandboxed)(
++    'captures completed commands without waiting for inherited output handles',
++    async () => {
++      const dir = mkdtempSync(join(tmpdir(), 'bounded-output-'));
++      let output = '';
++      try {
++        const keeper = `${GRANDCHILD.replace('setInterval(() => {}, 1000);', 'setTimeout(() => {}, 8000);')}\nprocess.send('ready');`;
++        const command = `
++const { spawn } = require('node:child_process');
++const child = spawn(process.execPath, ['--input-type=module', '-e', ${JSON.stringify(keeper)}], {
++  stdio: ['ignore', 'inherit', 'inherit', 'ipc'],
++});
++child.once('message', () => {
++  console.error('parent complete');
++  process.exit(0);
++});
++`;
++        const result = await runBounded('node', ['-e', command], {
++          timeout: 5000,
++          closeAfterKillMs: 500,
++          outputFiles: {
++            stdout: join(dir, 'stdout'),
++            stderr: join(dir, 'stderr'),
++          },
++        }).catch((error) => {
++          output = error.stdout || '';
++          throw error;
++        });
++        output = result.stdout;
++        expect(result.stderr).toBe('parent complete\n');
++        expect(isProcessAlive(descendant(output))).toBe(true);
++      } finally {
++        if (output) {
++          const identity = descendant(output);
++          if (isProcessAlive(identity)) {
++            process.kill(identity.pid, 'SIGKILL');
++          }
++          for (
++            let attempt = 0;
++            attempt < 50 && isProcessAlive(identity);
++            attempt++
++          ) {
++            await new Promise((done) => setTimeout(done, 100));
++          }
++          expect(isProcessAlive(identity)).toBe(false);
++        }
++        rmSync(dir, { recursive: true, force: true });
++      }
++    }
++  );
++
+   itUnless(sandboxed)(
+     'returns the output of a successful command',
+     async () => {

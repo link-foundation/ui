@@ -97,3 +97,26 @@ uses `CreateProcessW` with handle inheritance enabled, while its
 creates inheritable child handles. The probe tests whether an unrelated keeper
 can delay pipe closure after its owner exits. This remains a hypothesis until
 the Windows comparison supplies evidence.
+
+At `5eb67d1`, [Windows comparison job 126457771896](https://github.com/link-foundation/ui/actions/runs/41795021098/job/126457771896)
+reproduced about one second between exit and closure in three Node-worker
+samples. Deno's sixteen samples closed within 15 ms of exit. This establishes
+the mechanism on Windows, but does **not** connect it to the original Deno
+failure. Both runs used runner-provided Node 22.23.4; the original and current
+CI setup downloaded Deno 2.9.8. The linked 2.9.7 Windows process implementation
+is unchanged in 2.9.8.
+
+`inherited-output-regression.patch` preserves an uncommitted candidate
+regression from this investigation. Applying it against `82c6a5b` makes a real
+command exit successfully while a finite grandchild retains output handles;
+the helper reports a timeout despite exit code zero. The test failed locally
+in 5,027 ms and verified cleanup. It proposes file-backed capture, which has
+not been implemented because this mechanism has not been shown to cause #178.
+
+The next diagnostic writes traces directly to a fixture-owned file and reads
+it on completion or failure, so a delayed pipe reader cannot hide the final
+events. `CHANGESET_FIXTURE_ROOT_ONLY=1` preserves the original root-only
+preload; `CHANGESET_FIXTURE_TRACE_STDERR=1` also retains its original stderr
+logging. The Windows parallel suite and three finite repetitions with other
+subprocess fixtures use that mode; three isolated controls retain nested
+tracing. Command and suite timeouts are unchanged.

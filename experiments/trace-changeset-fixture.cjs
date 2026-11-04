@@ -6,10 +6,18 @@ if (process.env.DEBUG_CHANGESET_FIXTURE) {
   const fs = require('node:fs');
   const { syncBuiltinESMExports } = require('node:module');
   const started = Date.now();
-  const report = (operation, value) =>
-    console.error(
-      `[changeset fixture pid=${process.pid} +${Date.now() - started}ms] ${operation}: ${JSON.stringify(value)}`
-    );
+  const report = (operation, value) => {
+    const line = `[changeset fixture pid=${process.pid} +${Date.now() - started}ms] ${operation}: ${JSON.stringify(value)}`;
+    if (process.env.CHANGESET_FIXTURE_TRACE_FILE) {
+      fs.appendFileSync(process.env.CHANGESET_FIXTURE_TRACE_FILE, `${line}\n`);
+    }
+    if (
+      !process.env.CHANGESET_FIXTURE_TRACE_FILE ||
+      process.env.CHANGESET_FIXTURE_TRACE_STDERR
+    ) {
+      console.error(line);
+    }
+  };
   // Time between process start and this preload: slow runner startup.
   report('preload', {
     entry: process.argv[1],
