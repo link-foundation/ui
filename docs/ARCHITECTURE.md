@@ -192,6 +192,9 @@ applies the patch to the committed `site` configuration.
 - Hovering highlights elements and clicking selects them. The inspector shows
   the outline tree (links network), the property grid (resolved value plus the
   layer it came from), styles, tokens, animations and the LiNo source.
+- Per-object [comments](spec/comments.md) support picking, freehand lasso,
+  text/voice instructions, anchored tasks and versioned LiNo agent handoff in
+  both the inspector and designer.
 - The WYSIWYG designer reuses the inspector and adds a toolbox, canvas drag
   and drop, alignment guides, multi-select, undo/redo, docked panels,
   two-way source sync and a timeline. It is built with the framework itself.

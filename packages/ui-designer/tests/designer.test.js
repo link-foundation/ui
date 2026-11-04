@@ -112,3 +112,23 @@ test('two instances isolate selection, drafts and cleanup; storage errors remain
   a.close();
   b.close();
 });
+
+test('designer shares per-object comments without changing document history', async () => {
+  const page = setup({ storage: null });
+  page.designer.select('public');
+  const before = page.designer.getText();
+  const history = page.designer.store.log().length;
+  page.root.querySelector('[data-link-id=comments] button').click();
+  await Promise.resolve();
+  const comments = page.dom.window.document.querySelector('ui-comments');
+  assert.ok(comments);
+  const shadow = comments.shadowRoot;
+  assert.equal(shadow.querySelector('[data-target=public]').checked, true);
+  shadow.querySelector('[data-field=instruction]').value = 'Make this clearer';
+  shadow.querySelector('[data-action=add]').click();
+  assert.ok(shadow.querySelector('[data-task]'));
+  assert.equal(page.designer.getText(), before);
+  assert.equal(page.designer.store.log().length, history);
+  page.close();
+  assert.equal(comments.isConnected, false);
+});

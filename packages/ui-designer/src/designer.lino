@@ -43,6 +43,10 @@ designer: document
       label Save
       on press
         designer save
+    comments: button
+      label 'Comment on UI'
+      on press
+        designer comments
     copy-source: button
       label 'Copy source'
       on press

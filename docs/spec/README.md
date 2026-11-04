@@ -41,6 +41,9 @@ The parser is the official [`links-notation`](https://github.com/link-foundation
 package (measured with version 0.27.1) or its official port. Implementations
 MUST NOT read LiNo with a hand-written parser.
 
+The separate [UI comments format](comments.md) describes per-object agent
+tasks and revision snapshots outside the core element vocabulary.
+
 ## Fixtures
 
 Fixtures live in `fixtures/<area>/<name>.lino`. Each `.lino` file MUST have

@@ -28,6 +28,7 @@ import {
 } from './model.js';
 import { openDefaultsDialog } from './defaults-dialog.js';
 import { createOverlay } from './overlay.js';
+import { mountComments } from './comments/index.js';
 import {
   renderAnimations,
   renderEmpty,
@@ -359,6 +360,31 @@ async function createContext(options) {
 function commandsOf(ctx, close) {
   const { config, policy, inspector, t } = ctx;
   return {
+    comments() {
+      if (ctx.comments) {
+        return;
+      }
+      ctx.setPicking(false);
+      inspector.host.style.visibility = 'hidden';
+      ctx.comments = mountComments({
+        root: ctx.root,
+        tree: ctx.tree,
+        nodeFor: (id) => ctx.adapter.nodeFor(id),
+        observe: (refresh) => ctx.adapter.observe(refresh),
+        container: ctx.container,
+        ...ctx.commentOptions,
+        onClose() {
+          ctx.comments = null;
+          inspector.host.style.visibility = '';
+          if (!ctx.state.closed) {
+            ctx.setPicking(true);
+          }
+        },
+      });
+      if (ctx.state.selected) {
+        ctx.comments.select([ctx.state.selected]);
+      }
+    },
     defaults() {
       ctx.setPicking(false);
       ctx.defaultsDialog?.close();
@@ -458,6 +484,7 @@ export async function openSession(options) {
     }
     state.closed = true;
     ctx.defaultsDialog?.close();
+    ctx.comments?.destroy();
     cleanups.splice(0).forEach((cleanup) => cleanup());
     inspector.destroy();
     overlay.destroy();
@@ -482,7 +509,8 @@ export async function openSession(options) {
       if (
         event.key === 'Escape' &&
         !event.defaultPrevented &&
-        !ctx.defaultsDialog?.host.isConnected
+        !ctx.defaultsDialog?.host.isConnected &&
+        !ctx.comments
       ) {
         event.preventDefault();
         if (state.picking) {
