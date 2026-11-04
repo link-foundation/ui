@@ -80,6 +80,51 @@ yet, so `defaults` and `theme` start empty and are filled from patches
 Values are ui-core raw values: atoms (`'16px'`) and links (`['token',
 'space.large']` for `(token space.large)`).
 
+## Viewer-owned comfort properties
+
+Comfort metadata belongs to a config instance and identifies a whole target
+(`id`, `name`, and, for keyed properties, `key`), independently of its layer.
+The settings schema remains the source of policy: `bindConfig` from ui-settings
+automatically calls `registerComfort` for every field marked `(comfort)` at
+the bound target (default `settings`). This includes `sound.enabled` and
+`sound.volume` when the sound settings schema is bound. No package-specific
+names are built into ui-config.
+
+```js
+config.registerComfort('settings', 'sound.enabled');
+config.registerComfort('settings', 'sound.volume');
+config.isComfort('settings', 'sound.volume'); // true
+config.comfortProperties(); // [{ id, name, key: null, mode: 'prop' }, …]
+config.registerComfort('material3', 'token', 'motion.duration');
+
+// Shared looks retain viewer-owned targets, including values in lower layers.
+config.importLook(sharedPatchText, 'session');
+// An intentional user edit is still permitted.
+config.set('user', 'settings', 'sound.volume', ['0.2']);
+```
+
+`registerComfort(id, name, key?)` validates like `set`, is idempotent, and
+lasts for the config's lifetime. Registration changes no values and emits no
+change events. `isComfort` returns false for invalid or unregistered targets.
+`comfortProperties()` returns a fresh array of immutable canonical targets in
+registration order; keyed properties and positional values are supported.
+Metadata is trusted application policy, not serialized into patches. Rebind
+schemas or register policy when creating a fresh config.
+
+For migration, replace `importPatch(text, layer?)` with
+`importLook(text, layer?)` wherever the patch represents somebody else's look.
+It validates the entire patch before applying anything, then skips both `set`
+and `unset` of registered targets, applying other ops as one batch. The layer
+defaults to the patch's declared editable layer, just as for `importPatch`.
+It returns the same `{ ok, diagnostics }` result. A look containing only
+comfort ops succeeds without changing values or emitting events. The dev mode
+shared-preview consumer uses this path. Settings presets, shared values and
+randomize continue to use the existing schema comfort policy.
+
+`importPatch`, `set`, `unset`, `clear` and `loadLayer` continue to allow
+intentional edits, resets and persistence restoration of comfort properties.
+Do not use `loadLayer` to apply a shared look: it replaces a whole layer.
+
 ## Patch format
 
 ```

@@ -92,7 +92,7 @@ function preview(config, storage, before, report) {
           },
         ])
       );
-      const result = config.importPatch(formatLinks(report.links), 'session');
+      const result = config.importLook(formatLinks(report.links), 'session');
       if (!result.ok) {
         throw new Error(result.diagnostics.map((d) => d.message).join('; '));
       }

@@ -50,6 +50,11 @@ export function bindConfig(
   { target = 'settings', layer = 'user' } = {}
 ) {
   checkTarget(config, target, layer);
+  for (const field of schema.fields.values()) {
+    if (field.comfort) {
+      config.registerComfort(target, field.key);
+    }
+  }
   const below = ORDER.slice(0, ORDER.indexOf(layer));
 
   /** The value of a field from the given layers (top first), or undefined. */
