@@ -94,19 +94,21 @@ test('reload restores both drafts when tokens autosave runs later', async ({
 
 async function verifyDraftRestoration(page) {
   await start(page);
-  await input(page).fill('app: document\n  title Mine');
+  await replaceSource(page, 'app: document\n  title Mine');
   await expect(
     page.getByRole('tab', { name: 'document.lino •' })
   ).toHaveAttribute('aria-selected', 'true');
   await page.getByRole('tab', { name: 'tokens.lino' }).click();
-  await input(page).fill("theme: theme\n  token color.primary '#6750A4'");
+  await replaceSource(page, "theme: theme\n  token color.primary '#6750A4'");
+  await expect
+    .poll(() => activeText(page))
+    .toBe("theme: theme\n  token color.primary '#6750A4'");
   await page.getByRole('tab', { name: 'document.lino •' }).click();
   await expect(input(page)).toContainText('Mine');
   await input(page).focus();
   await page.keyboard.press('ControlOrMeta+z');
   await expect.poll(() => activeText(page)).not.toContain('Mine');
   await page.keyboard.press('Control+y');
-  await expect.poll(() => activeText(page)).toBe('app: document\n  title Mine');
   await expect.poll(() => activeText(page)).toBe('app: document\n  title Mine');
   // Each draft has its own debounce timer; wait for both storage round trips.
   await expect
@@ -137,6 +139,17 @@ async function verifyDraftRestoration(page) {
   await expect(input(page)).toContainText('#6750A4');
   await page.getByRole('tab', { name: 'document.lino •' }).click();
   await expect(input(page)).toContainText('Mine');
+}
+
+async function replaceSource(page, text) {
+  // CodeMirror owns selection. A DOM-only fill selection can be replaced by
+  // the editor's selection restoration before Playwright inserts the text.
+  const modifier = await page.evaluate(() =>
+    window.navigator.platform.startsWith('Mac') ? 'Meta' : 'Control'
+  );
+  await input(page).focus();
+  await input(page).press(`${modifier}+a`);
+  await page.keyboard.insertText(text);
 }
 
 test('dirty external updates wait for an explicit choice; compare is inert text', async ({
