@@ -1,6 +1,7 @@
+import assert from 'node:assert/strict';
 import { describe, expect, it } from 'test-anywhere';
 import { spawn } from 'node:child_process';
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { itUnless, sandboxed } from './helpers/skip.js';
@@ -39,6 +40,10 @@ function makeFixtures({
   packageStatus = 200,
 } = {}) {
   const dir = mkdtempSync(join(tmpdir(), 'preflight-fixtures-'));
+  writeFileSync(
+    join(dir, 'package.json'),
+    JSON.stringify({ name: '@link-foundation/ui-core', version: '1.0.0' })
+  );
   writeFileSync(join(dir, 'whoami_status'), String(whoamiStatus));
   writeFileSync(join(dir, 'whoami.json'), '{"username":"stub-user"}');
   writeFileSync(join(dir, 'token.json'), '{"token":"stub-registry-token"}');
@@ -66,6 +71,9 @@ function runPreflight(env, fixtureDir) {
         // (notably node, which the script uses for JSON parsing) stays real.
         PATH: `${STUB_DIR}:${process.env.PATH}`,
         PREFLIGHT_FIXTURE_DIR: fixtureDir,
+        // Status/error cases need one package, not every real workspace.
+        // Exercise workspace enumeration separately with two public packages.
+        JS_ROOT: fixtureDir,
         ACTIONS_ID_TOKEN_REQUEST_URL: '',
         ACTIONS_ID_TOKEN_REQUEST_TOKEN: 'private-request-token',
         NPM_TOKEN: '',
@@ -160,6 +168,70 @@ describe('release-preflight workflow wiring', () => {
 });
 
 describe('release-preflight probe behaviour (offline, curl stub)', () => {
+  itUnless(sandboxed)('probes only the single-package fixture', async () => {
+    const fixtures = makeFixtures();
+    const { code } = await runPreflight(
+      { PREFLIGHT_MODE: 'release', ACTIONS_ID_TOKEN_REQUEST_URL: OIDC_URL },
+      fixtures
+    );
+    expect(code).toBe(0);
+    const exchanges = readFileSync(join(fixtures, 'requests'), 'utf8')
+      .trim()
+      .split('\n')
+      .filter((url) => url.includes('/exchange/package/'));
+    assert.deepEqual(exchanges, [
+      'https://registry.npmjs.org/-/npm/v1/oidc/token/exchange/package/%40link-foundation%2Fui-core',
+    ]);
+  });
+
+  itUnless(sandboxed)(
+    'exchanges every public workspace package once',
+    async () => {
+      const fixtures = makeFixtures();
+      writeFileSync(
+        join(fixtures, 'package.json'),
+        JSON.stringify({
+          name: 'private-root',
+          private: true,
+          workspaces: ['packages/*'],
+        })
+      );
+      for (const [name, isPrivate] of [
+        ['a', false],
+        ['b', false],
+        ['hidden', true],
+      ]) {
+        const dir = join(fixtures, 'packages', name);
+        mkdirSync(dir, { recursive: true });
+        writeFileSync(
+          join(dir, 'package.json'),
+          JSON.stringify({
+            name: `@fixture/${name}`,
+            version: '1.0.0',
+            private: isPrivate,
+          })
+        );
+      }
+      const { code, stdout } = await runPreflight(
+        { PREFLIGHT_MODE: 'release', ACTIONS_ID_TOKEN_REQUEST_URL: OIDC_URL },
+        fixtures
+      );
+      expect(code).toBe(0);
+      const exchanges = readFileSync(join(fixtures, 'requests'), 'utf8')
+        .trim()
+        .split('\n')
+        .filter((url) => url.includes('/exchange/package/'));
+      assert.deepEqual(
+        exchanges,
+        ['a', 'b'].map(
+          (name) =>
+            `https://registry.npmjs.org/-/npm/v1/oidc/token/exchange/package/%40fixture%2F${name}`
+        )
+      );
+      expect(stdout).toContain('2 verified, 0 failed, 0 unknown');
+    }
+  );
+
   itUnless(sandboxed)(
     'passes in release mode when OIDC publishing is available',
     async () => {
