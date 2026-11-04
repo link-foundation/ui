@@ -39,3 +39,24 @@ it('material accepts only the three declared enums and preserves token prefixes'
     ).diagnostics.some((d) => d.severity === 'error')
   );
 });
+
+it('HIG material selectors and theme-root alternatives minify without CSS syntax warnings', async () => {
+  const { buildCss } = await import('@link-foundation/ui-dom');
+  const { transform } = await import('esbuild');
+  const css = buildCss({
+    themeRegistry: new Map([['hig', await loadTheme('hig')]]),
+  });
+  assert.doesNotMatch(css, /\]true/u);
+  for (const material of ['regular', 'thin', 'thick']) {
+    assert.ok(
+      css.includes(
+        `:is([material='${material}'], :where(:scope):is([material='${material}'])):not(`
+      )
+    );
+  }
+  const result = await transform(css, { loader: 'css', minify: true });
+  assert.deepEqual(
+    result.warnings.filter((warning) => warning.id === 'css-syntax-error'),
+    []
+  );
+});
