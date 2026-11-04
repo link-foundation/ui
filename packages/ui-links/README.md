@@ -217,6 +217,49 @@ read (and so may learn that an address exists).
 `connectTcp` client of `@link-foundation/link-cli-client` talks to it, and
 `connectLinks(address)` is a transport that also takes the pushes.
 
+## WebSocket transport
+
+`connectWebSocket(url, { binary? })` from
+`@link-foundation/ui-links/websocket` uses the runtime's native `WebSocket`
+(browser, Node.js 22+, Deno or Bun). It returns the same text transport interface
+as `connectInProcess`; `binary: true` converts requests, replies and pushes
+through the official `links-notation` binary codec.
+
+```js
+import { createSyncedLinks } from '@link-foundation/ui-links';
+import { connectWebSocket } from '@link-foundation/ui-links/websocket';
+
+const transport = await connectWebSocket('ws://127.0.0.1:8080', {
+  binary: true,
+});
+const client = createSyncedLinks({ transport });
+await client.subscribe([]);
+```
+
+On Node.js, `listenLinksWebSocket(server, { port?, host?, maxMessageBytes?,
+subject? })` from `@link-foundation/ui-links/websocket-server` returns
+`{ port, host, address, url, close }`. It uses `ws` (MIT), isolated in the server
+entry point so browser imports never load Node modules. The defaults are a
+random port on `127.0.0.1`, a 64 MiB message limit, and a null subject.
+Authentication and permissions use the same session protocol as TCP.
+
+Each WebSocket **message** is exactly one request or reply: text is a LiNo
+document, binary is exactly one `encodeBinary` packet (no TCP dot terminator
+or extra length prefix). Replies arrive in request order; pushes begin with
+`(notify: n)` and do not consume a waiting reply. Replies use the request's
+frame type, and pushes use the recipient's last request's frame type and binary
+codec options. Incomplete or concatenated binary packets close the socket with
+code 1002; oversized messages close it with code 1009. Socket errors and closure
+reject every waiting request and subsequent sends with `LinksError('offline')`.
+The synced client retains its in-memory outbox and can replay it with
+`client.connect(await connectWebSocket(url))`; persistent outboxes and reconnect
+resynchronisation are tracked separately in #114.
+
+Run `node examples/ui-links-websocket.mjs` for the TCP example's WebSocket twin.
+The example runs in the runtime CI matrix; `tests/ui/links-websocket.e2e.mjs`
+syncs two browser tabs through this server in text and binary modes.
+The framing proposal is tracked in link-foundation/link-cli#30.
+
 ## The synced client
 
 `createSyncedLinks({ transport?, cache? })` keeps a copy of part of the server
