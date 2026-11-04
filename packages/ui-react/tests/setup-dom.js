@@ -9,6 +9,7 @@
  */
 
 import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { URL } from 'node:url';
 import { JSDOM } from 'jsdom';
 import { createStore } from '@link-foundation/ui-store';
@@ -50,6 +51,24 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 const { act, createElement } = await import('react');
 const { createRoot } = await import('react-dom/client');
+
+// Opt-in export tracing for intermittent runtime failures; do not pre-load the
+// scheduler or change import order during normal tests.
+if (process.env.UI_REACT_TEST_DEBUG === '1') {
+  const require = createRequire(import.meta.url);
+  const fromReactDom = createRequire(require.resolve('react-dom/client'));
+  const scheduler = fromReactDom('scheduler');
+  console.error('[ui-react modules]', {
+    runtime: process.version,
+    nodeEnv: process.env.NODE_ENV,
+    react: require('react/package.json').version,
+    reactDom: require('react-dom/package.json').version,
+    scheduler: fromReactDom('scheduler/package.json').version,
+    schedulerPath: fromReactDom.resolve('scheduler'),
+    schedulerExports: Object.keys(scheduler),
+    nowType: typeof scheduler.unstable_now,
+  });
+}
 
 export { act, createElement as h };
 
