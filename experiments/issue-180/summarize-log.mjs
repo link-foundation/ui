@@ -10,11 +10,21 @@ const lines = (file.endsWith('.gz') ? gunzipSync(bytes) : bytes)
   // eslint-disable-next-line no-control-regex
   .replace(/(?:\x1b|\^\[)\[[\d;]*m/g, '')
   .split('\n');
-const rows = lines.map((text, index) => ({
+const allRows = lines.map((text, index) => ({
   line: index + 1,
   time: text.match(/\d{4}-\d\d-\d\dT[\d:.]+Z/)?.[0],
   text,
 }));
+// Exclude the separate formatter probes after the suite (including failures).
+const start = allRows.findIndex((row) =>
+  /Running Deno test suite/.test(row.text)
+);
+const end = allRows.findIndex(
+  (row, index) =>
+    index >= start &&
+    /Deno test suite (?:finished|did not finish)/.test(row.text)
+);
+const rows = allRows.slice(Math.max(0, start), end < 0 ? undefined : end + 1);
 for (const [label, pattern] of [
   ['suite', /Running Deno test suite/],
   ['download', /Download https:\/\/registry/],

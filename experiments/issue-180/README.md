@@ -107,3 +107,30 @@ bash scripts/run-with-budget-warning.sh 300 "Deno test suite" deno test -A --par
 
 No dependency install or checking phase has been moved outside the budget.
 The 15-minute job backstop and all existing formatter probes are preserved.
+
+## First fresh-run result and remaining subprocess stall
+
+Revision `e8274de` ran all three shards in [run 41803933045](https://github.com/link-foundation/ui/actions/runs/41803933045).
+The complete job logs are preserved as `windows-deno-shard-{1,2,3}.log.gz`.
+Shards 1 and 2 finished their cold suites in 89 and 104 seconds. Shard 3
+finished every preflight case by 09:05:21.455 (line 3967), but timed out at
+09:07:51.137 (line 4065). Its last result was at 09:05:25.965 (line 4063).
+The three preceding cases in `issue-262-regressions.test.js` completed at
+09:04:21.710 (lines 2836–2868); its final case, `enforces LF for every
+tracked shell script and hook`, never reported completion. Comparing the
+union of shard results with the same-revision successful Linux Deno job
+identifies that case as the only missing result. All other runtime legs and
+all other workflows passed. This revision was not considered a completed fix.
+
+That case performed 23 unbounded synchronous Git subprocess calls: one
+`ls-files`, then `check-attr` for each of 22 tracked paths. The log localizes
+the stall to this case, but cannot identify which individual invocation
+stalled or prove an internal Deno/Windows cause. These are replaced with two
+asynchronous `runBounded` calls with closed stdin: `ls-files -z`, then one
+`check-attr -z eol --` covering every discovered path. NUL-delimited triples
+retain path boundaries, and every `eol: lf` and file-content assertion stays.
+Each command has half the existing fixture hang guard, keeping both calls
+under the existing per-test budget. Optional `REPOSITORY_GIT_TRACE=1` records
+arguments, spawn, exit, pipe end and close elapsed times; it defaults off.
+Both lifecycle traces are enabled for Windows Deno CI so a recurrence names
+the command and phase instead of consuming the entire suite budget silently.
