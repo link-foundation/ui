@@ -6,7 +6,11 @@
 import { describe, it, expect } from 'test-anywhere';
 import { createStore } from '@link-foundation/ui-store';
 import { UiProvider, UiView, useUiAction } from '@link-foundation/ui-react';
-import { createActionRegistry } from '@link-foundation/ui-react/hooks';
+import { URL, fileURLToPath } from 'node:url';
+import {
+  runBounded,
+  HANG_GUARD_MS,
+} from '../../../tests/helpers/bounded-run.js';
 import { click, h, mount } from './setup-dom.js';
 
 const doc = (action) =>
@@ -23,6 +27,34 @@ async function warnings(fn) {
     console.warn = original;
   }
   return messages;
+}
+
+/** Reject transient NODE_ENV changes as well as a different final value. */
+async function withoutParentEnvWrites(fn) {
+  const parentEnv = process.env;
+  const writes = [];
+  // Deno workers share OS environment variables. Catch even a temporary
+  // write: checking only the final value misses the scheduler import race.
+  process.env = new Proxy(parentEnv, {
+    set(target, key, value) {
+      if (key === 'NODE_ENV') {
+        writes.push([key, value]);
+      }
+      return Reflect.set(target, key, value);
+    },
+    deleteProperty(target, key) {
+      if (key === 'NODE_ENV') {
+        writes.push([key]);
+      }
+      return Reflect.deleteProperty(target, key);
+    },
+  });
+  try {
+    await fn(parentEnv);
+  } finally {
+    process.env = parentEnv;
+  }
+  expect(writes).toEqual([]);
 }
 
 /** The native button of `ok` (the target of its press listener). */
@@ -135,20 +167,26 @@ describe('UiView actions', () => {
     expect(codes).toContain('unknown-action');
   });
 
-  it('stays silent without any actions and in production', async () => {
+  it('stays silent without actions and in production without changing parent NODE_ENV', async () => {
     const messages = await warnings(async () => {
       const view = await mount(h(UiView, { source: doc('(emit save)') }));
       await click(okOf(view));
       await view.unmount();
-      const registry = createActionRegistry();
-      registry.setActions({});
-      const env = process.env.NODE_ENV;
-      process.env.NODE_ENV = 'production';
-      try {
-        registry.dispatch({ source: 'ok', event: 'press', action: ['x'] });
-      } finally {
-        process.env.NODE_ENV = env;
-      }
+      await withoutParentEnvWrites(async (parentEnv) => {
+        const fixture = fileURLToPath(
+          new URL(
+            '../../../experiments/issue-179/production-actions.mjs',
+            import.meta.url
+          )
+        );
+        const args = globalThis.Deno
+          ? ['run', '-A', '--node-modules-dir=manual', fixture]
+          : [fixture];
+        await runBounded(process.execPath, args, {
+          timeout: HANG_GUARD_MS,
+          env: { ...parentEnv, NODE_ENV: 'production' },
+        });
+      });
     });
     expect(messages).toEqual([]);
   });
