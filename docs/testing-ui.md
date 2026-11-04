@@ -97,7 +97,7 @@ anti-aliasing differ on macOS, Windows and other Linux images.
 
 ## Reading failures
 
-When the job fails it uploads `ui-tests-failure-<run id>-<attempt>` with
+Every run uploads `ui-tests-report-<run id>-<attempt>` with
 `playwright-report/` and `test-results/`. For a screenshot mismatch,
 `test-results/<test>/` holds `*-expected.png`, `*-actual.png` and
 `*-diff.png`. Open `playwright-report/index.html` (or
