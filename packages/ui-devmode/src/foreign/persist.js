@@ -15,3 +15,40 @@ export async function loadOverrides(storage, location) {
 export async function saveOverrides(storage, location, overrides) {
   await storage.setItem(storageKey(location), overrides);
 }
+
+/** Cache reads for the synchronous panel and serialize delivery-channel writes. */
+export async function commentStorage(storage, location) {
+  const key = `${storageKey(location)}:comments`;
+  let text = null;
+  let restoreError = null;
+  let storageError = null;
+  let pending = Promise.resolve();
+  try {
+    text = await storage.getItem(key);
+  } catch (error) {
+    restoreError = error.message;
+  }
+  return {
+    get restoreError() {
+      return restoreError;
+    },
+    get storageError() {
+      return storageError;
+    },
+    whenSaved: () => pending,
+    getItem() {
+      if (restoreError) {
+        throw new Error(restoreError);
+      }
+      return text;
+    },
+    setItem(_key, value) {
+      text = value;
+      const write = pending.then(() => storage.setItem(key, value));
+      pending = write.catch((error) => {
+        storageError = error.message;
+      });
+      return write;
+    },
+  };
+}

@@ -130,3 +130,19 @@ Set `DESIGNER_SCREENSHOTS=1` when running the Chromium scenarios to refresh
 the four committed milestone screenshots in `docs/screenshots/designer/`.
 All runtime dependencies are existing permissively licensed framework packages;
 the designer adds no third-party runtime library or asset.
+
+## Per-object comments and agent tasks
+
+The toolbar's **Comment on UI** opens the same
+[comment panel as dev mode](../ui-devmode/README.md#comment-on-the-ui), initially
+selecting the designer's selected objects. Pick, lasso or use the keyboard
+checkbox list; write or dictate instructions and add one task per object.
+Comment bubbles stay anchored to the canvas while the panel is open. Save,
+resolve/reopen, delete and exchange reviews through validated LiNo.
+
+Reviews persist separately under `<storageKey>.comments` using the designer's
+`storage` option. They record exact canonical document versions and an ordered
+comment event history; they do not alter Source, draft text, or document
+undo/redo. Source and canvas edits refresh the review's current/outdated/missing
+indicators. Anonymous objects use stable store IDs in the review snapshot.
+`destroy()` closes the comment panel and stops any active dictation.

@@ -17,6 +17,9 @@ devmode-inspector: devmode-panel
     devmode-defaults: devmode-action
       label toolbar.defaults
       command defaults
+    devmode-comments: devmode-action
+      label toolbar.comments
+      command comments
     devmode-close: devmode-action
       label toolbar.close
       command close

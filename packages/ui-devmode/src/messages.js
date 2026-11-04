@@ -9,6 +9,7 @@ export const MESSAGES = Object.freeze({
   'inspector.title': 'Dev mode',
   'inspector.label': 'Dev mode inspector',
   'resize.label': 'Resize the inspector',
+  'toolbar.comments': 'Comment on UI',
   'toolbar.defaults': 'Make these the defaults',
   'defaults.title': 'Make these the defaults',
   'defaults.count': '{count} changes',

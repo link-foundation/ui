@@ -65,6 +65,7 @@ function readPolicy(policy) {
  *   styles?: string|object[], tokens?: string|Map<string, object>,
  *   theme?: string, animations?: string|object[], vocabulary?: object,
  *   messages?: Record<string, string>, layout?: string,
+ *   commentOptions?: object,
  *   window?: Window & typeof globalThis,
  *   onOpen?: () => void, onClose?: () => void }} options
  *   `root` is the container ui-dom rendered into, `config` the ui-config

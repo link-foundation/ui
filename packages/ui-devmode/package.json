@@ -8,6 +8,10 @@
       "types": "./src/index.d.ts",
       "default": "./src/index.js"
     },
+    "./comments": {
+      "types": "./src/comments/index.d.ts",
+      "default": "./src/comments/index.js"
+    },
     "./views": "./src/views.js",
     "./overlay": "./src/overlay.js",
     "./model": {

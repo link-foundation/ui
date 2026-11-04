@@ -195,3 +195,12 @@ Should a later dialect version adopt these properties, or represent geometry
 through named style links? Owner: the geometry/style dialect. v0 rule: parse
 designer documents with `designerVocabulary()`; other renderers retain the
 extension as unknown properties until they opt into that vocabulary.
+
+## UI comments
+
+Issue #147 owns the separate `ui-comments/1` annotation format, documented in
+[comments.md](comments.md). It is read by ui-devmode/comments and is not a new
+renderable core element kind. Review snapshots name otherwise anonymous
+objects with adapter IDs without changing the application document. A future
+collaborative backend may add authors or timestamps through a new format
+version; version 1 uses ordered deterministic events and explicit LiNo exchange.

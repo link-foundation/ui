@@ -224,6 +224,7 @@ export function mountDesigner(options) {
     undo: session.undo,
     redo: session.redo,
     destroy() {
+      context.comments?.destroy();
       controller.abort();
       unsubscribe();
       context.canvasController.destroy();

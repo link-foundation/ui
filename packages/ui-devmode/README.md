@@ -269,3 +269,79 @@ For programmatic use, import `mountForeignDevMode` from
 `layout` LiNo, or async `{ getItem, setItem }` storage wrapper. The returned
 controller supports select, exportOverrides, exportSubtree, close/toggle and
 async destroy. Repeated mounting toggles the existing controller.
+
+## Comment on the UI
+
+Press **Comment on UI** in the inspector to open per-object change requests.
+Pick an object, add/remove objects with Shift/Ctrl/Cmd, draw a freehand **Lasso**,
+or select checkboxes with the keyboard. Type an instruction or press **Start
+voice input**, review its transcript, and press **Add tasks**. Each selected
+object gets an independent task. Open tasks appear in anchored comment bubbles
+and the task panel; edit and save their instructions, resolve/reopen, or delete
+them. Escape cancels a gesture, then leaves picking, then closes comments.
+Closing comments returns to the inspector. Closing dev mode cleans up both.
+
+**Export LiNo** fills the handoff field; **Copy LiNo** uses the clipboard or
+selects the text for manual copying. Paste a review and press **Import LiNo**
+to replace it after validation. Requests include exact canonical UI snapshots,
+per-object target IDs, input method, status and ordered create/update/remove
+history. `current`, `outdated` and `missing` indicators prevent stale requests
+from looking current. Comments never execute patches or change the app.
+The [format specification](../../docs/spec/comments.md) describes all fields,
+validation, budgets and agent consumption.
+
+The review persists as LiNo in localStorage under
+`ui-comments:<pathname>` by default. `commentOptions` passed to `mountDevMode`
+can set `storage` (`null` disables persistence), `storageKey`, initial `text`,
+`messages` (English text to translation) and `trace(event, detail)` (off by
+default). Multiple mounts on one path should use distinct keys. Storage errors
+remain visible and leave in-memory tasks exportable. Imported reviews may refer
+to older UI; the panel retains them and marks them accordingly. Comments can
+refer to locked elements without changing the site's editing permissions.
+
+The same panel works with the foreign-page bookmarklet/extension and the
+WYSIWYG designer. A custom renderer with a stable-ID tree can mount it directly:
+
+```js
+import { mountComments } from '@link-foundation/ui-devmode/comments';
+
+const comments = mountComments({
+  root,
+  tree: store,
+  nodeFor: (id) => handle.nodeFor(id),
+  storageKey: 'my-page.comments',
+});
+comments.select(['ok', 'greeting']);
+comments.model.add(comments.selection(), 'Make this easier to understand');
+const handoff = comments.model.export();
+comments.destroy();
+```
+
+The pure exports are `createComments({ getDocument, text?, trace? })`,
+`readComments(text)`, `commentDocument(tree)`, `COMMENT_LIMITS` and `lasso`.
+The model exposes `tasks`, `revisions`, `events`, `add`, `update`, `remove`,
+`state`, `export`, `import` and `subscribe`. Returned lists are copies.
+`commentDocument` creates a named snapshot from a store-shaped tree. The mount
+also exposes `host`, `tree`, `select`, `selection`, `refresh` and `destroy`.
+Pass `observe` for adapters whose change subscription is separate from `tree`.
+All model operations are synchronous and deterministic.
+
+Voice input uses an optional browser service only after Start; availability,
+permissions, language support and service connectivity depend on the browser.
+The page language selects recognition language. Text entry remains available
+when recognition is absent or denied; no microphone or service is required for
+the rest of the workflow.
+
+![Comments anchored to a UI object](../../docs/screenshots/ui-comments.png)
+
+Tests: `node --test packages/ui-devmode/tests/comments*.test.js` and
+`npx playwright test packages/ui-devmode/e2e/comments.e2e.mjs --workers=1`.
+The browser suite covers text/voice tasks, freehand gestures, validation,
+persistence, designer integration, and light/dark WCAG 2.2 AA. Set
+`COMMENT_SCREENSHOTS=1` to refresh the two Chromium documentation images.
+
+Foreign-page comments use the same storage channel as overrides, with a separate
+origin/path key: local storage for a bookmarklet, `chrome.storage.local` in the
+extension. `whenSaved()` waits for both writes; asynchronous storage failures
+appear in the panel and `storageError`. Comment source snapshots retain the
+imported page IDs and never apply DOM edits.

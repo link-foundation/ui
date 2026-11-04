@@ -1,4 +1,5 @@
 /** Shell buttons and shortcuts share the same document commands. */
+import { mountComments } from '@link-foundation/ui-devmode/comments';
 import { isEditableTarget } from '@link-foundation/ui-devmode';
 import {
   moveElements,
@@ -35,6 +36,23 @@ export function createActions(context) {
     }
   };
   const commands = {
+    comments() {
+      if (context.comments) {
+        return;
+      }
+      context.comments = mountComments({
+        root: context.canvas,
+        tree: store,
+        nodeFor: (id) => context.handle.nodeFor(id),
+        storage: context.storage,
+        storageKey: `${context.storageKey}.comments`,
+        trace: context.options.trace,
+        onClose() {
+          context.comments = null;
+        },
+      });
+      context.comments.select([...selection.ids]);
+    },
     mode: () => context.setMode(context.mode() === 'design' ? 'run' : 'design'),
     undo: () => session.undo(),
     redo: () => session.redo(),

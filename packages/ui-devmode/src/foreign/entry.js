@@ -7,6 +7,7 @@ import {
   saveOverrides,
   localStorageAdapter,
   chromeStorageAdapter,
+  commentStorage,
 } from './persist.js';
 
 /** Open/toggle the same inspector over a foreign page. No page globals in extension world. */
@@ -32,6 +33,7 @@ export async function mountForeignDevMode({
         getItem: (key) => window.localStorage.getItem(key),
         setItem: (key, value) => window.localStorage.setItem(key, value),
       });
+  const comments = await commentStorage(storage, window.location);
   const adapter = createForeignAdapter({ root: document.body, ignore });
   let session;
   let opening;
@@ -61,12 +63,13 @@ export async function mountForeignDevMode({
       return Boolean(session);
     },
     get storageError() {
-      return storageError;
+      return storageError ?? comments.storageError;
     },
     get restoreError() {
-      return restoreError;
+      return restoreError ?? comments.restoreError;
     },
-    whenSaved: () => pendingSave,
+    whenSaved: () =>
+      Promise.all([pendingSave, comments.whenSaved()]).then(() => {}),
     async open() {
       if (destroyed) {
         return false;
@@ -86,6 +89,7 @@ export async function mountForeignDevMode({
           adapter,
           container: shadow,
           layout,
+          commentOptions: { storage: comments },
           policy: defaultPolicy(),
           t: translator(),
           onInspector(inspector) {
@@ -143,7 +147,7 @@ export async function mountForeignDevMode({
       controller.close();
       unsubscribe();
       adapter.destroy();
-      await pendingSave;
+      await controller.whenSaved();
       delete window.linkUiForeignDevMode;
     },
   };

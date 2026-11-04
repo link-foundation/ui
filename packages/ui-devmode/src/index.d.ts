@@ -128,6 +128,10 @@ export interface MountDevModeOptions {
   animations?: string | object[];
   vocabulary?: object;
   messages?: Record<string, string>;
+  commentOptions?: Pick<
+    import('@link-foundation/ui-devmode/comments').MountCommentsOptions,
+    'storage' | 'storageKey' | 'text' | 'messages' | 'trace'
+  >;
   /** The inspector layout (Links Notation); `inspector.lino` by default. */
   layout?: string;
   window?: Window & typeof globalThis;
