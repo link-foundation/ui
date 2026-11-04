@@ -157,7 +157,11 @@ const areaNames = new WeakMap();
 
 defineKind('grid', {
   tag: 'ui-grid',
-  create: (el, ctx) => ctx.document.createElement('ui-grid'),
+  create(el, ctx) {
+    const node = ctx.document.createElement('ui-grid');
+    areaNames.set(node, new Set());
+    return node;
+  },
   update(node, el, changed, ctx) {
     if (changed.includes('columns')) {
       const value = trackList(el.props.get('columns'));
