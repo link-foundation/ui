@@ -451,11 +451,9 @@ test('matrix audits settled theme colors and still rejects settled contrast defe
         for (const surface of document.querySelectorAll(
           '[data-link-id="node-menu"] > [role="menuitem"]'
         )) {
-          const backgroundColor =
-            window.getComputedStyle(surface).backgroundColor;
           const animation = surface.animate(
-            [{ backgroundColor: '#7d7d7d' }, { backgroundColor }],
-            { duration: 60_000, fill: 'forwards' }
+            { backgroundColor: ['#7d7d7d', '#7d7d7d'] },
+            { duration: 60_000 }
           );
           animation.pause();
           animation.currentTime = 0;

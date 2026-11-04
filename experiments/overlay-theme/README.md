@@ -66,6 +66,12 @@ sets a permanent white-on-gray defect and proves `expectAccessible` rejects it.
 The controlled animation stretches the observed transient state deterministically;
 it does not claim to reproduce WebKit's internal implementation.
 
+The animation has no fill, so finishing it releases the temporary gray override
+and exposes the theme's own CSS background. Sampling an end color immediately
+after `emulateMedia` can itself capture the previous scheme: the first full CI
+run caught this in Chromium as white radial-menu backgrounds in the dark
+screenshot. The regression therefore does not retain a sampled end color.
+
 The helper callback regression fails against the old helper (neither theme is
 audited). The original audit-before-screenshot order also fails on the controlled
 transient color. Both checks ensure the test does not just rely on an isolated
