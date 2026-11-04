@@ -11,6 +11,7 @@
  * The SQL storage (`createSqlLinks`) needs none: it is persistent itself.
  */
 
+import { formatLinks, parseLinks } from '@link-foundation/ui-core';
 import { observe } from './decorators.js';
 import { allLinks, ensureCreated, LinksError } from './links.js';
 import { formatLino, named, parseLino } from './lino.js';
@@ -73,12 +74,14 @@ export function localStorageAdapter(storage, prefix = 'links:') {
       const text = [];
       for (let i = 0; i < storage.length; i++) {
         const key = storage.key(i);
-        if (key !== null && key.startsWith(prefix)) {
+        if (key !== null && key.startsWith(prefix) && key !== `${prefix}sync`) {
           text.push(storage.getItem(key));
         }
       }
       return triplesFromLino(text.join('\n'));
     },
+    loadState: () => storage.getItem(`${prefix}sync`),
+    saveState: (text) => storage.setItem(`${prefix}sync`, text),
     put: (id, source, target) =>
       storage.setItem(`${prefix}${id}`, lineOf(id, source, target)),
     remove: (id) => storage.removeItem(`${prefix}${id}`),
@@ -101,9 +104,9 @@ export function indexedDbAdapter(indexedDB, name) {
   let db = null;
   let tail = Promise.resolve();
   let failure = null;
-  const write = (fn) => {
-    const tx = db.transaction('links', 'readwrite');
-    fn(tx.objectStore('links'));
+  const write = (fn, name = 'links') => {
+    const tx = db.transaction(name, 'readwrite');
+    fn(tx.objectStore(name));
     const done = new Promise((resolve, reject) => {
       tx.oncomplete = () => resolve();
       tx.onerror = () => reject(tx.error);
@@ -117,15 +120,22 @@ export function indexedDbAdapter(indexedDB, name) {
   };
   return {
     async load() {
-      const open = indexedDB.open(name, 1);
-      open.onupgradeneeded = () =>
-        open.result.createObjectStore('links', { keyPath: 'id' });
+      const open = indexedDB.open(name, 2);
+      open.onupgradeneeded = () => {
+        if (!open.result.objectStoreNames.contains('links')) {
+          open.result.createObjectStore('links', { keyPath: 'id' });
+        }
+        open.result.createObjectStore('sync');
+      };
       db = await request(open);
       const records = await request(
         db.transaction('links').objectStore('links').getAll()
       );
       return records.map((r) => [r.id, r.source, r.target]);
     },
+    loadState: () =>
+      request(db.transaction('sync').objectStore('sync').get('state')),
+    saveState: (text) => write((store) => store.put(text, 'state'), 'sync'),
     put: (id, source, target) =>
       write((store) => store.put({ id, source, target })),
     remove: (id) => write((store) => store.delete(id)),
@@ -149,20 +159,32 @@ export function indexedDbAdapter(indexedDB, name) {
  */
 export function linoTextAdapter({ read, write }) {
   const links = new Map();
+  let state = null;
   const save = () =>
     write(
       [...links.entries()]
         .sort((a, b) => a[0] - b[0])
         .map(([id, [source, target]]) => lineOf(id, source, target))
+        .concat(state ? state.trimEnd() : [])
         .join('\n')
     );
   return {
     async load() {
-      const triples = triplesFromLino((await read()) ?? '');
+      const document = parseLinks((await read()) ?? '');
+      const checkpoint = document.find((v) => v.id === 'sync');
+      state = checkpoint ? formatLinks([checkpoint]) : null;
+      const triples = triplesFromLino(
+        formatLino(document.filter((v) => v.id !== 'sync'))
+      );
       for (const [id, source, target] of triples) {
         links.set(id, [source, target]);
       }
       return triples;
+    },
+    loadState: () => state,
+    saveState(text) {
+      state = text;
+      save();
     },
     put(id, source, target) {
       links.set(id, [source, target]);
