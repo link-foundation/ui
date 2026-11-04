@@ -1,0 +1,27 @@
+▶ process-state observation
+  ✖ does not resurrect a zombie reaped between polling and assertion (5.313634ms)
+✖ process-state observation (11.027593ms)
+ℹ tests 1
+ℹ suites 1
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 184.98641
+
+✖ failing tests:
+
+test at node_modules/.deno/test-anywhere@0.8.50/node_modules/test-anywhere/src/index.js:174:12
+✖ does not resurrect a zombie reaped between polling and assertion (5.313634ms)
+  Error: Expected true to be false
+      at Object.toBe (file:///tmp/gh-issue-solver-1793758245397/node_modules/.deno/test-anywhere@0.8.50/node_modules/test-anywhere/src/index.js:391:15)
+      at TestContext.<anonymous> (file:///tmp/gh-issue-solver-1793758245397/tests/process-state.test.js:25:47)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at node:internal/test_runner/test:1903:71
+      at node:internal/per_context/primordials:505:82
+      at new Promise (<anonymous>)
+      at new SafePromise (node:internal/per_context/primordials:479:3)
+      at node:internal/per_context/primordials:505:9
