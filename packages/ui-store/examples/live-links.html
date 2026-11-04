@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Live links document</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "links-notation": "/node_modules/links-notation/dist/index.js"
+        }
+      }
+    </script>
+    <style>
+      body {
+        font:
+          18px system-ui,
+          sans-serif;
+        color: #172032;
+        background: #f3f5f8;
+        margin: 2rem auto;
+        padding: 1rem;
+        max-width: 48rem;
+      }
+      main {
+        background: white;
+        padding: 2rem;
+        border-radius: 1rem;
+        border: 1px solid #bcc5d3;
+      }
+      label {
+        display: block;
+        margin-block: 1rem;
+      }
+      input,
+      button {
+        font: inherit;
+        padding: 0.5rem;
+      }
+      input {
+        display: block;
+        width: 90%;
+      }
+      pre {
+        white-space: pre-wrap;
+        background: #eef1f6;
+        padding: 1rem;
+      }
+      @media (prefers-color-scheme: dark) {
+        body {
+          color: #eef1f6;
+          background: #172032;
+          color-scheme: dark;
+        }
+        main {
+          background: #202b40;
+        }
+        pre {
+          background: #172032;
+        }
+        :focus-visible {
+          outline-color: #91b9ff;
+        }
+      }
+      :focus-visible {
+        outline: 3px solid #2459aa;
+        outline-offset: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>One document, two browsers</h1>
+      <p>
+        Open this address in another tab. Edit either node and both documents
+        update.
+      </p>
+      <p role="status" id="status">Connecting</p>
+      <label>First node <input id="first" disabled /></label>
+      <label>Second node <input id="second" disabled /></label>
+      <button id="undo" type="button" disabled>Undo my edit</button>
+      <pre id="document" aria-label="Document in Links Notation"></pre>
+    </main>
+    <script type="module" src="./live-links.js"></script>
+  </body>
+</html>
