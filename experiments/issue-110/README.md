@@ -21,3 +21,9 @@ not a dependency: this transport preserves the existing in-memory outbox.
 
 Evidence is recorded in the PR acceptance table. Local command logs go in the
 ignored `logs/` directory; CI investigation logs go in `ci-logs/`.
+
+For local verification with installed Chrome (one worker), run
+`npx playwright test --config experiments/issue-110/playwright.config.mjs`.
+The standard configuration and CI still use pinned Chromium and WebKit.
+For manual inspection, run `node experiments/issue-110/serve.mjs` and open the
+printed URL in two tabs.
