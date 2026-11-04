@@ -1,0 +1,12 @@
+Source: https://github.com/link-foundation/ui/actions/runs/41707026716
+Linux Deno job log (ANSI removed); original job-log line numbers:
+4107: 2026-11-03T19:58:49.6600806Z ./tests/check-web-archive.test.js => never classifies a non-http error as a URL ... ok (104µs)
+4108: 2026-11-03T19:58:49.6603057Z ./tests/check-web-archive.test.js => matches the error count lychee itself reports ... ok (149µs)
+4109: 2026-11-03T19:58:49.6605723Z ./tests/check-release-needed.test.js => does not release on an unknown GitHub result (500) ... ok (115ms)
+4110: 2026-11-03T19:58:49.6608016Z ./tests/bounded-run.test.js => kills descendants on timeout and reports the timeout ... ok (2s)
+4111: 2026-11-03T19:58:49.6610304Z ./tests/check-web-archive.test.js => fails when the only lychee errors have no http URL to archive ... ok (111ms)
+4112: 2026-11-03T19:58:49.6612819Z ./tests/changeset-config.test.js => versions and formats the real package with Deno absent from PATH ... ok (2s)
+4113: 2026-11-03T19:58:49.6616097Z ./tests/changeset-config.test.js => checks the fresh merge in the independent lint job and discards changes ... ok (1ms)
+4114: 2026-11-03T19:58:49.6618670Z ./tests/check-release-needed.test.js => does not release on a malformed GitHub response ... ok (129ms)
+4115: 2026-11-03T19:58:49.6621052Z ./tests/check-release-needed.test.js => does not release on a GitHub network failure ... ok (106ms)
+4116: 2026-11-03T19:58:49.6623485Z ./tests/checkout-credentials.test.js => drops the credential on every checkout in a job that does not push ... ok (9ms)
