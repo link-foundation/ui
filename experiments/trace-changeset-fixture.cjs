@@ -8,24 +8,32 @@ if (process.env.DEBUG_CHANGESET_FIXTURE) {
   const started = Date.now();
   const report = (operation, value) =>
     console.error(
-      `[changeset fixture +${Date.now() - started}ms] ${operation}: ${JSON.stringify(value)}`
+      `[changeset fixture pid=${process.pid} +${Date.now() - started}ms] ${operation}: ${JSON.stringify(value)}`
     );
   // Time between process start and this preload: slow runner startup.
   report('preload', {
+    entry: process.argv[1],
     sinceProcessStartMs: Math.round(
       require('node:perf_hooks').performance.now()
     ),
   });
+  process.on('beforeExit', (code) => report('beforeExit', { code }));
+  process.on('exit', (code) => report('processExit', { code }));
   for (const method of ['spawn', 'execFile']) {
     const original = childProcess[method];
     childProcess[method] = function (command, args, ...rest) {
       report(method, { command, args });
       const child = original.call(this, command, args, ...rest);
+      report('spawned', { command, pid: child.pid });
       child.on('exit', (code, signal) =>
         report('exit', { command, code, signal })
       );
+      child.on('close', (code, signal) =>
+        report('close', { command, code, signal })
+      );
       // Formatter failures are otherwise swallowed by the parent's pipe.
       for (const stream of ['stdout', 'stderr']) {
+        child[stream]?.on('end', () => report('end', { command, stream }));
         child[stream]?.on('data', (data) =>
           report(stream, { command, data: String(data) })
         );

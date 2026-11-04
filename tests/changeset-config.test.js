@@ -169,6 +169,7 @@ describe('Changesets release formatter', () => {
                 env: {
                   ...env,
                   DEBUG_CHANGESET_FIXTURE: '1',
+                  NODE_OPTIONS: `${env.NODE_OPTIONS || ''} --require="${resolve('experiments/trace-changeset-fixture.cjs')}"`,
                   // Release formatting must use installed dependencies, never fetch.
                   npm_config_offline: 'true',
                   npm_config_yes: 'false',
@@ -178,7 +179,7 @@ describe('Changesets release formatter', () => {
               }
             );
             // Show where the time went while an overrun can still be acted on.
-            if (elapsedMs > budgetMs / 2) {
+            if (elapsedMs > budgetMs / 2 || env.DEBUG_CHANGESET_FIXTURE) {
               console.error(
                 `${file} took ${elapsedMs} of ${budgetMs} ms\n${stderr}`
               );
