@@ -373,7 +373,7 @@ links.count(); // the number of doublets
 
 ### Any doublets storage
 
-`writeDocumentLinks(encoded, links, names?)` writes the same doublets into any
+`writeDocumentLinks(encoded, links, names?)` writes the document into any
 storage with `create()` and `update(id, source, target)`: the storages of
 [`@link-foundation/ui-links`](../ui-links/README.md) (memory, SQLite,
 doublets-web, IndexedDB, localStorage and Links Notation text through its
@@ -397,6 +397,73 @@ const names = createNames();
 const where = writeDocumentLinks(encodeDocument(document), links, names);
 readDocumentLinks(links, { names, roots: where.roots }); // the document
 ```
+
+### A live document over synced links
+
+`writeDocumentLinks` adds stable root and element handles `(id: 0 value)`
+over the immutable `encodeDocument` fragments. The two returned root addresses
+stay fixed when the document becomes empty. `readDocumentLinks` reads this
+form and older documents without handles; `encodeDocument`, `decodeDocument`
+and `copyToDoubletsWeb` keep the original ordered snapshot encoding.
+
+`bindStoreLinks(store, links, { roots, names?, onError? })` follows a loaded
+live document and writes store edits back. Links win on initial binding.
+Load/subscribe to the complete reachable graph and its names first; unrelated
+links may remain in the same storage. A synced client supplies `onChange`,
+`resolve` and its in-data `names`; another observable storage can provide
+`onChange` and a shared names view explicitly.
+
+```js
+import { createLinksNames } from '@link-foundation/ui-links';
+import { bindStoreLinks, createStore } from '@link-foundation/ui-store';
+
+// Seed once on the server. Use these same in-data names on the server.
+const names = createLinksNames(serverLinks);
+const server = createLinksServer({ links: serverLinks, names });
+const { roots } = writeDocumentLinks(
+  encodeDocument(document),
+  serverLinks,
+  names
+);
+// Share these roots with both browsers.
+await client.subscribe([]);
+const store = createStore();
+const stop = bindStoreLinks(store, client, { roots });
+store.setPositional('greeting', ['Hello']);
+await stop.flush();
+stop(); // Dispose both subscriptions; the store and client remain usable.
+```
+
+A scalar or property edit interns only missing immutable fragments and
+updates the edited element's handle. Other elements and the roots stay
+unchanged. Identical writes create no links. Insert, remove, move, rename,
+anonymous elements, transactions and undo/redo follow the same encoding.
+Unreferenced fragments remain available for reuse; the binding never deletes
+shared data. Independent node edits converge. Competing edits to the same
+handle (including a parent's child list) use the server's write order;
+this is not a sequence CRDT.
+
+Cache changes are coalesced into store transactions with origin `links`.
+Those transactions stay in the operation log and are excluded from undo
+history, including initial loading and server refusal rollback. Top-level
+opaque links use the replayable operation
+`store.apply({ op: 'setDocumentUnknown', values })`; its event has type
+`document` and `id: null`. Names beginning with `!`, empty strings, numeric
+strings, `*` and `$`-prefixed strings are escaped with a leading `!` in the
+names storage and decoded when reading documents. The returned sidecar map
+continues to use the original strings.
+
+`stop.flush()` waits for client writes and reconciliation. Intermediate
+incomplete graphs wait for the next relevant cache event; `onError` can trace
+these reads (silent by default), and `flush()` rejects if the graph remains
+incomplete. The binding does not create a connection or subscription, or own
+their lifetime. A transport failure leaves optimistic edits queued in the
+client until reconnect; a refused write restores its previous graph and store.
+
+Run `node examples/ui-store-live.mjs` and open the printed URL in two tabs.
+The [browser example](examples/live-links.html) lets each tab edit either
+node and undo its own changes. Playwright exercises it in
+`tests/ui/store-links.e2e.mjs`.
 
 ### Several tabs
 

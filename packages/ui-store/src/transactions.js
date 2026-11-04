@@ -96,7 +96,7 @@ export function createTransactions(model, history, emit) {
       history.undone(tx.undoing);
     } else if (tx.meta.redoes !== undefined) {
       history.redone(item);
-    } else {
+    } else if (tx.origin !== 'links') {
       history.record(item);
     }
     emit(Object.freeze(tx.events), entry);
