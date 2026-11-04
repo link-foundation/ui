@@ -253,6 +253,7 @@ class TimelinePanel {
       this.active = item.id;
       this.time = 0;
       this.selected = [];
+      this.updateSelection();
     }
   };
   commit = (changes) => {
@@ -388,6 +389,9 @@ class TimelinePanel {
       : this.selected.some((k) => this.same(k, key))
         ? this.selected
         : [key];
+    this.updateSelection();
+  };
+  updateSelection = () => {
     this.rows
       .querySelectorAll('[data-marker]')
       .forEach((node) =>
@@ -619,6 +623,14 @@ class TimelinePanel {
       });
     }
   };
+  selectionExists = (key) => {
+    const item = [...this.model.animations, ...this.model.recordings].find(
+      (item) => item.id === key.id
+    );
+    return key.recording
+      ? !!item?.events?.[key.index]
+      : !!item?.tracks?.[key.track]?.keys[key.index];
+  };
   update = () => {
     const focused = this.document.activeElement;
     const rulerFocused =
@@ -642,7 +654,8 @@ class TimelinePanel {
       );
       return;
     }
-    this.active = this.current().id;
+    this.activate(this.current());
+    this.selected = this.selected.filter(this.selectionExists);
     this.rows.replaceChildren();
     this.rows.style.width = `${Math.max(600, this.maximum() * this.zoom + 230)}px`;
     const ruler = this.laneRow('Time (ms)');

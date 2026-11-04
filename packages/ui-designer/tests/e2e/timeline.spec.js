@@ -194,3 +194,39 @@ test('canvas selection restores its Properties after timeline selection', async 
     0
   );
 });
+
+test('switching to a recording clears the animation selection and its Properties', async ({
+  page,
+}) => {
+  await key(page).click();
+  await page.getByRole('button', { name: 'recording-1', exact: true }).click();
+  await expect(page.getByLabel('Key value', { exact: true })).toHaveCount(0);
+  await expect(page.locator('.timeline-marker[aria-pressed=true]')).toHaveCount(
+    0
+  );
+});
+
+test('removing the selected animation through Source retains a usable recording timeline', async ({
+  page,
+}) => {
+  const errors = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await key(page).click();
+  const before = await text(page);
+  const next =
+    before.slice(0, before.indexOf('press-feedback:')) +
+    before.slice(before.indexOf('recording-1:'));
+  await page.getByRole('tab', { name: 'Source', exact: true }).click();
+  await page
+    .getByRole('textbox', { name: 'LiNo source', exact: true })
+    .fill(next);
+  await expect.poll(() => text(page)).toBe(next);
+  await page.getByRole('tab', { name: 'Timeline', exact: true }).click();
+  await expect(page.getByLabel('Key value', { exact: true })).toHaveCount(0);
+  await page.getByRole('slider', { name: 'Playhead time' }).focus();
+  await page.keyboard.press('End');
+  await expect(page.locator('.timeline-preview [data-link-id=ok]')).toHaveText(
+    'Saved'
+  );
+  expect(errors).toEqual([]);
+});
