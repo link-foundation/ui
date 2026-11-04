@@ -13,6 +13,9 @@ if (process.env.DEBUG_CHANGESET_FIXTURE) {
   // Time between process start and this preload: slow runner startup.
   report('preload', {
     entry: process.argv[1],
+    sinceFixtureStartMs: process.env.CHANGESET_FIXTURE_STARTED_AT
+      ? Date.now() - Number(process.env.CHANGESET_FIXTURE_STARTED_AT)
+      : undefined,
     sinceProcessStartMs: Math.round(
       require('node:perf_hooks').performance.now()
     ),
