@@ -10,6 +10,7 @@ import {
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { describe, it } from 'test-anywhere';
 import { itUnless, sandboxed } from './helpers/skip.js';
 
@@ -34,7 +35,7 @@ describe('Windows Bun file shards', () => {
     assert.match(testJob, /BUN_SHARD: \$\{\{ matrix\.shard \|\| '1\/1' \}\}/);
     assert.match(
       testJob,
-      /run-with-budget-warning\.sh 300 "Bun test suite" bun test --timeout 30000 --shard "\$BUN_SHARD"/
+      /run-with-budget-warning\.sh 300 "Bun test suite" bun test --timeout 30000 --isolate --shard "\$BUN_SHARD"/
     );
     assert.match(testJob, /timeout-minutes: 15/);
     assert.match(testJob, /fail-fast: false/);
@@ -62,17 +63,32 @@ describe('Windows Bun file shards', () => {
         writeFileSync(join(cwd, file), text);
       };
       const run = (shard) =>
-        spawnSync('bun', ['test', '--timeout', '30000', '--shard', shard], {
-          cwd,
-          encoding: 'utf8',
-          timeout: 10000,
-        });
+        spawnSync(
+          'bun',
+          ['test', '--timeout', '30000', '--isolate', '--shard', shard],
+          {
+            cwd,
+            encoding: 'utf8',
+            timeout: 10000,
+          }
+        );
       try {
         copyFileSync('bunfig.toml', join(cwd, 'bunfig.toml'));
+        write('shared.js', 'export const state = {};\n');
+        const shared = JSON.stringify(
+          pathToFileURL(join(cwd, 'shared.js')).href
+        );
         for (const file of files) {
           write(
             file,
-            `import { test } from 'bun:test'; test('sentinel', () => console.log('OWNED:${file}'));\n`
+            `import { test, expect } from 'bun:test';
+import { state } from ${shared};
+test('sentinel', () => {
+  expect(globalThis.fixtureOwner).toBeUndefined();
+  expect(state.owner).toBeUndefined();
+  globalThis.fixtureOwner = state.owner = '${file}';
+  console.log('OWNED:${file}');
+});\n`
           );
         }
         for (const dir of [

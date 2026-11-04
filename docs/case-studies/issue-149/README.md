@@ -61,14 +61,21 @@ node experiments/issue-149/summarize-bun-log.mjs docs/case-studies/issue-149/log
 ## Change and regression checks
 
 Windows Bun uses three independent runners with Bun's built-in `--shard`
-file partitioning. Every shard still has a 30-second per-test timeout, a
+file partitioning and `--isolate` for fresh globals and module caches per file.
+Every shard still has a 30-second per-test timeout, a
 300-second step budget and a 15-minute job backstop. Shards use distinct
 concurrency groups so they cannot cancel each other. The other eight
 runtime/OS combinations retain their existing coverage. Bun on Linux and
 macOS uses `--shard 1/1`, which runs every discovered file.
 
 Independent runners isolate environment mutations and filesystem fixtures;
-tests within each shard remain serial. No test is removed, mocked differently,
+tests within each shard remain serial. Shard discovery sorts paths, exposing
+a pre-existing file-order dependency: export-wrapper tests load Vue against
+their jsdom document before ui-vue tests install a different document. Vue
+caches its original document. A two-file replay failed four ui-vue assertions
+without isolation and passed all 16 tests with isolation. Fresh globals and
+module registries prevent that cross-file fixture leak without changing any
+package implementation. No test is removed, mocked differently,
 or given a longer timeout. Three shards bound the work per Windows runner
 without introducing process contention on one machine.
 
@@ -76,10 +83,17 @@ without introducing process contention on one machine.
 all existing limits. Its workflow regression failed before the change. Its
 real Bun fixture checks that root tests, package tests and nested package
 tests execute exactly once across the three shards, archives and browser specs
-stay excluded, and an assertion failure fails its shard.
+stay excluded, globals and module state do not leak between files, and an
+assertion failure fails its shard.
 
 ```bash
 node --test tests/bun-shards.test.js tests/ci-timeouts.test.js tests/workflow-reliability.test.js
+```
+
+Reproduce the file-order failure, then add `--isolate` to make all 16 tests pass:
+
+```bash
+bun test --timeout 30000 --shard 1/1 ./packages/ui-convert/tests/export/wrappers.test.js ./packages/ui-vue/tests/components.test.js
 ```
 
 Windows CI is the performance authority; passing local checks alone cannot
