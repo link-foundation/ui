@@ -325,3 +325,51 @@ describe('hidden name conflicts', () => {
     session.close();
   });
 });
+
+describe('links-backed names server conformance', () => {
+  it('supports numeric and named read/update/delete operations with metadata counted as links', () => {
+    const links = ui.createMemoryLinks();
+    const names = ui.createLinksNames(links);
+    const session = ui.createLinksServer({ links, names }).session();
+    try {
+      expect(session.request('(create: (0 0))')).toBe('() ((1: 0 0))');
+      expect(session.request('(set-name: (1 item))')).toBe('(link: 1)');
+      expect(session.request('(count: ())')).toBe(`(count: ${links.count()})`);
+      expect(session.request('(each: (item))')).toBe('(1: 0 0)');
+      expect(session.request('(update: (item item item))')).toBe(
+        '((1: 0 0)) ((1: 1 1))'
+      );
+      expect(session.request('((item: item item)) ((item: item item))')).toBe(
+        '((item: item item)) ((item: item item))'
+      );
+      expect(session.request('(get-name: item)')).toBe('(name: item)');
+      session.request('(delete: item)');
+      expect(session.request('(get-by-name: item)')).toBe('');
+      expect(names.entries()).toEqual([]);
+    } finally {
+      session.close();
+    }
+  });
+
+  it('requires every individual encoding doublet to be readable', () => {
+    const links = ui.createMemoryLinks();
+    const id = links.create();
+    const names = ui.createLinksNames(links);
+    names.setName(id, 'text');
+    for (const hidden of names.dependencies([id])) {
+      const view = ui.withPermissions(
+        links,
+        {
+          canRead: (subject, link) => link.id !== hidden.id,
+          canWrite: () => false,
+          canCreate: () => false,
+        },
+        null
+      );
+      const restricted = names.withLinks(view);
+      expect(restricted.getName(id)).toBe(null);
+      expect(restricted.getByName('text')).toBe(null);
+      expect(restricted.entries()).toEqual([]);
+    }
+  });
+});
