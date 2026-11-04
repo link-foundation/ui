@@ -1,0 +1,28 @@
+en
+  nav
+    start 'Get started'
+    dialect 'Dialect'
+    components 'Components'
+    themes 'Themes'
+    about 'About'
+  language 'Language'
+  theme 'Theme'
+  scheme 'Colour scheme'
+  system 'Follow system'
+  light 'Light'
+  dark 'Dark'
+  footer 'Built with Links UI. Public domain code, CC0 original assets. Dev mode: Alt+Shift+D or ?ui-dev.'
+ru
+  nav
+    start 'Начало работы'
+    dialect 'Диалект'
+    components 'Компоненты'
+    themes 'Темы'
+    about 'О проекте'
+  language 'Язык'
+  theme 'Тема'
+  scheme 'Цветовая схема'
+  system 'Как в системе'
+  light 'Светлая'
+  dark 'Тёмная'
+  footer 'Сайт создан на Links UI. Код — общественное достояние, собственные ресурсы — CC0. Режим разработки: Alt+Shift+D или ?ui-dev.'

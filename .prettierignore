@@ -38,3 +38,6 @@ packages/ui-components/src/icons/own-icons.js
 packages/ui-components/tests/charts/__snapshots__/
 # Code exporter golden files are checked byte for byte by the export tests.
 packages/ui-convert/tests/export/fixtures/
+
+# Generated LiNo site HTML entries
+packages/site/.lino-pages/

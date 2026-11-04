@@ -1,0 +1,18 @@
+page: document
+  title Компоненты
+  page-title: heading
+    level 1
+    text Компоненты
+  page-lead: paragraph
+    text 'Каталог базовых компонентов содержит доступные элементы управления с поведением на LiNo. Полная галерея и песочница запланированы в задаче #63.'
+  section-title: heading
+    level 2
+    text 'Базовые элементы управления'
+  block-0: paragraph
+    text 'button · icon-button · label · link · text-field · text-area · number-field · color-field · checkbox · radio-group · radio · switch · slider · select · combobox · option · progress · badge · avatar'
+  block-1: link
+    label 'Каталог и примеры на LiNo'
+    href 'https://github.com/link-foundation/ui/blob/main/packages/ui-components/src/controls/catalog.lino'
+  block-2: link
+    label 'Задача о галерее'
+    href 'https://github.com/link-foundation/ui/issues/63'

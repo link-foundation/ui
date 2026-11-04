@@ -406,7 +406,10 @@ describe('workflow artifact and writer reliability', () => {
     const instantReleaseJob = getJobBlock(releaseWorkflow, 'instant-release');
     const dockerPublishJob = getJobBlock(releaseWorkflow, 'docker-publish');
     const changesetPrJob = getJobBlock(releaseWorkflow, 'changeset-pr');
-    const pagesDeployJob = getJobBlock(exampleAppWorkflow, 'pages-deploy');
+    const pagesDeployJob = getJobBlock(
+      readWorkflow('.github/workflows/site.yml'),
+      'site-deploy'
+    );
 
     expectMainWriterConcurrency(previewRegenJob);
     expectMainWriterConcurrency(pagesDeployJob);

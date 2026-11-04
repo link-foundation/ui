@@ -58,6 +58,9 @@ jobs:
       - name: Build example app
         run: npm run example:web:build
 
+      - name: Build documentation site
+        run: npm run build --workspace @link-foundation/ui-site
+
       # The icon gallery loads the generated sets from the gitignored dist/.
       - name: Build icon sets
         run: npm run build:icons
