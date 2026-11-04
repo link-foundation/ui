@@ -1,0 +1,34 @@
+Source: https://github.com/link-foundation/ui/actions/runs/41709268772
+Linux Deno job log (ANSI removed); original job-log line numbers:
+4204: 2026-11-03T20:08:10.8098665Z ./tests/dependency-graph.test.js => allows enabled graphs and warns on a plain disabled response in PRs ... ok (46ms)
+4205: 2026-11-03T20:08:10.8099325Z ./tests/create-github-release.test.js => passes release payload to gh api and reports success only on exit code 0 ... ok (95ms)
+4206: 2026-11-03T20:08:10.8099852Z ./tests/dependency-graph.test.js => requires the setting outside PRs ... ok (12ms)
+4207: 2026-11-03T20:08:10.8100335Z ./tests/bounded-run.test.js => kills descendants on timeout and reports the timeout ... FAILED (2s)
+4208: 2026-11-03T20:08:10.8100863Z ./tests/create-github-release.test.js => auto-detects multi-language release tags and titles ... ok (99ms)
+4209: 2026-11-03T20:08:10.8101416Z ./tests/create-github-release.test.js => fails when gh api exits non-zero with an unexpected error ... ok (94ms)
+4210: 2026-11-03T20:08:10.8101993Z ./tests/dependency-graph.test.js => retries ambiguous answers without diagnosing a disabled graph ... ok (274ms)
+4211: 2026-11-03T20:08:10.8102545Z ./tests/create-github-release.test.js => treats already_exists as an explicit idempotent skip ... ok (91ms)
+4212: 2026-11-03T20:08:10.8103388Z ./tests/deprecated-packages.test.js => package-lock.json has only reviewed deprecated packages ... ok (2ms)
+4213: 2026-11-03T20:08:10.8104611Z ./tests/deprecated-packages.test.js => .github/actions/artifact-transport/package-lock.json has only reviewed deprecated packages ... ok (761µs)
+5244: 2026-11-03T20:08:37.4024233Z
+5245: 2026-11-03T20:08:37.4024503Z  ERRORS
+5246: 2026-11-03T20:08:37.4024674Z
+5247: 2026-11-03T20:08:37.4025151Z kills descendants on timeout and reports the timeout => ./tests/bounded-run.test.js:100:22
+5248: 2026-11-03T20:08:37.4030940Z error: Error: Expected true to be false
+5249: 2026-11-03T20:08:37.4031209Z         throw new Error(message || defaultMessage);
+5250: 2026-11-03T20:08:37.4031424Z               ^
+5251: 2026-11-03T20:08:37.4031923Z     at Object.toBe (file:///home/runner/work/ui/ui/node_modules/.deno/test-anywhere@0.8.50/node_modules/test-anywhere/src/index.js:391:15)
+5252: 2026-11-03T20:08:37.4032516Z     at file:///home/runner/work/ui/ui/tests/bounded-run.test.js:120:28
+5253: 2026-11-03T20:08:37.4033084Z     at async file:///home/runner/work/ui/ui/node_modules/.deno/test-anywhere@0.8.50/node_modules/test-anywhere/src/index.js:155:9
+5254: 2026-11-03T20:08:37.4033407Z
+5255: 2026-11-03T20:08:37.4033485Z  FAILURES
+5256: 2026-11-03T20:08:37.4033577Z
+5257: 2026-11-03T20:08:37.4033788Z kills descendants on timeout and reports the timeout => ./tests/bounded-run.test.js:100:22
+5258: 2026-11-03T20:08:37.4034238Z
+5259: 2026-11-03T20:08:37.4034634Z FAILED | 3502 passed (40 steps) | 1 failed | 1 ignored (59s)
+5260: 2026-11-03T20:08:37.4034808Z
+5261: 2026-11-03T20:08:37.4053309Z error: Test failed
+5262: 2026-11-03T20:08:37.4066194Z Deno test suite finished in 65s of its 300s budget (exit 1).
+5263: 2026-11-03T20:08:37.4095368Z ##[error]Process completed with exit code 1.
+5264: 2026-11-03T20:08:37.4222205Z Post job cleanup.
+5265: 2026-11-03T20:08:37.5006256Z Caching is not enabled. Caching is skipped.
