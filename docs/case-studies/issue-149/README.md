@@ -51,6 +51,19 @@ that any particular Git subcommand hangs. The preflight file also pays for
 many Bash/Node/curl-stub processes on Windows (92.435 seconds in the passing
 run). Timing only the files reached before failure would miss that later cost.
 
+Follow-up CI at `1f21956` completed all Windows Bun shards in 97, 123 and 44
+seconds, covering the same 392 files exactly once. However, unchanged Windows
+Deno exhausted its 300-second budget while still passing preflight cases
+([job 126358718642](https://github.com/link-foundation/ui/actions/runs/41764072030/job/126358718642)).
+The preflight fixture used the real monorepo metadata: almost every status or
+error case repeated its exchange for all 19 published packages. Each package
+starts curl-stub/Bash processes, and successful responses also start Node for
+JSON validation. The fixture now supplies a one-package manifest via the real
+`JS_ROOT` configuration; a dedicated two-public/one-private workspace case
+checks complete enumeration and private-package exclusion. Both new regressions
+failed before the fixture root was selected. No production script is replaced
+or stubbed: the existing offline curl stub and real metadata readers still run.
+
 Reproduce attribution without running tests:
 
 ```bash
@@ -75,8 +88,7 @@ their jsdom document before ui-vue tests install a different document. Vue
 caches its original document. A two-file replay failed four ui-vue assertions
 without isolation and passed all 16 tests with isolation. Fresh globals and
 module registries prevent that cross-file fixture leak without changing any
-package implementation. No test is removed, mocked differently,
-or given a longer timeout. Three shards bound the work per Windows runner
+package implementation. No test is removed or given a longer timeout. Three shards bound the work per Windows runner
 without introducing process contention on one machine.
 
 `tests/bun-shards.test.js` guards the matrix, shard-specific concurrency and
@@ -84,7 +96,9 @@ all existing limits. Its workflow regression failed before the change. Its
 real Bun fixture checks that root tests, package tests and nested package
 tests execute exactly once across the three shards, archives and browser specs
 stay excluded, globals and module state do not leak between files, and an
-assertion failure fails its shard.
+assertion failure fails its shard. The preflight regressions additionally
+check exactly one exchange for the single-package fixture and one exchange for
+each public workspace package, with private packages excluded.
 
 ```bash
 node --test tests/bun-shards.test.js tests/ci-timeouts.test.js tests/workflow-reliability.test.js
