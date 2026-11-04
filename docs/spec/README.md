@@ -33,6 +33,7 @@ appear in all capitals.
 | [behaviour.md](behaviour.md)                         | Event handlers, actions, bindings; handlers are not code   |
 | [limits.md](limits.md)                               | Depth, input size, unknown kinds and the diagnostics table |
 | [open-questions.md](open-questions.md)               | Undecided points, their alternatives and owner issues      |
+| [animation-timing.md](animation-timing.md)           | Literal key offsets and segment easing                     |
 | [themes.md](themes.md)                               | Theme packages, modes, templates and subtree boundaries    |
 | [vocabulary.lino](vocabulary.lino)                   | Machine-readable v0 kinds, properties and actions          |
 | [element-tree.schema.json](element-tree.schema.json) | JSON Schema 2020-12 of the expected fixture output         |

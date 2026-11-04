@@ -3,8 +3,9 @@
  * `element.animate(keyframes, options)` (Web Animations API).
  *
  * Keyframes are written per offset; a key easing becomes the `easing` of its
- * keyframe (WAAPI applies it to the segment that starts there), the
- * animation easing becomes `options.easing`. Values are CSS text
+ * keyframe (WAAPI applies it to the segment that starts there), defaulting
+ * to the animation easing. `options.easing` stays linear so offsets are time
+ * positions. Values are CSS text
  * (`scale: '0.96'`). Tracks of non-CSS properties (`text`, ...) and effects
  * are left out: the player runs them in its frame loop. An animation with an
  * `(envelope ...)` is baked into sampled keyframes, since WAAPI has no
@@ -58,12 +59,12 @@ export function keyframeProperty(property) {
   return out;
 }
 
-function trackKeyframes(tracks, resolveToken) {
+function trackKeyframes(tracks, resolveToken, defaultEasing) {
   const frames = [];
   for (const track of tracks) {
     const name = keyframeProperty(track.property);
     for (const key of track.keys) {
-      const css = key.easing ? easingCss(key.easing, resolveToken) : null;
+      const css = easingCss(key.easing ?? defaultEasing, resolveToken);
       const easing = css === 'linear' ? null : css;
       let frame = frames.find(
         (f) =>
@@ -84,7 +85,7 @@ function trackKeyframes(tracks, resolveToken) {
   return frames.sort((a, b) => a.offset - b.offset);
 }
 
-/** One iteration sampled into linear keyframes (iteration easing included). */
+/** One iteration sampled into linear keyframes (segment easing included). */
 function bakedKeyframes(animation, tracks, duration, resolveToken) {
   const single = {
     ...animation,
@@ -125,10 +126,10 @@ export function toWaapi(animation, options = {}) {
   const baked = Boolean(animation.envelope);
   const keyframes = baked
     ? bakedKeyframes(animation, tracks, duration, resolveToken)
-    : trackKeyframes(tracks, resolveToken);
+    : trackKeyframes(tracks, resolveToken, animation.easing);
   const timing = {
     duration,
-    easing: baked ? 'linear' : easingCss(animation.easing, resolveToken),
+    easing: 'linear',
     fill: animation.fill ?? 'none',
     composite: animation.composite ?? 'replace',
   };
