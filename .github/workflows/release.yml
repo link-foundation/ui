@@ -439,6 +439,13 @@ jobs:
             bash scripts/run-with-budget-warning.sh 60 "Windows Deno release formatter" deno test -A tests/changeset-config.test.js
           done
 
+      - name: Probe Windows pipe inheritance across workers
+        if: ${{ !cancelled() && matrix.runtime == 'deno' && runner.os == 'Windows' }}
+        shell: bash
+        run: |
+          bash scripts/run-with-budget-warning.sh 60 "Node pipe inheritance probe" node experiments/issue-178/pipe-inheritance.mjs
+          bash scripts/run-with-budget-warning.sh 60 "Deno pipe inheritance probe" deno run -A experiments/issue-178/pipe-inheritance.mjs
+
   # === DOCKER IMAGE BUILD CHECK (pull requests) ===
   # Builds the Dockerfile without pushing so a broken image fails the pull
   # request instead of surfacing only after publish (issue #106).

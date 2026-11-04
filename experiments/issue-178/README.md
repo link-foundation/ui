@@ -79,3 +79,21 @@ process termination from pipe completion and event delivery in that gap.
 The next diagnostic revision records parent-side spawn/exit/stream-end/close
 events. The optional Node preload also takes two finite active-handle snapshots
 at 10 and 20 seconds; their timers are unreferenced and cannot prolong a command.
+
+## Handle inheritance probe
+
+`pipe-inheritance.mjs` compares four concurrent workers spawning short-lived
+Node children under Node and Deno. Four finite rounds create a probe with 67
+stdio slots alongside a one-second keeper; all output pipes are consumed.
+Each record distinguishes process exit from pipe closure. Linux controls show
+exit and close within 14 ms under both runtimes. CI runs each Windows control
+under a 60-second outer guard.
+
+The hypothesis is that overlapping Windows spawns inherit another worker's
+temporary child pipe handles. Deno 2.9.7's
+[Windows process implementation](https://github.com/denoland/deno/blob/v2.9.7/runtime/subprocess_windows/src/process.rs)
+uses `CreateProcessW` with handle inheritance enabled, while its
+[stdio implementation](https://github.com/denoland/deno/blob/v2.9.7/runtime/subprocess_windows/src/process_stdio.rs)
+creates inheritable child handles. The probe tests whether an unrelated keeper
+can delay pipe closure after its owner exits. This remains a hypothesis until
+the Windows comparison supplies evidence.
