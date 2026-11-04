@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { expectAccessible } from '../../../../tests/ui/helpers.mjs';
+import { delayTokenAutosave } from './helpers/delay-token-autosave.mjs';
 
 const PAGE = 'packages/ui-components/examples/editor.html';
 const input = (page) =>
@@ -81,6 +82,17 @@ for (const engine of ['codemirror', 'monaco']) {
 test('switching tabs preserves unsaved text and undo history; reload restores drafts', async ({
   page,
 }) => {
+  await verifyDraftRestoration(page);
+});
+
+test('reload restores both drafts when tokens autosave runs later', async ({
+  page,
+}) => {
+  await delayTokenAutosave(page);
+  await verifyDraftRestoration(page);
+});
+
+async function verifyDraftRestoration(page) {
   await start(page);
   await input(page).fill('app: document\n  title Mine');
   await expect(
@@ -125,7 +137,7 @@ test('switching tabs preserves unsaved text and undo history; reload restores dr
   await expect(input(page)).toContainText('#6750A4');
   await page.getByRole('tab', { name: 'document.lino •' }).click();
   await expect(input(page)).toContainText('Mine');
-});
+}
 
 test('dirty external updates wait for an explicit choice; compare is inert text', async ({
   page,
