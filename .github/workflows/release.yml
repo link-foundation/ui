@@ -427,7 +427,7 @@ jobs:
         run: bash scripts/run-with-budget-warning.sh 300 "Deno test suite" deno test -A --parallel
 
       - name: Repeat Windows Deno release formatter fixture
-        if: matrix.runtime == 'deno' && runner.os == 'Windows'
+        if: ${{ !cancelled() && matrix.runtime == 'deno' && runner.os == 'Windows' }}
         shell: bash
         env:
           DEBUG_CHANGESET_FIXTURE: '1'

@@ -170,7 +170,7 @@ describe('Changesets release formatter', () => {
                   ...env,
                   DEBUG_CHANGESET_FIXTURE: '1',
                   CHANGESET_FIXTURE_STARTED_AT: String(Date.now()),
-                  NODE_OPTIONS: `${env.NODE_OPTIONS || ''} --require="${resolve('experiments/trace-changeset-fixture.cjs')}"`,
+                  NODE_OPTIONS: `${env.NODE_OPTIONS || ''} --require="${resolve('experiments/trace-changeset-fixture.cjs').replaceAll('\\', '/')}"`,
                   // Release formatting must use installed dependencies, never fetch.
                   npm_config_offline: 'true',
                   npm_config_yes: 'false',
