@@ -33,3 +33,10 @@ Both text/binary two-tab tests pass using installed Chrome via
 `npx playwright test tests/ui/links-websocket.e2e.mjs --config experiments/issue-114/playwright.config.mjs`.
 Before/after evidence is in docs/screenshots/issue-114. The browser-server
 experiment supports manual checks alongside the static server.
+
+The next main merge added the released-clink contract. Its reference-server
+case exposed duplicate subscriptions when reconnecting the same transport.
+Reconnect now retires those server IDs before restoring restrictions, including
+subscriptions removed offline. The shared contract and an added offline
+unsubscribe regression verify this behavior; all 93 local ui-links tests pass
+(two released-server cases require CLINK and are verified by CI).

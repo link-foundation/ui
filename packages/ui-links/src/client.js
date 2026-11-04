@@ -472,6 +472,7 @@ async function refreshClient({
   cache,
   subscriptions,
   remoteSubscriptions,
+  transport,
   checkpoint,
   durable,
   isCurrent,
@@ -481,18 +482,25 @@ async function refreshClient({
 }) {
   await outbox.flush();
   if (!refresh) {
+    remoteSubscriptions.transport = transport;
     await durable();
     return;
   }
   if (!isCurrent()) {
     return;
   }
-  remoteSubscriptions.clear();
+  if (remoteSubscriptions.transport === transport) {
+    for (const id of remoteSubscriptions.ids.values()) {
+      await request(op('unsubscribe', String(id)));
+    }
+  }
+  remoteSubscriptions.transport = transport;
+  remoteSubscriptions.ids.clear();
   for (const [id, restriction] of subscriptions) {
     const [reply] = await request(
       op('subscribe', restrictionLino(restriction))
     );
-    remoteSubscriptions.set(id, numberOf(reply.values[0]));
+    remoteSubscriptions.ids.set(id, numberOf(reply.values[0]));
   }
   // No server change log: a fresh readable snapshot also removes
   // deleted links and links the subject may no longer read.
@@ -537,7 +545,7 @@ function createRemoteMethods({
   checkpoint,
   durable,
   subscriptions,
-  remoteSubscriptions,
+  remoteSubscriptions: { ids: remoteSubscriptions },
   allocateSubscription,
   ready,
   connected,
@@ -567,9 +575,9 @@ function createRemoteMethods({
       const remote = remoteSubscriptions.get(id);
       if (remote !== undefined && connected()) {
         await request(op('unsubscribe', String(remote)));
+        remoteSubscriptions.delete(id);
       }
       subscriptions.delete(id);
-      remoteSubscriptions.delete(id);
       checkpoint();
       await durable();
     },
@@ -636,6 +644,12 @@ async function loadLinks(request, writer, restriction) {
     const [reply, names] = await request(
       op('load', restrictionLino(restriction))
     );
+    // A server without this extension may treat it as a substitution query
+    // and return an empty successful result (notably a permission-filtered
+    // clink session). Only the explicit envelope identifies extension support.
+    if (reply?.id !== 'links' || names?.id !== 'names') {
+      throw new LinksError('remote', 'The server does not support load');
+    }
     data = reply.values[0].values;
     metadata = names.values[0].values;
   } catch (error) {
@@ -678,7 +692,7 @@ export function createSyncedLinks({
   const writer = createCacheWriter(cache, emit, state.real);
   let nextTemp = state.nextTemp;
   const subscriptions = new Map(state.subscriptions);
-  const remoteSubscriptions = new Map();
+  const remoteSubscriptions = { ids: new Map(), transport: null };
   let nextSubscription = state.nextSubscription;
   const checkpoint = () =>
     saveState(
@@ -761,6 +775,7 @@ export function createSyncedLinks({
           cache,
           subscriptions,
           remoteSubscriptions,
+          transport: next,
           checkpoint,
           durable,
           isCurrent: () => current === next,

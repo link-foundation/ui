@@ -29,6 +29,26 @@ function adapters() {
   };
 }
 
+it('retires subscriptions removed offline when reusing a transport', async () => {
+  const links = ui.createMemoryLinks();
+  links.create();
+  const server = ui.createLinksServer({ links });
+  const transport = ui.connectInProcess(server);
+  const client = ui.createSyncedLinks();
+  await client.connect(transport);
+  const { id } = await client.subscribe([]);
+  client.disconnect();
+  await client.unsubscribe(id);
+  await client.connect(transport);
+  const other = ui.createSyncedLinks({
+    transport: ui.connectInProcess(server),
+  });
+  await other.load([]);
+  other.update(1, 1, 1);
+  await other.flush();
+  expect(ui.getLink(client, 1)).toEqual({ id: 1, from_id: 0, to_id: 0 });
+});
+
 describe('persistent synced client', () => {
   for (const name of ['text', 'localStorage', 'indexedDB']) {
     it(`restores offline writes, counter and remaps with ${name}`, async () => {

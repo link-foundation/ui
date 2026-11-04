@@ -387,20 +387,47 @@ TCP.
 
 The protocol, the query language, the names sidecar and the text format are
 link-cli's; `tests/fixtures/links-operations.txt` is link-cli's protocol
-conversation, replayed by the tests. The differences:
+conversation, replayed by the tests. Permissions, authentication and
+subscriptions are shared with link-cli since Rust 1.3.0
+([permissions](https://github.com/link-foundation/link-cli/issues/149),
+[subscriptions](https://github.com/link-foundation/link-cli/issues/150)).
+The remaining differences by design:
 
-- `set-name` answers `(link: i)` with the address it named; link-cli's
-  conversation shows another number there.
+- `set-name` answers `(link: i)` with the address it named; link-cli returns
+  the address where its names store keeps the name. Clients need only the
+  successful acknowledgement.
 - Addresses follow the storage: in link-cli's README example
   `(((m a) (m a))) (((p a) (p a)))` the new `p` is link 1; here the update
   deletes link 4 and `p` takes the freed address 4 (the memory storage, like
   doublets-web, reuses the last freed address first).
-- `auth`, `subscribe`, `unsubscribe` and the permission layer are extensions;
-  link-cli has none of them yet.
-- Between connections, a client that did not subscribe keeps what it loaded
-  until it loads again. Reconnect refreshes all readable links.
-- A link a subject created is its own (while untyped) for the session that
-  created it.
+- `load` and `name-links` are ui-links extensions for names stored as links.
+  The synced client falls back to `each` and sidecar name resolution when a
+  server does not implement them. The two name encodings are independent.
+
+Both servers keep an untyped new link owned by the session that created it.
+Between connections, a client that did not subscribe keeps what it loaded
+until it loads again. Reconnect refreshes all readable links.
+Ownership is shared behavior, rather than a protocol deviation.
+
+### Verify against a released server
+
+```sh
+CARGO_BUILD_JOBS=1 cargo install link-cli --version 1.3.0 --locked
+CLINK=clink node --test --test-timeout=30000 packages/ui-links/tests/client.test.js packages/ui-links/tests/clink.test.js
+node examples/ui-links-permissions.mjs --server clink
+```
+
+`CLINK` selects an executable path (default `clink` for the example). The
+shared client contract uses identical data, names, rules and tokens against
+both servers, with rules in the data and in a separate file. It checks guest
+and authenticated reads, refused writes and cache rollback, temporary-address
+remapping, subscription delivery, permission loss and unsubscribe. Without
+`CLINK`, the external-server tests visibly skip; CI installs Rust 1.3.0 and
+runs them on Node.js, Bun and Deno, then runs the permissions example against
+both servers. Each fixture uses a temporary directory and an ephemeral local
+TCP port, and closes its connections and server before removing its own data.
+The latest C# release (4.0.6) predates permissions and subscriptions; a C#
+release containing those operations can use the same client contract.
 
 ## License
 
