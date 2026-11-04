@@ -8,7 +8,7 @@ test('share round trips every example, Unicode and hex colours', async () => {
   const examples = (await loadCatalog()).flatMap((c) =>
     c.examples.map((e) => e.text)
   );
-  for (const text of [...examples, "hello: text 'Привет 🌍 #6750A4'"]) {
+  for (const text of [...examples, '', "hello: text 'Привет 🌍 #6750A4'"]) {
     const result = await encodeShare(text);
     assert.equal(result.tooLong, false);
     assert.equal(await decodeShare(result.hash), text);

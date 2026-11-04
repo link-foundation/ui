@@ -89,7 +89,9 @@ export async function decodeShare(hash, platform = globalThis) {
         new platform.DecompressionStream('deflate-raw'),
         MAX_INPUT_SIZE * 4
       );
-      if (!result) {
+      // Some runtimes silently accept invalid raw-deflate bytes as empty output.
+      // Empty source uses the plain hash, so compressed empty output is invalid.
+      if (!result || result.length === 0) {
         return null;
       }
       text = new globalThis.TextDecoder('utf-8', { fatal: true }).decode(
