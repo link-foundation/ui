@@ -72,6 +72,12 @@ after `emulateMedia` can itself capture the previous scheme: the first full CI
 run caught this in Chromium as white radial-menu backgrounds in the dark
 screenshot. The regression therefore does not retain a sampled end color.
 
+The permanent-defect control also disables transitions on its injected style
+and captures it before auditing. Run 41787933994 exposed an early audit in this
+control: axe measured white on `#6e6e6e` (5.09:1), before the injected background
+reached `#7d7d7d` (4.11:1). All 36 ordinary matrix repetitions passed in that run.
+The negative control must settle its own style change as well as the theme.
+
 The helper callback regression fails against the old helper (neither theme is
 audited). The original audit-before-screenshot order also fails on the controlled
 transient color. Both checks ensure the test does not just rely on an isolated

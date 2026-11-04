@@ -478,7 +478,8 @@ test('matrix audits settled theme colors and still rejects settled contrast defe
   });
   await page.addStyleTag({
     content:
-      '[data-link-id="node-menu"] > [role="menuitem"] { color: white !important; background: #7d7d7d !important; }',
+      '[data-link-id="node-menu"] > [role="menuitem"] { color: white !important; background: #7d7d7d !important; transition: none !important; }',
   });
+  await page.screenshot({ animations: 'disabled' });
   await expect(expectAccessible(page)).rejects.toThrow(/color-contrast/);
 });
