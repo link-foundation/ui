@@ -282,7 +282,7 @@ describe('workflow concurrency policy', () => {
     expectCancellableCheckConcurrency(
       getJobBlock(releaseWorkflow, 'test'),
       'test',
-      '-${{ matrix.runtime }}-${{ matrix.os }}',
+      "-${{ matrix.runtime }}-${{ matrix.os }}-${{ matrix.shard || '1/1' }}",
       "${{ github.ref != 'refs/heads/main' }}"
     );
 
