@@ -48,8 +48,10 @@ describe('writeDocumentLinks and readDocumentLinks', () => {
   it('round-trips a document through a memory storage', () => {
     const links = createMemoryLinks();
     const where = writeDocumentLinks(encoded, links);
-    expect(links.count([])).toBe(encoded.links.length);
-    expect(where.roots).toEqual(encoded.roots);
+    // Each element and both roots have a stable handle in addition to
+    // their immutable encoding fragments.
+    expect(links.count([])).toBeGreaterThan(encoded.links.length);
+    expect(where.roots).not.toEqual(encoded.roots);
     const back = readDocumentLinks(links, where);
     expect(back.roots).toEqual(store.toDocument().roots);
   });
@@ -110,6 +112,45 @@ describe('writeDocumentLinks and readDocumentLinks', () => {
     await reader.load([]);
     const back = readDocumentLinks(reader, { names, roots });
     expect(back.roots).toEqual(store.toDocument().roots);
+  });
+
+  it('reads legacy immutable graphs without unescaping literal names', () => {
+    const document = createStore({ text: 'a: text !literal' }).toDocument();
+    const legacy = encodeDocument(document);
+    const links = createMemoryLinks();
+    for (const link of legacy.links) {
+      expect(links.create()).toBe(link.index);
+      links.update(link.index, link.source, link.target);
+    }
+    const names = createNames();
+    for (const [name, id] of legacy.names) {
+      names.setName(id, name);
+    }
+    expect(
+      readDocumentLinks(links, { roots: legacy.roots, names }).roots
+    ).toEqual(document.roots);
+  });
+
+  it('reads a document with 12000 sibling elements without using the call stack', () => {
+    const document = createStore({
+      text: 'text Value\n'.repeat(12000),
+    }).toDocument();
+    const links = createMemoryLinks();
+    const where = writeDocumentLinks(encodeDocument(document), links);
+    expect(readDocumentLinks(links, where).roots.length).toBe(12000);
+  });
+
+  it('rejects a cyclic live handle', () => {
+    const links = createMemoryLinks();
+    const where = writeDocumentLinks(encoded, links);
+    links.update(where.roots[0], 0, where.roots[0]);
+    let code;
+    try {
+      readDocumentLinks(links, where);
+    } catch (error) {
+      code = error.code;
+    }
+    expect(code).toBe('bad-doublets');
   });
 
   it('rejects a root that is missing', () => {

@@ -22,6 +22,7 @@
  *   | { op: 'setProp', id: string, name: string, values: RawValue[], index?: number }
  *   | { op: 'removeProp', id: string, name: string, index?: number }
  *   | { op: 'setPositional', id: string, values: RawValue[] }
+ *   | { op: 'setDocumentUnknown', values: RawValue[] }
  *   | { op: 'rename', id: string, to: string|null, as?: string }} Op
  *
  * `index`, `ids` and `as` are optional on input. `setProp` without `index`
@@ -60,6 +61,7 @@ const OPS = [
   'setProp',
   'removeProp',
   'setPositional',
+  'setDocumentUnknown',
   'rename',
 ];
 
@@ -358,7 +360,29 @@ function rename(model, op) {
   };
 }
 
+function setDocumentUnknown(model, op) {
+  const before = model.unknown;
+  const values = freezeValues(op.values);
+  model.unknown = values;
+  return {
+    op: { op: 'setDocumentUnknown', values },
+    events: [
+      {
+        type: 'document',
+        id: null,
+        parentId: null,
+        index: 0,
+        props: null,
+        before,
+        after: values,
+      },
+    ],
+    inverse: { op: 'setDocumentUnknown', values: before },
+  };
+}
+
 const APPLY = {
+  setDocumentUnknown,
   insert,
   remove,
   move,
@@ -380,7 +404,7 @@ export function applyOp(model, op) {
     'bad-op',
     `Unknown operation ${JSON.stringify(op?.op)}; use ${OPS.join(', ')}`
   );
-  if (op.op !== 'insert') {
+  if (op.op !== 'insert' && op.op !== 'setDocumentUnknown') {
     check(isName(op.id), 'bad-op', `${op.op}: \`id\` must be a string`);
   }
   const result = APPLY[op.op](model, op);

@@ -55,6 +55,7 @@ function encodeNode(node) {
 const at = (op) => optional(op.index !== undefined, ['at', String(op.index)]);
 
 const ENCODE = {
+  setDocumentUnknown: (op) => ['setDocumentUnknown', ...op.values],
   insert: (op) => [
     'insert',
     ...position(op.parentId, op.index),
@@ -203,6 +204,7 @@ function propertyOp(op, parts) {
 }
 
 const DECODE = {
+  setDocumentUnknown: (parts) => ({ op: 'setDocumentUnknown', values: parts }),
   insert(parts) {
     const found = sections(parts, ['parent', 'at', 'ids', 'node'], 'insert');
     check(found.ids && found.node, 'bad-log', 'insert needs (ids) and (node)');

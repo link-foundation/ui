@@ -31,6 +31,7 @@ export type Op =
       /** The store IDs of the subtree in pre-order (filled in when applied). */
       ids?: string[];
     }
+  | { op: 'setDocumentUnknown'; values: RawValue[] }
   | { op: 'remove'; id: string }
   | { op: 'move'; id: string; parentId: string | null; index?: number }
   | {
@@ -66,7 +67,13 @@ export interface ElementView {
   parentId: string | null;
 }
 
-export type EventType = 'insert' | 'update' | 'remove' | 'move' | 'rename';
+export type EventType =
+  | 'insert'
+  | 'update'
+  | 'remove'
+  | 'move'
+  | 'rename'
+  | 'document';
 
 export interface StoreEvent {
   /** Increases by one with every event of the store. */
@@ -76,7 +83,7 @@ export interface StoreEvent {
   origin: string;
   type: EventType;
   /** The element (for `rename`, its new ID). */
-  id: string;
+  id: string | null;
   parentId: string | null;
   index: number;
   /** The properties after the change; `null` for `remove`. */
@@ -263,8 +270,9 @@ export interface DoubletsStorageLike extends UnitedLinksLike {
   ): unknown;
 }
 /**
- * Write the doublets of a document into `links`; with `names`, the string
- * points get their names there too.
+ * Write immutable document fragments with stable root and element handles
+ * `(id: 0 value)` into `links`. With `names`, escaped string names are
+ * stored there too; the returned Map contains original document strings.
  */
 export function writeDocumentLinks(
   encoded: EncodedDocument,
@@ -374,3 +382,37 @@ export function openPersistentStore(
 ): Promise<{ store: Store; persistence: Persistence }>;
 
 export type { RawValue, UiDocument, UiNode, UiProperty };
+
+export interface ObservableDocumentLinks extends DoubletsStorageLike {
+  onChange(
+    listener: (change: {
+      before: { id: number; from_id: number; to_id: number } | null;
+      after: { id: number; from_id: number; to_id: number } | null;
+      origin?: string;
+    }) => void
+  ): () => unknown;
+  resolve?(id: number): number;
+  flush?(): Promise<void>;
+  names?: {
+    getName(id: number): string | null;
+    getByName(name: string): number | null;
+    setName(id: number, name: string): unknown;
+    entries(): [number, string][];
+  };
+}
+
+/** Disposes both subscriptions; flush waits for writes and applies the graph. */
+export interface StoreLinksBinding {
+  (): void;
+  flush(): Promise<void>;
+}
+/** Links win on initial load; subscribe/load the complete document first. */
+export function bindStoreLinks(
+  store: Store,
+  links: ObservableDocumentLinks,
+  options: {
+    roots: number[];
+    names?: Map<string, number> | NonNullable<ObservableDocumentLinks['names']>;
+    onError?: (error: unknown) => void;
+  }
+): StoreLinksBinding;

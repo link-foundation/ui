@@ -21,3 +21,4 @@ export {
 } from './doublets/links-adapter.js';
 export { DEFAULT_BUNDLE_LIMITS, BUNDLE_HEAD } from './bundle.js';
 export { SCHEMA_VERSION, DATABASE_PREFIX, databaseName } from './idb/schema.js';
+export { bindStoreLinks } from './doublets/bind-links.js';
