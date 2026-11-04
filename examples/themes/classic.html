@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="data:," />
+    <title>Classic LiNo themes</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "@material/material-color-utilities": "/node_modules/@material/material-color-utilities/index.js",
+          "@floating-ui/dom": "/node_modules/@floating-ui/dom/dist/floating-ui.dom.browser.mjs",
+          "@floating-ui/core": "/node_modules/@floating-ui/core/dist/floating-ui.core.browser.mjs",
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "@link-foundation/ui-store": "/packages/ui-store/src/index.js",
+          "@link-foundation/ui-style": "/packages/ui-style/src/index.js",
+          "@link-foundation/ui-tokens": "/packages/ui-tokens/src/index.js",
+          "@link-foundation/ui-tokens/themes": "/packages/ui-tokens/src/themes/index.js",
+          "@link-foundation/ui-themes": "/packages/ui-themes/src/index.js",
+          "@link-foundation/ui-dom": "/packages/ui-dom/src/index.js",
+          "links-notation": "/node_modules/links-notation/dist/index.js"
+        }
+      }
+    </script>
+    <link
+      rel="stylesheet"
+      href="../../packages/ui-components/src/controls/styles.css"
+    />
+    <link
+      rel="stylesheet"
+      href="../../packages/ui-components/src/layout/layout.css"
+    />
+    <link
+      rel="stylesheet"
+      href="../../packages/ui-components/src/chat/chat.css"
+    />
+    <link rel="stylesheet" href="classic.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Classic looks, living data</h1>
+      <p>Five families · one document · nested LiNo themes</p>
+      <div id="gallery"></div>
+      <section id="deepcase-demo">
+        <h2>DeepCase: switch the same subtree</h2>
+        <label for="deepcase-theme">DeepCase theme</label>
+        <select id="deepcase-theme">
+          <option>deepcase-classic</option>
+          <option>deepcase-dark</option>
+          <option>deepcase-perception</option>
+          <option>deepcase-2025</option>
+        </select>
+        <div id="deepcase"></div>
+      </section>
+      <h2>Historical comparison</h2>
+      <p>
+        The original graph and radial menu are references; the chrome above uses
+        a graph placeholder.
+      </p>
+      <div class="references">
+        <figure>
+          <img
+            src="../../assets/classic-themes/deepcase-76.png"
+            alt="DeepCase classic light reference from issue 76"
+          />
+          <figcaption>DeepCase app #76 · classic light</figcaption>
+        </figure>
+        <figure>
+          <img
+            src="../../assets/classic-themes/deepcase-299.png"
+            alt="DeepCase dark radial menu reference from issue 299"
+          />
+          <figcaption>DeepCase app #299 · dark radial menu</figcaption>
+        </figure>
+      </div>
+      <h2>Handler windows</h2>
+      <button id="open-handler" type="button">Open handler window</button>
+      <div id="windows"></div>
+      <h2>Independent nested axes</h2>
+      <div class="axis-controls">
+        <label for="skin">Skin</label
+        ><select id="skin">
+          <option>fa-glass</option>
+          <option>fa-flat</option>
+          <option>fa-material</option>
+          <option>fa-contrast</option>
+        </select>
+        <label for="chat-style">Chat</label
+        ><select id="chat-style">
+          <option>chat-bubbles</option>
+          <option>chat-cards</option>
+          <option>chat-compact</option>
+        </select>
+        <label for="composer-style">Composer</label
+        ><select id="composer-style">
+          <option>composer-glass-soft</option>
+          <option>composer-flat</option>
+          <option>composer-glass-clear</option>
+          <option>composer-bubble</option>
+        </select>
+      </div>
+      <div id="axes" class="ui-chat-shell"></div>
+      <h2>Seven corners × five lines</h2>
+      <div id="frames"></div>
+    </main>
+    <script type="module" src="classic.js"></script>
+  </body>
+</html>

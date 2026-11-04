@@ -37,6 +37,60 @@ const nonNegative = (v) => v.type !== 'dimension' || v.value >= 0;
 
 /** @type {Readonly<Record<string, PropertySpec>>} */
 export const PROPERTIES = Object.freeze({
+  'surface-opacity': {
+    css: 'background-color',
+    type: 'number',
+    tokens: ['number'],
+    check: (v) => v.value >= 0 && v.value <= 1,
+    write: (v, ctx) =>
+      `color-mix(in srgb, ${ctx.variable('color.surface')} calc(${values.toCss(v, ctx)} * 100%), transparent)`,
+  },
+  blur: {
+    css: 'backdrop-filter',
+    type: 'dimension',
+    tokens: ['dimension'],
+    check: nonNegative,
+    write: (v, ctx) => `blur(${values.toCss(v, ctx)})`,
+  },
+  glow: {
+    css: 'box-shadow',
+    type: 'number',
+    tokens: ['number'],
+    check: (v) => v.value >= 0 && v.value <= 1,
+    write: (v, ctx) =>
+      `0 0 calc(${values.toCss(v, ctx)} * 24px) ${ctx.variable('color.primary')}`,
+  },
+  scanline: {
+    css: 'background-image',
+    type: 'number',
+    tokens: ['number'],
+    check: (v) => v.value >= 0 && v.value <= 1,
+    write: (v, ctx) =>
+      `repeating-linear-gradient(transparent 0px 3px, rgb(128 128 128 / ${values.toCss(v, ctx)}) 3px 4px)`,
+  },
+  // Bounded geometry only: no arbitrary CSS functions, URLs or declarations.
+  'clip-path': {
+    css: 'clip-path',
+    type: 'string',
+    tokens: [],
+    check: (v) =>
+      /^(?:polygon\([0-9.% ,]+\)|inset\([0-9.]+px(?: round [0-9.]+px)?\))$/u.test(
+        v.value
+      ),
+    write: (v) => v.value,
+  },
+  'border-style': {
+    css: 'border-style',
+    type: ['enum', 'none', 'solid', 'dashed', 'double'],
+    tokens: [],
+  },
+  stroke: { css: 'stroke', type: 'color', tokens: ['color'] },
+  // Graph renderers consume this preference when constructing their arrowheads.
+  arrow: {
+    css: '--graph-arrow',
+    type: ['enum', 'none', 'triangle'],
+    tokens: [],
+  },
   'min-width': {
     css: 'min-width',
     type: 'dimension',

@@ -1,0 +1,60 @@
+deepcase-landing: theme
+  extends base
+  token chat.text '#3A3A3A'
+  token chat.sidebar '#EDF2F7'
+  token chat.bubble.in '#EDF2F7'
+  token chat.bubble.in.text '#3A3A3A'
+  token chat.bubble.out '#0080FF'
+  token chat.bubble.out.text '#000000'
+  token chat.edge '#3A3A3A'
+  token color.primary '#0080FF'
+  token color.on-primary '#000000'
+  token color.surface '#EDF2F7'
+  token color.on-surface '#3A3A3A'
+  token color.on-surface-variant
+    token color.on-surface
+  token color.outline '#3A3A3A'
+  token motion.duration.short 150ms
+  token surface.radius 16px
+  token surface.opacity 0.92
+  token surface.perspective 450px
+  mode dark
+    token chat.text '#EBF8FF'
+    token chat.sidebar '#141214'
+    token chat.bubble.in '#141214'
+    token chat.bubble.in.text '#EBF8FF'
+    token chat.bubble.out '#0080FF'
+    token chat.bubble.out.text '#000000'
+    token chat.edge '#EBF8FF'
+    token color.primary '#0080FF'
+    token color.on-primary '#000000'
+    token color.surface '#141214'
+    token color.on-surface '#EBF8FF'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#EBF8FF'
+    token motion.duration.short 150ms
+    token surface.radius 16px
+    token surface.opacity 0.92
+    token surface.perspective 450px
+  mode high-contrast
+    token chat.text '#000000'
+    token chat.sidebar '#FFFFFF'
+    token chat.bubble.in '#FFFFFF'
+    token chat.bubble.in.text '#000000'
+    token chat.bubble.out '#000000'
+    token chat.bubble.out.text '#FFFFFF'
+    token chat.edge '#000000'
+    token color.primary '#000000'
+    token color.on-primary '#FFFFFF'
+    token color.surface '#FFFFFF'
+    token color.on-surface '#000000'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#000000'
+    token motion.duration.short 150ms
+  motion reduced
+    token motion.duration.short 0ms
+    token effect.glow 0
+    token effect.scanline 0
+    token effect.flicker 0
