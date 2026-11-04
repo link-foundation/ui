@@ -138,3 +138,17 @@ baselines.
 and CI: no published package may import them, bundle them or depend on
 `tests/ui/helpers.mjs`. They are listed as reviewed exceptions in the
 dependency review of `.github/workflows/security.yml`.
+
+## Theme changes and accessibility timing
+
+For an accessibility audit in a screenshot matrix, switch the theme in `apply`
+and use `afterScreenshot: (page) => expectAccessible(page)`. The callback runs
+for every theme/locale cell after `toHaveScreenshot` has finished finite
+animations and captured a stable image. Auditing inside `apply` can sample
+intermediate system colors before the screenshot settles, even with reduced
+motion enabled (WebKit overlay matrix, #153).
+
+The pinned UI workflow repeats the overlay matrix and its controlled-animation
+regression three times with one WebKit worker and zero retries. It retains
+`overlay-webkit-<run>-<attempt>` separately from the full suite's
+`ui-tests-report-<run>-<attempt>` so both reports survive successful runs.

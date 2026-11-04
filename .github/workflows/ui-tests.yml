@@ -77,6 +77,27 @@ jobs:
       - name: Test native web keyboard actions and accessibility
         run: npx playwright test --config examples/react-native/playwright.config.mjs
 
+      - name: Repeat WebKit overlay theme matrix without retries
+        if: env.UPDATE_SNAPSHOTS != 'true'
+        env:
+          PLAYWRIGHT_HTML_REPORT: playwright-overlay-report
+        run: >-
+          npx playwright test packages/ui-components/e2e/overlays.e2e.mjs
+          --project webkit --grep 'accessible light/dark screenshots|matrix audits settled'
+          --repeat-each 3 --workers 1 --retries 0 --output test-results-overlay
+
+      - name: Retain repeated overlay matrix report
+        if: always() && env.UPDATE_SNAPSHOTS != 'true'
+        uses: ./.github/actions/artifact-transport
+        with:
+          name: overlay-webkit-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            playwright-overlay-report/
+            test-results-overlay/
+          required-file: playwright-overlay-report/index.html
+          retention-days: 7
+          if-no-files-found: error
+
       - name: Run Playwright tests
         if: env.UPDATE_SNAPSHOTS != 'true'
         run: npx playwright test
@@ -97,10 +118,10 @@ jobs:
           if-no-files-found: error
 
       - name: Upload test report and diffs
-        if: failure()
+        if: always()
         uses: ./.github/actions/artifact-transport
         with:
-          name: ui-tests-failure-${{ github.run_id }}-${{ github.run_attempt }}
+          name: ui-tests-report-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             playwright-report/
             test-results/
