@@ -4,6 +4,7 @@ import {
   existsSync,
   mkdtempSync,
   readFileSync,
+  readdirSync,
   rmSync,
   writeFileSync,
 } from 'node:fs';
@@ -48,6 +49,19 @@ function runCheck({ pagesStatus, buildType = 'workflow', mode }) {
 }
 
 describe('check-pages.sh', () => {
+  it('gives the site sole ownership of Pages deployment', () => {
+    const workflows = '.github/workflows';
+    const deploying = readdirSync(workflows).filter(
+      (name) =>
+        name.endsWith('.yml') &&
+        readFileSync(join(workflows, name), 'utf8').includes(
+          'uses: actions/deploy-pages@'
+        )
+    );
+    expect(deploying).toEqual(['site.yml']);
+    const example = readFileSync(join(workflows, 'example-app.yml'), 'utf8');
+    expect(example).toContain('name: universal-example-web');
+  });
   itShell('reports a site deployed by GitHub Actions in both modes', () => {
     for (const mode of ['warn', 'require']) {
       const result = runCheck({ pagesStatus: 200, mode });
@@ -108,12 +122,12 @@ describe('check-pages.sh', () => {
   it('runs before configure-pages with an explicit Pages read grant', () => {
     // Windows checkouts can have CRLF line endings.
     const workflow = readFileSync(
-      '.github/workflows/example-app.yml',
+      '.github/workflows/site.yml',
       'utf8'
     ).replaceAll('\r\n', '\n');
     const job = workflow
-      .split('\n  web-build:')[1]
-      .split('\n  pages-deploy:')[0];
+      .split('\n  site-build:')[1]
+      .split('\n  site-deploy:')[0];
 
     expect(job).toMatch(/permissions:\n\s+contents: read\n\s+pages: read/);
     expect(job.indexOf('scripts/check-pages.sh')).toBeGreaterThan(0);

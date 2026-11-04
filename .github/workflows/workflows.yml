@@ -105,6 +105,7 @@ jobs:
           .github/workflows/security.yml
           .github/workflows/workflows.yml
           .github/workflows/example-app.yml
+          .github/workflows/site.yml
           .github/workflows/licensing.yml
           .github/workflows/kotlin.yml
           .github/workflows/swift.yml

@@ -1,0 +1,17 @@
+page: document
+  title 'Интерфейс, описанный связями'
+  page-title: heading
+    level 1
+    text 'Интерфейс, описанный связями'
+  page-lead: paragraph
+    text 'Каждый элемент, стиль и анимация — связь в Links Notation. Links UI интерпретирует сеть связей во время выполнения: ядро на JavaScript и тонкие рендереры для разных платформ.'
+  section-title: heading
+    level 2
+    text 'Начните с документа'
+  block-0: code-block
+    text 'npm install @link-foundation/ui-core @link-foundation/ui-dom @link-foundation/ui-store'
+  block-1: paragraph
+    text 'Напишите документ LiNo и вызовите mountDocument(container, text). Откройте инспектор этого сайта: Alt+Shift+D или ?ui-dev.'
+  block-2: link
+    label 'Начало работы'
+    href getting-started/

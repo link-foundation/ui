@@ -1,0 +1,21 @@
+page: document
+  title 'Getting started'
+  page-title: heading
+    level 1
+    text 'Getting started'
+  page-lead: paragraph
+    text 'Install the core, store and DOM renderer. The web renderer uses custom elements and keeps stable link IDs on every node.'
+  section-title: heading
+    level 2
+    text Install
+  block-0: code-block
+    text 'npm install @link-foundation/ui-core @link-foundation/ui-dom @link-foundation/ui-store'
+  block-1: code-block
+    text ~1{6170703a20646f63756d656e740a20206772656574696e673a2074657874202748656c6c6f2c206c696e6b7327}
+  block-2: code-block
+    text ~1{696d706f7274207b206d6f756e74446f63756d656e74207d2066726f6d2027406c696e6b2d666f756e646174696f6e2f75692d646f6d273b0a6d6f756e74446f63756d656e7428646f63756d656e742e676574456c656d656e7442794964282761707027292c2074657874293b}
+  block-3: paragraph
+    text 'Serve the page as an ES module with a bundler such as Vite. Add controls and themes when you need them.'
+  block-4: link
+    label 'Read the dialect'
+    href dialect/
