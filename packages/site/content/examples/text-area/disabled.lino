@@ -1,0 +1,3 @@
+demo: document
+  text-area-disabled: text-area Comment
+    disabled true

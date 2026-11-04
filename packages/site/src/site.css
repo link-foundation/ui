@@ -73,3 +73,99 @@ pre {
 footer {
   border-top: 1px solid var(--color-outline, GrayText);
 }
+
+#component-gallery details {
+  margin: 0.75rem 0;
+  border: 1px solid var(--color-outline, GrayText);
+  padding: 0.75rem;
+}
+#component-gallery summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+#component-gallery pre {
+  overflow: auto;
+  padding: 1rem 0;
+}
+.gallery-matrix {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1rem;
+}
+.gallery-matrix figure {
+  margin: 0;
+  min-width: 0;
+  padding: 0.75rem;
+  border: 1px solid var(--color-outline, GrayText);
+}
+.gallery-matrix ui-document {
+  min-height: 5rem;
+  padding: 1rem;
+}
+.gallery-matrix figcaption {
+  font-size: 0.85rem;
+}
+ui-playground-editor,
+ui-playground-preview {
+  display: block;
+  min-width: 0;
+  overflow: auto;
+}
+ui-playground-editor section,
+ui-playground-preview section {
+  padding: 0.5rem;
+}
+[data-link-id='playground-split'] {
+  min-height: 28rem;
+}
+[data-link-id='playground-toolbar'] {
+  align-items: end;
+  gap: 0.75rem;
+}
+.lino-editor {
+  display: flex;
+  height: 24rem;
+  margin-top: 0.5rem;
+  border: 1px solid var(--color-outline, GrayText);
+}
+.lino-editor pre,
+.lino-editor textarea {
+  font:
+    0.9rem/1.6 ui-monospace,
+    monospace;
+  padding: 0.5rem;
+  tab-size: 2;
+}
+.lino-editor pre {
+  overflow: hidden;
+  text-align: right;
+  user-select: none;
+  border-right: 1px solid var(--color-outline, GrayText);
+}
+.lino-editor textarea {
+  min-width: 0;
+  width: 100%;
+  resize: none;
+  border: 0;
+  color: inherit;
+  background: inherit;
+  white-space: pre;
+}
+#playground-errors {
+  white-space: pre-wrap;
+}
+
+#component-gallery iframe {
+  width: 100%;
+  height: 34rem;
+  border: 0;
+}
+
+/* Native matrix links inherit the surrounding light/dark text contrast. */
+.gallery-matrix a,
+#component-gallery a {
+  color: inherit;
+}
+#component-gallery iframe:not([src]) {
+  display: none;
+}

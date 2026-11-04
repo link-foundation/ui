@@ -1,0 +1,4 @@
+demo: document
+  link-external: link 'Open UI'
+    href 'https://open-ui.org/'
+    external true

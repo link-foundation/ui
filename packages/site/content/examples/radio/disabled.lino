@@ -1,0 +1,8 @@
+demo: document
+  radio-disabled: radio-group Delivery
+    value post
+    radio-disabled-post: radio Post
+      value post
+    radio-disabled-courier: radio Courier
+      value courier
+      disabled true

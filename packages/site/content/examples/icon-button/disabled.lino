@@ -1,0 +1,4 @@
+demo: document
+  icon-button-disabled: icon-button settings
+    label Settings
+    disabled true

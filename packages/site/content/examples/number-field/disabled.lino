@@ -1,0 +1,4 @@
+demo: document
+  number-field-disabled: number-field Seats
+    value 4
+    disabled true

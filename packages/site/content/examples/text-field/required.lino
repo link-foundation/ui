@@ -1,0 +1,4 @@
+demo: document
+  text-field-required: text-field Email
+    type email
+    required true

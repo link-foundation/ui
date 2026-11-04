@@ -1,0 +1,4 @@
+demo: document
+  checkbox-disabled: checkbox Locked
+    checked true
+    disabled true
