@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import {
+  axeViolations,
   expectAccessible,
   screenshotMatrix,
 } from '../../../tests/ui/helpers.mjs';
@@ -426,8 +427,59 @@ for (const id of [
       locales: ['en'],
       apply: async (page, { theme }) => {
         await page.emulateMedia({ colorScheme: theme });
-        await expectAccessible(page);
       },
+      afterScreenshot: (page) => expectAccessible(page),
     });
   });
 }
+
+test('matrix audits settled theme colors and still rejects settled contrast defects', async ({
+  page,
+}) => {
+  await open(page, 'node-menu');
+  const checked = [];
+  await screenshotMatrix(page, 'overlays-node-menu', {
+    locales: ['en'],
+    apply: async (page, { theme }) => {
+      await page.emulateMedia({ colorScheme: theme });
+      // Hold a theme background at the reported gray until screenshot capture
+      // finishes the animation, exposing premature accessibility audits.
+      await page.evaluate(() => {
+        for (const animation of document.getAnimations()) {
+          animation.cancel();
+        }
+        for (const surface of document.querySelectorAll(
+          '[data-link-id="node-menu"] > [role="menuitem"]'
+        )) {
+          const animation = surface.animate(
+            { backgroundColor: ['#7d7d7d', '#7d7d7d'] },
+            { duration: 60_000 }
+          );
+          animation.pause();
+          animation.currentTime = 0;
+        }
+      });
+      if (theme === 'dark') {
+        expect((await axeViolations(page)).map(({ id }) => id)).toContain(
+          'color-contrast'
+        );
+      }
+    },
+    afterScreenshot: async (page, { theme }) => {
+      checked.push(theme);
+      await expectAccessible(page);
+    },
+  });
+  expect(checked).toEqual(['light', 'dark']);
+  await page.evaluate(() => {
+    for (const animation of document.getAnimations()) {
+      animation.cancel();
+    }
+  });
+  await page.addStyleTag({
+    content:
+      '[data-link-id="node-menu"] > [role="menuitem"] { color: white !important; background: #7d7d7d !important; transition: none !important; }',
+  });
+  await page.screenshot({ animations: 'disabled' });
+  await expect(expectAccessible(page)).rejects.toThrow(/color-contrast/);
+});
