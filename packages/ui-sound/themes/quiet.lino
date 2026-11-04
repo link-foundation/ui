@@ -1,0 +1,101 @@
+sound-theme quiet
+  voice tick
+    oscillator triangle
+      frequency 880
+      glide 880 0.042
+    envelope
+      attack 0.002
+      decay 0.04
+      sustain 0
+      release 0.02
+    gain 0.02
+    source
+      label 'own work'
+      license CC0-1.0
+  voice soft-open
+    oscillator sine
+      frequency 440
+      glide 660 0.13
+    envelope
+      attack 0.01
+      decay 0.12
+      sustain 0
+      release 0.05
+    gain 0.025
+    source
+      label 'own work'
+      license CC0-1.0
+  voice soft-close
+    oscillator sine
+      frequency 660
+      glide 440 0.11
+    envelope
+      attack 0.01
+      decay 0.1
+      sustain 0
+      release 0.04
+    gain 0.025
+    source
+      label 'own work'
+      license CC0-1.0
+  voice tap
+    oscillator sine
+      frequency 620
+      glide 600 0.043000000000000003
+    envelope
+      attack 0.003
+      decay 0.04
+      sustain 0
+      release 0.02
+    gain 0.015
+    source
+      label 'own work'
+      license CC0-1.0
+  voice chime
+    oscillator sine
+      frequency 784
+      glide 880 0.195
+    envelope
+      attack 0.015
+      decay 0.18
+      sustain 0
+      release 0.06
+    gain 0.02
+    source
+      label 'own work'
+      license CC0-1.0
+  event hover
+    mode random
+    voices tap
+  event click
+    mode random
+    voices tick
+  event toggle
+    mode random
+    voices tick
+  event select
+    mode random
+    voices tap
+  event scan
+    mode random
+    voices tap
+    throttle 120
+  event open
+    mode random
+    voices soft-open
+  event close
+    mode random
+    voices soft-close
+  event type
+    mode random
+    voices tap
+  event intro
+    mode random
+    voices chime
+  event notify
+    mode random
+    voices chime
+  bus
+    shelf 4000 -6
+    compressor -18 4
+    reverb 0.15
