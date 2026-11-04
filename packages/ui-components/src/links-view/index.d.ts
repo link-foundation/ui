@@ -652,6 +652,8 @@ export interface LinoNetworkElementOptions extends LinoNetworkOptions {
   tag?: string;
   createWorker?: () => Worker;
   fetch?: typeof fetch;
+  /** Optional source-load tracing; silent by default. */
+  debug?: (message: string, data?: object) => void;
 }
 export const LINO_NETWORK_TAG: 'lino-network';
 export function defineLinoNetwork(

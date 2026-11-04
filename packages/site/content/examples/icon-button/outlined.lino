@@ -1,0 +1,4 @@
+demo: document
+  icon-button-outlined: icon-button search
+    label Search
+    variant outlined

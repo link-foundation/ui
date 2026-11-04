@@ -5,12 +5,38 @@ const path = '/packages/ui-components/examples/lino-network.html';
 const view = (page) => page.locator('#network');
 async function open(page) {
   await page.goto(path);
-  await page.waitForFunction(
-    () => document.querySelector('#network')?.network?.links.size > 0
-  );
+  await page.evaluate(() => window.customElements.whenDefined('lino-network'));
   await view(page).evaluate((el) => el.ready);
+  expect(await view(page).evaluate((el) => el.diagnostics)).toEqual([]);
+  expect(
+    await view(page).evaluate((el) => el.network.links.size)
+  ).toBeGreaterThan(0);
   await expect(view(page).locator('svg')).toBeVisible();
 }
+
+test('upgrading the example starts one source fetch without aborting it', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const fetch = window.fetch.bind(window);
+    window.sourceLoads = [];
+    window.fetch = (url, options) => {
+      const load = { url, aborted: false };
+      window.sourceLoads.push(load);
+      options?.signal?.addEventListener('abort', () => {
+        load.aborted = true;
+      });
+      return fetch(url, options);
+    };
+  });
+  await open(page);
+  expect(await page.evaluate(() => window.sourceLoads)).toEqual([
+    {
+      url: '../../../docs/case-studies/issue-1/samples/document.lino',
+      aborted: false,
+    },
+  ]);
+});
 
 test('clicking a point reports its source line and highlights the source token', async ({
   page,

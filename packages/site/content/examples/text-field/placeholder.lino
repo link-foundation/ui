@@ -1,0 +1,4 @@
+demo: document
+  text-field-placeholder: text-field Search
+    type search
+    placeholder 'Type to search'

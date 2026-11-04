@@ -1,0 +1,8 @@
+demo: document
+  combobox-default: combobox City
+    combobox-default-berlin: option Berlin
+      value berlin
+    combobox-default-paris: option Paris
+      value paris
+    combobox-default-prague: option Prague
+      value prague

@@ -97,6 +97,8 @@ designer: document
       persist bottom-dock
       bottom-region: region
         side center
-        panels source
+        panels source timeline
       source: panel
         title Source
+      timeline: panel
+        title Timeline

@@ -136,6 +136,25 @@ class StaticElement extends StaticNode {
       .map((n) => (n.nodeType === 3 ? n.data : n.textContent))
       .join('');
   }
+  /** The attribute selectors used by static control templates. */
+  querySelector(selector) {
+    const attribute = /^\[([^=\]]+)(?:="([^"]*)")?\]$/.exec(selector);
+    for (const child of this.children) {
+      const matches = attribute
+        ? child.hasAttribute(attribute[1]) &&
+          (attribute[2] === undefined ||
+            child.getAttribute(attribute[1]) === attribute[2])
+        : child.localName === selector;
+      if (matches) {
+        return child;
+      }
+      const descendant = child.querySelector(selector);
+      if (descendant) {
+        return descendant;
+      }
+    }
+    return null;
+  }
   // Static output: events never happen.
   addEventListener() {}
   removeEventListener() {}

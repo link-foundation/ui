@@ -65,6 +65,9 @@ async function loadSource(node, state) {
   state.controller?.abort();
   const controller = new state.win.AbortController();
   state.controller = controller;
+  state.options.debug?.('Loading LiNo source', {
+    src: node.getAttribute('src'),
+  });
   try {
     let text = node.getAttribute('lino') ?? node.textContent;
     if (node.hasAttribute('src')) {
@@ -87,6 +90,11 @@ async function loadSource(node, state) {
     state.view.items = converted.links;
     await state.view.ready;
   } catch (error) {
+    state.options.debug?.('LiNo source load failed', {
+      src: node.getAttribute('src'),
+      aborted: controller.signal.aborted,
+      error,
+    });
     if (controller.signal.aborted) {
       return;
     }
@@ -140,6 +148,7 @@ export function defineLinoNetwork(win = globalThis.window, options = {}) {
         text: '',
         sourceMap: new Map(),
         diagnostics: [],
+        connected: false,
         ready: Promise.resolve(),
       };
       view.addEventListener('selectionchange', (event) =>
@@ -147,6 +156,7 @@ export function defineLinoNetwork(win = globalThis.window, options = {}) {
       );
     }
     connectedCallback() {
+      this.#state.connected = true;
       for (const name of ['layout', 'style-mode', 'theme', 'label']) {
         this.#forward(name);
       }
@@ -159,11 +169,15 @@ export function defineLinoNetwork(win = globalThis.window, options = {}) {
       this.#load();
     }
     disconnectedCallback() {
+      this.#state.connected = false;
       this.#state.controller?.abort();
       this.#state.observer?.disconnect();
     }
     attributeChangedCallback(name) {
-      if (!this.isConnected) {
+      // Upgrade reactions run while markup is already in the document, before
+      // connectedCallback. Let that callback forward attributes and load once;
+      // otherwise it immediately aborts and replaces the upgrade's first fetch.
+      if (!this.#state.connected) {
         return;
       }
       if (name === 'src' || name === 'lino') {

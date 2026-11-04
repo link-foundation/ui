@@ -1,0 +1,9 @@
+demo: document
+  radio-group-vertical: radio-group Plan
+    value pro
+    radio-group-vertical-free: radio Free
+      value free
+    radio-group-vertical-pro: radio Pro
+      value pro
+    radio-group-vertical-team: radio Team
+      value team

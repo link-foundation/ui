@@ -1,6 +1,6 @@
 /** Documentation semantics shared by static rendering and the live renderer. */
 import { defineKind } from '@link-foundation/ui-dom';
-import { defaultVocabulary } from '@link-foundation/ui-core';
+import { layoutVocabulary } from '@link-foundation/ui-components/layout';
 import { i18nVocabulary } from '@link-foundation/ui-i18n';
 import { registerControls } from '@link-foundation/ui-components/controls';
 
@@ -12,10 +12,12 @@ const DOCUMENT_KINDS = {
   navigation: [],
   main: [],
   footer: [],
+  'playground-editor': [],
+  'playground-preview': [],
 };
 
 export function siteVocabulary() {
-  const base = defaultVocabulary();
+  const base = layoutVocabulary();
   const kinds = new Map(base.kinds);
   for (const [kind, props] of Object.entries(DOCUMENT_KINDS)) {
     kinds.set(kind, {
@@ -41,6 +43,8 @@ export function registerSiteKinds() {
     navigation: 'nav',
     main: 'main',
     footer: 'footer',
+    'playground-editor': 'section',
+    'playground-preview': 'section',
   })) {
     const text = DOCUMENT_KINDS[kind].includes('text');
     defineKind(kind, {

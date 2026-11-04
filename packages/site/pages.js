@@ -5,6 +5,7 @@ import { parse, format, walk } from '@link-foundation/ui-core';
 import { createLocalizer, readCatalogs } from '@link-foundation/ui-i18n';
 import { listThemes } from '@link-foundation/ui-themes';
 import { siteVocabulary } from './src/kinds.js';
+import { loadCatalog } from './src/gallery/catalog.js';
 
 export async function readDocument(file) {
   const document = parse(await readFile(file, 'utf8'), {
@@ -52,6 +53,37 @@ export async function loadPages({ contentDir, layout, languages }) {
       const file = path.join(contentDir, language, name);
       const content = await readDocument(file);
       const page = name.slice(0, -5);
+      if (page === 'playground') {
+        const workspace = await readDocument(
+          new globalThis.URL(
+            './src/playground/playground.lino',
+            import.meta.url
+          )
+        );
+        const catalog = await loadCatalog();
+        walk(workspace, (node) => {
+          if (node.id === 'example-choice' || node.id === 'preview-theme') {
+            const choices =
+              node.id === 'example-choice'
+                ? catalog.flatMap((c) =>
+                    c.examples.map((e) => [
+                      e.id,
+                      `${c.title} · ${e.id.slice(c.kind.length + 1)}`,
+                    ])
+                  )
+                : listThemes().map((id) => [id, id]);
+            const template = node.children[0];
+            node.children = choices.map(([id, label]) => {
+              const option = globalThis.structuredClone(template);
+              option.id = `choice-${id}`;
+              setProperty(option, 'label', label);
+              setProperty(option, 'value', id);
+              return option;
+            });
+          }
+        });
+        content.roots[0].children.push(...workspace.roots);
+      }
       const route = `${language}/${page === 'index' ? '' : `${page}/`}`;
       const document = globalThis.structuredClone(shell);
       const root = document.roots[0];

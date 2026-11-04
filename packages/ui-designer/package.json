@@ -28,7 +28,8 @@
     "@link-foundation/ui-core": "^0.0.0",
     "@link-foundation/ui-devmode": "^0.0.0",
     "@link-foundation/ui-dom": "^0.0.0",
-    "@link-foundation/ui-store": "^0.0.0"
+    "@link-foundation/ui-store": "^0.0.0",
+    "@link-foundation/ui-animation": "^0.0.0"
   },
   "engines": {
     "node": ">=20"

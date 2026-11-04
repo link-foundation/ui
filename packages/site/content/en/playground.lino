@@ -1,0 +1,7 @@
+page: document
+  title 'Playground'
+  page-title: heading
+    level 1
+    text 'Playground'
+  page-lead: paragraph
+    text 'Edit Links Notation, inspect the preview and share your document.'

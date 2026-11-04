@@ -230,3 +230,87 @@
     border-color: Mark;
   }
 }
+
+.designer-timeline {
+  --timeline-accent: #2457b3;
+}
+.designer-timeline [data-link-id='timeline-toolbar'] {
+  flex-wrap: wrap;
+}
+.timeline-viewport {
+  overflow-x: auto;
+  min-height: 150px;
+  padding-bottom: 6px;
+}
+.timeline-row {
+  display: flex;
+  height: 32px;
+  border-bottom: 1px solid GrayText;
+}
+.timeline-label {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  flex: 0 0 200px;
+  box-sizing: border-box;
+  width: 200px;
+  background: Canvas;
+  color: CanvasText;
+  padding: 4px 8px;
+  text-align: start;
+  border: 0;
+  font: inherit;
+}
+.timeline-lane {
+  flex: 1;
+  position: relative;
+  touch-action: none;
+}
+.timeline-ruler {
+  cursor: crosshair;
+}
+.timeline-ruler > span {
+  position: absolute;
+  font-size: 12px;
+}
+.timeline-marker,
+.timeline-end {
+  position: absolute;
+  top: 3px;
+  transform: translateX(-50%);
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  background: Canvas;
+  color: CanvasText;
+  border: 1px solid GrayText;
+  cursor: ew-resize;
+  z-index: 2;
+  touch-action: none;
+}
+.timeline-marker[aria-pressed='true'] {
+  background: var(--timeline-accent);
+  color: white;
+}
+.timeline-playhead {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-left: 2px solid var(--timeline-accent);
+  pointer-events: none;
+  z-index: 1;
+}
+@media (prefers-color-scheme: dark) {
+  .designer-timeline {
+    --timeline-accent: #86b7ff;
+  }
+  .timeline-marker[aria-pressed='true'] {
+    color: #111;
+  }
+}
+.ui-designer [data-link-id='properties'] > label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+}

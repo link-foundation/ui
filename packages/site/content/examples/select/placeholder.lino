@@ -1,0 +1,7 @@
+demo: document
+  select-placeholder: select Fruit
+    placeholder 'Choose a fruit'
+    select-placeholder-apple: option Apple
+      value apple
+    select-placeholder-pear: option Pear
+      value pear

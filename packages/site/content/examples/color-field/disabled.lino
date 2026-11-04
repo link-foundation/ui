@@ -1,0 +1,4 @@
+demo: document
+  color-field-disabled: color-field Background
+    value '#ffffff'
+    disabled true

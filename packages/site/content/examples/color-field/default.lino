@@ -1,0 +1,3 @@
+demo: document
+  color-field-default: color-field Accent
+    value '#6750a4'

@@ -6,6 +6,7 @@ import { render } from '@link-foundation/ui-dom';
 import { mountDevMode } from '@link-foundation/ui-devmode';
 import themes from 'virtual:site-themes';
 import { registerSiteKinds, siteVocabulary } from './kinds.js';
+import { mountGallery } from './gallery/mount.js';
 import { languageHref } from './routes.js';
 
 registerSiteKinds();
@@ -24,12 +25,15 @@ config.set('user', 'site', 'locale', [data.language]);
 const store = createStore({ document: source });
 config.bindStore(store);
 const root = document.getElementById('app');
+const gallery = document.getElementById('component-gallery');
+gallery?.remove();
 root.replaceChildren();
 const handle = render(root, store, {
   config,
   themeRegistry: themes,
   themes,
   setTitle: true,
+  adoptStyles: false,
 });
 function syncChoices() {
   for (const [control, prop] of [
@@ -39,6 +43,10 @@ function syncChoices() {
     store.setProp(control, 'value', config.resolve('site', prop).value);
   }
   handle.flush();
+}
+if (gallery) {
+  root.querySelector('main').appendChild(gallery);
+  mountGallery(gallery);
 }
 syncChoices();
 config.subscribe(syncChoices);
@@ -60,5 +68,19 @@ root.addEventListener('ui-change', ({ detail }) => {
     config.set('user', 'site', prop, [value]);
   }
 });
-mountDevMode({ root, config, store, handle, vocabulary: siteVocabulary() });
+if (data.page === 'playground') {
+  const [{ mountPlayground }, { default: catalog }] = await Promise.all([
+    import('./playground/playground.js'),
+    import('virtual:site-examples'),
+  ]);
+  await mountPlayground({
+    root,
+    catalog,
+    themes,
+    siteStore: store,
+    siteHandle: handle,
+  });
+} else {
+  mountDevMode({ root, config, store, handle, vocabulary: siteVocabulary() });
+}
 document.body.dataset.ready = 'true';

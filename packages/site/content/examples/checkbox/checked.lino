@@ -1,0 +1,3 @@
+demo: document
+  checkbox-checked: checkbox 'Remember me'
+    checked true
