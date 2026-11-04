@@ -33,8 +33,13 @@ Those timestamps start when the preload executes, while the guard starts
 before spawning Node. They cannot establish a ten-second delay _after_ npm
 success: some of that difference could be startup delay. The original trace
 also does not record the nested npm/Prettier Node processes or stream closure.
-Both a startup/contention hypothesis and a pipe-completion hypothesis remain
-open until the shared-clock Windows trace is collected.
+The first investigation therefore considered both startup/contention and
+pipe-completion hypotheses before collecting a shared-clock Windows trace.
+
+The original npm log file timestamp (`02:08:54.611Z`) and the first fixture
+results (`02:08:53.685Z`) put npm startup about one second into that test.
+That constrains the initial-startup hypothesis: most of the delay was inside
+the formatter chain, rather than before the first Node preload.
 
 The optional `experiments/trace-changeset-fixture.cjs` preload now reports
 fixture-relative startup time, process IDs, nested process entry/exit, child
@@ -61,3 +66,16 @@ formatting assertions. These Linux results do not establish the Windows cause.
 
 Diagnosis and the regression remain in progress. Passing isolated runs alone
 will not count as satisfying the original issue's acceptance criteria.
+
+At `2ba1052`, [Windows/Deno job 126443701994](https://github.com/link-foundation/ui/actions/runs/41790677378/job/126443701994)
+passed the full parallel suite (3,816 passed, 53 steps, 78 ignored) in 244 seconds
+including installation and checking. Changesets took 4,566 ms in the parallel
+suite versus 985, 980, and 997 ms in the three isolated repetitions. Every
+nested process, shell, and stream closed successfully. The parallel trace
+reports the root Node exit at fixture-relative 2,557 ms, before Deno reports
+command completion at 4,566 ms. Parent-side event tracing is needed to separate
+process termination from pipe completion and event delivery in that gap.
+
+The next diagnostic revision records parent-side spawn/exit/stream-end/close
+events. The optional Node preload also takes two finite active-handle snapshots
+at 10 and 20 seconds; their timers are unreferenced and cannot prolong a command.

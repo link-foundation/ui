@@ -22,6 +22,22 @@ if (process.env.DEBUG_CHANGESET_FIXTURE) {
   });
   process.on('beforeExit', (code) => report('beforeExit', { code }));
   process.on('exit', (code) => report('processExit', { code }));
+  // Finite snapshots before the fixture's 25 s guard. Unref so diagnostics
+  // never keep a successful process alive or change its exit conditions.
+  for (const delay of [10000, 20000]) {
+    setTimeout(() => {
+      report(
+        'activeHandles',
+        process._getActiveHandles().map((handle) => ({
+          type: handle.constructor.name,
+          pid: handle.pid,
+          exitCode: handle.exitCode,
+          readableEnded: handle.readableEnded,
+          writableLength: handle.writableLength,
+        }))
+      );
+    }, delay).unref();
+  }
   for (const method of ['spawn', 'execFile']) {
     const original = childProcess[method];
     childProcess[method] = function (command, args, ...rest) {

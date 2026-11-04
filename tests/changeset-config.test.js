@@ -155,6 +155,7 @@ describe('Changesets release formatter', () => {
         );
         const budgetMs = HANG_GUARD_MS;
         const run = async (file, args) => {
+          const events = [];
           try {
             const { stderr, elapsedMs } = await runBounded(
               'node',
@@ -177,16 +178,19 @@ describe('Changesets release formatter', () => {
                   npm_config_loglevel: 'verbose',
                 },
                 timeout: budgetMs,
+                trace: (event) => events.push(event),
               }
             );
             // Show where the time went while an overrun can still be acted on.
             if (elapsedMs > budgetMs / 2 || env.DEBUG_CHANGESET_FIXTURE) {
               console.error(
-                `${file} took ${elapsedMs} of ${budgetMs} ms\n${stderr}`
+                `${file} took ${elapsedMs} of ${budgetMs} ms\nParent events: ${JSON.stringify(events)}\n${stderr}`
               );
             }
           } catch (error) {
-            assert.fail(`${error}\n${error.stdout}\n${error.stderr}`);
+            assert.fail(
+              `${error}\nParent events: ${JSON.stringify(events)}\n${error.stdout}\n${error.stderr}`
+            );
           }
         };
         await run('node_modules/@changesets/cli/bin.js', ['version']);

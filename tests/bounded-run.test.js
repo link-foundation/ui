@@ -73,13 +73,22 @@ describe('runBounded', () => {
   itUnless(sandboxed)(
     'returns the output of a successful command',
     async () => {
+      const events = [];
       const result = await runBounded(
         'node',
         ['-e', 'console.log("out"); console.error("err")'],
-        { timeout: HANG_GUARD_MS }
+        { timeout: HANG_GUARD_MS, trace: (event) => events.push(event) }
       );
       expect(result.stdout).toBe('out\n');
       expect(result.stderr).toBe('err\n');
+      expect(events.map(({ event }) => event).sort()).toEqual([
+        'close',
+        'end',
+        'end',
+        'exit',
+        'spawn',
+      ]);
+      expect(events.at(-1).event).toBe('close');
     }
   );
 

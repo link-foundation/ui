@@ -55,14 +55,14 @@ export function killTree(
  *
  * @param {string} command
  * @param {string[]} args
- * @param {{ timeout: number, closeAfterKillMs?: number } & import('node:child_process').SpawnOptions} options
+ * @param {{ timeout: number, closeAfterKillMs?: number, trace?: (event: object) => void } & import('node:child_process').SpawnOptions} options
  *   `closeAfterKillMs` bounds the wait for the pipes to close after the kill
  * @returns {Promise<{ stdout: string, stderr: string, elapsedMs: number }>}
  */
 export function runBounded(
   command,
   args,
-  { timeout, closeAfterKillMs = 1000, ...options }
+  { timeout, closeAfterKillMs = 1000, trace, ...options }
 ) {
   const started = Date.now();
   return new Promise((resolve, reject) => {
@@ -71,8 +71,13 @@ export function runBounded(
       detached: process.platform !== 'win32',
       stdio: ['ignore', 'pipe', 'pipe'],
     });
+    const report = (event, details = {}) =>
+      trace?.({ event, elapsedMs: Date.now() - started, ...details });
+    child.on('spawn', () => report('spawn', { pid: child.pid }));
+    child.on('exit', (code, signal) => report('exit', { code, signal }));
     const output = { stdout: '', stderr: '' };
     for (const stream of ['stdout', 'stderr']) {
+      child[stream].on('end', () => report('end', { stream }));
       child[stream].setEncoding('utf8');
       child[stream].on('data', (data) => {
         output[stream] += data;
@@ -110,9 +115,11 @@ export function runBounded(
     };
     const timer = setTimeout(() => {
       timedOut = true;
+      report('timeout');
       killTree(child.pid);
       // A descendant that escaped the kill can hold the pipes open forever.
       forceClose = setTimeout(() => {
+        report('force-close');
         child.stdout.destroy();
         child.stderr.destroy();
         finish(null, 'SIGKILL');
@@ -126,7 +133,10 @@ export function runBounded(
         reject(error);
       }
     });
-    child.on('close', finish);
+    child.on('close', (code, signal) => {
+      report('close', { code, signal });
+      finish(code, signal);
+    });
   });
 }
 
