@@ -55,13 +55,7 @@ export async function mountPlayground({
       return;
     }
     current?.destroy();
-    ({ theme, scheme } = syncChoices(
-      tree,
-      siteStore,
-      siteHandle,
-      theme,
-      scheme
-    ));
+    ({ theme, scheme } = syncChoices(tree, siteStore, siteHandle));
     current = createPreview({
       tree,
       preview,
@@ -156,7 +150,9 @@ export async function mountPlayground({
   window.addEventListener('hashchange', () => loadHash());
 }
 
-function syncChoices(tree, siteStore, siteHandle, theme, scheme) {
+function syncChoices(tree, siteStore, siteHandle) {
+  let theme = 'base';
+  let scheme = 'light';
   const doc = tree.roots.find((node) => node.kind === 'document');
   if (doc) {
     theme = doc.properties.find((p) => p.name === 'theme')?.values[0] ?? theme;

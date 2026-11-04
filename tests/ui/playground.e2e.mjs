@@ -45,6 +45,14 @@ test('examples and theme/scheme choices update the source document', async ({
     'data-scheme',
     'dark'
   );
+  // A new source without overrides must render the same after sharing it.
+  await choose(page, 'Examples', 'Checkbox · disabled');
+  await expect(
+    page.getByRole('combobox', { name: 'Preview theme', exact: true })
+  ).toContainText('base');
+  await expect(
+    page.getByRole('combobox', { name: 'Preview scheme', exact: true })
+  ).toContainText('Light');
 });
 
 test('live edits update within 500ms; syntax errors keep the last preview', async ({
