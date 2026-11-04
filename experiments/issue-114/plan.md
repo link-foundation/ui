@@ -27,4 +27,9 @@ Draft verification: all 11 new regressions pass under Node.js, Bun and Deno.
 The initial run failed all five original cases with missing openSyncedLinks.
 Additional coverage checks concurrent writes and pushes during snapshots,
 resuming acknowledged creates, persisted updates/deletes, and permission loss.
-No rendered UI changed; browser screenshots are not applicable.
+CI caught the browser fixture missing the new core dependency in its import map.
+Playwright reproduced the module resolution error; the mapping fixes it.
+Both text/binary two-tab tests pass using installed Chrome via
+`npx playwright test tests/ui/links-websocket.e2e.mjs --config experiments/issue-114/playwright.config.mjs`.
+Before/after evidence is in docs/screenshots/issue-114. The browser-server
+experiment supports manual checks alongside the static server.
