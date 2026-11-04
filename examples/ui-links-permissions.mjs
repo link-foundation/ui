@@ -1,7 +1,8 @@
 // Usage of @link-foundation/ui-links: a links server whose types and
 // permissions are links, and synced clients that see only what their user
 // may read.
-// Run: node examples/ui-links-permissions.mjs
+// Run: node examples/ui-links-permissions.mjs [--server clink]
+// CLINK may select the path of a released clink (Rust 1.3.0 or newer).
 import {
   allow,
   allLinks,
@@ -15,6 +16,8 @@ import {
   typeMarkers,
   typeSystem,
 } from '@link-foundation/ui-links';
+import { connectLinks } from '@link-foundation/ui-links/tcp';
+import { startClink } from './lib/ui-links-clink.mjs';
 
 // The data: Type -> User -> Admin, Type -> Doc -> Note -> Shared, and
 // Shared is Public too (multiple inheritance).
@@ -59,6 +62,20 @@ const tokens = new Map([
   ['alice-token', v.alice],
   ['boss-token', v.boss],
 ]);
+const backend = process.argv.slice(2);
+if (
+  backend.length &&
+  (backend.length !== 2 ||
+    backend[0] !== '--server' ||
+    !['clink', 'reference'].includes(backend[1]))
+) {
+  throw new Error(
+    'Usage: node examples/ui-links-permissions.mjs [--server reference|clink]'
+  );
+}
+const external =
+  backend[1] === 'clink' ? await startClink({ links, names, tokens }) : null;
+const transports = [];
 const server = createLinksServer({
   links,
   names,
@@ -68,32 +85,54 @@ const server = createLinksServer({
 
 /** A synced client of `server`, signed in with `token`. */
 async function signIn(token) {
-  const transport = connectInProcess(server);
+  const transport = external
+    ? await connectLinks(external.address)
+    : connectInProcess(server);
+  transports.push(transport);
   console.log(await transport.send(`(auth: ${token})`));
   return createSyncedLinks({ transport });
 }
 
-const boss = await signIn('boss-token');
-const alice = await signIn('alice-token');
+try {
+  const boss = await signIn('boss-token');
+  const alice = await signIn('alice-token');
 
-// The boss keeps everything up to date; alice loads what she may read.
-await boss.subscribe([]);
-await alice.load([]);
-const visible = allLinks(alice).map((link) => names.getName(link.id));
-console.log('alice sees:', visible); // memo and news, not plan
+  // The boss keeps everything up to date; alice loads what she may read.
+  await boss.subscribe([]);
+  await alice.load([]);
+  const visible = allLinks(alice).map((link) => names.getName(link.id));
+  console.log('alice sees:', visible); // memo and news, not plan
 
-// A write alice may not make is rolled back in her cache.
-alice.onError((error, write) =>
-  console.log(`refused ${write.kind}: ${error.message}`)
-);
-alice.update(v.memo, t.Secret, v.memo);
-await alice.flush();
-console.log('memo is still a Note:', types.isA(v.memo, t.Note)); // true
+  // A write alice may not make is rolled back in her cache.
+  alice.onError((error, write) =>
+    console.log(`refused ${write.kind}: ${error.message}`)
+  );
+  alice.update(v.memo, t.Secret, v.memo);
+  await alice.flush();
+  const [memo] = await boss.load([v.memo]);
+  console.log('memo is still a Note:', memo.from_id === t.Note); // true
 
-// A note alice writes reaches the boss through the subscription.
-const draft = alice.create();
-alice.update(draft, t.Note, draft);
-await alice.flush();
-const id = alice.resolve(draft);
-await new Promise((resolve) => setTimeout(resolve, 0));
-console.log('the boss sees the new note:', allLinks(boss, [id])[0]);
+  // A note alice writes reaches the boss through the subscription.
+  const draft = alice.create();
+  alice.update(draft, t.Note, draft);
+  await alice.flush();
+  const id = alice.resolve(draft);
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  for (
+    let attempt = 0;
+    attempt < 100 && allLinks(boss, [id])[0]?.from_id !== t.Note;
+    attempt++
+  ) {
+    await new Promise((resolve) => setTimeout(resolve, 10));
+  }
+  const received = allLinks(boss, [id])[0];
+  if (received?.from_id !== t.Note) {
+    throw new Error('Subscription did not deliver the new note');
+  }
+  console.log('the boss sees the new note:', received);
+} finally {
+  for (const transport of transports) {
+    await transport.close();
+  }
+  await external?.close();
+}

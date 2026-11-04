@@ -278,6 +278,7 @@ describe('CI timeout policy', () => {
       'changeset-check': 10,
       lint: 10,
       test: 15,
+      'clink-client': 15,
       'validate-docs': 5,
       release: 65,
       'instant-release': 65,
