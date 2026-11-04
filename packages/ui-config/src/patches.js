@@ -127,8 +127,9 @@ export function loadLayer(state, layer, text) {
  * @param {State} state
  * @param {string} text
  * @param {'user'|'session'} [layer]  default: the layer named by the patch
+ * @param {(target: import('./state.js').Target) => boolean} [accept]
  */
-export function importPatch(state, text, layer) {
+export function importPatch(state, text, layer, accept = () => true) {
   if (layer !== undefined) {
     state.checkEditable(layer);
   }
@@ -152,7 +153,9 @@ export function importPatch(state, text, layer) {
   }
   state.batch(() => {
     for (const { t, values } of ops) {
-      state.write(into, t, values);
+      if (accept(t)) {
+        state.write(into, t, values);
+      }
     }
   });
   return { ok: true, diagnostics };

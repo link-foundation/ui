@@ -3,7 +3,7 @@
  * configuration layers (defaults < theme < site < user < session).
  */
 
-import { LAYERS } from './layers.js';
+import { LAYERS, overrideKey } from './layers.js';
 import { check, ConfigError } from './errors.js';
 import { isValue } from './values.js';
 import { createState } from './state.js';
@@ -36,7 +36,23 @@ export function createConfig(options) {
   const state = createState(options);
   const { checkLayer, checkEditable, targetOrError, target, batch, write } =
     state;
+  const comfort = new Map();
+  const isComfort = (id, name, key) => {
+    const t = targetOrError(id, name, key);
+    return (
+      !(t instanceof ConfigError) &&
+      comfort.has(overrideKey(t.id, t.name, t.key))
+    );
+  };
   const config = {
+    /** Register a viewer-owned target; intentional editing stays permitted. */
+    registerComfort(id, name, key) {
+      const t = target(id, name, key);
+      comfort.set(overrideKey(t.id, t.name, t.key), Object.freeze(t));
+    },
+    isComfort,
+    comfortProperties: () => [...comfort.values()],
+
     /** The id of the document patches are written for (`(base …)`). */
     base: state.baseId,
     layers: LAYERS,
@@ -92,6 +108,9 @@ export function createConfig(options) {
 
     loadLayer: (layer, text) => loadLayer(state, layer, text),
     importPatch: (text, layer) => importPatch(state, text, layer),
+    /** Apply a shared look while keeping every registered comfort target. */
+    importLook: (text, layer) =>
+      importPatch(state, text, layer, (t) => !isComfort(t.id, t.name, t.key)),
     exportPatch: (exportOptions) => exportPatch(state, exportOptions),
     effective: () => effectiveDocument(state),
 
