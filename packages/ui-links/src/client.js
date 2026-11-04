@@ -411,6 +411,12 @@ async function loadLinks(request, writer, restriction) {
     const [reply, names] = await request(
       op('load', restrictionLino(restriction))
     );
+    // A server without this extension may treat it as a substitution query
+    // and return an empty successful result (notably a permission-filtered
+    // clink session). Only the explicit envelope identifies extension support.
+    if (reply?.id !== 'links' || names?.id !== 'names') {
+      throw new LinksError('remote', 'The server does not support load');
+    }
     data = reply.values[0].values;
     metadata = names.values[0].values;
   } catch (error) {

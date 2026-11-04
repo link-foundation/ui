@@ -27,6 +27,20 @@ async function until(check, tries = 100) {
 }
 
 describe('synced client', () => {
+  it('falls back to each when an unsupported load is an empty query reply', async () => {
+    const requests = [];
+    const client = createSyncedLinks({
+      transport: {
+        async send(text) {
+          requests.push(text);
+          return requests.length === 1 ? '' : '(7: 2 7)';
+        },
+      },
+    });
+    expect(await client.load([])).toEqual([{ id: 7, from_id: 2, to_id: 7 }]);
+    expect(requests).toEqual(['(load: ())', '(each: ())']);
+  });
+
   it('writes optimistically and moves temporary addresses', async () => {
     const server = createLinksServer({ links: createMemoryLinks() });
     const a = createSyncedLinks({ transport: connectInProcess(server) });
