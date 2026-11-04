@@ -13,7 +13,10 @@ import { dirname, join } from 'node:path';
 import { describe, it } from 'test-anywhere';
 import { itUnless, sandboxed } from './helpers/skip.js';
 
-const workflow = readFileSync('.github/workflows/release.yml', 'utf8');
+const workflow = readFileSync(
+  '.github/workflows/release.yml',
+  'utf8'
+).replaceAll('\r\n', '\n');
 const testJob = workflow.split('\n  test:\n')[1].split('\n  docker-build:')[0];
 
 describe('Windows Bun file shards', () => {
