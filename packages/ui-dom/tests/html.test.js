@@ -7,7 +7,10 @@ import { describe, it, expect } from 'test-anywhere';
 import { parse } from '@link-foundation/ui-core';
 import { createStore } from '@link-foundation/ui-store';
 import { renderToHTML as fromRoot } from '@link-foundation/ui-dom';
-import { renderToHTML } from '@link-foundation/ui-dom/html';
+import {
+  renderToHTML,
+  createStaticDocument,
+} from '@link-foundation/ui-dom/html';
 import { createDom, sample, snapshot } from './setup-dom.js';
 
 describe('renderToHTML', () => {
@@ -102,5 +105,21 @@ describe('renderToHTML', () => {
     expect(renderToHTML("(i: image 'a.png' (alt 'A'))")).toBe(
       '<ui-image data-link-id="i"><img src="a.png" alt="A"></ui-image>'
     );
+  });
+});
+
+describe('static template lookup', () => {
+  it('finds nested attribute parts and preserves their serialized output', () => {
+    const doc = createStaticDocument();
+    const root = doc.createElement('button');
+    const wrapper = doc.createElement('span');
+    const label = doc.createElement('span');
+    label.setAttribute('data-part', 'label');
+    wrapper.appendChild(label);
+    root.appendChild(wrapper);
+    expect(root.querySelector('[data-part="label"]')).toBe(label);
+    expect(root.querySelector('[data-part]')).toBe(label);
+    expect(root.querySelector('[data-part="icon"]')).toBe(null);
+    expect(root.querySelector('span')).toBe(wrapper);
   });
 });
