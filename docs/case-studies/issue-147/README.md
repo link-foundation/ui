@@ -46,13 +46,17 @@ separate from the application document and its edit history.
 ## Verification record
 
 The model and interaction tests were first run before their modules existed;
-both failed with `ERR_MODULE_NOT_FOUND`. The implemented model passes 23 focused
+both failed with `ERR_MODULE_NOT_FOUND`. The implemented model passes 24 focused
 unit tests (comments, voice, storage and designer), including a byte-exact check
 of the specification's generated LiNo example. Seven browser tests pass with
 one worker: text tasks and reload, lasso cancellation, voice opt-in/refusal,
 light/dark WCAG 2.2 AA, designer and foreign-page persistence. The first audit
 caught a marker whose accessible name omitted its visible instruction; including
-the visible text fixed the violation in both color schemes.
+the visible text fixed the violation in both color schemes. Two integration
+regressions then reproduced stale indicators after direct store edits and lost
+focus after closing a shadow-root panel. Subscribing to both adapter and store
+changes, and restoring the deepest active element after showing the inspector,
+fixed them.
 
 Local pinned browser revisions were absent. The bounded
 [`experiments/issue-147/playwright.config.mjs`](../../../experiments/issue-147/playwright.config.mjs)

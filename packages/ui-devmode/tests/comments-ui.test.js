@@ -97,7 +97,11 @@ it('opens shared comments from the inspector and restores the inspector on close
   const dev = mountDevMode({ ...page, commentOptions: { storage: null } });
   await dev.open();
   const inspector = page.document.querySelector('ui-devmode-inspector');
-  inspector.shadowRoot.querySelector('[data-command="comments"]').click();
+  const opener = inspector.shadowRoot.querySelector(
+    '[data-command="comments"]'
+  );
+  opener.focus();
+  opener.click();
   const host = page.document.querySelector('ui-comments');
   assert.ok(host);
   assert.equal(inspector.style.visibility, 'hidden');
@@ -106,9 +110,32 @@ it('opens shared comments from the inspector and restores the inspector on close
   page.window.dispatchEvent(key(page.window, { key: 'Escape' }));
   assert.equal(page.document.querySelector('ui-comments'), null);
   assert.equal(inspector.style.visibility, '');
+  assert.equal(inspector.shadowRoot.activeElement, opener);
   assert.equal(dev.isOpen, true);
   inspector.shadowRoot.querySelector('[data-command="comments"]').click();
   dev.destroy();
   assert.equal(page.document.querySelector('ui-comments'), null);
+  page.window.close();
+});
+
+it('refreshes revision and missing-target indicators after direct store changes', async () => {
+  const { mountDevMode } = await import('../src/index.js');
+  const page = createPage();
+  const dev = mountDevMode({ ...page, commentOptions: { storage: null } });
+  await dev.open();
+  page.document
+    .querySelector('ui-devmode-inspector')
+    .shadowRoot.querySelector('[data-command="comments"]')
+    .click();
+  const shadow = page.document.querySelector('ui-comments').shadowRoot;
+  shadow.querySelector('[data-target=ok]').click();
+  shadow.querySelector('[data-field=instruction]').value = 'Change label';
+  shadow.querySelector('[data-action=add]').click();
+  assert.match(shadow.querySelector('.meta').textContent, /current/);
+  page.store.setProp('ok', 'label', ['Save']);
+  assert.match(shadow.querySelector('.meta').textContent, /outdated/);
+  page.store.remove('ok');
+  assert.match(shadow.querySelector('.meta').textContent, /missing/);
+  dev.destroy();
   page.window.close();
 });

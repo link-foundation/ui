@@ -84,6 +84,9 @@ test('per-object text tasks are anchored, editable, exported, validated and rest
     .click();
   await expect(panel(page)).toHaveCount(0);
   await expect(page.locator('ui-devmode-inspector')).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Comment on UI', exact: true })
+  ).toBeFocused();
 });
 
 test('freehand lasso selects objects, Escape cancels a gesture and application clicks stay suppressed', async ({

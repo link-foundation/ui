@@ -26,6 +26,11 @@ label { display: block; } textarea { display: block; padding: 6px; width: 100%; 
   font-size: 12px; background: Canvas; color: CanvasText; border: 2px solid #b3261e; }
 svg { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 path { fill: rgb(26 86 219 / .12); stroke: #1a56db; stroke-width: 2; }
+@media (prefers-color-scheme: dark) {
+  .mark, .bubble { border-color: #ffb4ab; }
+  .mark.selected { border-color: #8ab4f8; }
+  path { stroke: #8ab4f8; fill: rgb(138 180 248 / .12); }
+}
 @media (forced-colors: active) { .mark, .bubble { border-color: Highlight; } }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
 `;

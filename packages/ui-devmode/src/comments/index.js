@@ -20,7 +20,7 @@ export function mountComments(options) {
   const { root, tree, nodeFor, onClose } = options;
   const document = root.ownerDocument;
   const window = document.defaultView;
-  const restoreFocus = document.activeElement;
+  const restoreFocus = activeElement(document);
   const t = (text) => options.messages?.[text] ?? text;
   const storageKey =
     options.storageKey ?? `ui-comments:${window.location.pathname}`;
@@ -86,10 +86,10 @@ export function mountComments(options) {
     picking.destroy();
     cleanups.splice(0).forEach((cleanup) => cleanup());
     view.host.remove();
+    onClose?.();
     if (restoreFocus?.isConnected) {
       restoreFocus.focus?.();
     }
-    onClose?.();
   }
   const picking = installCommentPicking({
     window,
@@ -148,8 +148,10 @@ export function mountComments(options) {
   );
   listen(window, 'scroll', marks, true);
   listen(window, 'resize', marks);
-  if (options.observe ?? tree.subscribe) {
-    cleanups.push((options.observe ?? tree.subscribe)(refresh));
+  for (const observe of new Set(
+    [options.observe, tree.subscribe].filter(Boolean)
+  )) {
+    cleanups.push(observe(refresh));
   }
   if (window.ResizeObserver) {
     const observer = new window.ResizeObserver(marks);
@@ -192,4 +194,12 @@ function commentListeners(cleanups) {
     target.addEventListener(name, handler, capture);
     cleanups.push(() => target.removeEventListener(name, handler, capture));
   };
+}
+
+function activeElement(document) {
+  let node = document.activeElement;
+  while (node?.shadowRoot?.activeElement) {
+    node = node.shadowRoot.activeElement;
+  }
+  return node;
 }
