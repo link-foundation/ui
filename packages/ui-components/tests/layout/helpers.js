@@ -45,6 +45,8 @@ export async function mountLayout(text, options = {}) {
     { pretendToBeVisual: true }
   );
   const { window } = dom;
+  const errors = [];
+  window.addEventListener('error', (event) => errors.push(event.error));
   setViewport(window, options.width ?? 1280, options.height ?? 800);
   const storage = options.storage ?? memoryStorage();
   const diagnostics = [];
@@ -66,6 +68,7 @@ export async function mountLayout(text, options = {}) {
     handle,
     storage,
     diagnostics,
+    errors,
     node: (id) => handle.nodeFor(id),
     close: () => {
       handle.destroy();
