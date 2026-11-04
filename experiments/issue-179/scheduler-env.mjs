@@ -10,6 +10,7 @@ import { URL } from 'node:url';
 const require = createRequire(
   new URL('../../packages/ui-react/package.json', import.meta.url)
 );
+const fromReactDom = createRequire(require.resolve('react-dom/client'));
 const { JSDOM } = require('jsdom');
 const React = require('react');
 const dom = new JSDOM('<div id="root"></div>');
@@ -69,12 +70,12 @@ try {
   });
   const { createRoot } = require('react-dom/client');
   process.env = original;
-  const scheduler = require('scheduler');
+  const scheduler = fromReactDom('scheduler');
   console.log(
     'versions:',
     require('react/package.json').version,
     require('react-dom/package.json').version,
-    require('scheduler/package.json').version
+    fromReactDom('scheduler/package.json').version
   );
   console.log('scheduler exports:', Object.keys(scheduler));
   assert.equal(intercepted, true);
