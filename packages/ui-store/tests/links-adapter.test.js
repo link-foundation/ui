@@ -131,6 +131,28 @@ describe('writeDocumentLinks and readDocumentLinks', () => {
     ).toEqual(document.roots);
   });
 
+  it('reads a document with 12000 sibling elements without using the call stack', () => {
+    const document = createStore({
+      text: 'text Value\n'.repeat(12000),
+    }).toDocument();
+    const links = createMemoryLinks();
+    const where = writeDocumentLinks(encodeDocument(document), links);
+    expect(readDocumentLinks(links, where).roots.length).toBe(12000);
+  });
+
+  it('rejects a cyclic live handle', () => {
+    const links = createMemoryLinks();
+    const where = writeDocumentLinks(encoded, links);
+    links.update(where.roots[0], 0, where.roots[0]);
+    let code;
+    try {
+      readDocumentLinks(links, where);
+    } catch (error) {
+      code = error.code;
+    }
+    expect(code).toBe('bad-doublets');
+  });
+
   it('rejects a root that is missing', () => {
     let code = null;
     try {

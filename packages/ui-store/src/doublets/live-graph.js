@@ -128,40 +128,54 @@ export function readGraph(links, { roots, names = links.names }) {
     check(link, 'bad-doublets', `Link ${id} does not exist`);
     return link;
   };
-  const visit = (id) => {
-    id = resolve(id);
-    if (done.has(id)) {
-      return done.get(id);
-    }
-    check(!active.has(id), 'bad-doublets', `Cycle at link ${id}`);
-    active.add(id);
-    const link = get(id);
-    let index;
-    if (link.from_id === 0) {
-      index = visit(link.to_id);
-    } else if (link.from_id === id && link.to_id === id) {
-      index = rows.length + 1;
-      const name = byId ? byId.get(id) : decodeName(names.getName(id));
-      check(
-        name !== null && name !== undefined,
-        'bad-doublets',
-        `Point ${id} has no name`
-      );
-      if (points.has(name)) {
-        index = points.get(name);
-      } else {
-        points.set(name, index);
-        rows.push({ index, source: index, target: index });
+  const visit = (first) => {
+    const stack = [{ id: resolve(first), after: false }];
+    while (stack.length) {
+      const { id, after } = stack.pop();
+      if (done.has(id)) {
+        continue;
       }
-    } else {
-      const source = visit(link.from_id);
-      const target = visit(link.to_id);
-      index = rows.length + 1;
-      rows.push({ index, source, target });
+      const link = get(id);
+      const point = link.from_id === id && link.to_id === id;
+      if (!after) {
+        check(!active.has(id), 'bad-doublets', `Cycle at link ${id}`);
+        active.add(id);
+        if (!point) {
+          stack.push({ id, after: true });
+          stack.push({ id: resolve(link.to_id), after: false });
+          if (link.from_id !== 0) {
+            stack.push({ id: resolve(link.from_id), after: false });
+          }
+          continue;
+        }
+      }
+      let index;
+      if (link.from_id === 0) {
+        index = done.get(resolve(link.to_id));
+      } else if (point) {
+        index = rows.length + 1;
+        const name = byId ? byId.get(id) : decodeName(names.getName(id));
+        check(
+          name !== null && name !== undefined,
+          'bad-doublets',
+          `Point ${id} has no name`
+        );
+        if (points.has(name)) {
+          index = points.get(name);
+        } else {
+          points.set(name, index);
+          rows.push({ index, source: index, target: index });
+        }
+      } else {
+        const source = done.get(resolve(link.from_id));
+        const target = done.get(resolve(link.to_id));
+        index = rows.length + 1;
+        rows.push({ index, source, target });
+      }
+      done.set(id, index);
+      active.delete(id);
     }
-    done.set(id, index);
-    active.delete(id);
-    return index;
+    return done.get(resolve(first));
   };
   const document = decodeDocument({
     roots: roots.map(visit),
@@ -169,8 +183,12 @@ export function readGraph(links, { roots, names = links.names }) {
     names: points,
   });
   const unwrap = (id) => {
-    const l = get(id);
-    return l.from_id === 0 ? unwrap(l.to_id) : resolve(id);
+    let link = get(id);
+    while (link.from_id === 0) {
+      id = link.to_id;
+      link = get(id);
+    }
+    return resolve(id);
   };
   const isNil = (id) => {
     const l = get(unwrap(id));
