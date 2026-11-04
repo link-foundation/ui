@@ -160,3 +160,12 @@ ui-playground-preview section {
   height: 34rem;
   border: 0;
 }
+
+/* Native matrix links inherit the surrounding light/dark text contrast. */
+.gallery-matrix a,
+#component-gallery a {
+  color: inherit;
+}
+#component-gallery iframe:not([src]) {
+  display: none;
+}
