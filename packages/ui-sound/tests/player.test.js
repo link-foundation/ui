@@ -35,7 +35,7 @@ function setup({ mode = 'random', enabled = true, reduced = false } = {}) {
     target,
     contexts: () => contexts,
     gesture: (type = 'pointerdown') =>
-      target.dispatchEvent(new globalThis.Event(type)),
+      target.dispatchEvent(new target.Event(type)),
     advance: (ms) => {
       time += ms;
     },
@@ -66,7 +66,7 @@ describe('sound player', () => {
         return fakeAudio();
       },
     });
-    target.dispatchEvent(new globalThis.Event('pointerdown'));
+    target.dispatchEvent(new target.Event('pointerdown'));
     expect(count).toBe(0);
     await player.dispose();
   });
@@ -136,7 +136,7 @@ describe('sound player', () => {
   });
   it('tracks pointer movement without creating audio and resumes a suspended context', async () => {
     const s = setup();
-    const move = Object.assign(new globalThis.Event('pointermove'), {
+    const move = Object.assign(new s.target.Event('pointermove'), {
       clientX: 0,
     });
     s.target.dispatchEvent(move);
@@ -160,7 +160,7 @@ describe('sound player', () => {
       },
       onDiagnostic: (d) => diagnostics.push(d.code),
     });
-    target.dispatchEvent(new globalThis.Event('keydown'));
+    target.dispatchEvent(new target.Event('keydown'));
     expect(player.play('click')).toEqual([]);
     expect(diagnostics).toEqual(['audio-unavailable']);
     await player.dispose();

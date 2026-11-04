@@ -1,5 +1,6 @@
 import { URL } from 'node:url';
 import { readFileSync } from 'node:fs';
+import { JSDOM } from 'jsdom';
 import { readSoundTheme } from '../src/theme.js';
 
 export const loadTheme = (name = 'quiet') =>
@@ -102,7 +103,11 @@ export function settings(initial = {}) {
   };
 }
 export function gestureTarget() {
-  const target = new globalThis.EventTarget();
+  // Keep Event and EventTarget in one DOM realm across Node, Bun and Deno.
+  const { window } = new JSDOM();
+  const target = new window.EventTarget();
+  target.Event = window.Event;
+  window.close();
   target.innerWidth = 100;
   return target;
 }
