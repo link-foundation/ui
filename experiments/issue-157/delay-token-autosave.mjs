@@ -1,4 +1,4 @@
-/** Widen the independent token autosave globalThis to reproduce #157 deterministically. */
+/** Widen the independent token autosave window to reproduce #157 deterministically. */
 export async function delayTokenAutosave(page) {
   await page.addInitScript(() => {
     const schedule = globalThis.setTimeout.bind(globalThis);
