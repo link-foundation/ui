@@ -96,18 +96,26 @@ test('switching tabs preserves unsaved text and undo history; reload restores dr
   await page.keyboard.press('Control+y');
   await expect.poll(() => activeText(page)).toBe('app: document\n  title Mine');
   await expect.poll(() => activeText(page)).toBe('app: document\n  title Mine');
+  // Each draft has its own debounce timer; wait for both storage round trips.
   await expect
     .poll(() =>
       page.evaluate(async () => {
         const { createDocumentsModel } =
           await import('/packages/ui-components/src/editor/documents-model.js');
-        return createDocumentsModel({
+        const restored = createDocumentsModel({
           storage: window.localStorage,
           key: 'issue-46-editor-tabs',
-        }).get('document.lino').text;
+        });
+        return [
+          restored.get('document.lino').text,
+          restored.get('tokens.lino').text,
+        ];
       })
     )
-    .toBe('app: document\n  title Mine');
+    .toEqual([
+      'app: document\n  title Mine',
+      "theme: theme\n  token color.primary '#6750A4'",
+    ]);
   await page.getByRole('tab', { name: 'tokens.lino •' }).click();
   await page.reload();
   await ready(page);
