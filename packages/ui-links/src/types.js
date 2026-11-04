@@ -142,6 +142,28 @@ export function typeSystem(links, { root, extends: extendsMarker = null }) {
 
   return {
     root,
+    links,
+    /** Whether committed writes can change the ancestry of other links. */
+    affects(changes, storage) {
+      if (storage !== links) {
+        return false;
+      }
+      const oldSources = new Set(changes.map(({ before }) => before?.from_id));
+      return changes.some(({ before, after }) => {
+        const id = (after ?? before).id;
+        if (id === root || id === extendsMarker || isExtension(id)) {
+          return true;
+        }
+        if ([before, after].some((link) => link?.from_id === extendsMarker)) {
+          return true;
+        }
+        // A source is a type even when it does not point at itself.
+        return (
+          before?.from_id !== after?.from_id &&
+          (links.count({ from_id: id }) > 0 || oldSources.has(id))
+        );
+      });
+    },
     typeOf,
     isType,
     parentsOf,

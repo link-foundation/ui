@@ -20,6 +20,7 @@
 
 import { CONTINUE, NULL } from './constants.js';
 import { point } from './types.js';
+import { watchPolicy } from './policy-watch.js';
 import {
   decorate,
   getLink,
@@ -73,6 +74,8 @@ export function createPolicy({ rules, markers, types }) {
 
   return {
     markers,
+    /** An isolated readable-types cache for a server. */
+    watch: () => watchPolicy({ rules, markers, types }),
     /** Whether `subject` may read `link` (writing allows reading). */
     canRead: (subject, link) =>
       allows(markers.allowRead, subject, link) ||
