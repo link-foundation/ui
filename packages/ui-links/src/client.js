@@ -31,6 +31,7 @@ import {
 } from './links.js';
 import { formatLino, group, named, parseLino } from './lino.js';
 import { createMemoryLinks } from './memory.js';
+import { createLinksNames } from './links-names.js';
 
 /**
  * @typedef {{ id: number, from_id: number, to_id: number }} Link
@@ -216,6 +217,12 @@ function createCacheWriter(cache, emit) {
     real,
     resolve,
     put,
+    refreshNames(ids, metadata) {
+      for (const mark of createLinksNames(cache).bindings(ids)) {
+        remove(mark.id, 'remote');
+      }
+      metadata.forEach((value) => put(linkFromLino(value), 'remote'));
+    },
     /** Apply the changes the server reports. */
     applyRemote(changes) {
       for (const { before, after } of changes) {
@@ -382,6 +389,46 @@ const listenerSet = (set) => (listener) => {
   return () => set.delete(listener);
 };
 
+/** Optional name encoding extension; older sidecar servers have no encoding. */
+async function requestNameLinks(request, ids) {
+  try {
+    return await request(
+      op('name-links', group([...new Set(ids)].map(String)))
+    );
+  } catch (error) {
+    if (error instanceof LinksError && error.code === 'remote') {
+      return [];
+    }
+    throw error;
+  }
+}
+
+/** Load data and its names, preserving the older `each` protocol as a fallback. */
+async function loadLinks(request, writer, restriction) {
+  let data;
+  let metadata;
+  try {
+    const [reply, names] = await request(
+      op('load', restrictionLino(restriction))
+    );
+    data = reply.values[0].values;
+    metadata = names.values[0].values;
+  } catch (error) {
+    if (!(error instanceof LinksError) || error.code !== 'remote') {
+      throw error;
+    }
+    data = await request(op('each', restrictionLino(restriction)));
+    metadata = [];
+  }
+  const links = data.map((value) => linkFromLino(value));
+  links.forEach((link) => writer.put(link, 'remote'));
+  writer.refreshNames(
+    links.flatMap((link) => [link.id, link.from_id, link.to_id]),
+    metadata
+  );
+  return links;
+}
+
 /**
  * A synced copy of the links of a server.
  * @param {{ transport?: Transport | null, cache?: any }} [options]
@@ -473,6 +520,7 @@ export function createSyncedLinks({
 
   const synced = withProperties(storage, {
     cache,
+    names: createLinksNames(storage),
     /** Use `next` as the transport: pushes come in, queued writes go. */
     connect(next) {
       disconnect();
@@ -502,12 +550,7 @@ export function createSyncedLinks({
     /** Whether `id` is a temporary address still waiting for the server. */
     isTemporary,
     /** Load the links of a restriction `[index, source, target]` into the cache. */
-    async load(restriction = []) {
-      const reply = await request(op('each', restrictionLino(restriction)));
-      const links = reply.map((value) => linkFromLino(value));
-      links.forEach((link) => writer.put(link, 'remote'));
-      return links;
-    },
+    load: (restriction = []) => loadLinks(request, writer, restriction),
     /** Load the links of a restriction and keep them up to date. */
     async subscribe(restriction = []) {
       const [reply] = await request(
@@ -533,6 +576,10 @@ export function createSyncedLinks({
         (value) => addresses.get(value) ?? numberOf(value)
       );
       writer.applyRemote(changes);
+      const ids = changes.flatMap(({ after }) =>
+        after ? [after.id, after.from_id, after.to_id] : []
+      );
+      writer.refreshNames(ids, await requestNameLinks(request, ids));
       return changes;
     },
     /** Every change of the cache: `{ before, after, origin }`. */
