@@ -234,11 +234,7 @@ export function compileCss(rules, options = {}) {
     if (material) {
       css += materialCss(
         material.value.value,
-        scopedSelector(
-          selectorCss(entry.selector, tagFor, states),
-          options.scope,
-          selectorCss(entry.selector, tagFor, states, true)
-        ),
+        scopedSelector(selector, options.scope, atRoot),
         entry.at,
         options
       );
