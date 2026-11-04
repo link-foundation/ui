@@ -129,7 +129,7 @@ export interface MountDevModeOptions {
   vocabulary?: object;
   messages?: Record<string, string>;
   commentOptions?: Pick<
-    import('./comments/index.js').MountCommentsOptions,
+    import('@link-foundation/ui-devmode/comments').MountCommentsOptions,
     'storage' | 'storageKey' | 'text' | 'messages' | 'trace'
   >;
   /** The inspector layout (Links Notation); `inspector.lino` by default. */

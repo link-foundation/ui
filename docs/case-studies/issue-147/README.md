@@ -58,6 +58,15 @@ focus after closing a shadow-root panel. Subscribing to both adapter and store
 changes, and restoring the deepest active element after showing the inspector,
 fixed them.
 
+The first CI revision caught two portability defects. Deno reported TS2694
+for the new relative JavaScript type reference; resolving the type through
+the package's declared `comments` export fixes it, as verified with
+`deno check` on both public declaration files. Windows checked out the format
+documentation with CRLF, so the documented-example test now normalizes line
+endings before extracting and comparing the canonical LiNo. The same test
+passes locally after the correction; the complete runtime matrix verifies
+both corrections in CI.
+
 Local pinned browser revisions were absent. The bounded
 [`experiments/issue-147/playwright.config.mjs`](../../../experiments/issue-147/playwright.config.mjs)
 reuses the already installed Chromium via `UI_DEVMODE_CHROMIUM_EXECUTABLE`.

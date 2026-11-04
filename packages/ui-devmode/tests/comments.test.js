@@ -69,7 +69,10 @@ describe('per-object UI comments', () => {
       new URL('../../../docs/spec/comments.md', import.meta.url),
       'utf8'
     );
-    const example = doc.split('```lino\n')[1].split('```')[0];
+    const example = doc
+      .replaceAll('\r\n', '\n')
+      .split('```lino\n')[1]
+      .split('```')[0];
     const model = createComments({
       getDocument: () => parse('ok: button\n  label OK\n'),
     });
