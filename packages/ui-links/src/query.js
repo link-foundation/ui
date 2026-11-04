@@ -113,15 +113,17 @@ export function transact(context, fn) {
   const raw = context.links;
   const base = context.base ?? raw;
   const links = observe(raw, (change) => recorded.push(change));
+  const names = context.names?.withLinks?.(links) ?? context.names;
   try {
-    fn(links, recorded, named);
-    const changes = netChanges(recorded);
+    fn(links, recorded, named, names);
+    let changes = netChanges(recorded);
     changes.forEach(({ after }) => checkReferences(base, after));
     for (const { before, after } of changes) {
       if (after === null && before !== null) {
-        context.names?.removeName(before.id);
+        names?.removeName(before.id);
       }
     }
+    changes = netChanges(recorded);
     return changes;
   } catch (error) {
     undo(context, base, recorded, named);
@@ -149,7 +151,7 @@ function undo(context, base, recorded, named) {
       context.links.forget?.(after.id);
     }
   }
-  for (const id of named) {
+  for (const id of context.names?.withLinks ? [] : named) {
     context.names?.removeName(id);
   }
 }
@@ -175,8 +177,8 @@ export function runQuery(context, query) {
       'A query is a restriction and a substitution'
     );
   }
-  return transact(context, (links, recorded, named) =>
-    createRun({ ...context, links, recorded, named })(sides[0], sides[1])
+  return transact(context, (links, recorded, named, names) =>
+    createRun({ ...context, links, recorded, named, names })(sides[0], sides[1])
   );
 }
 

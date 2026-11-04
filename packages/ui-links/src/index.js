@@ -29,6 +29,7 @@ export * from './sql.js';
 export * from './doublets-web.js';
 export * from './decorators.js';
 export * from './names.js';
+export * from './links-names.js';
 export * from './lino.js';
 export * from './query.js';
 export * from './types.js';
