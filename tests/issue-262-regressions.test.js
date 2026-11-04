@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import {
   mkdirSync,
   mkdtempSync,
@@ -12,6 +12,7 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { describe, it } from 'test-anywhere';
 import { itUnless, sandboxed } from './helpers/skip.js';
+import { HANG_GUARD_MS, runBounded } from './helpers/bounded-run.js';
 
 describe('issue 262 repository regressions', () => {
   it('runs the pinned secrets scan after Node setup and before installation', () => {
@@ -79,22 +80,39 @@ describe('issue 262 repository regressions', () => {
 
   itUnless(sandboxed)(
     'enforces LF for every tracked shell script and hook',
-    () => {
-      const files = execFileSync(
-        'git',
-        ['ls-files', '-z', '*.sh', '.husky/*'],
-        { encoding: 'utf8' }
-      )
+    async () => {
+      const runGit = (args) =>
+        runBounded('git', args, {
+          timeout: HANG_GUARD_MS / 2,
+          trace:
+            process.env.REPOSITORY_GIT_TRACE === '1'
+              ? (event) =>
+                  console.error(
+                    '[repository-git]',
+                    JSON.stringify({ args, ...event })
+                  )
+              : undefined,
+        });
+      const files = (
+        await runGit(['ls-files', '-z', '*.sh', '.husky/*'])
+      ).stdout
         .split('\0')
         .filter(Boolean);
       assert.ok(files.length > 0);
+      // One real Git invocation checks every path, including paths with
+      // spaces/newlines, without a synchronous process per tracked file.
+      const attributes = await runGit([
+        'check-attr',
+        '-z',
+        'eol',
+        '--',
+        ...files,
+      ]);
+      assert.deepEqual(
+        attributes.stdout.split('\0').slice(0, -1),
+        files.flatMap((file) => [file, 'eol', 'lf'])
+      );
       for (const file of files) {
-        const attributes = execFileSync(
-          'git',
-          ['check-attr', 'eol', '--', file],
-          { encoding: 'utf8' }
-        );
-        assert.equal(attributes.trim(), `${file}: eol: lf`);
         assert.ok(!readFileSync(file, 'utf8').includes('\r'), file);
       }
     }
