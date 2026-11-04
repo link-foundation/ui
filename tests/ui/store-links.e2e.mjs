@@ -50,7 +50,11 @@ test('two browsers edit a live UI document and undo only their own changes', asy
     expect(await page.locator('#document').textContent()).toBe(
       await other.locator('#document').textContent()
     );
-    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+    for (const colorScheme of ['light', 'dark']) {
+      await page.emulateMedia({ colorScheme });
+      expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+    }
+    await page.emulateMedia({ colorScheme: 'light' });
     await test.info().attach('converged-document', {
       body: await page.screenshot(),
       contentType: 'image/png',
