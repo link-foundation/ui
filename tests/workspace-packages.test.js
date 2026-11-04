@@ -136,7 +136,7 @@ describe('workspace-packages', () => {
 });
 
 describe('repository workspace', () => {
-  it('publishes ui-animation, ui-components, ui-config, ui-convert, ui-core, ui-designer, ui-devmode, ui-dom, ui-i18n, ui-links, ui-react, ui-react-native, ui-settings, ui-store, ui-style, ui-themes, ui-tokens and ui-vue from packages/', async () => {
+  it('publishes ui-animation, ui-components, ui-config, ui-convert, ui-core, ui-designer, ui-devmode, ui-dom, ui-i18n, ui-links, ui-react, ui-react-native, ui-settings, ui-sound, ui-store, ui-style, ui-themes, ui-tokens and ui-vue from packages/', async () => {
     const names = (await listPublishablePackages('.')).map((p) => p.dir);
     expect(names).toEqual([
       'packages/ui-animation',
@@ -152,6 +152,7 @@ describe('repository workspace', () => {
       'packages/ui-react',
       'packages/ui-react-native',
       'packages/ui-settings',
+      'packages/ui-sound',
       'packages/ui-store',
       'packages/ui-style',
       'packages/ui-themes',

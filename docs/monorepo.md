@@ -29,6 +29,7 @@ publishable artefact is a workspace package under `packages/`.
 │   ├── ui-react-native/    # @link-foundation/ui-react-native (native primitives)
 │   ├── ui-react/           # @link-foundation/ui-react (React adapter of ui-dom)
 │   ├── ui-settings/        # @link-foundation/ui-settings (settings schemas)
+│   ├── ui-sound/           # @link-foundation/ui-sound (synthesized UI sounds)
 │   ├── ui-style/           # @link-foundation/ui-style (style rules)
 │   ├── ui-themes/          # @link-foundation/ui-themes (LiNo theme packages)
 │   ├── ui-tokens/          # @link-foundation/ui-tokens (design tokens)
