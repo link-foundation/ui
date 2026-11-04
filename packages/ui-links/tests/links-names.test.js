@@ -297,3 +297,31 @@ describe('names protocol compatibility', () => {
     }
   });
 });
+
+describe('hidden name conflicts', () => {
+  it('refuses to replace or duplicate a hidden name through a writable data view', () => {
+    const links = ui.createMemoryLinks();
+    const id = links.create();
+    const other = links.create();
+    const names = ui.createLinksNames(links);
+    names.setName(id, 'private');
+    const hidden = names.bindings([id])[0].id;
+    const policy = {
+      canRead: (subject, link) => link.id !== hidden,
+      canWrite: () => true,
+      canCreate: () => true,
+    };
+    const server = ui.createLinksServer({ links, names, policy });
+    const session = server.session();
+    const before = ui.allLinks(links);
+    expect(session.request(`(set-name: (${id} 'changed'))`)).toContain('error');
+    expect(session.request(`(remove-name: ${id})`)).toContain('error');
+    expect(session.request(`(set-name: (${other} 'private'))`)).toContain(
+      'error'
+    );
+    expect(session.request('() ((private: 0 0))')).toContain('error');
+    expect(ui.allLinks(links)).toEqual(before);
+    expect(names.entries()).toEqual([[id, 'private']]);
+    session.close();
+  });
+});

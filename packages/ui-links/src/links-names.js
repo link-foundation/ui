@@ -38,6 +38,11 @@ function readText(links, at, m) {
 
 /** A names view over any storage, including a permission view or a cache. */
 export function createLinksNames(links) {
+  return namesView(links, links);
+}
+
+/** Preserve the authoritative storage when rebinding a restricted view. */
+function namesView(links, base) {
   const pair = (source, target) => {
     const found = search(links, source, target);
     if (found) {
@@ -99,6 +104,20 @@ export function createLinksNames(links) {
     }
     return result;
   };
+  const assertVisible = (id, text) => {
+    if (base !== links) {
+      const authority = createLinksNames(base);
+      const previous = authority.getName(id);
+      const other = authority.getByName(text);
+      if (
+        (previous !== null && names.getName(id) !== previous) ||
+        (other !== null && names.getByName(text) !== other) ||
+        (authority.entries().length > 0 && markers() === null)
+      ) {
+        throw new LinksError('forbidden', 'Forbidden: hidden name encoding');
+      }
+    }
+  };
   const names = {
     setName(id, text) {
       if (!isAddress(id) || !getLink(links, id)) {
@@ -110,6 +129,7 @@ export function createLinksNames(links) {
           `Not a name: ${JSON.stringify(text)}`
         );
       }
+      assertVisible(id, text);
       const m = markers(true);
       let tail = m.root;
       for (let i = text.length - 1; i >= 0; i--) {
@@ -130,6 +150,7 @@ export function createLinksNames(links) {
     getByName: (text) =>
       records().find((record) => record.text === text)?.id ?? null,
     removeName(id) {
+      assertVisible(id);
       const found = records().filter((record) => record.id === id);
       found.forEach((record) => links.delete(record.mark.id));
       return found.length > 0;
@@ -139,7 +160,7 @@ export function createLinksNames(links) {
         .map(({ id, text }) => [id, text])
         .sort((a, b) => a[0] - b[0]),
     /** Rebind reads/writes to a permission or transaction view. */
-    withLinks: (view) => createLinksNames(view),
+    withLinks: (view) => namesView(view, base),
     /** The name marks, excluding shared immutable text nodes. */
     bindings(ids) {
       const wanted = new Set(ids);
