@@ -1,0 +1,4 @@
+demo: document
+  slider-disabled: slider Balance
+    value 50
+    disabled true

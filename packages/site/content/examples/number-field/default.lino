@@ -1,0 +1,5 @@
+demo: document
+  number-field-default: number-field Quantity
+    value 2
+    min 0
+    max 10

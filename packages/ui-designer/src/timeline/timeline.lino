@@ -1,0 +1,23 @@
+timeline-ui: stack
+  gap 6px
+  timeline-toolbar: stack
+    direction horizontal
+    gap 4px
+    timeline-play: button
+      label Play
+    timeline-pause: button
+      label Pause
+    timeline-stop: button
+      label Stop
+    timeline-loop: button
+      label Loop
+    timeline-add: button
+      label 'Add key/event (K)'
+    timeline-delete: button
+      label 'Delete selected'
+    timeline-zoom-out: button
+      label 'Zoom out'
+    timeline-zoom-in: button
+      label 'Zoom in'
+  timeline-content: stack
+    gap 4px

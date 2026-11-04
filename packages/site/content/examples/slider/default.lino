@@ -1,0 +1,3 @@
+demo: document
+  slider-default: slider Volume
+    value 40

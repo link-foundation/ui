@@ -15,6 +15,7 @@ import { createActions, keyboard } from './actions.js';
 import { element, listen } from './dom.js';
 import { DESIGNER_LAYOUT } from './layout-text.js';
 import { mountSourcePanel } from './source-panel.js';
+import { mountTimeline } from './timeline/timeline.js';
 
 function browserStorage(window) {
   try {
@@ -165,6 +166,7 @@ function mountPanels(context) {
  * @param {{root: HTMLElement, documentText: string, storage?: Storage|null,
  *   storageKey?: string, catalog?: Map<string, object>, policy?: object|string,
  *   layoutText?: string, snapThreshold?: number, onAction?: Function,
+ *   resolveToken?: (path: string) => unknown, timelineFps?: number,
  *   trace?: (event: string, detail: object) => void}} options
  * @returns {{ready: Promise<void>, getText: () => string, undo: () => boolean, redo: () => boolean,
  *   destroy: () => void, store: object, select: (id: string) => void,
@@ -179,6 +181,7 @@ export function mountDesigner(options) {
   context.canvasController = mountCanvas(context);
   createToolbox(context.shell.nodeFor('toolbox'), context);
   context.command = createActions(context);
+  context.timeline = mountTimeline(context.shell.nodeFor('timeline'), context);
   const {
     root,
     source,
@@ -224,6 +227,7 @@ export function mountDesigner(options) {
     undo: session.undo,
     redo: session.redo,
     destroy() {
+      context.timeline?.destroy();
       context.comments?.destroy();
       controller.abort();
       unsubscribe();

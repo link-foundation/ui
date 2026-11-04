@@ -1,0 +1,4 @@
+demo: document
+  badge-count: badge 3
+    label 'unread messages'
+    tone primary

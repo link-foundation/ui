@@ -1,0 +1,7 @@
+demo: document
+  select-selected: select Language
+    value ru
+    select-selected-en: option English
+      value en
+    select-selected-ru: option Russian
+      value ru

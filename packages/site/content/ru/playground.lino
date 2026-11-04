@@ -1,0 +1,7 @@
+page: document
+  title 'Песочница'
+  page-title: heading
+    level 1
+    text 'Песочница'
+  page-lead: paragraph
+    text 'Редактируйте Links Notation, изучайте результат и делитесь документом.'

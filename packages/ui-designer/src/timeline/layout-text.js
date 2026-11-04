@@ -1,0 +1,3 @@
+/** Embedded timeline layout, checked against timeline.lino in tests. */
+export const TIMELINE_LAYOUT =
+  "timeline-ui: stack\n  gap 6px\n  timeline-toolbar: stack\n    direction horizontal\n    gap 4px\n    timeline-play: button\n      label Play\n    timeline-pause: button\n      label Pause\n    timeline-stop: button\n      label Stop\n    timeline-loop: button\n      label Loop\n    timeline-add: button\n      label 'Add key/event (K)'\n    timeline-delete: button\n      label 'Delete selected'\n    timeline-zoom-out: button\n      label 'Zoom out'\n    timeline-zoom-in: button\n      label 'Zoom in'\n  timeline-content: stack\n    gap 4px\n";

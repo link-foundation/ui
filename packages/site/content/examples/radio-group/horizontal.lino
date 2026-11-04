@@ -1,0 +1,11 @@
+demo: document
+  radio-group-horizontal: radio-group Size
+    orientation horizontal
+    value s
+    radio-group-horizontal-s: radio S
+      value s
+    radio-group-horizontal-m: radio M
+      value m
+    radio-group-horizontal-l: radio L
+      value l
+      disabled true

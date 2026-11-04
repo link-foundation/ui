@@ -1,0 +1,8 @@
+demo: document
+  option-disabled: select Shipping
+    value standard
+    option-disabled-standard: option Standard
+      value standard
+    option-disabled-express: option Express
+      value express
+      disabled true

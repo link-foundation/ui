@@ -1,0 +1,3 @@
+demo: document
+  button-text: button 'Learn more'
+    variant text
