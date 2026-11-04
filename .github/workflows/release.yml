@@ -439,6 +439,7 @@ jobs:
           DENO_SHARD: ${{ matrix.shard || '1/1' }}
           PREFLIGHT_FIXTURE_TRACE: ${{ runner.os == 'Windows' && '1' || '' }}
           REPOSITORY_GIT_TRACE: ${{ runner.os == 'Windows' && '1' || '' }}
+          DETECT_FIXTURE_TRACE: ${{ runner.os == 'Windows' && '1' || '' }}
           DEBUG_CHANGESET_FIXTURE: ${{ runner.os == 'Windows' && '1' || '' }}
           CHANGESET_FIXTURE_ROOT_ONLY: ${{ runner.os == 'Windows' && '1' || '' }}
           CHANGESET_FIXTURE_TRACE_STDERR: ${{ runner.os == 'Windows' && '1' || '' }}

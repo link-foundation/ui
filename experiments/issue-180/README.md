@@ -134,3 +134,22 @@ under the existing per-test budget. Optional `REPOSITORY_GIT_TRACE=1` records
 arguments, spawn, exit, pipe end and close elapsed times; it defaults off.
 Both lifecycle traces are enabled for Windows Deno CI so a recurrence names
 the command and phase instead of consuming the entire suite budget silently.
+
+Revision `b845d39` in [run 41806524308](https://github.com/link-foundation/ui/actions/runs/41806524308)
+confirmed the attribute case passed in 203 ms (line 2888): `ls-files` closed
+in 93 ms and the batched `check-attr` in 106 ms. Shards 1 and 2 passed in
+137 and 85 seconds, but shard 3 again hit 300 seconds (line 4043). This time
+`detect-code-changes.test.js` completed only its first of 40 cases (line
+2859); the remaining 39 are absent while every other test file completes.
+The complete failing job is `windows-deno-git-shard-3.log.gz`. This second
+revision was also not accepted as a completed fix.
+
+The detector fixtures repeatedly create real repositories with synchronous
+Git calls and synchronously run the CLI. Convert their command helpers and
+callers to asynchronous `runBounded`, retaining all repositories, merges,
+API stubs and assertions. Both direct Git setup and the real CLI now have
+the existing 25-second process-tree guard, closed stdin, drained output and
+optional `DETECT_FIXTURE_TRACE=1` lifecycle traces (default off; enabled in
+Windows Deno CI). The HTTP fixture's CLI invocation uses the same helper.
+This addresses the second observed unbounded fixture path; neither log
+establishes an internal Deno syscall cause.
