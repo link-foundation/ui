@@ -1,4 +1,5 @@
 playground-controls: stack
+  align stretch
   playground-toolbar: stack
     direction horizontal
     wrap true

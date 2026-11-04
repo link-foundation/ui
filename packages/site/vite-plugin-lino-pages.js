@@ -46,15 +46,11 @@ export function linoPages({ contentDir, layout, languages = ['en', 'ru'] }) {
       new globalThis.URL('./src/site.css', import.meta.url),
       'utf8'
     )}`;
-    const controlsCss = await readFile(
-      new globalThis.URL(
-        '../ui-components/src/controls/styles.css',
-        import.meta.url
-      ),
-      'utf8'
-    );
     await mkdir(generated, { recursive: true });
-    await writeFile(path.join(generated, 'site.css'), `${controlsCss}\n${css}`);
+    await writeFile(
+      path.join(generated, 'site.css'),
+      `${await componentCss()}\n${css}`
+    );
     const inputs = [];
     for (const page of pages) {
       const file = path.join(generated, page.route, 'index.html');
@@ -181,6 +177,18 @@ function appendGallery(bundle, catalog, themes, languages) {
       }
     }
   }
+}
+async function componentCss() {
+  const files = ['controls/styles.css', 'layout/layout.css'];
+  const sheets = await Promise.all(
+    files.map((file) =>
+      readFile(
+        new globalThis.URL(`../ui-components/src/${file}`, import.meta.url),
+        'utf8'
+      )
+    )
+  );
+  return sheets.join('\n');
 }
 function galleryHtml(html, catalog, themes, languages, serve) {
   if (serve) {

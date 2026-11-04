@@ -132,7 +132,7 @@ export async function mountPlayground({
       });
     }
   });
-  async function loadHash() {
+  async function loadHash(fallback) {
     const revision = ++generation;
     const hash = window.location.hash;
     const shared = hash ? await decodeShare(hash) : null;
@@ -141,15 +141,19 @@ export async function mountPlayground({
     }
     if (shared !== null) {
       load(shared);
-    } else if (hash) {
-      status.textContent = 'Invalid or oversized share link.';
+    } else {
+      if (fallback) {
+        load(fallback);
+      }
+      if (hash) {
+        status.textContent = 'Invalid or oversized share link.';
+      }
     }
   }
-  load(
+  await loadHash(
     examples.find((e) => e.id === 'button-filled')?.text ?? examples[0].text
   );
-  await loadHash();
-  window.addEventListener('hashchange', loadHash);
+  window.addEventListener('hashchange', () => loadHash());
 }
 
 function syncChoices(tree, siteStore, siteHandle, theme, scheme) {

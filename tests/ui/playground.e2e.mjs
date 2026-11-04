@@ -7,6 +7,24 @@ const ready = async (page, route = 'playground/') => {
   await expect(page.locator('body')).toHaveAttribute('data-ready', 'true');
 };
 const preview = (page) => page.locator('#live-preview');
+test('editor and preview sit side by side and the divider resizes them', async ({
+  page,
+}) => {
+  await ready(page);
+  const editor = page.locator('ui-playground-editor');
+  const output = page.locator('ui-playground-preview');
+  const before = await editor.boundingBox();
+  const right = await output.boundingBox();
+  expect(before.width).toBeGreaterThan(300);
+  expect(right.x).toBeGreaterThanOrEqual(before.x + before.width);
+  expect(right.y).toBe(before.y);
+  const divider = page.getByRole('separator');
+  await divider.focus();
+  await divider.press('ArrowRight');
+  await expect
+    .poll(async () => (await editor.boundingBox()).width)
+    .toBeGreaterThan(before.width);
+});
 async function choose(page, label, value) {
   await page.getByRole('combobox', { name: label, exact: true }).click();
   await page.getByRole('option', { name: value, exact: true }).click();
@@ -144,6 +162,7 @@ test('gallery cell opens its theme, scheme and disabled state in the playground'
   await cell
     .getByRole('link', { name: 'Open in playground', exact: true })
     .click();
+  await page.waitForURL(/\/playground\/#lino=/);
   await expect(page.locator('body')).toHaveAttribute('data-ready', 'true');
   await expect(preview(page).getByRole('button')).toBeDisabled();
   await expect(
@@ -156,6 +175,7 @@ for (const scheme of ['light', 'dark']) {
     test(`${route} ${scheme}: accessible with review screenshot`, async ({
       page,
     }) => {
+      await page.setViewportSize({ width: 1280, height: 1000 });
       await page.emulateMedia({ colorScheme: scheme });
       await ready(page, route);
       if (route === 'playground/') {
