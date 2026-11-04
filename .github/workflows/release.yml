@@ -424,7 +424,43 @@ jobs:
       - name: Run tests (Deno)
         if: matrix.runtime == 'deno'
         shell: bash
+        env:
+          DEBUG_CHANGESET_FIXTURE: ${{ runner.os == 'Windows' && '1' || '' }}
+          CHANGESET_FIXTURE_ROOT_ONLY: ${{ runner.os == 'Windows' && '1' || '' }}
+          CHANGESET_FIXTURE_TRACE_STDERR: ${{ runner.os == 'Windows' && '1' || '' }}
         run: bash scripts/run-with-budget-warning.sh 300 "Deno test suite" deno test -A --parallel
+
+      - name: Repeat Windows Deno release formatter fixture
+        if: ${{ !cancelled() && matrix.runtime == 'deno' && runner.os == 'Windows' }}
+        shell: bash
+        env:
+          DEBUG_CHANGESET_FIXTURE: '1'
+        run: |
+          for attempt in 1 2 3; do
+            echo "Release formatter repetition ${attempt}/3"
+            bash scripts/run-with-budget-warning.sh 60 "Windows Deno release formatter" deno test -A tests/changeset-config.test.js
+          done
+
+      - name: Repeat Windows Deno formatter with competing fixture processes
+        if: ${{ !cancelled() && matrix.runtime == 'deno' && runner.os == 'Windows' }}
+        shell: bash
+        env:
+          DEBUG_CHANGESET_FIXTURE: '1'
+          CHANGESET_FIXTURE_ROOT_ONLY: '1'
+          CHANGESET_FIXTURE_TRACE_STDERR: '1'
+        run: |
+          for attempt in 1 2 3; do
+            echo "Parallel release formatter repetition ${attempt}/3"
+            bash scripts/run-with-budget-warning.sh 60 "Windows Deno parallel release formatter" deno test -A --parallel tests/changeset-config.test.js tests/bounded-run.test.js tests/check-staged-formatting.test.js tests/check-release-needed.test.js packages/ui-themes/tests/material3-theme.test.js
+          done
+
+      - name: Probe Windows pipe inheritance across workers
+        if: ${{ !cancelled() && matrix.runtime == 'deno' && runner.os == 'Windows' }}
+        shell: bash
+        run: |
+          bash scripts/run-with-budget-warning.sh 60 "Node pipe inheritance probe" node experiments/issue-178/pipe-inheritance.mjs
+          bash scripts/run-with-budget-warning.sh 60 "Deno pipe inheritance probe" deno run -A experiments/issue-178/pipe-inheritance.mjs
+          bash scripts/run-with-budget-warning.sh 60 "Deno mixed spawn pipe inheritance probe" deno run -A experiments/issue-178/pipe-inheritance.mjs --mixed
 
   # === DOCKER IMAGE BUILD CHECK (pull requests) ===
   # Builds the Dockerfile without pushing so a broken image fails the pull

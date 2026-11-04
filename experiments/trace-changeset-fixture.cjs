@@ -6,26 +6,61 @@ if (process.env.DEBUG_CHANGESET_FIXTURE) {
   const fs = require('node:fs');
   const { syncBuiltinESMExports } = require('node:module');
   const started = Date.now();
-  const report = (operation, value) =>
-    console.error(
-      `[changeset fixture +${Date.now() - started}ms] ${operation}: ${JSON.stringify(value)}`
-    );
+  const report = (operation, value) => {
+    const line = `[changeset fixture pid=${process.pid} +${Date.now() - started}ms] ${operation}: ${JSON.stringify(value)}`;
+    if (process.env.CHANGESET_FIXTURE_TRACE_FILE) {
+      fs.appendFileSync(process.env.CHANGESET_FIXTURE_TRACE_FILE, `${line}\n`);
+    }
+    if (
+      !process.env.CHANGESET_FIXTURE_TRACE_FILE ||
+      process.env.CHANGESET_FIXTURE_TRACE_STDERR
+    ) {
+      console.error(line);
+    }
+  };
   // Time between process start and this preload: slow runner startup.
   report('preload', {
+    entry: process.argv[1],
+    sinceFixtureStartMs: process.env.CHANGESET_FIXTURE_STARTED_AT
+      ? Date.now() - Number(process.env.CHANGESET_FIXTURE_STARTED_AT)
+      : undefined,
     sinceProcessStartMs: Math.round(
       require('node:perf_hooks').performance.now()
     ),
   });
+  process.on('beforeExit', (code) => report('beforeExit', { code }));
+  process.on('exit', (code) => report('processExit', { code }));
+  // Finite snapshots before the fixture's 25 s guard. Unref so diagnostics
+  // never keep a successful process alive or change its exit conditions.
+  for (const delay of [10000, 20000]) {
+    setTimeout(() => {
+      report(
+        'activeHandles',
+        process._getActiveHandles().map((handle) => ({
+          type: handle.constructor.name,
+          pid: handle.pid,
+          exitCode: handle.exitCode,
+          readableEnded: handle.readableEnded,
+          writableLength: handle.writableLength,
+        }))
+      );
+    }, delay).unref();
+  }
   for (const method of ['spawn', 'execFile']) {
     const original = childProcess[method];
     childProcess[method] = function (command, args, ...rest) {
       report(method, { command, args });
       const child = original.call(this, command, args, ...rest);
+      report('spawned', { command, pid: child.pid });
       child.on('exit', (code, signal) =>
         report('exit', { command, code, signal })
       );
+      child.on('close', (code, signal) =>
+        report('close', { command, code, signal })
+      );
       // Formatter failures are otherwise swallowed by the parent's pipe.
       for (const stream of ['stdout', 'stderr']) {
+        child[stream]?.on('end', () => report('end', { command, stream }));
         child[stream]?.on('data', (data) =>
           report(stream, { command, data: String(data) })
         );

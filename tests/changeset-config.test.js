@@ -23,6 +23,18 @@ import { itUnless, sandboxed } from './helpers/skip.js';
 
 const config = JSON.parse(readFileSync('.changeset/config.json', 'utf8'));
 
+function inheritedTraceOptions(env) {
+  return env.CHANGESET_FIXTURE_ROOT_ONLY
+    ? env.NODE_OPTIONS || ''
+    : `${env.NODE_OPTIONS || ''} --require="${resolve('experiments/trace-changeset-fixture.cjs').replaceAll('\\', '/')}"`;
+}
+
+function createTraceFile(cwd, index) {
+  const traceFile = join(cwd, `command-${index}.trace`);
+  writeFileSync(traceFile, '');
+  return { traceFile, trace: () => readFileSync(traceFile, 'utf8') };
+}
+
 function createPrettierBins(dependencies) {
   const bin = join(dependencies, '.bin');
   mkdirSync(bin);
@@ -154,7 +166,10 @@ describe('Changesets release formatter', () => {
           'ENOENT'
         );
         const budgetMs = HANG_GUARD_MS;
+        let commandIndex = 0;
         const run = async (file, args) => {
+          const events = [];
+          const { traceFile, trace } = createTraceFile(cwd, commandIndex++);
           try {
             const { stderr, elapsedMs } = await runBounded(
               'node',
@@ -169,22 +184,28 @@ describe('Changesets release formatter', () => {
                 env: {
                   ...env,
                   DEBUG_CHANGESET_FIXTURE: '1',
+                  CHANGESET_FIXTURE_STARTED_AT: String(Date.now()),
+                  CHANGESET_FIXTURE_TRACE_FILE: traceFile,
+                  NODE_OPTIONS: inheritedTraceOptions(env),
                   // Release formatting must use installed dependencies, never fetch.
                   npm_config_offline: 'true',
                   npm_config_yes: 'false',
                   npm_config_loglevel: 'verbose',
                 },
                 timeout: budgetMs,
+                trace: (event) => events.push(event),
               }
             );
             // Show where the time went while an overrun can still be acted on.
-            if (elapsedMs > budgetMs / 2) {
+            if (elapsedMs > budgetMs / 2 || env.DEBUG_CHANGESET_FIXTURE) {
               console.error(
-                `${file} took ${elapsedMs} of ${budgetMs} ms\n${stderr}`
+                `${file} took ${elapsedMs} of ${budgetMs} ms\nParent events: ${JSON.stringify(events)}\n${trace()}\n${stderr}`
               );
             }
           } catch (error) {
-            assert.fail(`${error}\n${error.stdout}\n${error.stderr}`);
+            assert.fail(
+              `${error}\nParent events: ${JSON.stringify(events)}\n${trace()}\n${error.stdout}\n${error.stderr}`
+            );
           }
         };
         await run('node_modules/@changesets/cli/bin.js', ['version']);
