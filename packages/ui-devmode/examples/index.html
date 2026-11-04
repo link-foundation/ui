@@ -47,6 +47,16 @@
         padding-top: 16px;
         border-top: 1px solid GrayText;
       }
+      #forget {
+        /* WebKit paints a dark native surface but reports silver to axe.
+           Own the surface so computed and painted colors agree (#183). */
+        appearance: none;
+        background: light-dark(#efefef, #333);
+        color: CanvasText;
+        border: 1px solid GrayText;
+        border-radius: 4px;
+        padding: 4px 8px;
+      }
       output,
       kbd,
       code {
