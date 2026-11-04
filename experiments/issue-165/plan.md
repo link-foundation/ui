@@ -35,3 +35,13 @@ Acceptance mapping:
   the repository's release trigger; package versions are changed by release CI.
 - Full repository gates and final CI evidence are recorded in PR 192 after
   committing this candidate, so verification runs on the exact pushed revision.
+
+## Cross-runtime CI follow-up
+
+The first pushed revision (`3fc93c8`) failed Deno type checking on all three
+operating systems: `TS2307: Import "esbuild" not a dependency` in the new
+ui-style test. Logs are preserved under the ignored `ci-logs/` directory.
+Keep selector comparisons in ui-style and move the HIG/minifier integration
+test to `tests/material-css.test.js`, where esbuild is already declared as a
+root development dependency. All eight focused tests pass in Node, Bun and
+Deno after this test-only adjustment; no dependency changes are needed.

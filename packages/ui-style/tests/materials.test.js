@@ -1,12 +1,11 @@
 import { it } from 'node:test';
 import assert from 'node:assert/strict';
 import postcss from 'postcss';
-import { transform } from 'esbuild';
 import { readStyles, compileCss } from '../src/index.js';
 
 for (const scope of [undefined, ':scope', '[data-theme="hig"]']) {
   for (const part of ['', '    part indicator\n']) {
-    it(`material selectors preserve states and parts with scope ${scope} and part ${Boolean(part)}`, async () => {
+    it(`material selectors preserve states and parts with scope ${scope} and part ${Boolean(part)}`, () => {
       const { rules, diagnostics } = readStyles(`glass: style
   selector
     type checkbox
@@ -48,8 +47,6 @@ ${part}  material regular
         )
       );
       assert.doesNotMatch(css, /\]true/u);
-      const result = await transform(css, { loader: 'css', minify: true });
-      assert.deepEqual(result.warnings, []);
     });
   }
 }
