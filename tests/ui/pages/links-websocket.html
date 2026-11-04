@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Links WebSocket sync</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "links-notation": "/node_modules/links-notation/dist/index.js"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <main>
+      <h1>Links WebSocket sync</h1>
+      <p id="status" role="status">Connecting</p>
+      <button id="create" type="button" disabled>Create link</button>
+      <pre id="links" aria-label="Synced links"></pre>
+    </main>
+    <script type="module">
+      import { createSyncedLinks } from '/packages/ui-links/src/client.js';
+      import { linksToLino } from '/packages/ui-links/src/lino.js';
+      import { connectWebSocket } from '/packages/ui-links/src/websocket.js';
+
+      const params = new URLSearchParams(location.search);
+      const binary = params.get('binary') === 'true';
+      const transport = await connectWebSocket(params.get('server'), {
+        binary,
+      });
+      const client = createSyncedLinks({ transport });
+      const render = () => {
+        document.querySelector('#links').textContent = linksToLino(client);
+      };
+      client.onChange(render);
+      await client.subscribe([]);
+      render();
+      document.querySelector('#status').textContent =
+        `Connected (${binary ? 'binary' : 'text'})`;
+      document.querySelector('#create').disabled = false;
+      document.querySelector('#create').onclick = async () => {
+        client.create();
+        await client.flush();
+        render();
+      };
+      window.synced = client;
+      window.transport = transport;
+    </script>
+  </body>
+</html>

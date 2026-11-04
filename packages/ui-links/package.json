@@ -11,6 +11,14 @@
     "./tcp": {
       "types": "./src/tcp.d.ts",
       "default": "./src/tcp.js"
+    },
+    "./websocket": {
+      "types": "./src/websocket.d.ts",
+      "default": "./src/websocket.js"
+    },
+    "./websocket-server": {
+      "types": "./src/websocket-server.d.ts",
+      "default": "./src/websocket-server.js"
     }
   },
   "types": "./src/index.d.ts",
@@ -44,7 +52,8 @@
     "node": ">=20"
   },
   "dependencies": {
-    "links-notation": "^0.27.1"
+    "links-notation": "^0.27.1",
+    "ws": "^8.22.1"
   },
   "peerDependencies": {
     "doublets-web": "^0.1.3"
