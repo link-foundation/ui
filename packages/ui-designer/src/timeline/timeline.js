@@ -173,6 +173,7 @@ class TimelinePanel {
     );
   identity = (key) => `${key.id}/${key.track ?? 'event'}/${key.index}`;
   same = (a, b) => this.identity(a) === this.identity(b);
+  hasSelection = () => this.selected.length > 0;
   props = () => {
     if (this.selected.length) {
       this.propertySelection = true;
@@ -180,7 +181,8 @@ class TimelinePanel {
         this.context.shell.nodeFor('properties'),
         this.selected,
         this.current(),
-        this.commit
+        this.commit,
+        this.context.command
       );
     } else if (this.propertySelection) {
       this.propertySelection = false;

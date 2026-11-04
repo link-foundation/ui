@@ -230,3 +230,15 @@ test('removing the selected animation through Source retains a usable recording 
   );
   expect(errors).toEqual([]);
 });
+
+test('Properties edits can be undone immediately with the designer shortcut', async ({
+  page,
+}) => {
+  const before = await text(page);
+  await key(page).click();
+  await page.getByLabel('Key value', { exact: true }).fill('0.95');
+  await page.getByLabel('Key value', { exact: true }).press('Tab');
+  expect(await text(page)).toContain('key 0.5 0.95');
+  await page.keyboard.press('ControlOrMeta+z');
+  expect(await text(page)).toBe(before);
+});

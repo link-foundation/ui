@@ -42,7 +42,9 @@ export function createEditing(context) {
     context.handle.flush();
     selection.retain(outlineOrder(store));
     context.outline.update();
-    updateProperties(shell.nodeFor('properties'), context);
+    if (!context.timeline?.hasSelection()) {
+      updateProperties(shell.nodeFor('properties'), context);
+    }
     context.timeline?.update();
     context.canvasController?.update();
     shellStore.setProp('undo', 'disabled', [String(!store.canUndo())]);

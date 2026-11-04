@@ -3,23 +3,45 @@ import { formatLinks } from '@link-foundation/ui-core';
 import { NAMED_EASINGS } from '@link-foundation/ui-animation';
 import { element } from '../dom.js';
 
-export function timelineProperties(panel, selected, item, commit) {
-  panel.replaceChildren();
+export function timelineProperties(panel, selected, item, commit, command) {
+  const fields = new Set();
   const document = panel.ownerDocument;
   const field = (name, value, callback, choices) => {
-    const label = element(document, 'label', {}, name);
-    const input = element(document, choices ? 'select' : 'input', {
-      'aria-label': name,
-    });
-    if (choices) {
-      for (const choice of choices) {
-        input.append(element(document, 'option', { value: choice }, choice));
+    fields.add(name);
+    let label = [...panel.children].find(
+      (node) => node.dataset.timelineField === name
+    );
+    if (!label) {
+      label = element(document, 'label', { 'data-timeline-field': name }, name);
+      const input = element(document, choices ? 'select' : 'input', {
+        'aria-label': name,
+      });
+      if (choices) {
+        for (const choice of choices) {
+          input.append(element(document, 'option', { value: choice }, choice));
+        }
       }
+      label.append(input);
+      panel.append(label);
     }
-    input.value = value;
-    input.addEventListener('change', () => callback(input.value));
-    label.append(input);
-    panel.append(label);
+    const input = label.querySelector('input,select');
+    if (input.value !== String(value)) {
+      input.value = value;
+    }
+    input.onchange = () => callback(input.value);
+    input.onkeydown = (event) => {
+      // Keep native undo for an uncommitted text edit; committed fields use history.
+      if (
+        command &&
+        input.value === String(value) &&
+        (event.ctrlKey || event.metaKey) &&
+        event.key.toLowerCase() === 'z'
+      ) {
+        event.preventDefault();
+        event.stopPropagation();
+        void command(event.shiftKey ? 'redo' : 'undo');
+      }
+    };
   };
   const first = selected[0];
   if (!first) {
@@ -55,5 +77,10 @@ export function timelineProperties(panel, selected, item, commit) {
     field('Duration (ms)', item.durationMs, (value) =>
       commit([{ id: item.id, type: 'duration', ms: Number(value) }])
     );
+  }
+  for (const node of [...panel.children]) {
+    if (!fields.has(node.dataset.timelineField)) {
+      node.remove();
+    }
   }
 }
