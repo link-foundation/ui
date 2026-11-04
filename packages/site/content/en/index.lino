@@ -1,0 +1,17 @@
+page: document
+  title 'UI described as links'
+  page-title: heading
+    level 1
+    text 'UI described as links'
+  page-lead: paragraph
+    text 'Every element, style and animation is a Links Notation link. Links UI interprets a network of links at runtime, with a plain JavaScript core and thin platform renderers.'
+  section-title: heading
+    level 2
+    text 'Start with a document'
+  block-0: code-block
+    text 'npm install @link-foundation/ui-core @link-foundation/ui-dom @link-foundation/ui-store'
+  block-1: paragraph
+    text 'Write a LiNo document, then call mountDocument(container, text). Inspect this site with Alt+Shift+D or ?ui-dev.'
+  block-2: link
+    label 'Get started'
+    href getting-started/

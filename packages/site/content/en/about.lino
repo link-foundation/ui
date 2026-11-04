@@ -1,0 +1,21 @@
+page: document
+  title 'About Links UI'
+  page-title: heading
+    level 1
+    text 'About Links UI'
+  page-lead: paragraph
+    text 'Links UI is an associative UI framework from link-foundation. Documents, configuration, design tokens, styles and animations use Links Notation.'
+  section-title: heading
+    level 2
+    text 'Open and reusable'
+  block-0: paragraph
+    text 'Code is released into the public domain under the Unlicense. Original non-code assets use CC0-1.0. Third-party dependencies keep their own permissive licences and attribution.'
+  block-1: link
+    label 'Framework repository'
+    href 'https://github.com/link-foundation/ui'
+  block-2: link
+    label 'Links Notation'
+    href 'https://github.com/link-foundation/links-notation'
+  block-3: link
+    label 'Asset and dependency licensing'
+    href 'https://github.com/link-foundation/ui/blob/main/docs/licensing.md'

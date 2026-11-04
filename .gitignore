@@ -154,3 +154,6 @@ Package.resolved
 
 # Locally downloaded CI logs used while investigating failures
 ci-logs/
+
+# Generated LiNo site HTML entries
+packages/site/.lino-pages/

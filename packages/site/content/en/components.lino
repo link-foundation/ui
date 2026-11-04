@@ -1,0 +1,18 @@
+page: document
+  title Components
+  page-title: heading
+    level 1
+    text Components
+  page-lead: paragraph
+    text 'The basic controls catalog provides accessible controls with behaviour written in LiNo. The full gallery and playground are tracked in issue #63.'
+  section-title: heading
+    level 2
+    text 'Basic controls'
+  block-0: paragraph
+    text 'button · icon-button · label · link · text-field · text-area · number-field · color-field · checkbox · radio-group · radio · switch · slider · select · combobox · option · progress · badge · avatar'
+  block-1: link
+    label 'LiNo control catalog and stories'
+    href 'https://github.com/link-foundation/ui/blob/main/packages/ui-components/src/controls/catalog.lino'
+  block-2: link
+    label 'Gallery roadmap'
+    href 'https://github.com/link-foundation/ui/issues/63'
