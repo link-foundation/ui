@@ -27,12 +27,11 @@ function neutral(property, value) {
 }
 
 /**
- * The value of one track at eased progress `p`: the segment of the keys
- * around `p`, with the easing of its first key. Progress outside 0..1 (an
- * overshooting easing) extrapolates the first or last segment, as WAAPI
- * does.
+ * The value of one track at directed iteration progress `p`: the segment of the keys
+ * around `p`, with its first key easing or the animation easing as default.
+ * Easing changes interpolation within a segment, never the key offsets.
  */
-function trackValue(track, p, resolveToken) {
+function trackValue(track, p, resolveToken, defaultEasing) {
   const keys = track.keys;
   if (keys.length === 1) {
     return resolveValue(keys[0].value, resolveToken);
@@ -60,7 +59,7 @@ function trackValue(track, p, resolveToken) {
   const local = (p - from.offset) / span;
   const inside = local >= 0 && local <= 1;
   const eased = inside
-    ? easingFunction(from.easing, resolveToken)(local)
+    ? easingFunction(from.easing ?? defaultEasing, resolveToken)(local)
     : local;
   return interpolate(
     resolveValue(from.value, resolveToken),
@@ -119,7 +118,7 @@ export function sampleTyped(animation, tMs, options = {}) {
     if (track.keys.length === 0) {
       continue;
     }
-    let value = trackValue(track, at.eased, resolveToken);
+    let value = trackValue(track, at.progress, resolveToken, animation.easing);
     if (weight !== 1) {
       const rest = additive
         ? neutral(track.property, value)

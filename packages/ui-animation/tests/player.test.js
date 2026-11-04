@@ -93,31 +93,27 @@ function setup(text, options = {}) {
 }
 
 describe('createPlayer: play', () => {
-  it('plays press-feedback through WAAPI with the step-6 arguments', () => {
+  it('plays press-feedback through WAAPI with the literal-offset arguments', () => {
     const { calls, element, player } = setup(SAMPLE_TEXT);
     player.play('press-feedback');
     expect(calls.length).toBe(1);
     expect(calls[0].element).toBe(element('ok'));
     expect(calls[0].keyframes).toEqual([
-      { offset: 0, scale: '1' },
-      { offset: 0.5, scale: '0.96' },
-      { offset: 1, scale: '1' },
+      { offset: 0, easing: 'cubic-bezier(0.2, 0, 0, 1)', scale: '1' },
+      { offset: 0.5, easing: 'cubic-bezier(0.2, 0, 0, 1)', scale: '0.96' },
+      { offset: 1, easing: 'cubic-bezier(0.2, 0, 0, 1)', scale: '1' },
     ]);
     expect(calls[0].options).toEqual({
       duration: 150,
-      easing: 'cubic-bezier(0.2, 0, 0, 1)',
+      easing: 'linear',
       fill: 'none',
       composite: 'replace',
     });
   });
 
   it('seeks deterministically', () => {
-    const linear = SAMPLE_TEXT.replace(
-      '  easing standard\n',
-      '  easing linear\n'
-    );
     for (let round = 0; round < 3; round++) {
-      const { calls, player } = setup(linear);
+      const { calls, player } = setup(SAMPLE_TEXT);
       const run = player.play('press-feedback');
       run.seek(75);
       expect(run.currentTime).toBe(75);

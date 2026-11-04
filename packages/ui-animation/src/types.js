@@ -33,7 +33,7 @@
  * @typedef {object} Key
  * @property {number} offset  0..1
  * @property {AnimValue} value
- * @property {Easing|null} easing  of the segment that starts at this key
+ * @property {Easing|null} easing  of the segment that starts at this key; null inherits animation easing
  */
 
 /**

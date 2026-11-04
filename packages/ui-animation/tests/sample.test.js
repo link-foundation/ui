@@ -2,6 +2,8 @@
  * `sample(animation, tMs)`: pure, deterministic sampling.
  */
 
+import { readFileSync } from 'node:fs';
+import { URL } from 'node:url';
 import { describe, it, expect } from 'test-anywhere';
 import { loadAnimations, sample } from '@link-foundation/ui-animation';
 import {
@@ -111,5 +113,46 @@ describe('sample: timing', () => {
     expect(sample(tokened, 0, { resolveToken: resolve })).toEqual({
       opacity: 0.5,
     });
+  });
+});
+
+describe('literal keyframe timing (#186)', () => {
+  const text = readFileSync(
+    new URL('../../ui-designer/tests/fixtures/animation.lino', import.meta.url),
+    'utf8'
+  );
+  const animation = loadAnimations(text).animations.get('press-feedback');
+
+  it('samples the unchanged designer fixture at its literal midpoint', () => {
+    expect(sample(animation, 500, { resolveToken: () => 1000 })).toEqual({
+      scale: 0.96,
+    });
+  });
+
+  it('uses animation easing per segment, with explicit key easing overriding it', () => {
+    const model = loadAnimations(`a: animation
+  duration 1000ms
+  easing ease-in
+  fill both
+  iterations 2
+  direction alternate
+  track opacity
+    key 0 0 linear
+    key 0.5 1 hold
+    key 1 0
+  track scale
+    key 0 1
+    key 0.5 0.96
+    key 1 1
+`).animations.get('a');
+    expect(sample(model, 250).opacity).toBe(0.5);
+    expect(sample(model, 500).opacity).toBe(1);
+    expect(sample(model, 750).opacity).toBe(1);
+    expect(sample(model, 1000).opacity).toBe(0);
+    expect(sample(model, 1500).scale).toBe(0.96);
+    expect(sample(model, 1750).opacity).toBe(0.5);
+    // ease-in on the first scale segment stays above the linear midpoint.
+    expect(sample(model, 250).scale > 0.98).toBe(true);
+    expect(sample(model, 250).scale < 1).toBe(true);
   });
 });
