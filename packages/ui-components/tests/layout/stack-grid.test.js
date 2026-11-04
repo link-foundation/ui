@@ -11,7 +11,7 @@ import {
   layoutVocabulary,
   trackList,
 } from '@link-foundation/ui-components';
-import { mountLayout } from './helpers.js';
+import { flush, mountLayout } from './helpers.js';
 
 describe('stack kind', () => {
   it('writes the flexbox styles', async () => {
@@ -48,6 +48,90 @@ describe('stack kind', () => {
 });
 
 describe('grid kind', () => {
+  it('refreshes children and tracks without named areas or callback errors', async () => {
+    const page = await mountLayout(`g: grid
+  columns 1fr
+  a: text A`);
+    try {
+      expect(page.errors).toEqual([]);
+      expect(page.node('a').style.gridArea).toBe('');
+      page.store.insert('g', 1, { id: 'b', kind: 'text', positional: ['B'] });
+      await flush();
+      expect(page.node('b').style.gridArea).toBe('');
+      expect(page.node('b').hasAttribute('data-grid-area')).toBe(false);
+      page.store.remove('a');
+      await flush();
+      expect(page.node('a')).toBe(null);
+      page.store.setProp('g', 'columns', ['2']);
+      page.store.setProp('g', 'rows', ['auto']);
+      await flush();
+      expect(page.node('g').style.gridTemplateColumns).toBe(
+        'repeat(2, minmax(0, 1fr))'
+      );
+      expect(page.node('g').style.gridTemplateRows).toBe('auto');
+      expect(page.node('b').style.gridArea).toBe('');
+      expect(page.diagnostics).toEqual([]);
+      expect(page.errors).toEqual([]);
+    } finally {
+      page.close();
+    }
+  });
+
+  it('places new children and clears assignments when areas are removed', async () => {
+    const page = await mountLayout(`g: grid
+  areas 'a b'
+  a: text A`);
+    try {
+      expect(page.node('a').style.gridArea).toBe('a');
+      page.store.insert('g', 1, { id: 'b', kind: 'text', positional: ['B'] });
+      await flush();
+      expect(page.node('b').style.gridArea).toBe('b');
+      page.store.setProp('g', 'areas', ['b .']);
+      await flush();
+      expect(page.node('a').style.gridArea).toBe('');
+      expect(page.node('a').hasAttribute('data-grid-area')).toBe(false);
+      expect(page.node('b').style.gridArea).toBe('b');
+      page.store.removeProp('g', 'areas');
+      await flush();
+      expect(page.node('g').style.gridTemplateAreas).toBe('');
+      expect(page.node('b').style.gridArea).toBe('');
+      expect(page.node('b').hasAttribute('data-grid-area')).toBe(false);
+      page.store.insert('g', 2, { id: 'c', kind: 'text' });
+      await flush();
+      expect(page.node('c').style.gridArea).toBe('');
+      expect(page.errors).toEqual([]);
+    } finally {
+      page.close();
+    }
+  });
+
+  it('does not refresh a queued child change after the controller is destroyed', async () => {
+    const page = await mountLayout(`g: grid
+  areas a`);
+    try {
+      const grid = page.node('g');
+      const child = page.document.createElement('ui-text');
+      child.setAttribute('data-link-id', 'a');
+      let queued = 0;
+      const enqueue = page.window.queueMicrotask.bind(page.window);
+      page.window.queueMicrotask = (callback) => {
+        queued += 1;
+        enqueue(callback);
+      };
+      grid.appendChild(child);
+      // Deliver the real MutationObserver, then destroy before its refresh.
+      await Promise.resolve();
+      expect(queued).toBe(1);
+      page.handle.destroy();
+      await flush();
+      expect(child.style.gridArea).toBe('');
+      expect(child.hasAttribute('data-grid-area')).toBe(false);
+      expect(page.errors).toEqual([]);
+    } finally {
+      page.close();
+    }
+  });
+
   it('writes the tracks and places the children named after areas', async () => {
     const page =
       await mountLayout(`(page: grid (columns 16rem 1fr) (rows auto 1fr) (gap 8px)
@@ -81,6 +165,7 @@ describe('grid kind', () => {
     );
     expect(page.node('g').style.gridTemplateColumns).toBe('');
     expect(page.diagnostics.map((d) => d.code)).toEqual(['invalid-value']);
+    expect(page.errors).toEqual([]);
     page.close();
   });
 });
