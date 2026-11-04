@@ -2,7 +2,8 @@ import { describe, it, expect } from 'test-anywhere';
 import { parse } from '@link-foundation/ui-core';
 import { createConfig } from '@link-foundation/ui-config';
 
-import { bindConfig, defaults } from '../src/index.js';
+import { bindConfig, defaults, readSchema } from '../src/index.js';
+import { SOUND_SETTINGS_LINO } from '../../ui-sound/src/comfort.js';
 import { demoSchema } from './helpers.js';
 
 const schema = demoSchema();
@@ -63,4 +64,52 @@ describe('bindConfig', () => {
     const config = createConfig({ document: document() });
     expect(() => bindConfig(config, schema, { target: 'nope' })).toThrow();
   });
+});
+
+it('registers schema comfort flags at the bound target and keeps ordinary editing', () => {
+  const config = createConfig({ document: document() });
+  const settings = bindConfig(config, schema);
+  const expected = [...schema.fields.values()]
+    .filter((field) => field.comfort)
+    .map((field) => field.key);
+  expect(config.comfortProperties().map((property) => property.name)).toEqual(
+    expected
+  );
+  settings.set('motion.reduce', true);
+  expect(
+    config.importLook(`look: overrides
+  layer session
+  set settings motion.reduce false
+  set settings liquid.blur 24
+`).ok
+  ).toBe(true);
+  expect(settings.get('motion.reduce')).toBe(true);
+  expect(settings.get('liquid.blur')).toBe(24);
+  settings.reset(['motion.reduce']);
+  expect(settings.get('motion.reduce')).toBe(false);
+});
+
+it('discovers sound comfort from the schema at a custom target', () => {
+  const config = createConfig({ document: parse('preferences: group') });
+  const { schema: sound } = readSchema(SOUND_SETTINGS_LINO);
+  const settings = bindConfig(config, sound, {
+    target: 'preferences',
+    layer: 'session',
+  });
+  expect(config.comfortProperties().map(({ id, name }) => [id, name])).toEqual([
+    ['preferences', 'sound.enabled'],
+    ['preferences', 'sound.volume'],
+  ]);
+  settings.update({ 'sound.enabled': true, 'sound.volume': 0.2 });
+  config.importLook(`look: overrides
+  layer session
+  set preferences sound.enabled false
+  set preferences sound.volume 1
+`);
+  expect(settings.values()).toEqual({
+    'sound.enabled': true,
+    'sound.volume': 0.2,
+  });
+  settings.set('sound.volume', 0.3);
+  expect(settings.get('sound.volume')).toBe(0.3);
 });

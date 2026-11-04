@@ -92,3 +92,20 @@ test('disabled or session-restricted policy rejects previews without writes', ()
   }
   window.close();
 });
+
+test('shared previews retain registered comfort properties without hardcoded policy keys', () => {
+  const { window, config } = createPage();
+  config.registerComfort('ok', 'label');
+  config.set('user', 'ok', 'label', ['Mine']);
+  const report = applySharedOverrides({
+    config,
+    text: 'x: overrides\n  set ok label Shared\n  set greeting text Welcome',
+    storage: window.localStorage,
+  });
+  assert.equal(report.applied, true);
+  assert.deepEqual(config.resolve('ok', 'label').value, ['Mine']);
+  assert.deepEqual(config.resolve('greeting', 'text').value, ['Welcome']);
+  report.discard();
+  assert.deepEqual(config.resolve('ok', 'label').value, ['Mine']);
+  window.close();
+});
