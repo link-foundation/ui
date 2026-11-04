@@ -9,11 +9,24 @@ export function mountGallery(gallery) {
         return;
       }
       if (details.open) {
-        frame.setAttribute('src', frame.getAttribute('data-src'));
+        const source = matrixSource(frame.getAttribute('data-src'));
+        if (source) {
+          frame.setAttribute('src', source);
+        }
       } else {
         frame.removeAttribute('src');
       }
     },
     true
   );
+}
+
+/** Rebuild a relative asset path; DOM attributes cannot select executable URLs. */
+function matrixSource(source) {
+  const match = /^\.\.\/\.\.\/gallery\/(en|ru)\/([a-z0-9-]+\.html)$/.exec(
+    source
+  );
+  return match
+    ? `../../gallery/${encodeURIComponent(match[1])}/${encodeURIComponent(match[2])}`
+    : null;
 }
