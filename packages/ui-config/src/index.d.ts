@@ -103,7 +103,23 @@ export interface ConfigOptions {
   onListenerError?: (error: unknown, events: readonly ConfigEvent[]) => void;
 }
 
+/** A canonical property target, independent of configuration layers. */
+export interface ComfortProperty {
+  readonly id: string;
+  readonly name: string;
+  readonly key: string | null;
+  readonly mode: TargetMode;
+}
+
 export interface Config {
+  /** Mark a target as viewer-owned for this config's lifetime. Idempotent; validates like set. */
+  registerComfort(id: string, name: string, key?: string): void;
+  /** Whether the canonical target is viewer-owned; invalid targets return false. */
+  isComfort(id: string, name: string, key?: string): boolean;
+  /** A fresh array of immutable targets in registration order. */
+  comfortProperties(): ComfortProperty[];
+  /** Apply a shared patch, skipping comfort set/unset ops after full validation. */
+  importLook(text: string, layer?: EditableLayer): PatchResult;
   readonly base: string | null;
   readonly layers: readonly Layer[];
   readonly keyedProps: readonly string[];
