@@ -40,8 +40,8 @@ test('two browsers edit a live UI document and undo only their own changes', asy
       await expect(tab.getByRole('status')).toHaveText('Connected');
     }
     await Promise.all([
-      page.evaluate(() => window.demo.store.setPositional('a', ['Alice'])),
-      other.evaluate(() => window.demo.store.setPositional('b', ['Bob'])),
+      page.getByLabel('First node').fill('Alice'),
+      other.getByLabel('Second node').fill('Bob'),
     ]);
     for (const tab of [page, other]) {
       await expect(tab.getByLabel('First node')).toHaveValue('Alice');

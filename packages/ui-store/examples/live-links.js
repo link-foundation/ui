@@ -28,9 +28,7 @@ for (const [selector, id] of [
 ]) {
   const input = document.querySelector(selector);
   input.disabled = false;
-  input.addEventListener('change', () =>
-    store.setPositional(id, [input.value])
-  );
+  input.addEventListener('input', () => store.setPositional(id, [input.value]));
 }
 document.querySelector('#undo').onclick = () => store.undo();
 client.onError((error) => {
