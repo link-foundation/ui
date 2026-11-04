@@ -119,6 +119,7 @@ export function createLinksServer({
   autoCreate = false,
 }) {
   const sessions = new Set();
+  const policyWatch = policy?.watch?.();
   const server = {
     links,
     names,
@@ -126,16 +127,20 @@ export function createLinksServer({
     authenticate,
     autoCreate,
     sessions,
-    /** Send `changes` made by `origin` to every other session that asked. */
+    policyWatch,
+    /** Publish writes and indirect visibility changes to subscriptions. */
     publish(changes, origin) {
       const writes = changes.filter(({ before, after }) => before !== after);
       if (writes.length === 0) {
         return;
       }
+      const affected = policyWatch?.refresh(writes, links);
       for (const session of sessions) {
-        if (session !== origin) {
-          session.deliver(writes);
-        }
+        session.deliver(
+          writes,
+          affected?.(session.subject) ?? false,
+          session === origin
+        );
       }
     },
   };
@@ -313,6 +318,7 @@ function createOperations(server, state, { view, reader, write }) {
         parts.length === 2 ? [parts[0]] : parts;
       const n = state.next++;
       state.subscriptions.set(n, {
+        selected: new Map(select(parts).map((link) => [link.id, link])),
         names: new Map(),
         bindings: new Set(),
         query: normalizeQuery([id, from, to]),
@@ -377,6 +383,41 @@ function includeNames(names, subscription, selected, seen) {
   seen.splice(0, seen.length, ...delta.values());
 }
 
+/** Only changed values count; newly visible/hidden links have a null side. */
+const differs = ({ before, after }) =>
+  before?.from_id !== after?.from_id || before?.to_id !== after?.to_id;
+
+/** Diff the saved readable selection against a refreshed one. */
+function refreshSubscription(subscription, selected) {
+  const previous = subscription.selected;
+  subscription.selected = selected;
+  return [...new Set([...previous.keys(), ...selected.keys()])]
+    .map((id) => ({
+      before: previous.get(id) ?? null,
+      after: selected.get(id) ?? null,
+    }))
+    .filter(differs);
+}
+
+/** Ordinary writes touch only changed addresses in the saved selection. */
+function updateSubscription(subscription, changes, fits) {
+  return changes
+    .map(({ before, after }) => {
+      const id = (after ?? before).id;
+      const change = {
+        before: subscription.selected.get(id) ?? null,
+        after: fits(subscription, after) ? after : null,
+      };
+      if (change.after) {
+        subscription.selected.set(id, change.after);
+      } else {
+        subscription.selected.delete(id);
+      }
+      return change;
+    })
+    .filter(differs);
+}
+
 function openSession(server, { subject = null, onPush = null } = {}) {
   const { links, policy, autoCreate, sessions } = server;
   const state = { subject, subscriptions: new Map(), next: 1 };
@@ -385,7 +426,8 @@ function openSession(server, { subject = null, onPush = null } = {}) {
     : links;
   const names = server.names.withLinks?.(view) ?? server.names;
   const context = { links: view, base: links, names, autoCreate };
-  const readable = (link) => !policy || policy.canRead(state.subject, link);
+  const readable = (link) =>
+    !policy || (server.policyWatch ?? policy).canRead(state.subject, link);
   const nameRef = (id) => names.getName(id) ?? String(id);
   /** Tell the other sessions about `changes`; them as LiNo for the reply. */
   const report = (changes, ref = String) => {
@@ -462,29 +504,40 @@ function openSession(server, { subject = null, onPush = null } = {}) {
       return encodeBinary(handle(decoded.document), decoded.options);
     },
     /** Push the changes the subscriptions of this session ask for. */
-    deliver(changes) {
+    deliver(changes, refresh = false, own = false) {
       for (const { before, after } of changes) {
         if (after === null && before !== null) {
           view.forget?.(before.id);
         }
       }
-      if (!onPush) {
+      if (state.subscriptions.size === 0) {
         return;
       }
       for (const [n, subscription] of state.subscriptions) {
-        const seen = changes
-          .map(({ before, after }) => ({
-            before: fits(subscription, before) ? before : null,
-            after: fits(subscription, after) ? after : null,
-          }))
-          .filter(({ before, after }) => before !== null || after !== null);
+        const seen = refresh
+          ? refreshSubscription(
+              subscription,
+              new Map(
+                allLinks(links, subscription.query)
+                  .filter((link) => fits(subscription, link))
+                  .map((link) => [link.id, link])
+              )
+            )
+          : updateSubscription(subscription, changes, fits);
         if (names.dependencies) {
-          const selected = allLinks(view).filter((link) =>
-            fits(subscription, link)
-          );
+          const selected = [...subscription.selected.values()];
           includeNames(names, subscription, selected, seen);
         }
-        if (seen.length > 0) {
+        if (own) {
+          const written = new Set(
+            changes.map(({ before, after }) => (after ?? before).id)
+          );
+          const indirect = seen.filter(
+            ({ before, after }) => !written.has((after ?? before).id)
+          );
+          seen.splice(0, seen.length, ...indirect);
+        }
+        if (seen.length > 0 && onPush) {
           onPush([
             named('notify', [String(n)]),
             ...seen.map((change) => changeToLino(change)),
@@ -494,6 +547,9 @@ function openSession(server, { subject = null, onPush = null } = {}) {
     },
     close() {
       sessions.delete(api);
+      if (![...sessions].some((session) => session.subject === state.subject)) {
+        server.policyWatch?.forget(state.subject);
+      }
     },
   };
   sessions.add(api);
