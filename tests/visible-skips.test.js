@@ -152,7 +152,9 @@ describe('Deno CI leg', () => {
 
   it('grants the permissions required by fixture tests', () => {
     // A Windows checkout ends lines with CRLF.
-    expect(workflow).toMatch(/"Deno test suite" deno test -A --parallel\r?\n/);
+    expect(workflow).toMatch(
+      /"Deno test suite" deno test -A --parallel --shard "\$DENO_SHARD"\r?\n/
+    );
   });
 });
 

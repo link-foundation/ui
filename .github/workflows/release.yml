@@ -345,12 +345,14 @@ jobs:
       matrix:
         os: [ubuntu-24.04, macos-15, windows-2025]
         runtime: [node, bun, deno]
-        # Windows process/fixture startup varies enough to exhaust a serial
-        # Bun run. Partition files on independent runners; keep every test
-        # and the existing per-test, step and job limits (issue #149).
+        # Windows fixture startup and late file scheduling exhaust Bun/Deno
+        # suite budgets. Native file shards retain discovery and coverage on
+        # independent runners, with unchanged limits (issues #149 and #180).
         exclude:
           - os: windows-2025
             runtime: bun
+          - os: windows-2025
+            runtime: deno
         include:
           - os: windows-2025
             runtime: bun
@@ -360,6 +362,15 @@ jobs:
             shard: 2/3
           - os: windows-2025
             runtime: bun
+            shard: 3/3
+          - os: windows-2025
+            runtime: deno
+            shard: 1/3
+          - os: windows-2025
+            runtime: deno
+            shard: 2/3
+          - os: windows-2025
+            runtime: deno
             shard: 3/3
     steps:
       - uses: actions/checkout@v7
@@ -425,10 +436,12 @@ jobs:
         if: matrix.runtime == 'deno'
         shell: bash
         env:
+          DENO_SHARD: ${{ matrix.shard || '1/1' }}
+          PREFLIGHT_FIXTURE_TRACE: ${{ runner.os == 'Windows' && '1' || '' }}
           DEBUG_CHANGESET_FIXTURE: ${{ runner.os == 'Windows' && '1' || '' }}
           CHANGESET_FIXTURE_ROOT_ONLY: ${{ runner.os == 'Windows' && '1' || '' }}
           CHANGESET_FIXTURE_TRACE_STDERR: ${{ runner.os == 'Windows' && '1' || '' }}
-        run: bash scripts/run-with-budget-warning.sh 300 "Deno test suite" deno test -A --parallel
+        run: bash scripts/run-with-budget-warning.sh 300 "Deno test suite" deno test -A --parallel --shard "$DENO_SHARD"
 
       - name: Repeat Windows Deno release formatter fixture
         if: ${{ !cancelled() && matrix.runtime == 'deno' && runner.os == 'Windows' }}

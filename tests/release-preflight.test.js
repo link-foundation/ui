@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { describe, expect, it } from 'test-anywhere';
-import { spawn } from 'node:child_process';
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { itUnless, sandboxed } from './helpers/skip.js';
+import { runBounded, HANG_GUARD_MS } from './helpers/bounded-run.js';
 
 const SCRIPT = 'scripts/preflight-credentials.sh';
 // PATH entries are directories, so the stub lives at
@@ -62,9 +62,18 @@ function makeFixtures({
   return dir;
 }
 
-function runPreflight(env, fixtureDir) {
-  return new Promise((resolve, reject) => {
-    const child = spawn('bash', [SCRIPT], {
+async function runPreflight(env, fixtureDir) {
+  try {
+    const result = await runBounded('bash', [SCRIPT], {
+      timeout: HANG_GUARD_MS,
+      trace:
+        process.env.PREFLIGHT_FIXTURE_TRACE === '1'
+          ? (event) =>
+              console.error(
+                '[preflight-fixture]',
+                JSON.stringify({ fixtureDir, ...event })
+              )
+          : undefined,
       env: {
         ...process.env,
         // The stub prepends itself ahead of the real curl; everything else
@@ -82,16 +91,14 @@ function runPreflight(env, fixtureDir) {
         DOCKERHUB_TOKEN: '',
         ...env,
       },
-      stdio: ['ignore', 'pipe', 'pipe'],
     });
-
-    let stdout = '';
-    child.stdout.on('data', (chunk) => {
-      stdout += chunk;
-    });
-    child.on('error', reject);
-    child.on('close', (code) => resolve({ code, stdout }));
-  });
+    return { code: 0, ...result };
+  } catch (error) {
+    if (error.timedOut || error.code === undefined) {
+      throw error;
+    }
+    return { code: error.code, stdout: error.stdout };
+  }
 }
 
 describe('release-preflight workflow wiring', () => {
@@ -167,7 +174,7 @@ describe('release-preflight workflow wiring', () => {
   });
 });
 
-describe('release-preflight probe behaviour (offline, curl stub)', () => {
+describe('release-preflight fixture package selection', () => {
   itUnless(sandboxed)('probes only the single-package fixture', async () => {
     const fixtures = makeFixtures();
     const { code } = await runPreflight(
@@ -231,7 +238,9 @@ describe('release-preflight probe behaviour (offline, curl stub)', () => {
       expect(stdout).toContain('2 verified, 0 failed, 0 unknown');
     }
   );
+});
 
+describe('release-preflight probe behaviour (offline, curl stub)', () => {
   itUnless(sandboxed)(
     'passes in release mode when OIDC publishing is available',
     async () => {
