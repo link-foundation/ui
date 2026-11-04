@@ -146,3 +146,36 @@ comment event history; they do not alter Source, draft text, or document
 undo/redo. Source and canvas edits refresh the review's current/outdated/missing
 indicators. Anonymous objects use stable store IDs in the review snapshot.
 `destroy()` closes the comment panel and stops any active dictation.
+
+## Animation timeline
+
+Open the **Timeline** tab beside Source. Animations expand into property lanes;
+recordings have an event lane. The ruler uses milliseconds. Drag the ruler to
+seek the selected animation or recording, and use Play, Pause, Stop and Loop for
+preview. Preview always uses full motion for the edited content. Recording seek
+uses an isolated store; it never creates editing history or changes the source.
+
+Click diamonds/events to select, Shift+click to add/remove selection, and drag to
+move. Snapping uses the playhead, other keys/events and a 60 fps frame grid.
+`timelineFps` on `mountDesigner` customizes that grid. Arrow keys move selected
+markers by one frame, Shift+arrows by ten; on the ruler, arrows seek instead.
+Home/End seek to the beginning/end, Space toggles playback, K adds a key/event at
+the playhead, and Delete removes selection. Two keys must remain in each track.
+Every gesture is one undoable source transaction (`Ctrl/Cmd+Z`,
+`Ctrl/Cmd+Shift+Z`). Properties edits the selected value/easing or event action.
+Drag an animation's end handle (or focus it and press arrows) to change duration;
+replacing a duration token requires confirmation. Pass `resolveToken(path)` to
+resolve duration tokens, using the same callback as the animation player.
+
+Zoom buttons and Ctrl/Cmd+wheel change the scale; the track area scrolls
+horizontally. The layout is in `src/timeline/timeline.lino`; the runnable example
+is `examples/timeline.html` (serve the repository with
+`node scripts/serve-static.mjs`). Optional `trace` emits `timeline-commit` events
+and stays off by default.
+
+The exact midpoint expectation of #57 is blocked by
+[#186](https://github.com/link-foundation/ui/issues/186): the sample's global
+`standard` easing makes the existing player show scale approximately 0.990227 at
+500 ms, rather than the requested 0.96. The example preserves the original
+animation and player behavior. A visible Playwright FIXME records the unmet
+criterion; other preview, editing and accessibility scenarios run normally.

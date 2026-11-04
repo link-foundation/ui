@@ -16,3 +16,13 @@ export {
   sourceToStore,
   createDocumentSession,
 } from './sync.js';
+
+export {
+  readTimeline,
+  moveKeyframe,
+  insertKeyframe,
+  deleteKeyframe,
+  moveEvent,
+} from './timeline/model.js';
+export { timeToX, xToTime, snapTime } from './timeline/scale.js';
+export { timelineEdit, runTimelineCommand } from './timeline/commands.js';
