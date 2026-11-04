@@ -22,6 +22,50 @@ function mountSample(extra = {}) {
 const ids = (node) =>
   [...node.children].map((child) => child.getAttribute('data-link-id'));
 
+describe('positional updates with named properties', () => {
+  it('keeps named button properties after positional edits and subsequent property updates', () => {
+    const { window, container } = createDom();
+    const { store, handle } = mountDocument(
+      container,
+      `app: document
+  ok: button 'OK'
+    variant filled
+    disabled true
+    on press
+      navigate home`
+    );
+    const node = handle.nodeFor('ok');
+    const button = node.querySelector('button');
+    try {
+      store.setPositional('ok', ['Save']);
+      handle.flush();
+      expect(handle.nodeFor('ok')).toBe(node);
+      expect(button.textContent).toBe('Save');
+      expect(node.getAttribute('variant')).toBe('filled');
+      expect(node.hasAttribute('disabled')).toBe(true);
+      expect(button.disabled).toBe(true);
+
+      store.undo();
+      handle.flush();
+      expect(button.textContent).toBe('OK');
+      store.redo();
+      store.setProp('ok', 'disabled', ['false']);
+      handle.flush();
+      expect(button.textContent).toBe('Save');
+      expect(node.getAttribute('variant')).toBe('filled');
+      expect(button.disabled).toBe(false);
+      const actions = [];
+      node.addEventListener('ui-action', (event) => actions.push(event.detail));
+      button.click();
+      expect(actions.length).toBe(1);
+      expect(handle.diagnostics).toEqual([]);
+    } finally {
+      handle.destroy();
+      window.close();
+    }
+  });
+});
+
 describe('incremental updates', () => {
   it('patches positional edits, insertion defaults and undo without replacing nodes or explicit properties', () => {
     const { store, handle } = mountSample();
