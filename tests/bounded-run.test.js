@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { URL } from 'node:url';
 import { describe, it, expect } from 'test-anywhere';
 import {
   HANG_GUARD_MS,
@@ -8,31 +8,33 @@ import {
   runBounded,
 } from './helpers/bounded-run.js';
 import { itUnless, sandboxed } from './helpers/skip.js';
-
-function isAlive(pid) {
-  try {
-    process.kill(pid, 0);
-  } catch (error) {
-    return error.code === 'EPERM';
-  }
-  // A killed orphan stays a zombie until init reaps it; some containers never do.
-  try {
-    return readFileSync(`/proc/${pid}/stat`, 'utf8').split(') ')[1][0] !== 'Z';
-  } catch {
-    return true;
-  }
-}
+import { isProcessAlive } from './helpers/process-state.js';
 
 // The child starts a grandchild that shares its output pipe and outlives it,
 // like cmd.exe starting npx: only a tree kill ends both.
-const PARENT = `
-const { spawn } = require('node:child_process');
-const grandchild = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], {
-  stdio: 'inherit',
-});
-console.log('grandchild ' + grandchild.pid);
+const GRANDCHILD = `
+import { readProcess } from ${JSON.stringify(new URL('./helpers/process-state.js', import.meta.url).href)};
+console.log('grandchild ' + JSON.stringify(readProcess(process.pid)));
 setInterval(() => {}, 1000);
 `;
+const PARENT = `
+const { spawn } = require('node:child_process');
+spawn(process.execPath, ['--input-type=module', '-e', ${JSON.stringify(GRANDCHILD)}], {
+  stdio: 'inherit',
+});
+setInterval(() => {}, 1000);
+`;
+
+function descendant(stdout) {
+  const record = /^grandchild (.+)$/m.exec(stdout)?.[1];
+  assert.ok(record, `no grandchild identity in ${stdout}`);
+  const identity = JSON.parse(record);
+  assert.ok(identity?.pid > 0, `invalid grandchild identity: ${record}`);
+  if (process.platform === 'linux') {
+    assert.ok(identity.startTime && identity.group, record);
+  }
+  return identity;
+}
 
 describe('killTree', () => {
   it('kills the whole tree with taskkill on Windows', () => {
@@ -111,13 +113,16 @@ describe('runBounded', () => {
       expect(failure.message).toContain('timed out after 2000 ms');
       // The pipes closed by themselves, so no descendant kept them open.
       expect(failure.elapsedMs).toBeLessThan(6000);
-      const pid = Number(/grandchild (\d+)/.exec(failure.stdout)?.[1]);
-      assert.ok(pid > 0, `no grandchild pid in ${failure.stdout}`);
+      const identity = descendant(failure.stdout);
       // taskkill returns before Windows finishes tearing processes down.
-      for (let attempt = 0; attempt < 50 && isAlive(pid); attempt++) {
+      for (
+        let attempt = 0;
+        attempt < 50 && isProcessAlive(identity);
+        attempt++
+      ) {
         await new Promise((done) => setTimeout(done, 100));
       }
-      expect(isAlive(pid)).toBe(false);
+      expect(isProcessAlive(identity)).toBe(false);
     }
   );
 
@@ -141,10 +146,9 @@ describe('runBounded', () => {
       }
       assert.ok(failure, 'the command must not succeed');
       expect(failure.timedOut).toBe(true);
-      const pid = Number(/grandchild (\d+)/.exec(failure.stdout)?.[1]);
-      assert.ok(pid > 0, `no grandchild pid in ${failure.stdout}`);
-      if (isAlive(pid)) {
-        process.kill(pid, 'SIGKILL');
+      const identity = descendant(failure.stdout);
+      if (isProcessAlive(identity)) {
+        process.kill(identity.pid, 'SIGKILL');
       }
     }
   );
