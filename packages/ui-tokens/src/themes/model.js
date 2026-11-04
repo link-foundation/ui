@@ -26,7 +26,7 @@ const systemColors = new Set([
   'ButtonText',
   'ButtonFace',
 ]);
-const defaults = new Set(['motion', 'sound', 'volume', 'transparency']);
+const defaults = new Set(['motion', 'sound', 'volume', 'transparency', 'menu']);
 
 /** Inspect every value, including nested template/style links, before interpreting it. */
 function safe(link, diagnostics, id) {

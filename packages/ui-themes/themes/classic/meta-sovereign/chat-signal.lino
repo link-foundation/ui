@@ -1,0 +1,68 @@
+chat-signal: theme
+  extends base
+  token color.primary '#245AC8'
+  token color.on-primary '#FFFFFF'
+  token color.surface '#FFFFFF'
+  token color.on-surface '#17212B'
+  token color.on-surface-variant
+    token color.on-surface
+  token color.outline '#17212B'
+  token motion.duration.short 150ms
+  token bubble.radius 18px
+  mode dark
+    token color.primary '#245AC8'
+    token color.on-primary '#FFFFFF'
+    token color.surface '#121820'
+    token color.on-surface '#F0F5FA'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#F0F5FA'
+    token motion.duration.short 150ms
+    token bubble.radius 18px
+  mode high-contrast
+    token chat.text '#000000'
+    token chat.sidebar '#FFFFFF'
+    token chat.bubble.in '#FFFFFF'
+    token chat.bubble.in.text '#000000'
+    token chat.bubble.out '#000000'
+    token chat.bubble.out.text '#FFFFFF'
+    token chat.edge '#000000'
+    token color.primary '#000000'
+    token color.on-primary '#FFFFFF'
+    token color.surface '#FFFFFF'
+    token color.on-surface '#000000'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#000000'
+    token motion.duration.short 150ms
+  motion reduced
+    token motion.duration.short 0ms
+    token effect.glow 0
+    token effect.scanline 0
+    token effect.flicker 0
+  token chat.bg '#ffffff'
+  token chat.sidebar '#f6f6f6'
+  token chat.bubble.in '#e9e9e9'
+  token chat.bubble.in.text '#000000'
+  token chat.bubble.out '#2c6bed'
+  token chat.bubble.out.text '#ffffff'
+  token chat.bubble.radius 18px
+  token chat.bubble.tail 18px
+  token chat.bubble.padding.block 0.45rem
+  token chat.bubble.padding.inline 0.75rem
+  token chat.text '#17212b'
+  token chat.column 44rem
+  token chat.selection.bg '#164e63'
+  token chat.selection.text '#ffffff'
+  mode dark
+    token chat.bg '#121212'
+    token chat.sidebar '#1b1b1b'
+    token chat.bubble.in '#3b3b3b'
+    token chat.bubble.in.text '#ffffff'
+    token chat.bubble.out '#2c6bed'
+    token chat.bubble.out.text '#ffffff'
+    token chat.text '#f4f6f8'
+    token chat.selection.bg '#b9e6fb'
+    token chat.selection.text '#102b39'
+  pair chat.bubble.in.text chat.bubble.in
+  pair chat.bubble.out.text chat.bubble.out

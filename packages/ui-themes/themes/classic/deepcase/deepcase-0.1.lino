@@ -1,0 +1,63 @@
+classic-chrome: stack
+  direction vertical
+  gap 8px
+  theme deepcase-classic
+  control-row: stack
+    direction horizontal
+    wrap true
+    auth-group: button-group
+      label Authentication
+      auth: button
+        label 'auth 376'
+      auth-clear: button
+        label 'Clear authentication'
+    space-group: button-group
+      label Space
+      space: button
+        label 'space 182'
+      space-clear: button
+        label 'Clear space'
+    container-group: button-group
+      label Container
+      container: button
+        label 'container 182'
+      container-clear: button
+        label 'Clear container'
+    token-group: button-group
+      label Tokens
+      copy-token: button
+        label 'copy token'
+      paste-token: button
+        label 'paste token'
+    editor-group: button-group
+      label Tools
+      gql: button
+        label gql
+      editor: button
+        label editor
+    packager: button
+      label packager
+      variant filled
+  switch-row: stack
+    direction horizontal
+    wrap true
+    autofocus: switch
+      label autofocus
+      checked true
+    focus: switch
+      label focus
+    debug: switch
+      label debug
+    types: switch
+      label types
+    promises: switch
+      label promises
+    traveler: switch
+      label traveler
+    breadcrumbs: switch
+      label breadcrumbs
+  search: text-field
+    label 'Search links'
+    placeholder Search
+  graph: graph-canvas
+  version: text '0.1.0-beta.2'

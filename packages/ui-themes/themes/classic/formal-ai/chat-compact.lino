@@ -1,0 +1,40 @@
+chat-compact: theme
+  token chat.style.padding 4px
+  token chat.style.radius 2px
+  token chat.style.width 1
+  token bubble.radius 2px
+  token chat.bubble.radius 2px
+  mode dark
+    token chat.style.padding 4px
+    token chat.style.radius 2px
+    token chat.style.width 1
+    token bubble.radius 2px
+    token chat.bubble.radius 2px
+  mode high-contrast
+    token chat.text '#000000'
+    token chat.sidebar '#FFFFFF'
+    token chat.bubble.in '#FFFFFF'
+    token chat.bubble.in.text '#000000'
+    token chat.bubble.out '#000000'
+    token chat.bubble.out.text '#FFFFFF'
+    token chat.edge '#000000'
+    token color.primary '#000000'
+    token color.on-primary '#FFFFFF'
+    token color.surface '#FFFFFF'
+    token color.on-surface '#000000'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#000000'
+    token motion.duration.short 150ms
+  motion reduced
+    token motion.duration.short 0ms
+    token effect.glow 0
+    token effect.scanline 0
+    token effect.flicker 0
+  style
+    selector
+      type message-bubble
+    padding
+      token chat.style.padding
+    radius
+      token chat.style.radius

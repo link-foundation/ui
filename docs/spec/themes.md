@@ -92,6 +92,10 @@ Its `mode` modifier has eight complete contexts for the combined scheme,
 contrast and motion states, so overlapping token overrides stay deterministic.
 The test validates against a vendored copy of the official current schema.
 
+Classic theme menu preferences such as `menu radial` are retained in
+`Theme.defaults.menu`. Menu components can read this metadata when selecting
+their presentation; it does not change the layout or graph renderer.
+
 A style selector can target a native part with `(selector (type button)
 (part root))`. Hover, pressed and disabled states apply to the host. Checked follows
 the native checked input or ARIA checked input inside the host. Focus and

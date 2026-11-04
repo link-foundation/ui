@@ -26,7 +26,7 @@ export interface Theme {
   pairs: [string, string, number?][];
   springs?: Record<string, { response: number; damping: number }>;
   defaults: Partial<
-    Record<'motion' | 'sound' | 'volume' | 'transparency', string>
+    Record<'motion' | 'sound' | 'volume' | 'transparency' | 'menu', string>
   >;
   diagnostics: ThemeDiagnostic[];
   set: TokenSet;

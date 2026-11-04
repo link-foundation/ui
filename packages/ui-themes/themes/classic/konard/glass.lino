@@ -1,0 +1,89 @@
+glass: theme
+  extends base
+  token chat.text '#142B43'
+  token chat.sidebar '#E9F2FA'
+  token chat.bubble.in '#E9F2FA'
+  token chat.bubble.in.text '#142B43'
+  token chat.bubble.out '#174D82'
+  token chat.bubble.out.text '#FFFFFF'
+  token chat.edge '#142B43'
+  token color.primary '#174D82'
+  token color.on-primary '#FFFFFF'
+  token color.surface '#E9F2FA'
+  token color.on-surface '#142B43'
+  token color.on-surface-variant
+    token color.on-surface
+  token color.outline '#142B43'
+  token motion.duration.short 150ms
+  token surface.opacity 0.78
+  token surface.radius 12px
+  token surface.blur 16px
+  token shape.corner.full 12px
+  token shape.corner.small 12px
+  token ui.control.corner 12px
+  token chat.style.radius 12px
+  token chat.bubble.tail 12px
+  mode dark
+    token chat.text '#E9F2FA'
+    token chat.sidebar '#0B1626'
+    token chat.bubble.in '#0B1626'
+    token chat.bubble.in.text '#E9F2FA'
+    token chat.bubble.out '#B9DCFF'
+    token chat.bubble.out.text '#10243A'
+    token chat.edge '#E9F2FA'
+    token color.primary '#B9DCFF'
+    token color.on-primary '#10243A'
+    token color.surface '#0B1626'
+    token color.on-surface '#E9F2FA'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#E9F2FA'
+    token motion.duration.short 150ms
+    token surface.opacity 0.78
+    token surface.radius 12px
+    token surface.blur 16px
+    token shape.corner.full 12px
+    token shape.corner.small 12px
+    token ui.control.corner 12px
+    token chat.style.radius 12px
+    token chat.bubble.tail 12px
+  mode high-contrast
+    token chat.text '#000000'
+    token chat.sidebar '#FFFFFF'
+    token chat.bubble.in '#FFFFFF'
+    token chat.bubble.in.text '#000000'
+    token chat.bubble.out '#000000'
+    token chat.bubble.out.text '#FFFFFF'
+    token chat.edge '#000000'
+    token color.primary '#000000'
+    token color.on-primary '#FFFFFF'
+    token color.surface '#FFFFFF'
+    token color.on-surface '#000000'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#000000'
+    token motion.duration.short 150ms
+  motion reduced
+    token motion.duration.short 0ms
+    token effect.glow 0
+    token effect.scanline 0
+    token effect.flicker 0
+  style
+    selector
+      type panel
+    radius
+      token surface.radius
+    surface-opacity
+      token surface.opacity
+    blur
+      token surface.blur
+  style
+    selector
+      type button
+    radius
+      token surface.radius
+  style
+    selector
+      type composer
+    radius
+      token surface.radius

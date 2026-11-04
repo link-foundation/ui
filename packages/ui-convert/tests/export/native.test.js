@@ -90,6 +90,7 @@ test('native strings escape interpolation, controls, backslashes and quotes', as
 const available = (program, args) =>
   spawnSync(program, args, { encoding: 'utf8' }).status === 0;
 const swiftAvailable =
+  process.platform === 'darwin' &&
   available('swiftc', ['--version']) &&
   available('xcrun', ['--sdk', 'macosx', '--show-sdk-path']);
 test(
@@ -115,8 +116,8 @@ test(
 );
 
 const kotlinAvailable =
-  available('kotlinc', ['-version']) &&
-  Boolean(process.env.UI_CONVERT_COMPOSE_CLASSPATH);
+  Boolean(process.env.UI_CONVERT_COMPOSE_CLASSPATH) &&
+  available('kotlinc', ['-version']);
 test(
   'optional real Compose compilation',
   {
