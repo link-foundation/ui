@@ -240,6 +240,10 @@ export function rollback(links: LinksStorage, recorded: Change[]): void;
 
 export interface TypeSystem {
   root: number;
+  /** Storage that holds the type hierarchy. */
+  links: LinksStorage;
+  /** Whether committed writes can change the ancestry of other links. */
+  affects(changes: Change[], storage: LinksStorage): boolean;
   typeOf(value: number | Link): number | null;
   isType(id: number): boolean;
   parentsOf(type: number): number[];
@@ -280,6 +284,15 @@ export interface PermissionMarkers {
 }
 export interface Policy {
   markers: PermissionMarkers;
+  /** Optional server-local cache; permission views continue to read live rules. */
+  watch?(): {
+    canRead(subject: number | null, link: Link): boolean;
+    refresh(
+      changes: Change[],
+      storage: LinksStorage
+    ): (subject: number | null) => boolean;
+    forget(subject: number | null): boolean;
+  };
   canRead(subject: number | null, link: Link): boolean;
   canWrite(subject: number | null, link: Link): boolean;
   canCreate(subject: number | null): boolean;
