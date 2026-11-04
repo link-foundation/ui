@@ -1,9 +1,15 @@
 // Bounded cross-worker Windows handle-inheritance probe. Compare Node and Deno.
 // Four rounds, four workers, at most eight small Node children at once. Every
 // keeper exits after one second; an outer CI guard remains the final backstop.
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
+import process from 'node:process';
 import { URL } from 'node:url';
-import { Worker, isMainThread, parentPort } from 'node:worker_threads';
+import {
+  Worker,
+  isMainThread,
+  parentPort,
+  workerData,
+} from 'node:worker_threads';
 
 const rounds = 4;
 const workers = 4;
@@ -32,7 +38,12 @@ function start(code, stdio) {
 if (isMainThread) {
   const pool = Array.from(
     { length: workers },
-    () => new Worker(new URL(import.meta.url))
+    (_, index) =>
+      new Worker(new URL(import.meta.url), {
+        workerData: {
+          synchronous: process.argv.includes('--mixed') && index === 0,
+        },
+      })
   );
   try {
     for (let round = 0; round < rounds; round++) {
@@ -55,6 +66,18 @@ if (isMainThread) {
   }
 } else {
   parentPort.on('message', async () => {
+    if (workerData.synchronous) {
+      const started = Date.now();
+      const result = spawnSync(
+        'node',
+        ['--max-old-space-size=32', '-e', 'console.log("synchronous probe");'],
+        { stdio: ['ignore', 'pipe', 'pipe'], timeout: 5000 }
+      );
+      parentPort.postMessage({
+        synchronous: { code: result.status, elapsed: Date.now() - started },
+      });
+      return;
+    }
     const probe = start('console.log("probe");', [
       'ignore',
       'pipe',

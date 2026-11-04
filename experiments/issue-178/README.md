@@ -120,3 +120,11 @@ preload; `CHANGESET_FIXTURE_TRACE_STDERR=1` also retains its original stderr
 logging. The Windows parallel suite and three finite repetitions with other
 subprocess fixtures use that mode; three isolated controls retain nested
 tracing. Command and suite timeouts are unchanged.
+
+The original full log also shows the Material 3 theme test's synchronous
+`npm ls` taking 35 seconds and finishing at `02:09:19.905Z`, immediately after
+the Changesets process-tree kill at `02:09:19.713Z` (lines 40402–40430).
+The targeted parallel repetitions therefore include that actual theme test.
+The `--mixed` inheritance control adds a synchronous spawn in one worker to
+compare it with the asynchronous workers; its child has a five-second bound.
+This timing correlation is a lead, not yet proof of a shared cause.
