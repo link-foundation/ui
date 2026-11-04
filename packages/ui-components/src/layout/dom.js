@@ -126,18 +126,22 @@ export function dropController(node) {
 export function watchChildren(node, refresh, attributes = []) {
   const win = node.ownerDocument.defaultView;
   let pending = false;
+  let active = true;
   const observer = new win.MutationObserver((records) => {
     const relevant = records.some(
       (r) =>
         r.type !== 'attributes' ||
         (r.target.parentNode === node && r.target.hasAttribute('data-link-id'))
     );
-    if (!relevant || pending) {
+    if (!active || !relevant || pending) {
       return;
     }
     pending = true;
     win.queueMicrotask(() => {
       pending = false;
+      if (!active) {
+        return;
+      }
       refresh();
       observer.takeRecords();
     });
@@ -151,7 +155,13 @@ export function watchChildren(node, refresh, attributes = []) {
     });
   }
   observer.observe(node, init);
-  return observer;
+  return {
+    takeRecords: () => observer.takeRecords(),
+    disconnect() {
+      active = false;
+      observer.disconnect();
+    },
+  };
 }
 
 /** The CSS context of ui-style `declarationCss`: tokens → `var(--…)`. */
