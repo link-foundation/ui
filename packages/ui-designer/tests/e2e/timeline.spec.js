@@ -29,14 +29,14 @@ test('scrub uses the player under reduced motion; source-preserving key/event dr
   const box = await ruler.boundingBox();
   await page.mouse.click(box.x + 200, box.y + 12);
   await expect(ruler).toHaveAttribute('aria-valuenow', '500');
-  // The real player applies the animation-level easing globally (#186).
+  // Literal offsets hold even with the unchanged animation easing (#186).
   await expect
     .poll(() =>
       page
         .locator('.designer-canvas [data-link-id=ok]')
         .evaluate((n) => Number(window.getComputedStyle(n).scale))
     )
-    .toBeCloseTo(0.990227, 4);
+    .toBeCloseTo(0.96, 4);
   const before = await text(page);
   await dragBy(page, key(page), -40);
   expect(await text(page)).toBe(before.replace('key 0.5 0.96', 'key 0.4 0.96'));
@@ -134,10 +134,6 @@ for (const colorScheme of ['light', 'dark']) {
 }
 
 test('requested 50% midpoint equals scale 0.96', async ({ page }) => {
-  test.fixme(
-    true,
-    'Blocked by #186: #57 expects 0.96 but the #52 player and sampler produce 0.990227 for easing standard. Do not override the fixture or player.'
-  );
   const ruler = page.getByRole('slider', { name: 'Playhead time' });
   const box = await ruler.boundingBox();
   await page.mouse.click(box.x + 200, box.y + 12);
