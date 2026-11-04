@@ -67,6 +67,14 @@ endings before extracting and comparing the canonical LiNo. The same test
 passes locally after the correction; the complete runtime matrix verifies
 both corrections in CI.
 
+The full browser matrix also reported a WebKit dark-mode contrast violation
+on the example's existing `#forget` native button, outside the comments UI.
+The retained frame and axe's reported colors disagree; that investigation is
+recorded with a screenshot in [issue #183](https://github.com/link-foundation/ui/issues/183).
+The comments audit covers the shared `ui-comments` host, including its panel
+and anchored markers, in both schemes, matching the inspector and defaults
+dialog audits. No comments violations or WCAG rules are suppressed.
+
 Local pinned browser revisions were absent. The bounded
 [`experiments/issue-147/playwright.config.mjs`](../../../experiments/issue-147/playwright.config.mjs)
 reuses the already installed Chromium via `UI_DEVMODE_CHROMIUM_EXECUTABLE`.

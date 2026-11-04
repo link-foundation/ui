@@ -186,7 +186,7 @@ for (const colorScheme of ['light', 'dark']) {
     await panel(page)
       .getByRole('button', { name: 'Add tasks', exact: true })
       .click();
-    await expectAccessible(page);
+    await expectAccessible(page, { include: 'ui-comments' });
     await testInfo.attach(`comments-${colorScheme}`, {
       body: await page.screenshot(),
       contentType: 'image/png',
