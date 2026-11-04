@@ -61,9 +61,22 @@ test('site content and language navigation work without JavaScript', async ({
   }
 });
 
-test('site theme and scheme persist, system follows the OS, language keeps the page', async ({
-  page,
-}) => {
+for (const [name, id] of [
+  ['Material 3', 'material3'],
+  ['HIG · iOS', 'hig-ios'],
+  ['Fluent 2', 'fluent2'],
+]) {
+  test(`site theme ${name} persists across reloads`, async ({ page }) => {
+    await page.goto(`${home}en/themes/`);
+    await ready(page);
+    await choose(page, 'Theme', name);
+    await page.reload();
+    await ready(page);
+    await expect(page.locator('ui-document')).toHaveAttribute('data-theme', id);
+  });
+}
+
+test('site scheme persists and system follows the OS', async ({ page }) => {
   await page.goto(`${home}en/themes/`);
   await ready(page);
   await choose(page, 'Colour scheme', 'Dark');
@@ -83,27 +96,6 @@ test('site theme and scheme persist, system follows the OS, language keeps the p
     'light'
   );
   await choose(page, 'Theme', 'Material 3');
-  await page.reload();
-  await ready(page);
-  await expect(page.locator('ui-document')).toHaveAttribute(
-    'data-theme',
-    'material3'
-  );
-  await choose(page, 'Theme', 'HIG · iOS');
-  await page.reload();
-  await ready(page);
-  await expect(page.locator('ui-document')).toHaveAttribute(
-    'data-theme',
-    'hig-ios'
-  );
-  await choose(page, 'Theme', 'Fluent 2');
-  await page.reload();
-  await ready(page);
-  await expect(page.locator('ui-document')).toHaveAttribute(
-    'data-theme',
-    'fluent2'
-  );
-  await choose(page, 'Theme', 'Material 3');
   await choose(page, 'Colour scheme', 'Follow system');
   await page.emulateMedia({ colorScheme: 'light' });
   const light = await page
@@ -121,8 +113,19 @@ test('site theme and scheme persist, system follows the OS, language keeps the p
         .evaluate((node) => globalThis.getComputedStyle(node).backgroundColor)
     )
     .not.toBe(light);
-  await choose(page, 'Language', 'Русский');
-  await expect(page).toHaveURL(new RegExp(`${home}ru/themes/$`));
+});
+
+test('site language navigation keeps the page and selected theme', async ({
+  page,
+}) => {
+  await page.goto(`${home}en/themes/`);
+  await ready(page);
+  await choose(page, 'Theme', 'Material 3');
+  // A URL assertion can pass at navigation commit, before the new module loads.
+  await Promise.all([
+    page.waitForURL(new RegExp(`${home}ru/themes/$`)),
+    choose(page, 'Language', 'Русский'),
+  ]);
   await ready(page);
   await expect(page.locator('html')).toHaveAttribute('lang', 'ru');
   await expect(page.locator('ui-document')).toHaveAttribute(
