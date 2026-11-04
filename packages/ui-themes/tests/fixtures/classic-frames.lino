@@ -1,0 +1,489 @@
+frame-square-none: style
+  selector
+    type panel
+  clip-path 'inset(0px)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style none
+  border-width 0px
+  opacity
+    token surface.opacity
+
+frame-square-gap: style
+  selector
+    type panel
+  clip-path 'inset(0px)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style dashed
+  border-width 1px
+  opacity
+    token surface.opacity
+
+frame-square-line: style
+  selector
+    type panel
+  clip-path 'inset(0px)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style solid
+  border-width 1px
+  opacity
+    token surface.opacity
+
+frame-square-accent: style
+  selector
+    type panel
+  clip-path 'inset(0px)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style solid
+  border-width 3px
+  opacity
+    token surface.opacity
+
+frame-square-bracket: style
+  selector
+    type panel
+  clip-path 'inset(0px)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style double
+  border-width 4px
+  opacity
+    token surface.opacity
+
+frame-cut-none: style
+  selector
+    type panel
+  clip-path 'polygon(12% 0%, 88% 0%, 100% 12%, 100% 88%, 88% 100%, 12% 100%, 0% 88%, 0% 12%)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style none
+  border-width 0px
+  opacity
+    token surface.opacity
+
+frame-cut-gap: style
+  selector
+    type panel
+  clip-path 'polygon(12% 0%, 88% 0%, 100% 12%, 100% 88%, 88% 100%, 12% 100%, 0% 88%, 0% 12%)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style dashed
+  border-width 1px
+  opacity
+    token surface.opacity
+
+frame-cut-line: style
+  selector
+    type panel
+  clip-path 'polygon(12% 0%, 88% 0%, 100% 12%, 100% 88%, 88% 100%, 12% 100%, 0% 88%, 0% 12%)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style solid
+  border-width 1px
+  opacity
+    token surface.opacity
+
+frame-cut-accent: style
+  selector
+    type panel
+  clip-path 'polygon(12% 0%, 88% 0%, 100% 12%, 100% 88%, 88% 100%, 12% 100%, 0% 88%, 0% 12%)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style solid
+  border-width 3px
+  opacity
+    token surface.opacity
+
+frame-cut-bracket: style
+  selector
+    type panel
+  clip-path 'polygon(12% 0%, 88% 0%, 100% 12%, 100% 88%, 88% 100%, 12% 100%, 0% 88%, 0% 12%)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style double
+  border-width 4px
+  opacity
+    token surface.opacity
+
+frame-tall-none: style
+  selector
+    type panel
+  clip-path 'polygon(6% 0%, 94% 0%, 100% 12%, 100% 88%, 94% 100%, 6% 100%, 0% 88%, 0% 12%)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style none
+  border-width 0px
+  opacity
+    token surface.opacity
+
+frame-tall-gap: style
+  selector
+    type panel
+  clip-path 'polygon(6% 0%, 94% 0%, 100% 12%, 100% 88%, 94% 100%, 6% 100%, 0% 88%, 0% 12%)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style dashed
+  border-width 1px
+  opacity
+    token surface.opacity
+
+frame-tall-line: style
+  selector
+    type panel
+  clip-path 'polygon(6% 0%, 94% 0%, 100% 12%, 100% 88%, 94% 100%, 6% 100%, 0% 88%, 0% 12%)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style solid
+  border-width 1px
+  opacity
+    token surface.opacity
+
+frame-tall-accent: style
+  selector
+    type panel
+  clip-path 'polygon(6% 0%, 94% 0%, 100% 12%, 100% 88%, 94% 100%, 6% 100%, 0% 88%, 0% 12%)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style solid
+  border-width 3px
+  opacity
+    token surface.opacity
+
+frame-tall-bracket: style
+  selector
+    type panel
+  clip-path 'polygon(6% 0%, 94% 0%, 100% 12%, 100% 88%, 94% 100%, 6% 100%, 0% 88%, 0% 12%)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style double
+  border-width 4px
+  opacity
+    token surface.opacity
+
+frame-wide-none: style
+  selector
+    type panel
+  clip-path 'polygon(12% 0%, 88% 0%, 100% 6%, 100% 94%, 88% 100%, 12% 100%, 0% 94%, 0% 6%)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style none
+  border-width 0px
+  opacity
+    token surface.opacity
+
+frame-wide-gap: style
+  selector
+    type panel
+  clip-path 'polygon(12% 0%, 88% 0%, 100% 6%, 100% 94%, 88% 100%, 12% 100%, 0% 94%, 0% 6%)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style dashed
+  border-width 1px
+  opacity
+    token surface.opacity
+
+frame-wide-line: style
+  selector
+    type panel
+  clip-path 'polygon(12% 0%, 88% 0%, 100% 6%, 100% 94%, 88% 100%, 12% 100%, 0% 94%, 0% 6%)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style solid
+  border-width 1px
+  opacity
+    token surface.opacity
+
+frame-wide-accent: style
+  selector
+    type panel
+  clip-path 'polygon(12% 0%, 88% 0%, 100% 6%, 100% 94%, 88% 100%, 12% 100%, 0% 94%, 0% 6%)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style solid
+  border-width 3px
+  opacity
+    token surface.opacity
+
+frame-wide-bracket: style
+  selector
+    type panel
+  clip-path 'polygon(12% 0%, 88% 0%, 100% 6%, 100% 94%, 88% 100%, 12% 100%, 0% 94%, 0% 6%)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style double
+  border-width 4px
+  opacity
+    token surface.opacity
+
+frame-round-none: style
+  selector
+    type panel
+  clip-path 'inset(0px round 12px)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style none
+  border-width 0px
+  opacity
+    token surface.opacity
+
+frame-round-gap: style
+  selector
+    type panel
+  clip-path 'inset(0px round 12px)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style dashed
+  border-width 1px
+  opacity
+    token surface.opacity
+
+frame-round-line: style
+  selector
+    type panel
+  clip-path 'inset(0px round 12px)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style solid
+  border-width 1px
+  opacity
+    token surface.opacity
+
+frame-round-accent: style
+  selector
+    type panel
+  clip-path 'inset(0px round 12px)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style solid
+  border-width 3px
+  opacity
+    token surface.opacity
+
+frame-round-bracket: style
+  selector
+    type panel
+  clip-path 'inset(0px round 12px)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style double
+  border-width 4px
+  opacity
+    token surface.opacity
+
+frame-scoop-none: style
+  selector
+    type panel
+  clip-path 'polygon(12% 0%, 88% 0%, 88% 12%, 100% 12%, 100% 88%, 88% 88%, 88% 100%, 12% 100%, 12% 88%, 0% 88%, 0% 12%, 12% 12%)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style none
+  border-width 0px
+  opacity
+    token surface.opacity
+
+frame-scoop-gap: style
+  selector
+    type panel
+  clip-path 'polygon(12% 0%, 88% 0%, 88% 12%, 100% 12%, 100% 88%, 88% 88%, 88% 100%, 12% 100%, 12% 88%, 0% 88%, 0% 12%, 12% 12%)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style dashed
+  border-width 1px
+  opacity
+    token surface.opacity
+
+frame-scoop-line: style
+  selector
+    type panel
+  clip-path 'polygon(12% 0%, 88% 0%, 88% 12%, 100% 12%, 100% 88%, 88% 88%, 88% 100%, 12% 100%, 12% 88%, 0% 88%, 0% 12%, 12% 12%)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style solid
+  border-width 1px
+  opacity
+    token surface.opacity
+
+frame-scoop-accent: style
+  selector
+    type panel
+  clip-path 'polygon(12% 0%, 88% 0%, 88% 12%, 100% 12%, 100% 88%, 88% 88%, 88% 100%, 12% 100%, 12% 88%, 0% 88%, 0% 12%, 12% 12%)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style solid
+  border-width 3px
+  opacity
+    token surface.opacity
+
+frame-scoop-bracket: style
+  selector
+    type panel
+  clip-path 'polygon(12% 0%, 88% 0%, 88% 12%, 100% 12%, 100% 88%, 88% 88%, 88% 100%, 12% 100%, 12% 88%, 0% 88%, 0% 12%, 12% 12%)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style double
+  border-width 4px
+  opacity
+    token surface.opacity
+
+frame-notch-none: style
+  selector
+    type panel
+  clip-path 'polygon(0% 0%, 12% 0%, 12% 6%, 24% 6%, 24% 0%, 100% 0%, 100% 100%, 0% 100%)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style none
+  border-width 0px
+  opacity
+    token surface.opacity
+
+frame-notch-gap: style
+  selector
+    type panel
+  clip-path 'polygon(0% 0%, 12% 0%, 12% 6%, 24% 6%, 24% 0%, 100% 0%, 100% 100%, 0% 100%)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style dashed
+  border-width 1px
+  opacity
+    token surface.opacity
+
+frame-notch-line: style
+  selector
+    type panel
+  clip-path 'polygon(0% 0%, 12% 0%, 12% 6%, 24% 6%, 24% 0%, 100% 0%, 100% 100%, 0% 100%)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style solid
+  border-width 1px
+  opacity
+    token surface.opacity
+
+frame-notch-accent: style
+  selector
+    type panel
+  clip-path 'polygon(0% 0%, 12% 0%, 12% 6%, 24% 6%, 24% 0%, 100% 0%, 100% 100%, 0% 100%)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style solid
+  border-width 3px
+  opacity
+    token surface.opacity
+
+frame-notch-bracket: style
+  selector
+    type panel
+  clip-path 'polygon(0% 0%, 12% 0%, 12% 6%, 24% 6%, 24% 0%, 100% 0%, 100% 100%, 0% 100%)'
+  radius 0px
+  background
+    token color.surface
+  border-color
+    token color.primary
+  border-style double
+  border-width 4px
+  opacity
+    token surface.opacity

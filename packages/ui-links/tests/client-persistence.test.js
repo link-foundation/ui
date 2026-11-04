@@ -108,6 +108,7 @@ describe('persistent synced client', () => {
     const make = adapters().text;
     const a = await ui.openSyncedLinks({ adapter: make() });
     await a.connect(ui.connectInProcess(server, { subject: v.alice }));
+    await a.load([]);
     a.disconnect();
     a.update(v.note, t.Public, v.note);
     await a.flush();
@@ -159,6 +160,8 @@ describe('reconnect boundaries', () => {
   it('preserves writes made while the reconnect snapshot is in flight', async () => {
     const server = ui.createLinksServer({ links: ui.createMemoryLinks() });
     const a = ui.createSyncedLinks();
+    await a.connect(ui.connectInProcess(server));
+    a.disconnect();
     const transport = ui.connectInProcess(server);
     let release;
     let started;
@@ -214,6 +217,7 @@ describe('persistent updates and readable snapshots', () => {
       adapter: make(),
       transport: ui.connectInProcess(server),
     });
+    await a.load([]);
     a.disconnect();
     a.update(1, 1, 1);
     a.delete(2);
@@ -230,6 +234,7 @@ describe('persistent updates and readable snapshots', () => {
     const server = ui.createLinksServer({ links, names, policy });
     const a = ui.createSyncedLinks();
     await a.connect(ui.connectInProcess(server, { subject: v.alice }));
+    await a.load([]);
     expect(ui.getLink(a, v.note)?.id).toBe(v.note);
     a.disconnect();
     const admin = ui.connectInProcess(server, { subject: v.boss });

@@ -99,7 +99,9 @@ describe('log as Links Notation', () => {
       json(store.log())
     );
   });
+});
 
+describe('log round trips and validation', () => {
   for (const [seed, sample] of [
     [4, null],
     [5, 'document.lino'],

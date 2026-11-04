@@ -36,6 +36,7 @@ import {
 } from './links.js';
 import { formatLino, group, named, parseLino } from './lino.js';
 import { createMemoryLinks } from './memory.js';
+import { createLinksNames } from './links-names.js';
 
 /**
  * @typedef {{ id: number, from_id: number, to_id: number }} Link
@@ -222,6 +223,12 @@ function createCacheWriter(cache, emit, remaps) {
     resolve,
     put,
     remove,
+    refreshNames(ids, metadata) {
+      for (const mark of createLinksNames(cache).bindings(ids)) {
+        remove(mark.id, 'remote');
+      }
+      metadata.forEach((value) => put(linkFromLino(value), 'remote'));
+    },
     /** Apply the changes the server reports. */
     applyRemote(changes) {
       for (const { before, after } of changes) {
@@ -470,8 +477,13 @@ async function refreshClient({
   isCurrent,
   getVersion,
   buffer,
+  refresh,
 }) {
   await outbox.flush();
+  if (!refresh) {
+    await durable();
+    return;
+  }
   if (!isCurrent()) {
     return;
   }
@@ -534,10 +546,7 @@ function createRemoteMethods({
     /** Load the links of a restriction `[index, source, target]` into the cache. */
     async load(restriction = []) {
       await ready();
-      const reply = await request(op('each', restrictionLino(restriction)));
-      const links = reply.map((value) => linkFromLino(value));
-      links.forEach((link) => writer.put(link, 'remote'));
-      return links;
+      return loadLinks(request, writer, restriction);
     },
     /** Load the links of a restriction and keep them up to date. */
     async subscribe(restriction = []) {
@@ -578,6 +587,10 @@ function createRemoteMethods({
         (value) => addresses.get(value) ?? numberOf(value)
       );
       writer.applyRemote(changes);
+      const ids = changes.flatMap(({ after }) =>
+        after ? [after.id, after.from_id, after.to_id] : []
+      );
+      writer.refreshNames(ids, await requestNameLinks(request, ids));
       return changes;
     },
   };
@@ -599,6 +612,46 @@ function listenForPush(next, writer, buffer) {
       }
     }) ?? null
   );
+}
+
+/** Optional name encoding extension; older sidecar servers have no encoding. */
+async function requestNameLinks(request, ids) {
+  try {
+    return await request(
+      op('name-links', group([...new Set(ids)].map(String)))
+    );
+  } catch (error) {
+    if (error instanceof LinksError && error.code === 'remote') {
+      return [];
+    }
+    throw error;
+  }
+}
+
+/** Load data and its names, preserving the older `each` protocol as a fallback. */
+async function loadLinks(request, writer, restriction) {
+  let data;
+  let metadata;
+  try {
+    const [reply, names] = await request(
+      op('load', restrictionLino(restriction))
+    );
+    data = reply.values[0].values;
+    metadata = names.values[0].values;
+  } catch (error) {
+    if (!(error instanceof LinksError) || error.code !== 'remote') {
+      throw error;
+    }
+    data = await request(op('each', restrictionLino(restriction)));
+    metadata = [];
+  }
+  const links = data.map((value) => linkFromLino(value));
+  links.forEach((link) => writer.put(link, 'remote'));
+  writer.refreshNames(
+    links.flatMap((link) => [link.id, link.from_id, link.to_id]),
+    metadata
+  );
+  return links;
 }
 
 /**
@@ -631,6 +684,7 @@ export function createSyncedLinks({
     saveState(
       writeClientState({
         nextTemp,
+        connected: state.connected,
         real: [...writer.real],
         queue: state.queue,
         subscriptions: [...subscriptions],
@@ -679,9 +733,7 @@ export function createSyncedLinks({
       }
       return nextTemp--;
     },
-    changed: () => {
-      localVersion++;
-    },
+    changed: () => localVersion++,
     emit,
     outbox,
     isTemporary,
@@ -691,10 +743,14 @@ export function createSyncedLinks({
 
   const synced = withProperties(storage, {
     cache,
+    names: createLinksNames(storage),
     /** Use `next` as the transport: pushes come in, queued writes go. */
     connect(next) {
       disconnect();
       current = next;
+      const refresh = state.connected;
+      state.connected = true;
+      checkpoint();
       const buffer = { value: null };
       stopPush = listenForPush(next, writer, buffer);
       const run = () =>
@@ -710,6 +766,7 @@ export function createSyncedLinks({
           isCurrent: () => current === next,
           getVersion: () => localVersion,
           buffer,
+          refresh,
         });
       connecting = run().catch((error) => {
         if (current === next) {

@@ -171,6 +171,13 @@ export interface NamesStore {
 }
 export function isName(name: unknown): name is string;
 export function createNames(entries?: Iterable<[number, string]>): NamesStore;
+export interface LinksNames extends NamesStore {
+  withLinks(links: LinksStorage): LinksNames;
+  dependencies(ids: Iterable<number>): Link[];
+  bindings(ids: Iterable<number>): Link[];
+}
+/** Names encoded as doublets in the same storage, without a sidecar. */
+export function createLinksNames(links: LinksStorage): LinksNames;
 
 // Links Notation
 
@@ -215,7 +222,12 @@ export function querySides(document: LinoValue[]): [any, any] | null;
 /** Run `fn` as one atomic write; the net changes. */
 export function transact(
   context: QueryContext,
-  fn: (links: LinksStorage, recorded: Change[], named: Set<number>) => void
+  fn: (
+    links: LinksStorage,
+    recorded: Change[],
+    named: number[],
+    names?: NamesStore
+  ) => void
 ): Change[];
 /** Run a substitution query (LiNo text or a parsed document). */
 export function runQuery(
@@ -409,6 +421,7 @@ export interface PendingWrite {
 }
 export interface SyncedLinks extends LinksStorage {
   readonly cache: LinksStorage;
+  readonly names: LinksNames;
   connect(transport: Transport): Promise<void>;
   disconnect(): void;
   readonly connected: boolean;

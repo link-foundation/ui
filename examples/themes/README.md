@@ -27,6 +27,15 @@ The test checks nested computed colors, preserved node identity, system
 preferences, forced colors, synchronous saved preference restoration, and
 axe accessibility (including contrast). See [the API contract](../../docs/spec/themes.md).
 
+Open [classic.html](classic.html) for the five classic theme families, all 38
+packs, the DeepCase chrome switcher, independent chat/composer axes and all
+35 frame combinations. Historical reference images are compared beside the
+recreated light and dark chrome in the browser evidence:
+
+```sh
+CLASSIC_SCREENSHOTS=docs/screenshots/issue-51 npx playwright test tests/e2e/theme-classic.spec.js --project=chromium --workers=1
+```
+
 Open http://127.0.0.1:4173/examples/themes/hig.html for the six HIG panels (iOS/macOS × light/dark/increased contrast). See [the HIG guide](../../docs/themes/hig.md). Capture review images with:
 
 ```sh

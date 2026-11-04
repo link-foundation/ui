@@ -1,0 +1,22 @@
+handlers: stack
+  theme deepcase-dark
+  direction vertical
+  handler-hint: text 'Handler windows use the same dark tokens.'
+  handler: window
+    title 'Client handler'
+    open false
+    x 16
+    y 16
+    width 480
+    height 280
+    handler-tabs: tab-group
+      label 'Handler views'
+      preview: panel
+        title Preview
+        preview-body: text 'Handler preview placeholder'
+      handlers-list: panel
+        title Handlers
+        handlers-body: text 'ClientHandler · String · Query'
+      results: panel
+        title Results
+        results-body: text 'No handler executed in this theme gallery.'

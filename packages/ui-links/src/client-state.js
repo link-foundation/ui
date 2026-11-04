@@ -18,6 +18,7 @@ const readLink = (value) =>
       };
 
 export const emptyClientState = () => ({
+  connected: false,
   nextTemp: MAX_ADDRESS,
   real: [],
   queue: [],
@@ -28,6 +29,7 @@ export const emptyClientState = () => ({
 export function writeClientState(state) {
   return formatLinks([
     named('sync', [
+      named('connected', [String(state.connected)]),
       named('next', [String(state.nextTemp)]),
       named('subscription-counter', [String(state.nextSubscription)]),
       named(
@@ -72,6 +74,7 @@ export function readClientState(text) {
     root.values.map((v) => (typeof v === 'string' ? [v, []] : [v.id, v.values]))
   );
   return {
+    connected: fields.get('connected')?.[0] === 'true',
     nextTemp: Number(fields.get('next')[0]),
     nextSubscription: Number(fields.get('subscription-counter')[0]),
     real: fields.get('remaps').map((v) => v.map(Number)),

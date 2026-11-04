@@ -23,6 +23,7 @@ the query engine and the type system run on a client as on a server.
 ```js
 import {
   connectInProcess,
+  createLinksNames,
   createLinksServer,
   createMemoryLinks,
   createSyncedLinks,
@@ -110,6 +111,56 @@ given; `namesToLino` and `namesFromLino` do the same for names. `parseLino`,
 of [links-notation](https://github.com/link-foundation/links-notation)'s
 `BinaryLinoCodec`, in the document model of `@link-foundation/link-cli-client`
 (a reference is a string, a link is `{ id, values }`).
+
+### Names in the data storage
+
+Pass `names: createLinksNames(links)` to `createLinksServer` to store names
+with the data instead of in a sidecar. It implements the same `setName`,
+`getName`, `getByName`, `removeName` and `entries` interface; queries,
+`linksFromLino` / `linksToLino` and `namesFromLino` / `namesToLino` accept it.
+Reopening `createLinksNames` on persisted doublets recovers the names without
+another file. The sidecar remains the default for protocol compatibility.
+
+```js
+const links = createMemoryLinks();
+const names = createLinksNames(links);
+const server = createLinksServer({ links, names, autoCreate: true });
+const transport = connectInProcess(server);
+const client = createSyncedLinks({ transport });
+await client.query('() ((greeting: greeting greeting))');
+client.names.getByName('greeting'); // the address in the client cache
+```
+
+The encoding follows link-cli's Unicode string/name approach, using doublets
+for both text and the binding. It has its own portable layout, without
+link-cli's pinned addresses or external numeric references. The reserved
+namespace shape is `(r: 0 r)` with bit markers `(z: r r)` and `(o: r z)`.
+A right list of bit-marker addresses, terminated by `r`, stores UTF-16 code
+units in most significant bit order. `(p: data text)` marked `(n: r p)` binds
+the text to a link. The complete three-marker shape identifies a namespace;
+applications using this names store must reserve that shape. Numeric
+addresses are allocated normally. Renames remove old name marks; shared text
+and binding doublets remain available for reuse. Cascading deletion of a data
+link removes its bindings. Plain storage deletion follows the storage's usual
+non-cascading semantics; dangling bindings do not resolve to names.
+
+A permission view must allow reading the named link **and every doublet in
+its encoding** to resolve the name. Name writes use the same view, so grant
+access to the namespace, sequence and binding links as appropriate. Server
+name operations and query name creation participate in the request's atomic
+transaction, including rollback on denied metadata writes. `withLinks(view)`
+rebinds the names interface to another view; `dependencies(ids)` returns the
+readable encoding links needed for those addresses. `bindings(ids)` selects
+only their name marks, without shared text nodes.
+
+The protocol extensions `(load: restriction)` and `(name-links: (ids…))`
+return data with its readable name encoding and the encoding alone,
+respectively. `load` answers `(links: (...))` and `(names: (...))`.
+The synced client loads these doublets into the same cache and exposes
+`client.names`. Partial subscriptions include name changes even when the
+name doublets themselves do not match the subscribed restriction. Renames,
+removals and reassignment update other subscribed clients. Encoding links
+are regular cached links and count toward the cache's `count()`.
 
 ## Substitution queries
 
@@ -279,12 +330,12 @@ in `cache` (a memory storage by default) and has the storage interface itself:
   writes; its changes come into the cache.
 - `onChange({ before, after, origin })` reports every change of the cache.
 - `await connect(transport)` replays queued writes, restores subscriptions and
-  replaces the cache with the server's current readable links, reporting
+  on reconnect replaces the cache with the server's current readable links, reporting
   differences with `origin: 'remote'`. This includes removal of deleted or
   newly unreadable links. The server has no version log, so reconnect uses
   a full readable snapshot, including links outside previous restrictions.
-  Subscriptions continue to deliver only their matching changes. Subscription
-  IDs belong to the client and remain valid across reconnects and reloads.
+  Subscriptions continue to deliver only their matching changes. The first connection keeps the cache partial until `load` or `subscribe`.
+  Subscription IDs belong to the client and remain valid across reconnects and reloads.
 
 For a durable offline client, use the async opener with one of the persistence
 adapters. It uses `persistLinks` for the cache and stores its outbox, rollback

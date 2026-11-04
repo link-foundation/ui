@@ -1,0 +1,968 @@
+immortality-mission: theme
+  extends base
+  token chat.text '#eef6f6'
+  token chat.sidebar '#0a1018'
+  token chat.bubble.in '#0a1018'
+  token chat.bubble.in.text '#eef6f6'
+  token chat.bubble.out '#7efcf6'
+  token chat.bubble.out.text '#000000'
+  token chat.edge '#eef6f6'
+  token color.primary '#7efcf6'
+  token color.on-primary '#000000'
+  token color.surface '#0a1018'
+  token color.on-surface '#eef6f6'
+  token color.on-surface-variant
+    token color.on-surface
+  token color.outline '#eef6f6'
+  token motion.duration.short 150ms
+  token color.background '#05080d'
+  token palette.page '#05080d'
+  token palette.surface-1 '#0a1018'
+  token palette.surface-2 '#0d1520'
+  token palette.text-primary '#eef6f6'
+  token palette.text-secondary '#9fb4bc'
+  token palette.text-muted '#64777f'
+  token palette.gridline '#16222e'
+  token palette.baseline '#24313d'
+  token palette.series-1 '#10a99a'
+  token palette.threshold '#c98500'
+  token palette.neon '#7efcf6'
+  token palette.neon-dim 'rgba(126, 252, 246, 0.28)'
+  token palette.neon-faint 'rgba(126, 252, 246, 0.1)'
+  token palette.danger '#e66767'
+  mode dark
+    token chat.text '#eef6f6'
+    token chat.sidebar '#0a1018'
+    token chat.bubble.in '#0a1018'
+    token chat.bubble.in.text '#eef6f6'
+    token chat.bubble.out '#7efcf6'
+    token chat.bubble.out.text '#000000'
+    token chat.edge '#eef6f6'
+    token color.primary '#7efcf6'
+    token color.on-primary '#000000'
+    token color.surface '#0a1018'
+    token color.on-surface '#eef6f6'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#eef6f6'
+    token motion.duration.short 150ms
+    token color.background '#05080d'
+    token palette.page '#05080d'
+    token palette.surface-1 '#0a1018'
+    token palette.surface-2 '#0d1520'
+    token palette.text-primary '#eef6f6'
+    token palette.text-secondary '#9fb4bc'
+    token palette.text-muted '#64777f'
+    token palette.gridline '#16222e'
+    token palette.baseline '#24313d'
+    token palette.series-1 '#10a99a'
+    token palette.threshold '#c98500'
+    token palette.neon '#7efcf6'
+    token palette.neon-dim 'rgba(126, 252, 246, 0.28)'
+    token palette.neon-faint 'rgba(126, 252, 246, 0.1)'
+    token palette.danger '#e66767'
+  mode high-contrast
+    token chat.text '#000000'
+    token chat.sidebar '#FFFFFF'
+    token chat.bubble.in '#FFFFFF'
+    token chat.bubble.in.text '#000000'
+    token chat.bubble.out '#000000'
+    token chat.bubble.out.text '#FFFFFF'
+    token chat.edge '#000000'
+    token color.primary '#000000'
+    token color.on-primary '#FFFFFF'
+    token color.surface '#FFFFFF'
+    token color.on-surface '#000000'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#000000'
+    token motion.duration.short 150ms
+  motion reduced
+    token motion.duration.short 0ms
+    token effect.glow 0
+    token effect.scanline 0
+    token effect.flicker 0
+immortality-glitchy: theme
+  extends base
+  token chat.text '#fbf1fd'
+  token chat.sidebar '#120d17'
+  token chat.bubble.in '#120d17'
+  token chat.bubble.in.text '#fbf1fd'
+  token chat.bubble.out '#e2aeeb'
+  token chat.bubble.out.text '#000000'
+  token chat.edge '#fbf1fd'
+  token color.primary '#e2aeeb'
+  token color.on-primary '#000000'
+  token color.surface '#120d17'
+  token color.on-surface '#fbf1fd'
+  token color.on-surface-variant
+    token color.on-surface
+  token color.outline '#fbf1fd'
+  token motion.duration.short 150ms
+  token color.background '#05080D'
+  token palette.surface-1 '#120d17'
+  token palette.surface-2 '#1b1321'
+  token palette.text-primary '#fbf1fd'
+  token palette.text-secondary '#d5b8da'
+  token palette.text-muted '#987ca0'
+  token palette.gridline '#2c2034'
+  token palette.baseline '#493351'
+  token palette.series-1 '#c45cd6'
+  token palette.threshold '#54d8dc'
+  token palette.neon '#e2aeeb'
+  token palette.neon-dim 'rgba(196, 92, 214, 0.34)'
+  token palette.neon-faint 'rgba(196, 92, 214, 0.12)'
+  mode dark
+    token chat.text '#fbf1fd'
+    token chat.sidebar '#120d17'
+    token chat.bubble.in '#120d17'
+    token chat.bubble.in.text '#fbf1fd'
+    token chat.bubble.out '#e2aeeb'
+    token chat.bubble.out.text '#000000'
+    token chat.edge '#fbf1fd'
+    token color.primary '#e2aeeb'
+    token color.on-primary '#000000'
+    token color.surface '#120d17'
+    token color.on-surface '#fbf1fd'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#fbf1fd'
+    token motion.duration.short 150ms
+    token color.background '#05080D'
+    token palette.surface-1 '#120d17'
+    token palette.surface-2 '#1b1321'
+    token palette.text-primary '#fbf1fd'
+    token palette.text-secondary '#d5b8da'
+    token palette.text-muted '#987ca0'
+    token palette.gridline '#2c2034'
+    token palette.baseline '#493351'
+    token palette.series-1 '#c45cd6'
+    token palette.threshold '#54d8dc'
+    token palette.neon '#e2aeeb'
+    token palette.neon-dim 'rgba(196, 92, 214, 0.34)'
+    token palette.neon-faint 'rgba(196, 92, 214, 0.12)'
+  mode high-contrast
+    token chat.text '#000000'
+    token chat.sidebar '#FFFFFF'
+    token chat.bubble.in '#FFFFFF'
+    token chat.bubble.in.text '#000000'
+    token chat.bubble.out '#000000'
+    token chat.bubble.out.text '#FFFFFF'
+    token chat.edge '#000000'
+    token color.primary '#000000'
+    token color.on-primary '#FFFFFF'
+    token color.surface '#FFFFFF'
+    token color.on-surface '#000000'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#000000'
+    token motion.duration.short 150ms
+  motion reduced
+    token motion.duration.short 0ms
+    token effect.glow 0
+    token effect.scanline 0
+    token effect.flicker 0
+immortality-amber: theme
+  extends base
+  token chat.text '#fff8e9'
+  token chat.sidebar '#151008'
+  token chat.bubble.in '#151008'
+  token chat.bubble.in.text '#fff8e9'
+  token chat.bubble.out '#ffd273'
+  token chat.bubble.out.text '#000000'
+  token chat.edge '#fff8e9'
+  token color.primary '#ffd273'
+  token color.on-primary '#000000'
+  token color.surface '#151008'
+  token color.on-surface '#fff8e9'
+  token color.on-surface-variant
+    token color.on-surface
+  token color.outline '#fff8e9'
+  token motion.duration.short 150ms
+  token color.background '#05080D'
+  token palette.surface-1 '#151008'
+  token palette.surface-2 '#1e170a'
+  token palette.text-primary '#fff8e9'
+  token palette.text-secondary '#d8c59e'
+  token palette.text-muted '#927f5d'
+  token palette.gridline '#34270f'
+  token palette.baseline '#59451e'
+  token palette.series-1 '#e4a72b'
+  token palette.threshold '#70d9cf'
+  token palette.neon '#ffd273'
+  token palette.neon-dim 'rgba(255, 190, 68, 0.32)'
+  token palette.neon-faint 'rgba(255, 190, 68, 0.1)'
+  mode dark
+    token chat.text '#fff8e9'
+    token chat.sidebar '#151008'
+    token chat.bubble.in '#151008'
+    token chat.bubble.in.text '#fff8e9'
+    token chat.bubble.out '#ffd273'
+    token chat.bubble.out.text '#000000'
+    token chat.edge '#fff8e9'
+    token color.primary '#ffd273'
+    token color.on-primary '#000000'
+    token color.surface '#151008'
+    token color.on-surface '#fff8e9'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#fff8e9'
+    token motion.duration.short 150ms
+    token color.background '#05080D'
+    token palette.surface-1 '#151008'
+    token palette.surface-2 '#1e170a'
+    token palette.text-primary '#fff8e9'
+    token palette.text-secondary '#d8c59e'
+    token palette.text-muted '#927f5d'
+    token palette.gridline '#34270f'
+    token palette.baseline '#59451e'
+    token palette.series-1 '#e4a72b'
+    token palette.threshold '#70d9cf'
+    token palette.neon '#ffd273'
+    token palette.neon-dim 'rgba(255, 190, 68, 0.32)'
+    token palette.neon-faint 'rgba(255, 190, 68, 0.1)'
+  mode high-contrast
+    token chat.text '#000000'
+    token chat.sidebar '#FFFFFF'
+    token chat.bubble.in '#FFFFFF'
+    token chat.bubble.in.text '#000000'
+    token chat.bubble.out '#000000'
+    token chat.bubble.out.text '#FFFFFF'
+    token chat.edge '#000000'
+    token color.primary '#000000'
+    token color.on-primary '#FFFFFF'
+    token color.surface '#FFFFFF'
+    token color.on-surface '#000000'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#000000'
+    token motion.duration.short 150ms
+  motion reduced
+    token motion.duration.short 0ms
+    token effect.glow 0
+    token effect.scanline 0
+    token effect.flicker 0
+immortality-monochrome: theme
+  extends base
+  token chat.text '#f3f5f6'
+  token chat.sidebar '#0d0f11'
+  token chat.bubble.in '#0d0f11'
+  token chat.bubble.in.text '#f3f5f6'
+  token chat.bubble.out '#ffffff'
+  token chat.bubble.out.text '#000000'
+  token chat.edge '#f3f5f6'
+  token color.primary '#ffffff'
+  token color.on-primary '#000000'
+  token color.surface '#0d0f11'
+  token color.on-surface '#f3f5f6'
+  token color.on-surface-variant
+    token color.on-surface
+  token color.outline '#f3f5f6'
+  token motion.duration.short 150ms
+  token color.background '#05080D'
+  token palette.surface-1 '#0d0f11'
+  token palette.surface-2 '#15181b'
+  token palette.text-primary '#f3f5f6'
+  token palette.text-secondary '#bac0c4'
+  token palette.text-muted '#737b80'
+  token palette.gridline '#252a2e'
+  token palette.baseline '#3f464b'
+  token palette.series-1 '#d8dee1'
+  token palette.threshold '#8b9499'
+  token palette.neon '#ffffff'
+  token palette.neon-dim 'rgba(255, 255, 255, 0.25)'
+  token palette.neon-faint 'rgba(255, 255, 255, 0.08)'
+  mode dark
+    token chat.text '#f3f5f6'
+    token chat.sidebar '#0d0f11'
+    token chat.bubble.in '#0d0f11'
+    token chat.bubble.in.text '#f3f5f6'
+    token chat.bubble.out '#ffffff'
+    token chat.bubble.out.text '#000000'
+    token chat.edge '#f3f5f6'
+    token color.primary '#ffffff'
+    token color.on-primary '#000000'
+    token color.surface '#0d0f11'
+    token color.on-surface '#f3f5f6'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#f3f5f6'
+    token motion.duration.short 150ms
+    token color.background '#05080D'
+    token palette.surface-1 '#0d0f11'
+    token palette.surface-2 '#15181b'
+    token palette.text-primary '#f3f5f6'
+    token palette.text-secondary '#bac0c4'
+    token palette.text-muted '#737b80'
+    token palette.gridline '#252a2e'
+    token palette.baseline '#3f464b'
+    token palette.series-1 '#d8dee1'
+    token palette.threshold '#8b9499'
+    token palette.neon '#ffffff'
+    token palette.neon-dim 'rgba(255, 255, 255, 0.25)'
+    token palette.neon-faint 'rgba(255, 255, 255, 0.08)'
+  mode high-contrast
+    token chat.text '#000000'
+    token chat.sidebar '#FFFFFF'
+    token chat.bubble.in '#FFFFFF'
+    token chat.bubble.in.text '#000000'
+    token chat.bubble.out '#000000'
+    token chat.bubble.out.text '#FFFFFF'
+    token chat.edge '#000000'
+    token color.primary '#000000'
+    token color.on-primary '#FFFFFF'
+    token color.surface '#FFFFFF'
+    token color.on-surface '#000000'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#000000'
+    token motion.duration.short 150ms
+  motion reduced
+    token motion.duration.short 0ms
+    token effect.glow 0
+    token effect.scanline 0
+    token effect.flicker 0
+immortality-tron: theme
+  extends base
+  token chat.text '#e4fbfb'
+  token chat.sidebar '#000b0b'
+  token chat.bubble.in '#000b0b'
+  token chat.bubble.in.text '#e4fbfb'
+  token chat.bubble.out '#00cfd1'
+  token chat.bubble.out.text '#000000'
+  token chat.edge '#e4fbfb'
+  token color.primary '#00cfd1'
+  token color.on-primary '#000000'
+  token color.surface '#000b0b'
+  token color.on-surface '#e4fbfb'
+  token color.on-surface-variant
+    token color.on-surface
+  token color.outline '#e4fbfb'
+  token motion.duration.short 150ms
+  token color.background '#000103'
+  token palette.surface-1 '#000b0b'
+  token palette.surface-2 '#001414'
+  token palette.text-primary '#e4fbfb'
+  token palette.text-secondary '#9ac0bf'
+  token palette.text-muted '#597c7c'
+  token palette.gridline '#012525'
+  token palette.baseline '#0c3d3d'
+  token palette.series-1 '#00b2b4'
+  token palette.threshold '#fbc600'
+  token palette.neon '#00cfd1'
+  token palette.neon-dim 'rgba(0, 207, 209, 0.34)'
+  token palette.neon-faint 'rgba(0, 207, 209, 0.11)'
+  mode dark
+    token chat.text '#e4fbfb'
+    token chat.sidebar '#000b0b'
+    token chat.bubble.in '#000b0b'
+    token chat.bubble.in.text '#e4fbfb'
+    token chat.bubble.out '#00cfd1'
+    token chat.bubble.out.text '#000000'
+    token chat.edge '#e4fbfb'
+    token color.primary '#00cfd1'
+    token color.on-primary '#000000'
+    token color.surface '#000b0b'
+    token color.on-surface '#e4fbfb'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#e4fbfb'
+    token motion.duration.short 150ms
+    token color.background '#000103'
+    token palette.surface-1 '#000b0b'
+    token palette.surface-2 '#001414'
+    token palette.text-primary '#e4fbfb'
+    token palette.text-secondary '#9ac0bf'
+    token palette.text-muted '#597c7c'
+    token palette.gridline '#012525'
+    token palette.baseline '#0c3d3d'
+    token palette.series-1 '#00b2b4'
+    token palette.threshold '#fbc600'
+    token palette.neon '#00cfd1'
+    token palette.neon-dim 'rgba(0, 207, 209, 0.34)'
+    token palette.neon-faint 'rgba(0, 207, 209, 0.11)'
+  mode high-contrast
+    token chat.text '#000000'
+    token chat.sidebar '#FFFFFF'
+    token chat.bubble.in '#FFFFFF'
+    token chat.bubble.in.text '#000000'
+    token chat.bubble.out '#000000'
+    token chat.bubble.out.text '#FFFFFF'
+    token chat.edge '#000000'
+    token color.primary '#000000'
+    token color.on-primary '#FFFFFF'
+    token color.surface '#FFFFFF'
+    token color.on-surface '#000000'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#000000'
+    token motion.duration.short 150ms
+  motion reduced
+    token motion.duration.short 0ms
+    token effect.glow 0
+    token effect.scanline 0
+    token effect.flicker 0
+immortality-ares: theme
+  extends base
+  token chat.text '#fbeceb'
+  token chat.sidebar '#110303'
+  token chat.bubble.in '#110303'
+  token chat.bubble.in.text '#fbeceb'
+  token chat.bubble.out '#ff2f45'
+  token chat.bubble.out.text '#000000'
+  token chat.edge '#fbeceb'
+  token color.primary '#ff2f45'
+  token color.on-primary '#000000'
+  token color.surface '#110303'
+  token color.on-surface '#fbeceb'
+  token color.on-surface-variant
+    token color.on-surface
+  token color.outline '#fbeceb'
+  token motion.duration.short 150ms
+  token color.background '#000103'
+  token palette.surface-1 '#110303'
+  token palette.surface-2 '#1c0908'
+  token palette.text-primary '#fbeceb'
+  token palette.text-secondary '#d0aeab'
+  token palette.text-muted '#8b6c69'
+  token palette.gridline '#301715'
+  token palette.baseline '#4c2b28'
+  token palette.series-1 '#ff4b4f'
+  token palette.threshold '#00cfd1'
+  token palette.neon '#ff2f45'
+  token palette.neon-dim 'rgba(242, 0, 36, 0.4)'
+  token palette.neon-faint 'rgba(242, 0, 36, 0.13)'
+  mode dark
+    token chat.text '#fbeceb'
+    token chat.sidebar '#110303'
+    token chat.bubble.in '#110303'
+    token chat.bubble.in.text '#fbeceb'
+    token chat.bubble.out '#ff2f45'
+    token chat.bubble.out.text '#000000'
+    token chat.edge '#fbeceb'
+    token color.primary '#ff2f45'
+    token color.on-primary '#000000'
+    token color.surface '#110303'
+    token color.on-surface '#fbeceb'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#fbeceb'
+    token motion.duration.short 150ms
+    token color.background '#000103'
+    token palette.surface-1 '#110303'
+    token palette.surface-2 '#1c0908'
+    token palette.text-primary '#fbeceb'
+    token palette.text-secondary '#d0aeab'
+    token palette.text-muted '#8b6c69'
+    token palette.gridline '#301715'
+    token palette.baseline '#4c2b28'
+    token palette.series-1 '#ff4b4f'
+    token palette.threshold '#00cfd1'
+    token palette.neon '#ff2f45'
+    token palette.neon-dim 'rgba(242, 0, 36, 0.4)'
+    token palette.neon-faint 'rgba(242, 0, 36, 0.13)'
+  mode high-contrast
+    token chat.text '#000000'
+    token chat.sidebar '#FFFFFF'
+    token chat.bubble.in '#FFFFFF'
+    token chat.bubble.in.text '#000000'
+    token chat.bubble.out '#000000'
+    token chat.bubble.out.text '#FFFFFF'
+    token chat.edge '#000000'
+    token color.primary '#000000'
+    token color.on-primary '#FFFFFF'
+    token color.surface '#FFFFFF'
+    token color.on-surface '#000000'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#000000'
+    token motion.duration.short 150ms
+  motion reduced
+    token motion.duration.short 0ms
+    token effect.glow 0
+    token effect.scanline 0
+    token effect.flicker 0
+immortality-clu: theme
+  extends base
+  token chat.text '#fdf0e6'
+  token chat.sidebar '#100400'
+  token chat.bubble.in '#100400'
+  token chat.bubble.in.text '#fdf0e6'
+  token chat.bubble.out '#ff8300'
+  token chat.bubble.out.text '#000000'
+  token chat.edge '#fdf0e6'
+  token color.primary '#ff8300'
+  token color.on-primary '#000000'
+  token color.surface '#100400'
+  token color.on-surface '#fdf0e6'
+  token color.on-surface-variant
+    token color.on-surface
+  token color.outline '#fdf0e6'
+  token motion.duration.short 150ms
+  token color.background '#000103'
+  token palette.surface-1 '#100400'
+  token palette.surface-2 '#1b0b02'
+  token palette.text-primary '#fdf0e6'
+  token palette.text-secondary '#ccb1a0'
+  token palette.text-muted '#886f5e'
+  token palette.gridline '#2e1a0c'
+  token palette.baseline '#492e1b'
+  token palette.series-1 '#e56f00'
+  token palette.threshold '#00cfd1'
+  token palette.neon '#ff8300'
+  token palette.neon-dim 'rgba(255, 131, 0, 0.36)'
+  token palette.neon-faint 'rgba(255, 131, 0, 0.11)'
+  mode dark
+    token chat.text '#fdf0e6'
+    token chat.sidebar '#100400'
+    token chat.bubble.in '#100400'
+    token chat.bubble.in.text '#fdf0e6'
+    token chat.bubble.out '#ff8300'
+    token chat.bubble.out.text '#000000'
+    token chat.edge '#fdf0e6'
+    token color.primary '#ff8300'
+    token color.on-primary '#000000'
+    token color.surface '#100400'
+    token color.on-surface '#fdf0e6'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#fdf0e6'
+    token motion.duration.short 150ms
+    token color.background '#000103'
+    token palette.surface-1 '#100400'
+    token palette.surface-2 '#1b0b02'
+    token palette.text-primary '#fdf0e6'
+    token palette.text-secondary '#ccb1a0'
+    token palette.text-muted '#886f5e'
+    token palette.gridline '#2e1a0c'
+    token palette.baseline '#492e1b'
+    token palette.series-1 '#e56f00'
+    token palette.threshold '#00cfd1'
+    token palette.neon '#ff8300'
+    token palette.neon-dim 'rgba(255, 131, 0, 0.36)'
+    token palette.neon-faint 'rgba(255, 131, 0, 0.11)'
+  mode high-contrast
+    token chat.text '#000000'
+    token chat.sidebar '#FFFFFF'
+    token chat.bubble.in '#FFFFFF'
+    token chat.bubble.in.text '#000000'
+    token chat.bubble.out '#000000'
+    token chat.bubble.out.text '#FFFFFF'
+    token chat.edge '#000000'
+    token color.primary '#000000'
+    token color.on-primary '#FFFFFF'
+    token color.surface '#FFFFFF'
+    token color.on-surface '#000000'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#000000'
+    token motion.duration.short 150ms
+  motion reduced
+    token motion.duration.short 0ms
+    token effect.glow 0
+    token effect.scanline 0
+    token effect.flicker 0
+immortality-athena: theme
+  extends base
+  token chat.text '#fdf7e2'
+  token chat.sidebar '#0c0700'
+  token chat.bubble.in '#0c0700'
+  token chat.bubble.in.text '#fdf7e2'
+  token chat.bubble.out '#fbc600'
+  token chat.bubble.out.text '#000000'
+  token chat.edge '#fdf7e2'
+  token color.primary '#fbc600'
+  token color.on-primary '#000000'
+  token color.surface '#0c0700'
+  token color.on-surface '#fdf7e2'
+  token color.on-surface-variant
+    token color.on-surface
+  token color.outline '#fdf7e2'
+  token motion.duration.short 150ms
+  token color.background '#000103'
+  token palette.surface-1 '#0c0700'
+  token palette.surface-2 '#150e00'
+  token palette.text-primary '#fdf7e2'
+  token palette.text-secondary '#c1b79b'
+  token palette.text-muted '#7e745a'
+  token palette.gridline '#271e06'
+  token palette.baseline '#3f3414'
+  token palette.series-1 '#dcae00'
+  token palette.threshold '#59aaf8'
+  token palette.neon '#fbc600'
+  token palette.neon-dim 'rgba(251, 198, 0, 0.34)'
+  token palette.neon-faint 'rgba(251, 198, 0, 0.1)'
+  mode dark
+    token chat.text '#fdf7e2'
+    token chat.sidebar '#0c0700'
+    token chat.bubble.in '#0c0700'
+    token chat.bubble.in.text '#fdf7e2'
+    token chat.bubble.out '#fbc600'
+    token chat.bubble.out.text '#000000'
+    token chat.edge '#fdf7e2'
+    token color.primary '#fbc600'
+    token color.on-primary '#000000'
+    token color.surface '#0c0700'
+    token color.on-surface '#fdf7e2'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#fdf7e2'
+    token motion.duration.short 150ms
+    token color.background '#000103'
+    token palette.surface-1 '#0c0700'
+    token palette.surface-2 '#150e00'
+    token palette.text-primary '#fdf7e2'
+    token palette.text-secondary '#c1b79b'
+    token palette.text-muted '#7e745a'
+    token palette.gridline '#271e06'
+    token palette.baseline '#3f3414'
+    token palette.series-1 '#dcae00'
+    token palette.threshold '#59aaf8'
+    token palette.neon '#fbc600'
+    token palette.neon-dim 'rgba(251, 198, 0, 0.34)'
+    token palette.neon-faint 'rgba(251, 198, 0, 0.1)'
+  mode high-contrast
+    token chat.text '#000000'
+    token chat.sidebar '#FFFFFF'
+    token chat.bubble.in '#FFFFFF'
+    token chat.bubble.in.text '#000000'
+    token chat.bubble.out '#000000'
+    token chat.bubble.out.text '#FFFFFF'
+    token chat.edge '#000000'
+    token color.primary '#000000'
+    token color.on-primary '#FFFFFF'
+    token color.surface '#FFFFFF'
+    token color.on-surface '#000000'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#000000'
+    token motion.duration.short 150ms
+  motion reduced
+    token motion.duration.short 0ms
+    token effect.glow 0
+    token effect.scanline 0
+    token effect.flicker 0
+immortality-aphrodite: theme
+  extends base
+  token chat.text '#fdeef8'
+  token chat.sidebar '#0f040b'
+  token chat.bubble.in '#0f040b'
+  token chat.bubble.in.text '#fdeef8'
+  token chat.bubble.out '#f259c8'
+  token chat.bubble.out.text '#000000'
+  token chat.edge '#fdeef8'
+  token color.primary '#f259c8'
+  token color.on-primary '#000000'
+  token color.surface '#0f040b'
+  token color.on-surface '#fdeef8'
+  token color.on-surface-variant
+    token color.on-surface
+  token color.outline '#fdeef8'
+  token motion.duration.short 150ms
+  token color.background '#000103'
+  token palette.surface-1 '#0f040b'
+  token palette.surface-2 '#190914'
+  token palette.text-primary '#fdeef8'
+  token palette.text-secondary '#caaebf'
+  token palette.text-muted '#856c7c'
+  token palette.gridline '#2c1725'
+  token palette.baseline '#472b3d'
+  token palette.series-1 '#e05cbc'
+  token palette.threshold '#56eeee'
+  token palette.neon '#f259c8'
+  token palette.neon-dim 'rgba(242, 89, 200, 0.36)'
+  token palette.neon-faint 'rgba(242, 89, 200, 0.11)'
+  mode dark
+    token chat.text '#fdeef8'
+    token chat.sidebar '#0f040b'
+    token chat.bubble.in '#0f040b'
+    token chat.bubble.in.text '#fdeef8'
+    token chat.bubble.out '#f259c8'
+    token chat.bubble.out.text '#000000'
+    token chat.edge '#fdeef8'
+    token color.primary '#f259c8'
+    token color.on-primary '#000000'
+    token color.surface '#0f040b'
+    token color.on-surface '#fdeef8'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#fdeef8'
+    token motion.duration.short 150ms
+    token color.background '#000103'
+    token palette.surface-1 '#0f040b'
+    token palette.surface-2 '#190914'
+    token palette.text-primary '#fdeef8'
+    token palette.text-secondary '#caaebf'
+    token palette.text-muted '#856c7c'
+    token palette.gridline '#2c1725'
+    token palette.baseline '#472b3d'
+    token palette.series-1 '#e05cbc'
+    token palette.threshold '#56eeee'
+    token palette.neon '#f259c8'
+    token palette.neon-dim 'rgba(242, 89, 200, 0.36)'
+    token palette.neon-faint 'rgba(242, 89, 200, 0.11)'
+  mode high-contrast
+    token chat.text '#000000'
+    token chat.sidebar '#FFFFFF'
+    token chat.bubble.in '#FFFFFF'
+    token chat.bubble.in.text '#000000'
+    token chat.bubble.out '#000000'
+    token chat.bubble.out.text '#FFFFFF'
+    token chat.edge '#000000'
+    token color.primary '#000000'
+    token color.on-primary '#FFFFFF'
+    token color.surface '#FFFFFF'
+    token color.on-surface '#000000'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#000000'
+    token motion.duration.short 150ms
+  motion reduced
+    token motion.duration.short 0ms
+    token effect.glow 0
+    token effect.scanline 0
+    token effect.flicker 0
+immortality-poseidon: theme
+  extends base
+  token chat.text '#e9f3fd'
+  token chat.sidebar '#010813'
+  token chat.bubble.in '#010813'
+  token chat.bubble.in.text '#e9f3fd'
+  token chat.bubble.out '#59aaf8'
+  token chat.bubble.out.text '#000000'
+  token chat.edge '#e9f3fd'
+  token color.primary '#59aaf8'
+  token color.on-primary '#000000'
+  token color.surface '#010813'
+  token color.on-surface '#e9f3fd'
+  token color.on-surface-variant
+    token color.on-surface
+  token color.outline '#e9f3fd'
+  token motion.duration.short 150ms
+  token color.background '#000103'
+  token palette.surface-1 '#010813'
+  token palette.surface-2 '#04101e'
+  token palette.text-primary '#e9f3fd'
+  token palette.text-secondary '#a5bad1'
+  token palette.text-muted '#63778c'
+  token palette.gridline '#102031'
+  token palette.baseline '#21374e'
+  token palette.series-1 '#2f8fea'
+  token palette.threshold '#fbc600'
+  token palette.neon '#59aaf8'
+  token palette.neon-dim 'rgba(0, 129, 241, 0.42)'
+  token palette.neon-faint 'rgba(0, 129, 241, 0.14)'
+  mode dark
+    token chat.text '#e9f3fd'
+    token chat.sidebar '#010813'
+    token chat.bubble.in '#010813'
+    token chat.bubble.in.text '#e9f3fd'
+    token chat.bubble.out '#59aaf8'
+    token chat.bubble.out.text '#000000'
+    token chat.edge '#e9f3fd'
+    token color.primary '#59aaf8'
+    token color.on-primary '#000000'
+    token color.surface '#010813'
+    token color.on-surface '#e9f3fd'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#e9f3fd'
+    token motion.duration.short 150ms
+    token color.background '#000103'
+    token palette.surface-1 '#010813'
+    token palette.surface-2 '#04101e'
+    token palette.text-primary '#e9f3fd'
+    token palette.text-secondary '#a5bad1'
+    token palette.text-muted '#63778c'
+    token palette.gridline '#102031'
+    token palette.baseline '#21374e'
+    token palette.series-1 '#2f8fea'
+    token palette.threshold '#fbc600'
+    token palette.neon '#59aaf8'
+    token palette.neon-dim 'rgba(0, 129, 241, 0.42)'
+    token palette.neon-faint 'rgba(0, 129, 241, 0.14)'
+  mode high-contrast
+    token chat.text '#000000'
+    token chat.sidebar '#FFFFFF'
+    token chat.bubble.in '#FFFFFF'
+    token chat.bubble.in.text '#000000'
+    token chat.bubble.out '#000000'
+    token chat.bubble.out.text '#FFFFFF'
+    token chat.edge '#000000'
+    token color.primary '#000000'
+    token color.on-primary '#FFFFFF'
+    token color.surface '#FFFFFF'
+    token color.on-surface '#000000'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#000000'
+    token motion.duration.short 150ms
+  motion reduced
+    token motion.duration.short 0ms
+    token effect.glow 0
+    token effect.scanline 0
+    token effect.flicker 0
+immortality-soulextract: theme
+  extends base
+  token chat.text '#e8fdff'
+  token chat.sidebar '#02161a'
+  token chat.bubble.in '#02161a'
+  token chat.bubble.in.text '#e8fdff'
+  token chat.bubble.out '#27e1fa'
+  token chat.bubble.out.text '#000000'
+  token chat.edge '#e8fdff'
+  token color.primary '#27e1fa'
+  token color.on-primary '#000000'
+  token color.surface '#02161a'
+  token color.on-surface '#e8fdff'
+  token color.on-surface-variant
+    token color.on-surface
+  token color.outline '#e8fdff'
+  token motion.duration.short 150ms
+  token color.background '#000000'
+  token palette.page '#000000'
+  token palette.surface-1 '#02161a'
+  token palette.surface-2 '#062328'
+  token palette.text-primary '#e8fdff'
+  token palette.text-secondary '#a6d9de'
+  token palette.text-muted '#5d8c91'
+  token palette.gridline '#06343a'
+  token palette.baseline '#0b4a50'
+  token palette.series-1 '#19a0b3'
+  token palette.threshold '#fae127'
+  token palette.neon '#27e1fa'
+  token palette.neon-dim 'rgba(39, 225, 250, 0.34)'
+  token palette.neon-faint 'rgba(39, 225, 250, 0.1)'
+  mode dark
+    token chat.text '#e8fdff'
+    token chat.sidebar '#02161a'
+    token chat.bubble.in '#02161a'
+    token chat.bubble.in.text '#e8fdff'
+    token chat.bubble.out '#27e1fa'
+    token chat.bubble.out.text '#000000'
+    token chat.edge '#e8fdff'
+    token color.primary '#27e1fa'
+    token color.on-primary '#000000'
+    token color.surface '#02161a'
+    token color.on-surface '#e8fdff'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#e8fdff'
+    token motion.duration.short 150ms
+    token color.background '#000000'
+    token palette.page '#000000'
+    token palette.surface-1 '#02161a'
+    token palette.surface-2 '#062328'
+    token palette.text-primary '#e8fdff'
+    token palette.text-secondary '#a6d9de'
+    token palette.text-muted '#5d8c91'
+    token palette.gridline '#06343a'
+    token palette.baseline '#0b4a50'
+    token palette.series-1 '#19a0b3'
+    token palette.threshold '#fae127'
+    token palette.neon '#27e1fa'
+    token palette.neon-dim 'rgba(39, 225, 250, 0.34)'
+    token palette.neon-faint 'rgba(39, 225, 250, 0.1)'
+  mode high-contrast
+    token chat.text '#000000'
+    token chat.sidebar '#FFFFFF'
+    token chat.bubble.in '#FFFFFF'
+    token chat.bubble.in.text '#000000'
+    token chat.bubble.out '#000000'
+    token chat.bubble.out.text '#FFFFFF'
+    token chat.edge '#000000'
+    token color.primary '#000000'
+    token color.on-primary '#FFFFFF'
+    token color.surface '#FFFFFF'
+    token color.on-surface '#000000'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#000000'
+    token motion.duration.short 150ms
+  motion reduced
+    token motion.duration.short 0ms
+    token effect.glow 0
+    token effect.scanline 0
+    token effect.flicker 0
+immortality-matrix: theme
+  extends base
+  token chat.text '#e6ffe9'
+  token chat.sidebar '#020c04'
+  token chat.bubble.in '#020c04'
+  token chat.bubble.in.text '#e6ffe9'
+  token chat.bubble.out '#3dff7a'
+  token chat.bubble.out.text '#000000'
+  token chat.edge '#e6ffe9'
+  token color.primary '#3dff7a'
+  token color.on-primary '#000000'
+  token color.surface '#020c04'
+  token color.on-surface '#e6ffe9'
+  token color.on-surface-variant
+    token color.on-surface
+  token color.outline '#e6ffe9'
+  token motion.duration.short 150ms
+  token color.background '#000400'
+  token palette.page '#000400'
+  token palette.surface-1 '#020c04'
+  token palette.surface-2 '#041507'
+  token palette.text-primary '#e6ffe9'
+  token palette.text-secondary '#9fc7a6'
+  token palette.text-muted '#5d7f63'
+  token palette.gridline '#0b2611'
+  token palette.baseline '#164020'
+  token palette.series-1 '#1fbf55'
+  token palette.threshold '#e8f75a'
+  token palette.neon '#3dff7a'
+  token palette.neon-dim 'rgba(61, 255, 122, 0.3)'
+  token palette.neon-faint 'rgba(61, 255, 122, 0.09)'
+  mode dark
+    token chat.text '#e6ffe9'
+    token chat.sidebar '#020c04'
+    token chat.bubble.in '#020c04'
+    token chat.bubble.in.text '#e6ffe9'
+    token chat.bubble.out '#3dff7a'
+    token chat.bubble.out.text '#000000'
+    token chat.edge '#e6ffe9'
+    token color.primary '#3dff7a'
+    token color.on-primary '#000000'
+    token color.surface '#020c04'
+    token color.on-surface '#e6ffe9'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#e6ffe9'
+    token motion.duration.short 150ms
+    token color.background '#000400'
+    token palette.page '#000400'
+    token palette.surface-1 '#020c04'
+    token palette.surface-2 '#041507'
+    token palette.text-primary '#e6ffe9'
+    token palette.text-secondary '#9fc7a6'
+    token palette.text-muted '#5d7f63'
+    token palette.gridline '#0b2611'
+    token palette.baseline '#164020'
+    token palette.series-1 '#1fbf55'
+    token palette.threshold '#e8f75a'
+    token palette.neon '#3dff7a'
+    token palette.neon-dim 'rgba(61, 255, 122, 0.3)'
+    token palette.neon-faint 'rgba(61, 255, 122, 0.09)'
+  mode high-contrast
+    token chat.text '#000000'
+    token chat.sidebar '#FFFFFF'
+    token chat.bubble.in '#FFFFFF'
+    token chat.bubble.in.text '#000000'
+    token chat.bubble.out '#000000'
+    token chat.bubble.out.text '#FFFFFF'
+    token chat.edge '#000000'
+    token color.primary '#000000'
+    token color.on-primary '#FFFFFF'
+    token color.surface '#FFFFFF'
+    token color.on-surface '#000000'
+    token color.on-surface-variant
+      token color.on-surface
+    token color.outline '#000000'
+    token motion.duration.short 150ms
+  motion reduced
+    token motion.duration.short 0ms
+    token effect.glow 0
+    token effect.scanline 0
+    token effect.flicker 0

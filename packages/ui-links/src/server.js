@@ -53,6 +53,8 @@ import { runQuery, transact } from './query.js';
 const OPERATIONS = new Set([
   'count',
   'each',
+  'load',
+  'name-links',
   'create',
   'update',
   'delete',
@@ -210,13 +212,34 @@ function createReader(view, names) {
 
 /** The operations of the protocol for one session. */
 function createOperations(server, state, { view, reader, write }) {
-  const { names, policy, authenticate } = server;
+  const { policy, authenticate } = server;
+  const names = server.names.withLinks?.(view) ?? server.names;
   const { address, visibleLink, restrictionOf, select } = reader;
   return {
     count: (arg) => [
       named('count', [String(select(restrictionOf(arg)).length)]),
     ],
     each: (arg) => select(restrictionOf(arg)).map(linkLine),
+    load(arg) {
+      const selected = select(restrictionOf(arg));
+      return [
+        named('links', [group(selected.map(linkLine))]),
+        named('names', [
+          group(
+            (
+              names.dependencies?.(
+                selected.flatMap((link) => [link.id, link.from_id, link.to_id])
+              ) ?? []
+            ).map(linkLine)
+          ),
+        ]),
+      ];
+    },
+    'name-links'(arg) {
+      return (names.dependencies?.(argsOf(arg).map(address)) ?? []).map(
+        linkLine
+      );
+    },
     create(arg) {
       const [s, t] = one(argsOf(arg), 2, '(create: (source target))').map(
         address
@@ -250,7 +273,9 @@ function createOperations(server, state, { view, reader, write }) {
       if (policy && !policy.canWrite(state.subject, link)) {
         throw new LinksError('forbidden', `Forbidden: set-name ${id}`);
       }
-      names.setName(id, name);
+      write((store, recorded, named, transactionNames) =>
+        transactionNames.setName(id, name)
+      );
       return [named('link', [String(id)])];
     },
     'get-by-name'(arg) {
@@ -267,7 +292,9 @@ function createOperations(server, state, { view, reader, write }) {
         if (policy && !policy.canWrite(state.subject, link)) {
           throw new LinksError('forbidden', `Forbidden: remove-name ${i}`);
         }
-        names.removeName(i);
+        write((store, recorded, named, transactionNames) =>
+          transactionNames.removeName(i)
+        );
       }
       return [];
     },
@@ -286,9 +313,24 @@ function createOperations(server, state, { view, reader, write }) {
         parts.length === 2 ? [parts[0]] : parts;
       const n = state.next++;
       state.subscriptions.set(n, {
+        names: new Map(),
+        bindings: new Set(),
         query: normalizeQuery([id, from, to]),
         either: parts.length === 2 ? parts[1] : null,
       });
+      const subscription = state.subscriptions.get(n);
+      for (const link of names.dependencies?.(
+        select(parts).flatMap((link) => [link.id, link.from_id, link.to_id])
+      ) ?? []) {
+        subscription.names.set(link.id, link);
+      }
+      subscription.bindings = new Set(
+        (
+          names.bindings?.(
+            select(parts).flatMap((link) => [link.id, link.from_id, link.to_id])
+          ) ?? []
+        ).map((link) => link.id)
+      );
       return [named('subscription', [String(n)])];
     },
     unsubscribe(arg) {
@@ -299,12 +341,49 @@ function createOperations(server, state, { view, reader, write }) {
   };
 }
 
+/** Diff a subscription's name marks while retaining shared text nodes. */
+function includeNames(names, subscription, selected, seen) {
+  const current = new Map(
+    names
+      .dependencies(
+        selected.flatMap((link) => [link.id, link.from_id, link.to_id])
+      )
+      .map((link) => [link.id, link])
+  );
+  const delta = new Map(
+    seen.map((change) => [(change.after ?? change.before).id, change])
+  );
+  for (const [id, before] of subscription.names) {
+    if (!current.has(id) && subscription.bindings.has(id)) {
+      delta.set(id, { before, after: null });
+    }
+  }
+  for (const [id, after] of current) {
+    const before = subscription.names.get(id) ?? null;
+    if (
+      !before ||
+      before.from_id !== after.from_id ||
+      before.to_id !== after.to_id
+    ) {
+      delta.set(id, { before, after });
+    }
+  }
+  subscription.bindings = new Set(
+    names
+      .bindings(selected.flatMap((link) => [link.id, link.from_id, link.to_id]))
+      .map((link) => link.id)
+  );
+  subscription.names = current;
+  seen.splice(0, seen.length, ...delta.values());
+}
+
 function openSession(server, { subject = null, onPush = null } = {}) {
-  const { links, names, policy, autoCreate, sessions } = server;
+  const { links, policy, autoCreate, sessions } = server;
   const state = { subject, subscriptions: new Map(), next: 1 };
   const view = policy
     ? withPermissions(links, policy, () => state.subject)
     : links;
+  const names = server.names.withLinks?.(view) ?? server.names;
   const context = { links: view, base: links, names, autoCreate };
   const readable = (link) => !policy || policy.canRead(state.subject, link);
   const nameRef = (id) => names.getName(id) ?? String(id);
@@ -399,6 +478,12 @@ function openSession(server, { subject = null, onPush = null } = {}) {
             after: fits(subscription, after) ? after : null,
           }))
           .filter(({ before, after }) => before !== null || after !== null);
+        if (names.dependencies) {
+          const selected = allLinks(view).filter((link) =>
+            fits(subscription, link)
+          );
+          includeNames(names, subscription, selected, seen);
+        }
         if (seen.length > 0) {
           onPush([
             named('notify', [String(n)]),
