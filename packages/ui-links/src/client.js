@@ -18,7 +18,12 @@
  * type system and the decorators work on it as on any storage.
  */
 
-import { MAX_ADDRESS } from './constants.js';
+import {
+  emptyClientState,
+  readClientState,
+  writeClientState,
+} from './client-state.js';
+import { persistLinks } from './persist.js';
 import { deleteCascade } from './decorators.js';
 import {
   allLinks,
@@ -185,9 +190,9 @@ async function addressesOf(request, document) {
  * The writes into the cache that do not go to the server: links the server
  * sent, real addresses for temporary ones, refused writes undone.
  */
-function createCacheWriter(cache, emit) {
+function createCacheWriter(cache, emit, remaps) {
   /** Temporary address → real address. */
-  const real = new Map();
+  const real = new Map(remaps);
   const resolve = (id) => real.get(id) ?? id;
 
   const put = (link, origin) => {
@@ -216,6 +221,7 @@ function createCacheWriter(cache, emit) {
     real,
     resolve,
     put,
+    remove,
     /** Apply the changes the server reports. */
     applyRemote(changes) {
       for (const { before, after } of changes) {
@@ -275,8 +281,16 @@ function createCacheWriter(cache, emit) {
  * @param {() => void} io.disconnect  called when the transport fails
  * @param {(error: Error, write: object | null) => void} io.report
  */
-function createOutbox({ writer, request, connected, disconnect, report }) {
-  const queue = [];
+function createOutbox({
+  writer,
+  request,
+  connected,
+  disconnect,
+  report,
+  queue,
+  checkpoint,
+  durable,
+}) {
   let flushing = null;
   const { resolve } = writer;
 
@@ -284,12 +298,17 @@ function createOutbox({ writer, request, connected, disconnect, report }) {
     const s = String(resolve(entry.source));
     const t = String(resolve(entry.target));
     const self = entry.source === entry.id || entry.target === entry.id;
-    const [created] = changesFromLino(
-      await request(self ? op('create', '0', '0') : op('create', s, t))
-    );
-    writer.remap(entry.id, created.after.id);
+    let real = resolve(entry.id);
+    if (real === entry.id) {
+      const [created] = changesFromLino(
+        await request(self ? op('create', '0', '0') : op('create', s, t))
+      );
+      real = created.after.id;
+      writer.remap(entry.id, real);
+      await durable();
+    }
     if (self) {
-      const id = String(created.after.id);
+      const id = String(real);
       const swap = (part, text) => (part === entry.id ? id : text);
       await request(
         op('update', id, swap(entry.source, s), swap(entry.target, t))
@@ -313,6 +332,7 @@ function createOutbox({ writer, request, connected, disconnect, report }) {
 
   /** Send one write; `false` when the transport failed. */
   const sendFirst = async () => {
+    await durable();
     const entry = queue[0];
     entry.sent = true;
     try {
@@ -329,6 +349,8 @@ function createOutbox({ writer, request, connected, disconnect, report }) {
       report(error, entry);
     }
     queue.shift();
+    checkpoint();
+    await durable();
     return true;
   };
 
@@ -356,8 +378,12 @@ function createOutbox({ writer, request, connected, disconnect, report }) {
     /** Queue a write made in the cache. */
     push(entry) {
       queue.push({ sent: false, ...entry });
+      checkpoint();
       if (connected()) {
-        flush();
+        flush().catch((error) => {
+          disconnect();
+          report(error, null);
+        });
       }
     },
     /** A create not sent yet that an update of `id` can join. */
@@ -382,6 +408,199 @@ const listenerSet = (set) => (listener) => {
   return () => set.delete(listener);
 };
 
+/** Optimistic writes keep their inverse changes with the durable outbox. */
+function createOptimisticStorage(
+  cache,
+  { allocate, changed, emit, outbox, isTemporary, checkpoint }
+) {
+  return decorate(cache, {
+    create() {
+      changed();
+      const id = allocate();
+      cache.createAt(id);
+      const after = getLink(cache, id);
+      emit(null, after, 'local');
+      const changes = [{ before: null, after }];
+      outbox.push({ kind: 'create', id, source: 0, target: 0, changes });
+      return id;
+    },
+    update(id, source, target) {
+      changed();
+      const before = getLink(cache, id);
+      if (before === null) {
+        throw notFound(id);
+      }
+      cache.update(id, source, target);
+      const after = getLink(cache, id);
+      emit(before, after, 'local');
+      const create = outbox.joinable(id, [source, target], isTemporary);
+      if (create) {
+        Object.assign(create, { source, target });
+        create.changes.push({ before, after });
+        checkpoint();
+      } else {
+        const changes = [{ before, after }];
+        outbox.push({ kind: 'update', id, source, target, changes });
+      }
+      return id;
+    },
+    delete(id) {
+      changed();
+      const removed = deleteCascade(cache, id);
+      for (const link of removed) {
+        emit(link, null, 'local');
+      }
+      const changes = removed.map((before) => ({ before, after: null }));
+      outbox.push({ kind: 'delete', id, source: 0, target: 0, changes });
+      return id;
+    },
+  });
+}
+
+/** Replay before reading a snapshot; retry if local writes raced with it. */
+async function refreshClient({
+  outbox,
+  request,
+  writer,
+  cache,
+  subscriptions,
+  remoteSubscriptions,
+  checkpoint,
+  durable,
+  isCurrent,
+  getVersion,
+  buffer,
+}) {
+  await outbox.flush();
+  if (!isCurrent()) {
+    return;
+  }
+  remoteSubscriptions.clear();
+  for (const [id, restriction] of subscriptions) {
+    const [reply] = await request(
+      op('subscribe', restrictionLino(restriction))
+    );
+    remoteSubscriptions.set(id, numberOf(reply.values[0]));
+  }
+  // No server change log: a fresh readable snapshot also removes
+  // deleted links and links the subject may no longer read.
+  let reply;
+  while (isCurrent()) {
+    await outbox.flush();
+    if (!isCurrent()) {
+      return;
+    }
+    const version = getVersion();
+    buffer.value = [];
+    reply = await request(op('each', restrictionLino([])));
+    if (!isCurrent()) {
+      return;
+    }
+    if (version === getVersion() && outbox.size === 0) {
+      break;
+    }
+  }
+  if (!isCurrent()) {
+    return;
+  }
+  const links = reply.map((v) => linkFromLino(v));
+  const ids = new Set(links.map((l) => l.id));
+  for (const link of allLinks(cache)) {
+    if (!ids.has(link.id)) {
+      writer.remove(link.id, 'remote');
+    }
+  }
+  links.forEach((link) => writer.put(link, 'remote'));
+  writer.applyRemote(buffer.value);
+  buffer.value = null;
+  checkpoint();
+  await durable();
+}
+
+/** Reads, subscriptions and substitution queries use the active connection. */
+function createRemoteMethods({
+  request,
+  outbox,
+  writer,
+  checkpoint,
+  durable,
+  subscriptions,
+  remoteSubscriptions,
+  allocateSubscription,
+  ready,
+  connected,
+}) {
+  const methods = {
+    /** Load the links of a restriction `[index, source, target]` into the cache. */
+    async load(restriction = []) {
+      await ready();
+      const reply = await request(op('each', restrictionLino(restriction)));
+      const links = reply.map((value) => linkFromLino(value));
+      links.forEach((link) => writer.put(link, 'remote'));
+      return links;
+    },
+    /** Load the links of a restriction and keep them up to date. */
+    async subscribe(restriction = []) {
+      await ready();
+      const [reply] = await request(
+        op('subscribe', restrictionLino(restriction))
+      );
+      const links = await methods.load(restriction);
+      const id = allocateSubscription();
+      subscriptions.set(id, [...restriction]);
+      remoteSubscriptions.set(id, numberOf(reply.values[0]));
+      checkpoint();
+      await durable();
+      return { id, links };
+    },
+    /** Stop the pushes of a subscription. */
+    async unsubscribe(id) {
+      const remote = remoteSubscriptions.get(id);
+      if (remote !== undefined && connected()) {
+        await request(op('unsubscribe', String(remote)));
+      }
+      subscriptions.delete(id);
+      remoteSubscriptions.delete(id);
+      checkpoint();
+      await durable();
+    },
+    /**
+     * Run a substitution query (LiNo text) on the server after the queued
+     * writes; its changes come into the cache and are returned.
+     */
+    async query(text) {
+      await ready();
+      await outbox.flush();
+      const document = await request(parseLino(text));
+      const addresses = await addressesOf(request, document);
+      const changes = changesFromLino(
+        document,
+        (value) => addresses.get(value) ?? numberOf(value)
+      );
+      writer.applyRemote(changes);
+      return changes;
+    },
+  };
+  return methods;
+}
+
+/** Buffer pushes while a reconnect snapshot is being read. */
+function listenForPush(next, writer, buffer) {
+  return (
+    next.onPush?.((text) => {
+      const [notify, ...changes] = parseLino(text);
+      if (typeof notify !== 'string' && notify.id === 'notify') {
+        const parsed = changesFromLino(changes);
+        if (buffer.value) {
+          buffer.value.push(...parsed);
+        } else {
+          writer.applyRemote(parsed);
+        }
+      }
+    }) ?? null
+  );
+}
+
 /**
  * A synced copy of the links of a server.
  * @param {{ transport?: Transport | null, cache?: any }} [options]
@@ -391,6 +610,9 @@ const listenerSet = (set) => (listener) => {
 export function createSyncedLinks({
   transport = null,
   cache = createMemoryLinks(),
+  state = emptyClientState(),
+  saveState = () => {},
+  durable = async () => {},
 } = {}) {
   const listeners = { change: new Set(), error: new Set(), remap: new Set() };
   const call = (kind, ...args) => {
@@ -400,8 +622,23 @@ export function createSyncedLinks({
   };
   const emit = (before, after, origin) =>
     call('change', Object.freeze({ before, after, origin }));
-  const writer = createCacheWriter(cache, emit);
-  let nextTemp = MAX_ADDRESS;
+  const writer = createCacheWriter(cache, emit, state.real);
+  let nextTemp = state.nextTemp;
+  const subscriptions = new Map(state.subscriptions);
+  const remoteSubscriptions = new Map();
+  let nextSubscription = state.nextSubscription;
+  const checkpoint = () =>
+    saveState(
+      writeClientState({
+        nextTemp,
+        real: [...writer.real],
+        queue: state.queue,
+        subscriptions: [...subscriptions],
+        nextSubscription,
+      })
+    );
+  let connecting = null;
+  let localVersion = 0;
   let current = null;
   let stopPush = null;
 
@@ -422,52 +659,33 @@ export function createSyncedLinks({
       ...writer,
       remap(temp, id) {
         writer.remap(temp, id);
+        checkpoint();
         call('remap', temp, id);
       },
     },
+    queue: state.queue,
+    checkpoint,
+    durable,
     request,
     connected: () => current !== null,
     disconnect,
     report: (error, write) => call('error', error, write),
   });
 
-  const storage = decorate(cache, {
-    create() {
-      const id = nextTemp--;
-      cache.createAt(id);
-      const after = getLink(cache, id);
-      emit(null, after, 'local');
-      const changes = [{ before: null, after }];
-      outbox.push({ kind: 'create', id, source: 0, target: 0, changes });
-      return id;
-    },
-    update(id, source, target) {
-      const before = getLink(cache, id);
-      if (before === null) {
-        throw notFound(id);
+  const storage = createOptimisticStorage(cache, {
+    allocate() {
+      while (getLink(cache, nextTemp) !== null) {
+        nextTemp--;
       }
-      cache.update(id, source, target);
-      const after = getLink(cache, id);
-      emit(before, after, 'local');
-      const create = outbox.joinable(id, [source, target], isTemporary);
-      if (create) {
-        Object.assign(create, { source, target });
-        create.changes.push({ before, after });
-      } else {
-        const changes = [{ before, after }];
-        outbox.push({ kind: 'update', id, source, target, changes });
-      }
-      return id;
+      return nextTemp--;
     },
-    delete(id) {
-      const removed = deleteCascade(cache, id);
-      for (const link of removed) {
-        emit(link, null, 'local');
-      }
-      const changes = removed.map((before) => ({ before, after: null }));
-      outbox.push({ kind: 'delete', id, source: 0, target: 0, changes });
-      return id;
+    changed: () => {
+      localVersion++;
     },
+    emit,
+    outbox,
+    isTemporary,
+    checkpoint,
   });
   delete storage.createAt;
 
@@ -477,14 +695,31 @@ export function createSyncedLinks({
     connect(next) {
       disconnect();
       current = next;
-      stopPush =
-        next.onPush?.((text) => {
-          const [notify, ...changes] = parseLino(text);
-          if (typeof notify !== 'string' && notify.id === 'notify') {
-            writer.applyRemote(changesFromLino(changes));
-          }
-        }) ?? null;
-      return outbox.flush();
+      const buffer = { value: null };
+      stopPush = listenForPush(next, writer, buffer);
+      const run = () =>
+        refreshClient({
+          outbox,
+          request,
+          writer,
+          cache,
+          subscriptions,
+          remoteSubscriptions,
+          checkpoint,
+          durable,
+          isCurrent: () => current === next,
+          getVersion: () => localVersion,
+          buffer,
+        });
+      connecting = run().catch((error) => {
+        if (current === next) {
+          disconnect();
+          connecting = null;
+        }
+        call('error', error, null);
+        throw error;
+      });
+      return connecting;
     },
     /** Stop using the transport; writes queue until `connect`. */
     disconnect,
@@ -496,45 +731,27 @@ export function createSyncedLinks({
       return outbox.size;
     },
     /** Send the queued writes; resolves when they are answered. */
-    flush: () => outbox.flush(),
+    async flush() {
+      await connecting;
+      await outbox.flush();
+      await durable();
+    },
     /** The real address of a temporary one (itself when it is not one). */
     resolve: writer.resolve,
     /** Whether `id` is a temporary address still waiting for the server. */
     isTemporary,
-    /** Load the links of a restriction `[index, source, target]` into the cache. */
-    async load(restriction = []) {
-      const reply = await request(op('each', restrictionLino(restriction)));
-      const links = reply.map((value) => linkFromLino(value));
-      links.forEach((link) => writer.put(link, 'remote'));
-      return links;
-    },
-    /** Load the links of a restriction and keep them up to date. */
-    async subscribe(restriction = []) {
-      const [reply] = await request(
-        op('subscribe', restrictionLino(restriction))
-      );
-      const links = await synced.load(restriction);
-      return { id: numberOf(reply.values[0]), links };
-    },
-    /** Stop the pushes of a subscription. */
-    async unsubscribe(id) {
-      await request(op('unsubscribe', String(id)));
-    },
-    /**
-     * Run a substitution query (LiNo text) on the server after the queued
-     * writes; its changes come into the cache and are returned.
-     */
-    async query(text) {
-      await outbox.flush();
-      const document = await request(parseLino(text));
-      const addresses = await addressesOf(request, document);
-      const changes = changesFromLino(
-        document,
-        (value) => addresses.get(value) ?? numberOf(value)
-      );
-      writer.applyRemote(changes);
-      return changes;
-    },
+    ...createRemoteMethods({
+      request,
+      outbox,
+      writer,
+      checkpoint,
+      durable,
+      subscriptions,
+      remoteSubscriptions,
+      allocateSubscription: () => nextSubscription++,
+      ready: () => connecting,
+      connected: () => current !== null,
+    }),
     /** Every change of the cache: `{ before, after, origin }`. */
     onChange: listenerSet(listeners.change),
     /** Refused writes `(error, write)` and transport failures `(error, null)`. */
@@ -543,7 +760,33 @@ export function createSyncedLinks({
     onRemap: listenerSet(listeners.remap),
   });
   if (transport) {
-    synced.connect(transport);
+    synced.connect(transport).catch(() => {});
+  }
+  return synced;
+}
+
+/** Restore the cache and LiNo outbox from one persistence adapter. */
+export async function openSyncedLinks({
+  adapter,
+  transport = null,
+  cache = createMemoryLinks(),
+}) {
+  if (!adapter.loadState || !adapter.saveState) {
+    throw new LinksError(
+      'bad-request',
+      'Sync persistence needs loadState/saveState'
+    );
+  }
+  const persisted = await persistLinks(cache, adapter);
+  const state = readClientState(await adapter.loadState());
+  const synced = createSyncedLinks({
+    cache: persisted,
+    state,
+    saveState: (text) => adapter.saveState(text),
+    durable: () => persisted.flush(),
+  });
+  if (transport) {
+    await synced.connect(transport);
   }
   return synced;
 }

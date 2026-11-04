@@ -312,6 +312,11 @@ export interface PersistenceAdapter {
   flush?(): Promise<void>;
   close?(): unknown;
 }
+/** A cache adapter with a LiNo sync checkpoint sidecar. */
+export interface SyncPersistenceAdapter extends PersistenceAdapter {
+  loadState(): string | null | undefined | Promise<string | null | undefined>;
+  saveState(text: string): unknown;
+}
 export function persistLinks<T extends LinksStorage>(
   links: T,
   adapter: PersistenceAdapter
@@ -327,7 +332,7 @@ export function localStorageAdapter(
     removeItem(key: string): void;
   },
   prefix?: string
-): PersistenceAdapter;
+): SyncPersistenceAdapter;
 /** The part of `IDBFactory` the adapter uses. */
 export interface IndexedDbFactory {
   open(name: string, version?: number): any;
@@ -335,11 +340,11 @@ export interface IndexedDbFactory {
 export function indexedDbAdapter(
   indexedDB: IndexedDbFactory,
   name: string
-): PersistenceAdapter & { flush(): Promise<void>; close(): void };
+): SyncPersistenceAdapter & { flush(): Promise<void>; close(): void };
 export function linoTextAdapter(io: {
   read: () => string | Promise<string>;
   write: (text: string) => void;
-}): PersistenceAdapter;
+}): SyncPersistenceAdapter;
 
 // Framing (`clink --serve`)
 
@@ -430,6 +435,12 @@ export function createSyncedLinks(options?: {
   transport?: Transport | null;
   cache?: LinksStorage;
 }): SyncedLinks;
+/** Restore durable offline writes before connecting; await flush before reload. */
+export function openSyncedLinks(options: {
+  adapter: SyncPersistenceAdapter;
+  transport?: Transport | null;
+  cache?: LinksStorage;
+}): Promise<SyncedLinks>;
 export function connectInProcess(
   server: LinksServer,
   options?: { subject?: number | null }

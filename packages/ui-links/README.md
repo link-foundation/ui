@@ -251,9 +251,9 @@ frame type, and pushes use the recipient's last request's frame type and binary
 codec options. Incomplete or concatenated binary packets close the socket with
 code 1002; oversized messages close it with code 1009. Socket errors and closure
 reject every waiting request and subsequent sends with `LinksError('offline')`.
-The synced client retains its in-memory outbox and can replay it with
-`client.connect(await connectWebSocket(url))`; persistent outboxes and reconnect
-resynchronisation are tracked separately in #114.
+The synced client retains its outbox and can replay it with
+`await client.connect(await connectWebSocket(url))`. Use `openSyncedLinks` below
+to keep queued writes across reloads.
 
 Run `node examples/ui-links-websocket.mjs` for the TCP example's WebSocket twin.
 The example runs in the runtime CI matrix; `tests/ui/links-websocket.e2e.mjs`
@@ -278,6 +278,54 @@ in `cache` (a memory storage by default) and has the storage interface itself:
 - `query(text)` runs a substitution query on the server after the queued
   writes; its changes come into the cache.
 - `onChange({ before, after, origin })` reports every change of the cache.
+- `await connect(transport)` replays queued writes, restores subscriptions and
+  replaces the cache with the server's current readable links, reporting
+  differences with `origin: 'remote'`. This includes removal of deleted or
+  newly unreadable links. The server has no version log, so reconnect uses
+  a full readable snapshot, including links outside previous restrictions.
+  Subscriptions continue to deliver only their matching changes. Subscription
+  IDs belong to the client and remain valid across reconnects and reloads.
+
+For a durable offline client, use the async opener with one of the persistence
+adapters. It uses `persistLinks` for the cache and stores its outbox, rollback
+records, temporary-address counter, remaps and subscription restrictions as
+nested Links Notation through the same adapter:
+
+```js
+import {
+  openSyncedLinks,
+  localStorageAdapter,
+} from '@link-foundation/ui-links';
+
+const client = await openSyncedLinks({
+  adapter: localStorageAdapter(localStorage, 'my-client:'),
+});
+const id = client.create();
+client.update(id, id, id);
+await client.flush(); // durable even offline; safe to recreate the client
+// After a reload, open with the same adapter, then:
+await client.connect(transport);
+client.resolve(id); // the server's real address, retained across reloads
+```
+
+`openSyncedLinks({ adapter, transport?, cache? })` restores before connecting;
+`cache` must be empty. `flush()` waits for replay, reconnect refresh and adapter
+writes; offline it waits only for persistence. Await it before an intentional
+reload. Custom adapters add `loadState()` (LiNo text or null, possibly a promise)
+and `saveState(text)` to the persistence interface, and include checkpoint
+writes in `flush()`. localStorage uses the reserved `prefix + 'sync'` key;
+IndexedDB upgrades to version 2 with a `sync` object store; the text adapter
+adds a nested `sync` record alongside the link records. Existing cache data
+loads without a checkpoint. Use one active client per adapter namespace.
+
+The server's answer wins: refused writes retain the existing rollback and error
+notifications, then reconnect reconciles against the readable server snapshot.
+Acknowledged creates keep their remap before a self-reference update, so that
+step can resume after reload. Delivery remains at least once: a connection lost
+after the server commits but before its acknowledgement can replay a write
+(the protocol has no request deduplication). Adapter flush is the durability
+boundary; separate cache/checkpoint records do not promise an atomic snapshot
+if the process crashes during a write.
 
 A transport is `{ send(text): Promise<text>, onPush?(listener), close?() }`:
 `connectInProcess(server, { subject? })` for a server in the same process,
@@ -298,8 +346,8 @@ conversation, replayed by the tests. The differences:
   doublets-web, reuses the last freed address first).
 - `auth`, `subscribe`, `unsubscribe` and the permission layer are extensions;
   link-cli has none of them yet.
-- A client that did not subscribe keeps what it loaded, even after other
-  clients changed it, until it loads again.
+- Between connections, a client that did not subscribe keeps what it loaded
+  until it loads again. Reconnect refreshes all readable links.
 - A link a subject created is its own (while untyped) for the session that
   created it.
 
