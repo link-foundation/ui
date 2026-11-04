@@ -43,6 +43,7 @@ export function createEditing(context) {
     selection.retain(outlineOrder(store));
     context.outline.update();
     updateProperties(shell.nodeFor('properties'), context);
+    context.timeline?.update();
     context.canvasController?.update();
     shellStore.setProp('undo', 'disabled', [String(!store.canUndo())]);
     shellStore.setProp('redo', 'disabled', [String(!store.canRedo())]);
@@ -51,6 +52,7 @@ export function createEditing(context) {
     }
   }
   function choose(id, event = {}) {
+    context.timeline?.clearSelection();
     if (event.shiftKey && id) {
       selection.range(id, outlineOrder(store));
     } else if ((event.ctrlKey || event.metaKey) && id) {
