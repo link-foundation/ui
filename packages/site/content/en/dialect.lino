@@ -1,0 +1,17 @@
+page: document
+  title 'The UI dialect'
+  page-title: heading
+    level 1
+    text 'The UI dialect'
+  page-lead: paragraph
+    text 'LiNo describes UI as nested links: an element has an ID, a kind, properties and children. Write nested, indented links with two spaces per level.'
+  section-title: heading
+    level 2
+    text 'One notation across platforms'
+  block-0: code-block
+    text ~1{6170703a20646f63756d656e740a2020626f64793a20737461636b0a202020206772656574696e673a2074657874202748656c6c6f2c206c696e6b73270a202020206f6b3a20627574746f6e0a2020202020206c6162656c204f4b}
+  block-1: paragraph
+    text 'The official links-notation parser reads every document. The core projects its links into a typed element tree.'
+  block-2: link
+    label 'Specification and conformance fixtures'
+    href 'https://github.com/link-foundation/ui/tree/main/docs/spec'

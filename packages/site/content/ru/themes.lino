@@ -1,0 +1,18 @@
+page: document
+  title 'Темы и цветовые схемы'
+  page-title: heading
+    level 1
+    text 'Темы и цветовые схемы'
+  page-lead: paragraph
+    text 'Выберите Base, Material 3, Fluent 2 или HIG (включая iOS и macOS) в шапке сайта. Светлая, тёмная и системная схемы используют движок тем. Выбор сохраняется в пользовательском слое конфигурации.'
+  section-title: heading
+    level 2
+    text 'Ваши предпочтения'
+  block-0: paragraph
+    text 'Системная схема следует prefers-color-scheme. Темы учитывают повышенную контрастность и уменьшение движения. Темы можно вкладывать друг в друга без замены элементов управления.'
+  block-1: link
+    label 'Контракт тем'
+    href 'https://github.com/link-foundation/ui/blob/main/docs/spec/themes.md'
+  block-2: link
+    label 'Material 3'
+    href 'https://github.com/link-foundation/ui/blob/main/docs/themes/material3.md'

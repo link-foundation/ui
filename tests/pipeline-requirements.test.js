@@ -69,10 +69,10 @@ describe('complete pipeline requirements', () => {
     }
   });
   it('suppresses only the known deploy-pages warning at the deployment step', () => {
-    const source = read('.github/workflows/example-app.yml');
+    const source = read('.github/workflows/site.yml');
     const step = source
       .split('uses: actions/deploy-pages@v5')[1]
-      .split('\n  desktop-package:')[0];
+      .split('\n  pipeline-status:')[0];
     expect(step).toContain('NODE_OPTIONS: --disable-warning=DEP0040');
     expect(source).not.toMatch(/--no-warnings|NODE_NO_WARNINGS/);
   });

@@ -32,3 +32,4 @@ rules:
       - links.yml
       - security.yml
       - ui-tests.yml
+      - site.yml
