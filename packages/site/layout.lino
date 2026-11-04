@@ -20,6 +20,10 @@ site: document
         label
           t nav.components
         href 'components/'
+      nav-playground: link
+        label
+          t nav.playground
+        href 'playground/'
       nav-themes: link
         label
           t nav.themes

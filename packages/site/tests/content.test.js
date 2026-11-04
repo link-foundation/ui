@@ -10,13 +10,21 @@ export const pageOptions = {
   languages: ['en', 'ru'],
 };
 
-test('all twelve LiNo pages parse, localize and share the same page set', async () => {
+test('all fourteen LiNo pages parse, localize and share the same page set', async () => {
   const pages = await loadPages(pageOptions);
-  assert.equal(pages.length, 12);
+  assert.equal(pages.length, 14);
   for (const language of pageOptions.languages) {
     assert.deepEqual(
       pages.filter((p) => p.language === language).map((p) => p.page),
-      ['about', 'components', 'dialect', 'getting-started', 'index', 'themes']
+      [
+        'about',
+        'components',
+        'dialect',
+        'getting-started',
+        'index',
+        'playground',
+        'themes',
+      ]
     );
   }
   for (const page of pages) {

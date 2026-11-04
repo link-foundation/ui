@@ -1,0 +1,3 @@
+demo: document
+  button-outlined: button Cancel
+    variant outlined

@@ -1,0 +1,5 @@
+demo: document
+  slider-steps: slider Brightness
+    value 60
+    step 10
+    value-text '{value} %'

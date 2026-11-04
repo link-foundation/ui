@@ -1,0 +1,3 @@
+demo: document
+  link-internal: link 'Read the guide'
+    href /docs/guide

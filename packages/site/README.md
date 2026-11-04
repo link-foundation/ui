@@ -54,3 +54,29 @@ npx playwright test tests/ui/site.e2e.mjs --config experiments/issue-62/playwrig
 # With the static server running, regenerate the four review images:
 SITE_CHROME_PATH=/opt/google/chrome/chrome node experiments/issue-62/screenshots.mjs
 ```
+
+The components page includes all 19 catalog controls and 49 reusable story
+examples from `content/examples/<component>/*.lino`. Each expandable example
+shows its source and a lazy static frame containing every registered theme,
+light/dark scheme and default/disabled state. Frames keep the complete gallery
+usable on machines with limited memory. Each cell opens its exact document in
+the playground. #20 exposes no forced hover/pressed API.
+
+The playground uses the framework's resizable split, an accessible textarea with
+line numbers, and an isolated preview. Updates debounce for 150 ms and keep the
+last valid preview when parsing fails. Inspect opens ui-devmode on the preview;
+property changes preserve source comments through ui-core/source. Examples and
+preview theme/scheme selectors share the same source document.
+
+Copy link uses `#lino=` or browser-native raw-deflate `#lino-z=` within an
+8,192-character URL budget. Unsupported compression or oversized documents offer
+copying the source instead. Shared text is limited to 65,536 characters and depth
+32; known kinds and HTTPS/relative URLs are required. Actions become no-op log
+calls; behavior machines and bindings are removed before rendering. No shared
+document is sent to a server.
+
+`tests/ui/playground.e2e.mjs` checks edits, invalid input, clipboard round trips,
+inspector backsync, gallery links, axe and light/dark review images. Run it with
+the same local Playwright config shown above. To regenerate the committed
+examples from the controls' stories, run
+`node experiments/issue-63/generate-examples.mjs`.

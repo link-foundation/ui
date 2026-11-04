@@ -1,0 +1,3 @@
+demo: document
+  button-tonal: button 'Save draft'
+    variant tonal

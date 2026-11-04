@@ -17,67 +17,89 @@ const vite = path.join(
   'bin/vite.js'
 );
 
-test('Vite emits all pre-rendered entries and deployable assets for /ui/', async () => {
-  const output = await mkdtemp(path.join(tmpdir(), 'ui-site-build-'));
-  const environment = process.env.NODE_ENV;
-  const button = getKind('button');
-  try {
-    // Vite changes NODE_ENV and the site registers kinds. Keep both out of
-    // Bun/Deno's shared test process so other renderer tests retain defaults.
-    await promisify(execFile)(
-      'node',
-      [
-        vite,
-        'build',
-        '--config',
-        path.join(site, 'vite.config.js'),
-        '--base',
-        '/ui/',
-        '--outDir',
-        output,
-        '--logLevel',
-        'silent',
-      ],
-      { cwd: site, env: { ...process.env, NODE_ENV: 'production' } }
-    );
-    assert.equal(process.env.NODE_ENV, environment);
-    assert.equal(getKind('button'), button);
-    for (const language of ['en', 'ru']) {
-      for (const page of [
-        '',
-        'getting-started/',
-        'dialect/',
-        'components/',
-        'themes/',
-        'about/',
-      ]) {
-        const html = await readFile(
-          path.join(output, language, page, 'index.html'),
-          'utf8'
-        );
-        const document = new JSDOM(html).window.document;
-        assert.equal(document.documentElement.lang, language);
-        assert.ok(document.querySelector('main h1')?.textContent.length > 5);
-        assert.ok(document.querySelector('main [data-link-id]'));
-        assert.ok(!document.querySelector('ui-unknown'));
-        for (const script of document.querySelectorAll('script[src]')) {
-          const src = script.getAttribute('src');
-          assert.ok(src.startsWith('/ui/assets/'), src);
-          await readFile(path.join(output, src.slice('/ui/'.length)));
+test(
+  'Vite emits all pre-rendered entries and deployable assets for /ui/',
+  { timeout: 60_000 },
+  async () => {
+    const output = await mkdtemp(path.join(tmpdir(), 'ui-site-build-'));
+    const environment = process.env.NODE_ENV;
+    const button = getKind('button');
+    try {
+      // Vite changes NODE_ENV and the site registers kinds. Keep both out of
+      // Bun/Deno's shared test process so other renderer tests retain defaults.
+      await promisify(execFile)(
+        'node',
+        [
+          vite,
+          'build',
+          '--config',
+          path.join(site, 'vite.config.js'),
+          '--base',
+          '/ui/',
+          '--outDir',
+          output,
+          '--logLevel',
+          'silent',
+        ],
+        { cwd: site, env: { ...process.env, NODE_ENV: 'production' } }
+      );
+      assert.equal(process.env.NODE_ENV, environment);
+      assert.equal(getKind('button'), button);
+      for (const language of ['en', 'ru']) {
+        for (const page of [
+          '',
+          'getting-started/',
+          'dialect/',
+          'components/',
+          'playground/',
+          'themes/',
+          'about/',
+        ]) {
+          const html = await readFile(
+            path.join(output, language, page, 'index.html'),
+            'utf8'
+          );
+          const document = new JSDOM(html).window.document;
+          assert.equal(document.documentElement.lang, language);
+          assert.ok(document.querySelector('main h1')?.textContent.length > 5);
+          assert.ok(document.querySelector('main [data-link-id]'));
+          assert.ok(!document.querySelector('ui-unknown'));
+          if (page === 'components/') {
+            assert.equal(
+              document.querySelectorAll('[data-component]').length,
+              19
+            );
+            const frame = document.querySelector('#component-gallery iframe');
+            const matrixPath = path.resolve(
+              path.dirname(path.join(output, language, page, 'index.html')),
+              frame.getAttribute('data-src')
+            );
+            const matrix = new JSDOM(await readFile(matrixPath, 'utf8')).window
+              .document;
+            assert.ok(matrix.querySelector('button'));
+            assert.ok(!matrix.querySelector('ui-unknown'));
+            matrix.defaultView.close();
+          }
+          document.defaultView.close();
+          for (const script of document.querySelectorAll('script[src]')) {
+            const src = script.getAttribute('src');
+            assert.ok(src.startsWith('/ui/assets/'), src);
+            await readFile(path.join(output, src.slice('/ui/'.length)));
+          }
         }
       }
+      const home = new JSDOM(
+        await readFile(path.join(output, 'index.html'), 'utf8')
+      ).window.document;
+      assert.deepEqual(
+        [...home.querySelectorAll('a')].map((a) => a.getAttribute('href')),
+        ['./en/', './ru/']
+      );
+    } finally {
+      await rm(output, { recursive: true, force: true });
     }
-    const home = new JSDOM(
-      await readFile(path.join(output, 'index.html'), 'utf8')
-    ).window.document;
-    assert.deepEqual(
-      [...home.querySelectorAll('a')].map((a) => a.getAttribute('href')),
-      ['./en/', './ru/']
-    );
-  } finally {
-    await rm(output, { recursive: true, force: true });
   }
-});
+);
 
 test('malformed LiNo fails with filename, line and column', async () => {
   const directory = await mkdtemp(path.join(tmpdir(), 'ui-site-parse-'));

@@ -5,15 +5,19 @@ import { fileURLToPath } from 'node:url';
 import { escapeHtml, renderToHTML, buildCss } from '@link-foundation/ui-dom';
 import { listThemes, loadTheme } from '@link-foundation/ui-themes';
 import { loadPages } from './pages.js';
+import { loadCatalog } from './src/gallery/catalog.js';
+import { renderGallery, renderMatrix } from './src/gallery/render.js';
 import { registerSiteKinds } from './src/kinds.js';
 
 const packageRoot = fileURLToPath(new globalThis.URL('.', import.meta.url));
 const THEME_MODULE = 'virtual:site-themes';
+const EXAMPLES_MODULE = 'virtual:site-examples';
 const json = (value) => JSON.stringify(value).replaceAll('<', '\\u003c');
 
 export function linoPages({ contentDir, layout, languages = ['en', 'ru'] }) {
   const generated = path.join(packageRoot, '.lino-pages');
   let themes;
+  let catalog;
   let resolved;
   async function generate() {
     registerSiteKinds();
@@ -23,6 +27,7 @@ export function linoPages({ contentDir, layout, languages = ['en', 'ru'] }) {
         listThemes().map(async (id) => [id, await loadTheme(id)])
       )
     );
+    catalog = await loadCatalog();
     const css = `${buildCss({ themeRegistry: themes })}\n${buildCss(
       {
         baseCss: false,
@@ -54,11 +59,18 @@ export function linoPages({ contentDir, layout, languages = ['en', 'ru'] }) {
     for (const page of pages) {
       const file = path.join(generated, page.route, 'index.html');
       await mkdir(path.dirname(file), { recursive: true });
+      let body = renderToHTML(page.document, { themeRegistry: themes });
+      if (page.page === 'components') {
+        body = body.replace(
+          '</main>',
+          `<div id="gallery-${page.language}"></div></main>`
+        );
+      }
       const html = `<!doctype html><html lang="${page.language}"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="data:,"><title>${escapeHtml(page.title)}</title>
 <link rel="stylesheet" href="/site.css"></head><body>
-<div id="app">${renderToHTML(page.document, { themeRegistry: themes })}</div>
+<div id="app">${body}</div>
 <script id="site-document" type="application/json">${json({ text: page.text, language: page.language, page: page.page, languages })}</script>
 <script type="module" src="/site-main.js"></script></body></html>`;
       await writeFile(file, html);
@@ -93,15 +105,34 @@ export function linoPages({ contentDir, layout, languages = ['en', 'ru'] }) {
         build: { rollupOptions: { input } },
       };
     },
+    generateBundle: {
+      order: 'post',
+      handler(_options, bundle) {
+        appendGallery(bundle, catalog, themes, languages);
+        emitMatrices(this, bundle, catalog, themes, languages);
+      },
+    },
+    transformIndexHtml(html) {
+      return galleryHtml(
+        html,
+        catalog,
+        themes,
+        languages,
+        resolved.command === 'serve'
+      );
+    },
     configResolved(config) {
       resolved = config;
     },
     resolveId(id) {
-      if (id === THEME_MODULE) {
+      if (id === THEME_MODULE || id === EXAMPLES_MODULE) {
         return `\0${id}`;
       }
     },
     load(id) {
+      if (id === `\0${EXAMPLES_MODULE}`) {
+        return `export default ${JSON.stringify(catalog)};`;
+      }
       if (id === `\0${THEME_MODULE}`) {
         const data = JSON.stringify(themes, (_key, value) =>
           value instanceof Map ? { siteMap: [...value] } : value
@@ -110,6 +141,7 @@ export function linoPages({ contentDir, layout, languages = ['en', 'ru'] }) {
       }
     },
     configureServer(server) {
+      serveMatrices(server, catalog, themes, languages);
       server.watcher.add([contentDir, layout, path.join(packageRoot, 'src')]);
       server.watcher.on('change', async (file) => {
         if (
@@ -131,4 +163,64 @@ export function linoPages({ contentDir, layout, languages = ['en', 'ru'] }) {
       });
     },
   };
+}
+
+function appendGallery(bundle, catalog, themes, languages) {
+  // Append pre-rendered examples after Vite has parsed the small page shell.
+  // Feeding thousands of static controls through its HTML AST wastes memory.
+  for (const asset of Object.values(bundle)) {
+    if (asset.type === 'asset' && asset.fileName.endsWith('.html')) {
+      for (const language of languages) {
+        const marker = `<div id="gallery-${language}"></div>`;
+        if (String(asset.source).includes(marker)) {
+          asset.source = String(asset.source).replace(
+            marker,
+            renderGallery(catalog, language)
+          );
+        }
+      }
+    }
+  }
+}
+function galleryHtml(html, catalog, themes, languages, serve) {
+  if (serve) {
+    for (const language of languages) {
+      const marker = `<div id="gallery-${language}"></div>`;
+      if (html.includes(marker)) {
+        html = html.replace(marker, renderGallery(catalog, language));
+      }
+    }
+  }
+  return html;
+}
+
+function emitMatrices(plugin, bundle, catalog, themes, languages) {
+  const stylesheet = Object.values(bundle).find((asset) =>
+    asset.fileName.endsWith('.css')
+  )?.fileName;
+  for (const language of languages) {
+    for (const example of catalog.flatMap((c) => c.examples)) {
+      plugin.emitFile({
+        type: 'asset',
+        fileName: `gallery/${language}/${example.id}.html`,
+        source: renderMatrix(example, themes, language, `../../${stylesheet}`),
+      });
+    }
+  }
+}
+
+function serveMatrices(server, catalog, themes, languages) {
+  server.middlewares.use((request, response, next) => {
+    const parts = request.url.split('?')[0].split('/');
+    const at = parts.indexOf('gallery');
+    const language = parts[at + 1];
+    const example = catalog
+      .flatMap((c) => c.examples)
+      .find((e) => `${e.id}.html` === parts[at + 2]);
+    if (at < 0 || !languages.includes(language) || !example) {
+      return next();
+    }
+    response.setHeader('Content-Type', 'text/html; charset=utf-8');
+    response.end(renderMatrix(example, themes, language, '/site.css'));
+  });
 }

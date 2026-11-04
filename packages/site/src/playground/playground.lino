@@ -1,0 +1,39 @@
+playground-controls: stack
+  playground-toolbar: stack
+    direction horizontal
+    wrap true
+    example-choice: select
+      label Examples
+      value button-filled
+      initial-example: option
+        label Button
+        value button-filled
+    preview-theme: select
+      label 'Preview theme'
+      value base
+      initial-theme: option
+        label Base
+        value base
+    preview-scheme: select
+      label 'Preview scheme'
+      value light
+      light-preview: option
+        label Light
+        value light
+      dark-preview: option
+        label Dark
+        value dark
+      system-preview: option
+        label System
+        value system
+    inspect-preview: button
+      label Inspect
+    share-preview: button
+      label 'Copy link'
+  playground-split: split
+    direction row
+    sizes 50 50
+    min 20 20
+    label 'Editor and preview'
+    source-pane: playground-editor
+    preview-pane: playground-preview

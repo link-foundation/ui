@@ -1,0 +1,4 @@
+demo: document
+  badge-error: badge 2
+    label errors
+    tone error
