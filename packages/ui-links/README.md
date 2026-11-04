@@ -262,6 +262,15 @@ subject may. References are checked, and failed requests undone, in the
 storage under the permission view, so a subject may use a type it may not
 read (and so may learn that an address exists).
 
+With `createPolicy`, rule and hierarchy writes through the server also push
+links that become readable as creations and links that become hidden as
+deletions, in one notification per subscription per request. Rule changes
+refresh only subjects they mention (including instances and subtypes);
+`Anything` rules and hierarchy changes can affect every subscriber. A
+server-local cache shares readable types between sessions of the same subject.
+The ordinary permission view still reads live rules. Direct storage mutations
+outside server requests do not publish notifications.
+
 `listenLinks(server, { port?, host?, maxMessageBytes? })` from
 `@link-foundation/ui-links/tcp` serves it on TCP (Node.js), framed like
 `clink --serve` (`encodeMessage`, `createMessageReader`): the
