@@ -16,17 +16,17 @@ import {
 } from './helpers.js';
 
 describe('toWaapi', () => {
-  it('compiles press-feedback to the step-6 object', () => {
+  it('compiles press-feedback to the literal-offset object', () => {
     const press = animationOf(SAMPLE_TEXT, 'press-feedback');
     expect(toWaapi(press, { resolveToken })).toEqual({
       keyframes: [
-        { offset: 0, scale: '1' },
-        { offset: 0.5, scale: '0.96' },
-        { offset: 1, scale: '1' },
+        { offset: 0, easing: 'cubic-bezier(0.2, 0, 0, 1)', scale: '1' },
+        { offset: 0.5, easing: 'cubic-bezier(0.2, 0, 0, 1)', scale: '0.96' },
+        { offset: 1, easing: 'cubic-bezier(0.2, 0, 0, 1)', scale: '1' },
       ],
       options: {
         duration: 150,
-        easing: 'cubic-bezier(0.2, 0, 0, 1)',
+        easing: 'linear',
         fill: 'none',
         composite: 'replace',
       },
@@ -37,12 +37,22 @@ describe('toWaapi', () => {
     const panel = animationOf(STEP_2_TEXT, 'panel-enter');
     expect(toWaapi(panel)).toEqual({
       keyframes: [
-        { offset: 0, opacity: '0', translate: '0 8px' },
-        { offset: 1, opacity: '1', translate: '0 0' },
+        {
+          offset: 0,
+          easing: 'cubic-bezier(0.2, 0, 0, 1)',
+          opacity: '0',
+          translate: '0 8px',
+        },
+        {
+          offset: 1,
+          easing: 'cubic-bezier(0.2, 0, 0, 1)',
+          opacity: '1',
+          translate: '0 0',
+        },
       ],
       options: {
         duration: 300,
-        easing: 'cubic-bezier(0.2, 0, 0, 1)',
+        easing: 'linear',
         fill: 'backwards',
         composite: 'replace',
       },
@@ -59,7 +69,9 @@ describe('toWaapi', () => {
 
   it('writes a spring easing as linear() and key easings on keyframes', () => {
     const bounce = animationOf(STEP_2_TEXT, 'bounce');
-    expect(toWaapi(bounce).options.easing.startsWith('linear(0, ')).toBe(true);
+    expect(toWaapi(bounce).keyframes[0].easing.startsWith('linear(0, ')).toBe(
+      true
+    );
     const held = loadAnimations(
       '(h: animation (duration 100ms) (track opacity (key 0 0 hold) (key 1 1)))'
     ).animations.get('h');

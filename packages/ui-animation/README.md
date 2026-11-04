@@ -147,8 +147,13 @@ help))))`.
   (`toCssLinear`).
 
 A key may carry the easing of the segment that starts at it:
-`(key 0 1 ease-out)`. Easing follows WAAPI: the animation easing applies
-to the whole iteration, and the key easings to their segments.
+`(key 0 1 ease-out)`. Key offsets are literal fractions of the iteration duration, after delay and
+playback direction. Animation easing is the default for each segment; a key's
+explicit easing overrides it for the segment starting there. With no easing,
+interpolation is linear. Thus the unchanged `press-feedback` sample reaches
+scale `0.96` at 50% even with `easing standard`. See the normative
+[timing contract](../../docs/spec/animation-timing.md) resolving #52 and #57.
+Procedural effects have no key segments and retain whole-iteration easing.
 
 ### `timeline`
 
@@ -279,13 +284,13 @@ sample `press-feedback` with the sample tokens:
 ```js
 ({
   keyframes: [
-    { offset: 0, scale: '1' },
-    { offset: 0.5, scale: '0.96' },
-    { offset: 1, scale: '1' },
+    { offset: 0, easing: 'cubic-bezier(0.2, 0, 0, 1)', scale: '1' },
+    { offset: 0.5, easing: 'cubic-bezier(0.2, 0, 0, 1)', scale: '0.96' },
+    { offset: 1, easing: 'cubic-bezier(0.2, 0, 0, 1)', scale: '1' },
   ],
   options: {
     duration: 150,
-    easing: 'cubic-bezier(0.2, 0, 0, 1)',
+    easing: 'linear',
     fill: 'none',
     composite: 'replace',
   },
