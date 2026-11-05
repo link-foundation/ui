@@ -60,6 +60,9 @@ export function listboxActions(list) {
           options[
             current === -1 ? 0 : Math.min(current + 1, options.length - 1)
           ],
+        pageNext: () =>
+          options[Math.min(Math.max(current, 0) + 10, options.length - 1)],
+        pagePrevious: () => options[Math.max(current - 10, 0)],
         previous: () =>
           options[
             current === -1 ? options.length - 1 : Math.max(current - 1, 0)
@@ -111,6 +114,13 @@ export function connectListbox(list, control, refresh) {
   const { listbox } = list;
   const onClick = (event) => {
     list.picked = event.target.closest?.('ui-option') ?? null;
+    if (
+      !list.picked ||
+      !listbox.contains(list.picked) ||
+      !isAvailable(list.picked)
+    ) {
+      event.stopImmediatePropagation();
+    }
   };
   const keepFocus = (event) => event.preventDefault();
   listbox.addEventListener('click', onClick, true);

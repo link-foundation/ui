@@ -153,3 +153,6 @@ export function storiesDocument(
   sets: readonly StorySet[],
   options?: { id?: string }
 ): string;
+
+/** Hex or integer rgb(r, g, b) normalized to #rrggbb. */
+export function formatColor(value: unknown): string | null;

@@ -125,7 +125,7 @@ function render(control) {
 
 export const COMBOBOX_KIND = Object.freeze({
   tag: 'ui-combobox',
-  childrenSlot: (node) => node.children[2],
+  childrenSlot: (node) => controlOf(node).parts.listbox,
   attributes: { disabled: 'boolean', invalid: 'boolean' },
   create(el, ctx) {
     let list = null;

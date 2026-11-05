@@ -16,7 +16,7 @@ import {
   stopControl,
   textOf,
 } from './dom.js';
-import { formatHex } from './color.js';
+import { formatColor as formatHex } from './color.js';
 import { createTextControl, inputOf, updateTextControl } from './text-field.js';
 
 /** The picker shows black for no colour. */
@@ -70,7 +70,7 @@ export const COLOR_FIELD_KIND = Object.freeze({
         type: 'text',
         autocomplete: 'off',
         spellcheck: 'false',
-        maxlength: '7',
+        maxlength: '32',
       },
       children: (doc, node) => {
         const indicator = partOf(doc, 'input', 'indicator', {
@@ -80,7 +80,12 @@ export const COLOR_FIELD_KIND = Object.freeze({
           value: PICKER_DEFAULT,
         });
         node.appendChild(indicator);
-        return { indicator };
+        const palette = partOf(doc, 'div', 'palette', {
+          role: 'group',
+          'aria-label': 'Palette',
+        });
+        node.appendChild(palette);
+        return { indicator, palette };
       },
       actions,
       render,
@@ -92,6 +97,37 @@ export const COLOR_FIELD_KIND = Object.freeze({
     const { indicator } = control.parts;
     if (has('disabled')) {
       indicator.toggleAttribute('disabled', control.service.context.disabled);
+    }
+    control.parts.palette.setAttribute(
+      'aria-label',
+      `${textOf(el, 'label') || el.id} palette`
+    );
+    if (has('palette')) {
+      const palette = control.parts.palette;
+      palette.replaceChildren();
+      for (const pair of el.props.get('palette') ?? []) {
+        const values = Array.isArray(pair) ? pair : pair?.values;
+        if (!Array.isArray(values) || values.length !== 2) {
+          continue;
+        }
+        const [name, raw] = values;
+        const color = formatHex(raw);
+        if (!color) {
+          continue;
+        }
+        const button = partOf(ctx.document, 'button', null, { type: 'button' });
+        button.textContent = name;
+        button.addEventListener('click', () => {
+          if (!control.service.context.disabled) {
+            control.assign({ value: color, invalid: false });
+          }
+        });
+        palette.appendChild(button);
+      }
+    }
+    control.parts.palette.hidden = control.parts.palette.children.length === 0;
+    for (const button of control.parts.palette.children) {
+      button.disabled = control.service.context.disabled;
     }
     if (has('value')) {
       const hex = formatHex(textOf(el, 'value'));

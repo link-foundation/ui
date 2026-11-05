@@ -34,6 +34,16 @@ select-machine: machine
       do open-list
         activate last
       when not-disabled
+    on page-next
+      target open
+      do open-list
+        activate pageNext
+      when not-disabled
+    on page-previous
+      target open
+      do open-list
+        activate pagePrevious
+      when not-disabled
     on commit
       target open
       do open-list
@@ -51,7 +61,7 @@ select-machine: machine
       do close-list
     on blur
       target closed
-      do close-list
+      do select-active close-list
     on next
       do
         activate next
@@ -64,6 +74,12 @@ select-machine: machine
     on last
       do
         activate last
+    on page-next
+      do
+        activate pageNext
+    on page-previous
+      do
+        activate pagePrevious
     on typeahead
       do typeahead
     on commit
@@ -89,8 +105,8 @@ select-machine: machine
     key Alt+ArrowUp commit
     key Home first
     key End last
-    key PageDown last
-    key PageUp first
+    key PageDown page-next
+    key PageUp page-previous
     key Enter commit
     key Space commit
     key Escape close

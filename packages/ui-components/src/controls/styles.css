@@ -998,3 +998,19 @@
     background: conic-gradient(Highlight 0.3turn, GrayText 0);
   }
 }
+
+/* Keep pointer steppers beside the text editor. */
+:where(ui-number-field) {
+  display: inline-grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+}
+:where(ui-number-field) > [data-part='label'] {
+  grid-column: 1 / -1;
+}
+:where(ui-number-field)
+  > :is([data-part='increment'], [data-part='decrement']) {
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+  font: inherit;
+}

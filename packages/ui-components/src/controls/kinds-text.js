@@ -121,6 +121,7 @@ number-field: kind
   children none
   machine number-field-machine
   role spinbutton
+  property fallback number
 
 color-field: kind
   description 'A hex colour text input with the native colour picker.'
@@ -137,6 +138,7 @@ color-field: kind
   children none
   machine color-field-machine
   role textbox
+  property palette any
 
 checkbox: kind
   description 'A box that is checked, unchecked or mixed.'
@@ -235,6 +237,13 @@ select: kind
   children any
   machine select-machine
   role combobox
+  property external-label boolean
+  property aria-label string
+  property aria-labelledby string
+  property list-label string
+  property list-labelledby string
+  property menu-min-width number
+  property menu-max-height number
 
 combobox: kind
   description 'A text input that filters a list of options.'

@@ -5,8 +5,12 @@ number-field-machine: machine
     readonly false
     invalid false
   state ready
+    on type
+      do read-draft
+      when editable
     on commit
       do read-value
+      when editable
     on revert
       do restore-value
       when editable
@@ -52,6 +56,7 @@ number-field-machine: machine
       context max
     attr aria-invalid
       context invalid
+    on input type
     on change commit
     key ArrowUp arrow-up
     key ArrowDown arrow-down
@@ -59,6 +64,8 @@ number-field-machine: machine
     key Shift+ArrowDown shift-arrow-down
     key PageUp page-up
     key PageDown page-down
-    key Home home
-    key End end
     key Escape revert
+  part increment
+    on click arrow-up
+  part decrement
+    on click arrow-down
