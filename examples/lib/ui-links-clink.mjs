@@ -89,3 +89,25 @@ export async function startClink({
     throw error;
   }
 }
+
+/** Start `clink --serve --triplets` on a temporary database, fresh. */
+export async function startClinkTriplets() {
+  const directory = await mkdtemp(join(tmpdir(), 'ui-links-clink-'));
+  try {
+    const server = await startServer({
+      command: process.env.CLINK ?? 'clink',
+      db: join(directory, 'data.links'),
+      args: ['--triplets'],
+    });
+    return {
+      address: server.address,
+      async close() {
+        await server.close();
+        await rm(directory, { recursive: true, force: true });
+      },
+    };
+  } catch (error) {
+    await rm(directory, { recursive: true, force: true });
+    throw error;
+  }
+}

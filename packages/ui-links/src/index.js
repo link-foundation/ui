@@ -41,3 +41,4 @@ export * from './persist.js';
 export * from './framing.js';
 export * from './server.js';
 export * from './client.js';
+export * from './triplets-client.js';

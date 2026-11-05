@@ -12,6 +12,8 @@ import {
   getLink,
   linkOf,
   runQuery,
+  typeMarkers,
+  typeSystem,
   withTriplets,
 } from '../src/index.js';
 
@@ -599,6 +601,37 @@ describe('a doublet of somebody else', () => {
       `The type ${plain} is not a triplet.`
     );
     expect(triplets.countTriplets({ type: root })).toBe(3);
+    expectNoOrphans(triplets, { foreign: true });
+  });
+});
+
+describe('withTriplets over the type hierarchy', () => {
+  it('reads nodes as values of their types, and not the wiring of Extends', () => {
+    const links = createMemoryLinks();
+    const names = createNames();
+    const markers = typeMarkers(links, names);
+    const types = typeSystem(links, markers);
+    const triplets = withTriplets(links, { names });
+    const { root } = markers;
+    expect(triplets.getTriplet(root)).toEqual(triplet(root, root, 0, 0));
+
+    const person = types.define();
+    const open = types.define();
+    const admin = types.define(person, open);
+    const boss = triplets.createTriplet(admin);
+    expect(types.isA(boss, person)).toBe(true);
+    expect(types.isA(boss, open)).toBe(true);
+    expect(
+      triplets
+        .eachTriplet({ type: root })
+        .filter(({ index }) => index === person || index === open)
+    ).toEqual([triplet(person, root, 0, 0), triplet(open, root, 0, 0)]);
+
+    const knows = triplets.createTriplet(root);
+    const link = triplets.createTriplet(knows, boss, admin);
+    expect(triplets.eachTriplet({ to: admin })).toEqual([
+      triplet(link, knows, boss, admin),
+    ]);
     expectNoOrphans(triplets, { foreign: true });
   });
 });
