@@ -97,18 +97,18 @@ sends. This is link-foundation/link-cli#153.
 
 ## What was adapted, and how doublets change it
 
-| deep-foundation                                | here (doublets, `packages/ui-links`)                                                                    |
-| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| link `(id, type, from, to)`                    | doublet `(id: source target)`; the **source is the type**: `(v: T x)` is a value of `T` pointing at `x` |
-| a type is a link, possibly its own type        | the root is the point `(Type: Type Type)`; a sub-type is `(S: T S)`                                     |
-| several parents via trees                      | extra parents `(p: S T2)` marked `(m: Extends p)`; `isA`/`ancestorsOf` follow both, cycles included     |
-| rule = selectors of subject, object, action    | rule = pair `(g: Subject Object)` marked `AllowRead` or `AllowWrite`; `Anything` matches all            |
-| select/update/delete checked on the link       | read and write checked on the link (write implies read)                                                 |
-| insert checked on the type of the new link     | write checked on the link after the change; a fresh untyped link is its creator's until typed           |
-| Hasura filters rows per subject                | `withPermissions` hides unreadable links; the server answers each session as its subject                |
-| subscriptions through Hasura live queries      | `(subscribe: (i s t))` and pushed `(notify: n)` changes, filtered per subscriber                        |
-| minilinks `apply` with optimistic negative ids | `createSyncedLinks`: a cache, an outbox, temporary addresses counted down from `MAX_ADDRESS`, remap     |
-| GraphQL over PostgreSQL                        | link-cli's LiNo protocol (text and binary) over any doublets storage                                    |
+| deep-foundation                                | here (doublets, `packages/ui-links`)                                                                           |
+| ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| link `(id, type, from, to)`                    | doublet `(id: source target)`; the **source is the type**: `(v: T x)` is a value of `T` pointing at `x`        |
+| a type is a link, possibly its own type        | the root is the point `(Type: Type Type)`; a sub-type is `(S: T S)`                                            |
+| several parents via trees                      | extra parents `(p: S T2)` marked `(m: Extends p)`; `isA`/`ancestorsOf` follow both, cycles included            |
+| rule = selectors of subject, object, action    | rule = pair `(g: Subject Object)` marked `AllowRead`, `AllowWrite` or `AllowReference`; `Anything` matches all |
+| select/update/delete checked on the link       | read and write checked on the link (write implies read)                                                        |
+| insert checked on the type of the new link     | write checked on the link after the change; a fresh untyped link is its creator's until typed                  |
+| Hasura filters rows per subject                | `withPermissions` hides unreadable links; the server answers each session as its subject                       |
+| subscriptions through Hasura live queries      | `(subscribe: (i s t))` and pushed `(notify: n)` changes, filtered per subscriber                               |
+| minilinks `apply` with optimistic negative ids | `createSyncedLinks`: a cache, an outbox, temporary addresses counted down from `MAX_ADDRESS`, remap            |
+| GraphQL over PostgreSQL                        | link-cli's LiNo protocol (text and binary) over any doublets storage                                           |
 
 Triplets come back as a layer over doublets (link-foundation/link-cli#151),
 which the type-as-source encoding makes direct: a triplet `(i: T f t)` is the
