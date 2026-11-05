@@ -188,7 +188,10 @@ function readDefault(field, raw, diagnostics) {
     );
     return false;
   }
-  const result = coerce(field, raw);
+  const result = coerce(field, raw, {
+    ...field.normalization,
+    primitives: 'coerce',
+  });
   if (!result.ok || outOfRange(field, raw)) {
     diagnostics.push(
       diagnostic(
@@ -210,7 +213,7 @@ function readDefault(field, raw, diagnostics) {
  * @param {Diagnostic[]} diagnostics
  * @returns {SettingField|null}
  */
-function readField(key, values, diagnostics) {
+function readField(key, values, diagnostics, normalization) {
   const at = { key };
   const clauses = clausesOf(values);
   const typeClause = clauses.find((c) => c.name === 'type');
@@ -241,6 +244,9 @@ function readField(key, values, diagnostics) {
     apply: [],
     props: {},
   };
+  if (normalization) {
+    field.normalization = normalization;
+  }
   const raw = readClauses(field, clauses, diagnostics);
   if (
     !checkShape(field, diagnostics) ||
@@ -254,8 +260,10 @@ function readField(key, values, diagnostics) {
 function readSection(id, values) {
   const section = { id };
   for (const { name, args } of clausesOf(values)) {
-    if ((name === 'label' || name === 'description') && text(args)) {
+    if (['label', 'description', 'level'].includes(name) && text(args)) {
       section[name] = text(args);
+    } else if (name === 'tabs' && args.every(isAtom)) {
+      section.tabs = [...args];
     }
   }
   return section;
@@ -281,7 +289,10 @@ function readPreset(id, values, fields, diagnostics) {
       );
       continue;
     }
-    const result = coerce(field, rawOf(rest));
+    const result = coerce(field, rawOf(rest), {
+      ...field.normalization,
+      primitives: 'coerce',
+    });
     if (!result.ok) {
       diagnostics.push(
         diagnostic('bad-value', 'error', `preset ${id}: bad value for ${key}`, {
@@ -390,7 +401,7 @@ function checkKey(key, seen, diagnostics, kind) {
 }
 
 /** First pass: the version, sections and fields. */
-function readDefinitions(heads, schema, diagnostics) {
+function readDefinitions(heads, schema, diagnostics, options) {
   const seen = new Set();
   let hasVersion = false;
   for (const { kind, id, values } of heads) {
@@ -400,7 +411,7 @@ function readDefinitions(heads, schema, diagnostics) {
     } else if (kind === 'section' && checkKey(id, seen, diagnostics, kind)) {
       schema.sections.push(readSection(id, values));
     } else if (kind === 'setting' && checkKey(id, seen, diagnostics, kind)) {
-      const field = readField(id, values, diagnostics);
+      const field = readField(id, values, diagnostics, options.normalization);
       if (field) {
         schema.fields.set(id, field);
       }
@@ -494,7 +505,7 @@ export function readSchema(text, options = {}) {
     const { kind, id, rest } = headOf(record);
     return { kind, id, values: record.values.slice(rest) };
   });
-  readDefinitions(heads, schema, diagnostics);
+  readDefinitions(heads, schema, diagnostics, options);
   readReferences(heads, schema, diagnostics);
   checkSections(schema, diagnostics);
   schema.migrations.sort((a, b) => a.from - b.from);

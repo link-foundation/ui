@@ -20,7 +20,7 @@
 
 import { formatLinks } from '@link-foundation/ui-core';
 
-import { formatValue } from './coerce.js';
+import { coerce, formatValue } from './coerce.js';
 import { applySharedLook } from './presets.js';
 import { migrate } from './migrate.js';
 import { clausesOf, diagnostic, rawOf, readRecords } from './read.js';
@@ -107,7 +107,12 @@ export function fromLino(schema, text, options = {}) {
     if (name === 'version' && args.length === 1) {
       version = Number(args[0]);
     } else if (name !== '' && !Object.hasOwn(stored, name)) {
-      stored[name] = rawOf(args);
+      const raw = rawOf(args);
+      const field = schema.fields.get(name);
+      const parsed = field
+        ? coerce(field, raw, { ...field.normalization, primitives: 'coerce' })
+        : { ok: false };
+      stored[name] = parsed.ok ? parsed.value : raw;
     }
   }
   const out = migrate(
@@ -249,4 +254,31 @@ export function fromShareHash(schema, hash, viewerValues) {
     return { ...shared, values: viewer };
   }
   return { ...shared, values: applySharedLook(schema, viewer, shared.values) };
+}
+
+/** Adapt an existing storage/object codec while retaining framework validation. */
+export function createSettingsCodec(schema, { decode, encode }) {
+  return {
+    read(text, { base, look = false } = {}) {
+      try {
+        const raw = decode(text);
+        if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+          throw new TypeError('Expected settings object');
+        }
+        const result = merge(schema, base, raw);
+        return {
+          ok: result.rejected.length === 0,
+          ...result,
+          values: look
+            ? applySharedLook(schema, base, result.values)
+            : result.values,
+        };
+      } catch {
+        return { ok: false, ...merge(schema, base, undefined) };
+      }
+    },
+    write(values) {
+      return encode(diff(schema, merge(schema, values, undefined).values));
+    },
+  };
 }
