@@ -404,6 +404,8 @@ export interface LinksServer {
   links: LinksStorage;
   names: NamesStore;
   policy: Policy | null;
+  /** The triplets of `links`, when the server is in triplet mode. */
+  triplets?: TripletsView;
   session(options?: {
     subject?: number | null;
     onPush?: (document: LinoValue[]) => void;
@@ -416,6 +418,8 @@ export function createLinksServer(options: {
   policy?: Policy | null;
   authenticate?: ((token: string) => number | null) | null;
   autoCreate?: boolean;
+  /** Speak triplets: link-cli's `docs/protocol/triplets.txt`. */
+  triplets?: boolean;
 }): LinksServer;
 export function changeToLino(
   change: Change,
@@ -482,3 +486,160 @@ export function changesFromLino(
   document: LinoValue[],
   ref?: (text: string) => number
 ): Change[];
+
+// Triplets
+
+/** `(index: type from to)`: a type, and two parts that may be 0. */
+export interface Triplet {
+  index: number;
+  type: number;
+  from: number;
+  to: number;
+}
+export type TripletQuery =
+  | Partial<Record<keyof Triplet, number | null>>
+  | (number | null | undefined)[];
+export interface TripletMarkers {
+  pair: number;
+  nothing: number;
+}
+export interface TripletsReads {
+  getTriplet(index: number): Triplet | null;
+  isTriplet(index: number): boolean;
+  eachTriplet(query?: TripletQuery): Triplet[];
+  countTriplets(query?: TripletQuery): number;
+}
+export interface TripletsWrites {
+  /** `(i: type from to)`; `type` must be a triplet. */
+  createTriplet(type: number, from?: number, to?: number): number;
+  createTripletPoint(): number;
+  /** The triplet as it was before. */
+  updateTriplet(index: number, type: number, from: number, to: number): Triplet;
+  /** Every triplet removed, `index` first. */
+  deleteTriplet(index: number): Triplet[];
+}
+/** A storage of doublets that also reads and writes the triplets in them. */
+export interface TripletsView
+  extends LinksStorage, TripletsReads, TripletsWrites {
+  readonly markers: TripletMarkers;
+  readonly names: NamesStore | undefined;
+  readonly doublets: LinksStorage;
+  /** The same view over a layer of the same storage. */
+  over(other: LinksStorage): TripletsView;
+  createTripletPointAt(address: number): void;
+  /** How many doublets use the doublet at `id`, itself left out. */
+  doubletUsages(id: number): number;
+  /** What the doublet at `address` is in the encoding. */
+  roleOf(address: number): { kind: string; triplet?: Triplet } | null;
+}
+export function tripletMarkers(
+  links: LinksStorage,
+  names: NamesStore
+): TripletMarkers;
+export function matchesTriplet(triplet: Triplet, query?: TripletQuery): boolean;
+/** What deleting `first` deletes, `first` first: it and what uses it. */
+export function cascadeOf(
+  triplets: Pick<TripletsReads, 'eachTriplet'>,
+  first: Triplet
+): Triplet[];
+export function withTriplets(
+  links: LinksStorage,
+  options?: { names?: NamesStore; markers?: TripletMarkers }
+): TripletsView;
+export function withTripletPermissions(
+  triplets: TripletsView,
+  policy: Policy,
+  subject: number | null,
+  created?: Set<number>
+): TripletsView;
+export function processTripletsQuery(
+  triplets: TripletsView,
+  names: NamesStore | undefined,
+  document: LinoValue[],
+  named?: unknown[]
+): TripletChange[];
+export function transactTriplets<T>(
+  context: { links: TripletsView; names?: NamesStore },
+  fn: (
+    triplets: TripletsView,
+    names: NamesStore | undefined,
+    named: unknown[]
+  ) => T
+): T;
+export function packTriplets(
+  document: LinoValue[],
+  options?: unknown
+): LinoValue[];
+export function canonicalTriplets(document: LinoValue[]): LinoValue[];
+export function createTripletsSession(session: {
+  context: { links: TripletsView; names?: NamesStore };
+  state: {
+    subscriptions: Map<number, unknown>;
+    next: number;
+    format?: unknown;
+  };
+  nameRef: (id: number) => string;
+  publish: (changes: TripletChange[]) => void;
+  onPush?: (document: LinoValue[]) => void;
+}): {
+  operations: Record<string, ((argument: LinoValue) => LinoValue[]) | null>;
+  list(): LinoValue[];
+  query(document: LinoValue[]): LinoValue[];
+  deliver(changes: TripletChange[], own: boolean): void;
+};
+
+// Synced triplets client
+
+export interface TripletChange {
+  readonly before: Triplet | null;
+  readonly after: Triplet | null;
+}
+export interface SyncedTripletChange extends TripletChange {
+  readonly origin: 'local' | 'remote' | 'rollback' | 'remap';
+}
+export interface PendingTripletWrite {
+  kind: 'create' | 'update' | 'delete';
+  index: number;
+  type?: number;
+  from?: number;
+  to?: number;
+  point?: boolean;
+  changes: TripletChange[];
+}
+export interface SyncedTriplets extends TripletsReads, TripletsWrites {
+  /** Without parts it is a point, like `createTripletPoint`. */
+  createTriplet(type?: number, from?: number, to?: number): number;
+  create(type?: number, from?: number, to?: number): number;
+  update(index: number, type: number, from: number, to: number): number;
+  delete(index: number): number;
+  count(query?: TripletQuery): number;
+  each(
+    handler: (triplet: Triplet) => unknown,
+    query?: TripletQuery
+  ): typeof CONTINUE | typeof BREAK;
+  connect(transport: Transport): Promise<void>;
+  disconnect(): void;
+  readonly connected: boolean;
+  /** Writes the server has not answered yet. */
+  readonly pending: number;
+  flush(): Promise<void>;
+  /** The real address of a temporary one. */
+  resolve(index: number): number;
+  isTemporary(index: number): boolean;
+  load(restriction?: (number | null)[]): Promise<Triplet[]>;
+  remoteCount(restriction?: (number | null)[]): Promise<number>;
+  subscribe(
+    restriction?: (number | null)[]
+  ): Promise<{ id: number; triplets: Triplet[] }>;
+  unsubscribe(id: number): Promise<void>;
+  /** A substitution query on the server; its changes enter the cache. */
+  query(text: string): Promise<TripletChange[]>;
+  onChange(listener: (change: SyncedTripletChange) => void): () => boolean;
+  onError(
+    listener: (error: Error, write: PendingTripletWrite | null) => void
+  ): () => boolean;
+  onRemap(listener: (temp: number, index: number) => void): () => boolean;
+}
+export function createSyncedTriplets(options?: {
+  transport?: Transport | null;
+}): SyncedTriplets;

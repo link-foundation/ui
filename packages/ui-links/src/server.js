@@ -27,6 +27,10 @@
  * source or the target, and `(i s t)`.
  *
  * Every request is atomic: a request that fails changes nothing.
+ *
+ * With `triplets: true` the server is in triplet mode (`clink --serve
+ * --triplets`) and reads the same requests as triplets: see
+ * `triplets-server.js`.
  */
 
 import { ANY } from './constants.js';
@@ -48,6 +52,12 @@ import {
 } from './lino.js';
 import { createNames } from './names.js';
 import { forbidden, withPermissions } from './permissions.js';
+import {
+  tripletMarkers,
+  withTripletPermissions,
+  withTriplets,
+} from './triplets.js';
+import { createTripletsSession, packTriplets } from './triplets-server.js';
 import { runQuery, transact } from './query.js';
 
 const OPERATIONS = new Set([
@@ -110,6 +120,8 @@ const linkLine = (link) =>
  * @param {(token: string) => number | null} [options.authenticate]  the
  *   subject of a token, `null` when the token is not valid
  * @param {boolean} [options.autoCreate]  queries create missing references
+ * @param {boolean} [options.triplets]  triplet mode: every request reads as
+ *   triplets over `links`, and the markers are created when missing
  */
 export function createLinksServer({
   links,
@@ -117,9 +129,11 @@ export function createLinksServer({
   policy = null,
   authenticate = null,
   autoCreate = false,
+  triplets = false,
 }) {
   const sessions = new Set();
-  const policyWatch = policy?.watch?.();
+  // Rules on doublets say nothing of the doublets a triplet is stored in.
+  const policyWatch = triplets ? null : policy?.watch?.();
   const server = {
     links,
     names,
@@ -128,8 +142,15 @@ export function createLinksServer({
     autoCreate,
     sessions,
     policyWatch,
+    triplets: triplets
+      ? withTriplets(links, { names, markers: tripletMarkers(links, names) })
+      : null,
     /** Publish writes and indirect visibility changes to subscriptions. */
     publish(changes, origin) {
+      if (triplets) {
+        // Triplet mode publishes triplets, not the doublets below them.
+        return;
+      }
       const writes = changes.filter(({ before, after }) => before !== after);
       if (writes.length === 0) {
         return;
@@ -148,6 +169,8 @@ export function createLinksServer({
     links,
     names,
     policy,
+    /** The triplets of `links` in triplet mode; `undefined` otherwise. */
+    triplets: server.triplets ?? undefined,
     /**
      * A connection: requests run as its subject.
      * @param {object} [options]
@@ -441,9 +464,14 @@ function updateSubscription(subscription, changes, fits) {
 function openSession(server, { subject = null, onPush = null } = {}) {
   const { links, policy, autoCreate, sessions } = server;
   const state = { subject, subscriptions: new Map(), next: 1 };
-  const view = policy
-    ? withPermissions(links, policy, () => state.subject)
-    : links;
+  const subjectOf = () => state.subject;
+  const doublets = policy ? withPermissions(links, policy, subjectOf) : links;
+  const tripletsView =
+    server.triplets &&
+    (policy
+      ? withTripletPermissions(server.triplets, policy, subjectOf)
+      : server.triplets);
+  const view = tripletsView || doublets;
   const names =
     server.names.withLinks?.(view) ??
     (policy ? namesOfView(server.names, view) : server.names);
@@ -457,18 +485,37 @@ function openSession(server, { subject = null, onPush = null } = {}) {
     return changes.map((change) => changeToLino(change, ref));
   };
   const write = (fn, ref = String) => report(transact(context, fn), ref);
-  const operations = createOperations(server, state, {
-    names,
-    view,
-    reader: createReader(view, names),
-    write,
-  });
+  const tripletMode =
+    server.triplets &&
+    createTripletsSession({
+      context,
+      state,
+      nameRef,
+      onPush,
+      publish(changes) {
+        for (const session of sessions) {
+          session.deliverTriplets(changes, session === api);
+        }
+      },
+    });
+  const operations = {
+    ...createOperations(server, state, {
+      names,
+      view,
+      reader: createReader(view, names),
+      write,
+    }),
+    ...tripletMode?.operations,
+  };
 
   /** Answer one request document. */
   const handle = (document) => {
     try {
       const [first] = document;
       if (document.length === 0 || isEmptyGroup(document)) {
+        if (tripletMode) {
+          return tripletMode.list();
+        }
         return allLinks(view).map((link) =>
           named(nameRef(link.id), [nameRef(link.from_id), nameRef(link.to_id)])
         );
@@ -477,11 +524,14 @@ function openSession(server, { subject = null, onPush = null } = {}) {
         document.length === 1 &&
         typeof first !== 'string' &&
         OPERATIONS.has(first.id) &&
+        operations[first.id] &&
         first.values.length === 1
       ) {
         return operations[first.id](first.values[0]);
       }
-      return report(runQuery(context, document), nameRef);
+      return tripletMode
+        ? tripletMode.query(document)
+        : report(runQuery(context, document), nameRef);
     } catch (error) {
       if (!(error instanceof LinksError)) {
         throw error;
@@ -511,6 +561,7 @@ function openSession(server, { subject = null, onPush = null } = {}) {
       } catch (error) {
         return formatLino([named('error', [error.message])]);
       }
+      state.format = null;
       return formatLino(handle(document));
     },
     /** Answer a binary packet with a packet of the same options. */
@@ -524,8 +575,15 @@ function openSession(server, { subject = null, onPush = null } = {}) {
       if (decoded === null) {
         return encodeBinary([named('error', ['Incomplete binary packet'])]);
       }
-      return encodeBinary(handle(decoded.document), decoded.options);
+      state.format = decoded.options;
+      const reply = handle(decoded.document);
+      return encodeBinary(
+        tripletMode ? packTriplets(reply, decoded.options) : reply,
+        decoded.options
+      );
     },
+    /** Triplet mode: push what the subscriptions of this session ask for. */
+    deliverTriplets: (changes, own) => tripletMode?.deliver(changes, own),
     /** Push the changes the subscriptions of this session ask for. */
     deliver(changes, refresh = false, own = false) {
       for (const { before, after } of changes) {

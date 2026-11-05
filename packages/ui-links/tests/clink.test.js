@@ -4,12 +4,17 @@ import {
   allLinks,
   connectInProcess,
   createLinksServer,
+  createMemoryLinks,
   createSyncedLinks,
+  createSyncedTriplets,
   getLink,
   parseLino,
 } from '@link-foundation/ui-links';
 import { connectLinks } from '@link-foundation/ui-links/tcp';
-import { startClink } from '../../../examples/lib/ui-links-clink.mjs';
+import {
+  startClink,
+  startClinkTriplets,
+} from '../../../examples/lib/ui-links-clink.mjs';
 import { world } from './helpers.js';
 
 async function until(check) {
@@ -124,4 +129,107 @@ for (const backend of ['reference', 'clink']) {
       });
     });
   }
+}
+
+for (const backend of ['reference', 'clink']) {
+  describe(`${backend} synced triplets client`, () => {
+    const test = backend === 'clink' && !process.env.CLINK ? it.skip : it;
+    test('creates, reads, updates and deletes triplets, and hears of others (set CLINK for released-server coverage)', async () => {
+      const transports = [];
+      let clink;
+      try {
+        let connect;
+        if (backend === 'clink') {
+          clink = await startClinkTriplets();
+          connect = () => connectLinks(clink.address);
+        } else {
+          const server = createLinksServer({
+            links: createMemoryLinks(),
+            triplets: true,
+          });
+          connect = async () => connectInProcess(server);
+        }
+        const open = async () => {
+          const transport = await connect();
+          transports.push(transport);
+          const client = createSyncedTriplets();
+          await client.connect(transport);
+          return client;
+        };
+        const writer = await open();
+        const reader = await open();
+        await reader.subscribe();
+        const refusals = [];
+        writer.onError((error) => refusals.push(error.message));
+
+        // Creates: optimistic at once, at real addresses once answered.
+        const person = writer.createTripletPoint();
+        const alice = writer.createTriplet(person);
+        const bob = writer.createTriplet(person);
+        const knows = writer.createTripletPoint();
+        const edge = writer.createTriplet(knows, alice, bob);
+        expect(writer.isTemporary(edge)).toBe(true);
+        await writer.flush();
+        const [P, A, B, K, E] = [person, alice, bob, knows, edge].map(
+          writer.resolve
+        );
+        expect(writer.isTemporary(E)).toBe(false);
+        expect(refusals).toEqual([]);
+
+        // Reads: from the server, from another connection, and pushed.
+        expect(await writer.remoteCount()).toBe(5);
+        expect(await writer.load([E])).toEqual([
+          { index: E, type: K, from: A, to: B },
+        ]);
+        expect(
+          (await writer.load([null, P])).map(({ index }) => index)
+        ).toEqual([P, A, B]);
+        expect(await until(() => reader.count() === 5)).toBe(true);
+        expect(reader.getTriplet(E)).toEqual({
+          index: E,
+          type: K,
+          from: A,
+          to: B,
+        });
+
+        // Updates, seen by the other client too.
+        writer.updateTriplet(E, K, B, A);
+        await writer.flush();
+        expect(await writer.load([E])).toEqual([
+          { index: E, type: K, from: B, to: A },
+        ]);
+        expect(await until(() => reader.getTriplet(E)?.from === B)).toBe(true);
+
+        // A refused write is undone with the words of the server.
+        const refused = writer.createTriplet(4000);
+        await writer.flush();
+        expect(writer.isTriplet(refused)).toBe(false);
+        expect(refusals).toEqual(['The type 4000 is not a triplet.']);
+
+        // Deletes cascade over what uses the triplet, here and over there.
+        expect(writer.deleteTriplet(A).map(({ index }) => index)).toEqual([
+          A,
+          E,
+        ]);
+        await writer.flush();
+        expect(await writer.load([A])).toEqual([]);
+        expect(await writer.remoteCount()).toBe(3);
+        expect(await until(() => reader.count() === 3)).toBe(true);
+        expect(reader.isTriplet(E)).toBe(false);
+
+        // A substitution query with three-part links.
+        const added = await writer.query(`() ((90000: ${P} ${B} 0))`);
+        expect(added.map(({ after }) => after)).toEqual([
+          { index: 90000, type: P, from: B, to: 0 },
+        ]);
+        expect(writer.getTriplet(90000).from).toBe(B);
+        expect(await until(() => reader.isTriplet(90000))).toBe(true);
+      } finally {
+        for (const transport of transports) {
+          await transport.close();
+        }
+        await clink?.close();
+      }
+    });
+  });
 }

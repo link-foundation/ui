@@ -28,6 +28,7 @@ import {
   search,
 } from './links.js';
 import { formatLino, parseLino } from './lino.js';
+import { processTripletsQuery } from './triplets-query.js';
 
 /**
  * @typedef {{ index: string, source: Pattern | null, target: Pattern | null }} Pattern
@@ -158,7 +159,35 @@ function undo(context, base, recorded, named) {
 }
 
 /**
- * Run a query on `links`.
+ * `transact` on a triplets view (`withTriplets`, `withTripletPermissions`):
+ * `fn(triplets, names, named)` sees the view over the observed doublets, and
+ * the result is whatever it returns; a failure undoes every doublet it wrote.
+ */
+export function transactTriplets(context, fn) {
+  const view = context.links;
+  let result;
+  let writes = [];
+  try {
+    transact(
+      { names: context.names ?? view.names, links: view.doublets },
+      (links, recorded, named, names) => {
+        writes = recorded;
+        result = fn(view.over(links), names, named);
+      }
+    );
+  } catch (error) {
+    writes
+      .filter(({ before }) => before === null)
+      .forEach(({ after }) => view.forget?.(after.id));
+    throw error;
+  }
+  return result;
+}
+
+/**
+ * Run a query on `links`. Over a triplets view (`withTriplets`) every pattern
+ * has three parts, and the result is the change of every triplet the query
+ * touched, `{ before, after }`, first as `processTripletsQuery` lists them.
  * @param {object} context
  * @param {any} context.links  a storage
  * @param {any} [context.base]  the storage under `links` when it is a
@@ -171,6 +200,11 @@ function undo(context, base, recorded, named) {
  */
 export function runQuery(context, query) {
   const document = typeof query === 'string' ? parseLino(query) : query;
+  if (typeof context.links.eachTriplet === 'function') {
+    return transactTriplets(context, (triplets, names, named) =>
+      processTripletsQuery(triplets, names, document, named)
+    );
+  }
   const sides = querySides(document);
   if (sides === null) {
     throw new LinksError(
