@@ -2,6 +2,7 @@
  * Does an accordion that mounts open play its opening animation? Run with:
  *   npx playwright test --config experiments/accordion-mount.config.mjs
  */
+/* global document, getComputedStyle, matchMedia */
 import { expect, test } from '@playwright/test';
 
 test('probe', async ({ page }) => {
