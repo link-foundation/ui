@@ -1,15 +1,15 @@
-import {
-  defaults,
-  merge,
-  diff,
-  toLino,
-  applyToRoot,
-} from '@link-foundation/ui-settings';
-import { buildPanelModel } from './panel-model.js';
-import { createRows, panelNodes, refreshRows } from './panel-rows.js';
+import { merge, diff } from '@link-foundation/ui-settings';
+import { createSavedLooks } from './saved-looks.js';
+import { refreshPanel } from './panel-refresh.js';
+import { createRows, panelNodes } from './panel-rows.js';
 import { createToolbar, createSharing } from './panel-actions.js';
 
 let sequence = 0;
+
+function initialValues(schema, options) {
+  return merge(schema, options.target?.values() ?? options.values, undefined)
+    .values;
+}
 
 /** Create a light-DOM settings-panel element. The optional target is a
  * ui-settings bindConfig binding (user or session), or the same interface.
@@ -25,11 +25,9 @@ export function createSettingsPanel(schema, options = {}) {
   element.dataset.mode = mode;
   element.setAttribute('role', 'region');
   element.setAttribute('aria-label', options.label ?? 'Settings');
-  let values = merge(
-    schema,
-    options.target?.values() ?? options.values,
-    undefined
-  ).values;
+  let values = initialValues(schema, options);
+  const tabs = { ...options.tabs };
+  let level = options.level;
   let peeking = false;
   let opener;
   let destroyed = false;
@@ -52,73 +50,61 @@ export function createSettingsPanel(schema, options = {}) {
   const count = node('p');
   count.setAttribute('aria-live', 'polite');
   count.setAttribute('aria-atomic', 'true');
+  const context = {
+    node,
+    button,
+    schema,
+    options,
+    win,
+    commit,
+    getValues: () => values,
+    isPeeking: () => peeking,
+  };
   const {
     presets,
     peek,
     endPeek,
     destroy: stopToolbar,
   } = createToolbar({
-    node,
-    button,
-    schema,
-    options,
-    win,
-    commit,
-    getValues: () => values,
-    isPeeking: () => peeking,
+    ...context,
     setPeek(value) {
       peeking = value;
       refresh();
     },
   });
-  const { rows, sections } = createRows({
-    node,
-    button,
-    schema,
-    id,
-    commit,
-    getValues: () => values,
-    isPeeking: () => peeking,
-  });
-  const { changes, status } = createSharing({
-    node,
-    button,
-    schema,
-    options,
-    win,
-    commit,
-    getValues: () => values,
+  const { rows, sections } = createRows({ ...context, setTab, id });
+  const { changes, status, importText, exportText } = createSharing({
+    ...context,
     isDestroyed: () => destroyed,
   });
-
+  const saved = createSavedLooks(context);
+  function setTab(section, tab) {
+    tabs[section] = tab;
+    refresh();
+  }
   function refresh(updateControls = true) {
-    const shown = peeking ? defaults(schema) : values;
-    const model = buildPanelModel(schema, values, { query: search.value });
-    refreshRows(schema, {
-      rows,
-      sections,
-      model,
-      values,
-      shown,
-      peeking,
-      updateControls,
-    });
-    count.textContent = `${model.changedCount} changed settings`;
-    presets.value = model.activePreset ?? '';
-    peek.setAttribute('aria-pressed', String(peeking));
-    changes.value = toLino(schema, values);
-    if (options.previewRoot) {
-      applyToRoot(schema, shown, options.previewRoot);
-    }
+    refreshPanel(
+      context,
+      { rows, sections, search, count, presets, peek, changes },
+      { values, peeking, tabs, level },
+      updateControls
+    );
   }
   function commit(changes) {
     if (destroyed || peeking) {
-      return;
+      return false;
     }
-    const result = merge(schema, values, changes);
+    let result = merge(schema, values, changes);
+    if (!result.rejected.length && options.normalizeChanges) {
+      result = merge(
+        schema,
+        values,
+        options.normalizeChanges(result.values, changes)
+      );
+    }
     if (result.rejected.length) {
       status.textContent = `Invalid settings: ${result.rejected.join(', ')}`;
-      return;
+      return false;
     }
     if (options.target) {
       options.target.update(result.values);
@@ -128,6 +114,7 @@ export function createSettingsPanel(schema, options = {}) {
     }
     refresh();
     options.onChange?.({ ...values }, diff(schema, values));
+    return true;
   }
   const unsubscribe = options.target?.subscribe?.((next) => {
     values = merge(schema, next, undefined).values;
@@ -141,6 +128,9 @@ export function createSettingsPanel(schema, options = {}) {
   };
   doc.addEventListener('keydown', escape);
   refresh();
+  if (options.sharedHash) {
+    saved.applyShared(options.sharedHash);
+  }
   if (mode === 'drawer') {
     element.hidden = true;
   }
@@ -148,6 +138,14 @@ export function createSettingsPanel(schema, options = {}) {
     element,
     values: () => globalThis.structuredClone(values),
     update: commit,
+    importText,
+    exportText,
+    ...saved,
+    setTab,
+    setLevel(next) {
+      level = next;
+      refresh();
+    },
     open(trigger = doc.activeElement) {
       opener = trigger;
       element.hidden = false;
@@ -162,6 +160,7 @@ export function createSettingsPanel(schema, options = {}) {
       doc.removeEventListener('keydown', escape);
       for (const entry of rows.values()) {
         entry.control.destroy();
+        entry.preview?.destroy?.();
       }
       element.remove();
     },

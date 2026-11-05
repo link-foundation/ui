@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { JSDOM } from 'jsdom';
+import { createConfig } from '@link-foundation/ui-config';
+import { parse } from '@link-foundation/ui-core';
 import {
   readSchema,
   merge,
@@ -10,6 +12,7 @@ import {
   beforePaintScript,
   paintSnapshot,
   createSettingsCodec,
+  bindConfig,
 } from '../src/index.js';
 
 const text = `s: schema
@@ -180,4 +183,29 @@ noise:
   assert.equal(style.getPropertyValue('--corner'), '');
   assert.equal(style.getPropertyValue('--noise'), '0.6');
   dom.window.close();
+});
+
+test('strict runtime values survive LiNo config binding and nullable overrides', () => {
+  const { schema } = readSchema(
+    `s: schema
+  version 1
+n:
+  type number
+  default 4
+  step 1
+  nullable true`,
+    { normalization: { primitives: 'strict', numbers: 'clamp' } }
+  );
+  const config = createConfig({
+    document: parse(`app: document
+  settings: group`),
+  });
+  const bound = bindConfig(config, schema);
+  assert.deepEqual(bound.update({ n: '2.4' }).rejected, ['n']);
+  bound.update({ n: 2.4 });
+  assert.equal(bound.get('n'), 2.4);
+  bound.update({ n: null });
+  assert.equal(bound.get('n'), null);
+  bound.reset();
+  assert.equal(bound.get('n'), 4);
 });

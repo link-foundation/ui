@@ -70,6 +70,9 @@ export function coerce(field, raw, policy = field?.normalization ?? {}) {
  * @param {unknown} b
  */
 export function equalValue(field, a, b) {
+  if (a === null || b === null) {
+    return Object.is(a, b);
+  }
   const type = fieldType(field.type);
   return type ? Boolean(type.equals(a, b)) : Object.is(a, b);
 }

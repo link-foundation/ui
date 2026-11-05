@@ -1,3 +1,4 @@
+import { fieldVisible } from './conditions.js';
 import {
   activePreset,
   countCustomized,
@@ -9,7 +10,8 @@ import {
  * @param {Record<string, unknown>} values
  * @param {{ query?: string }} [options]
  */
-export function buildPanelModel(schema, values, { query = '' } = {}) {
+export function buildPanelModel(schema, values, options = {}) {
+  const { query = '', includeAll = false } = options;
   const all = merge(schema, values, undefined).values;
   const needle = query.trim().toLocaleLowerCase();
   const sections = new Map(
@@ -28,12 +30,19 @@ export function buildPanelModel(schema, values, { query = '' } = {}) {
     ]
       .join(' ')
       .toLocaleLowerCase();
-    if (text.includes(needle)) {
+    if (
+      text.includes(needle) &&
+      (includeAll || fieldVisible(field, all, options, sections.get(id)))
+    ) {
       sections.get(id).fields.push(field);
     }
   }
   return {
     sections: [...sections.values()].filter((s) => s.fields.length),
+    visibleCount: [...sections.values()].reduce(
+      (n, s) => n + s.fields.length,
+      0
+    ),
     changedCount: countCustomized(schema, all),
     activePreset: activePreset(schema, all) ?? undefined,
   };

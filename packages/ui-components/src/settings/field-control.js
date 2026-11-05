@@ -13,7 +13,7 @@ export function mountField(container, field, value, onChange, id) {
   const property = element === 'switch' ? 'checked' : 'value';
   const clauses = Object.entries(props)
     .filter(([key]) => !['options', 'unit'].includes(key))
-    .map(([key, v]) => [key, String(v)]);
+    .map(([key, v]) => [key, ...(Array.isArray(v) ? v : [String(v)])]);
   const children =
     element === 'select'
       ? (field.options ?? []).map((v, i) => ({
@@ -27,7 +27,7 @@ export function mountField(container, field, value, onChange, id) {
       values: [
         element,
         ...clauses,
-        [property, ...formatValue(field, value)],
+        ...(value === null ? [] : [[property, ...formatValue(field, value)]]),
         ...children,
       ],
     },
@@ -46,12 +46,18 @@ export function mountField(container, field, value, onChange, id) {
       }
     }
     number.value = String(value);
-    number.addEventListener('change', () => onChange(number.value));
+    number.addEventListener('input', () =>
+      onChange(number.value === '' ? null : Number(number.value))
+    );
     container.append(number);
   }
   return {
     update(next) {
-      mounted.store.setProp(id, property, formatValue(field, next));
+      if (next === null) {
+        mounted.store.removeProp(id, property);
+      } else {
+        mounted.store.setProp(id, property, formatValue(field, next));
+      }
       if (number) {
         number.value = String(next);
       }

@@ -4,6 +4,7 @@ import {
   randomize,
   toLino,
   fromLino,
+  fromLegacyJson,
   toShareHash,
 } from '@link-foundation/ui-settings';
 
@@ -39,6 +40,7 @@ export function createToolbar({
       commit(
         randomize(schema, getValues(), {
           random: options.random ?? Math.random,
+          locked: options.randomLocked,
         })
       ),
     toolbar
@@ -135,19 +137,61 @@ export function createSharing({
       status.textContent = 'Select and copy this text';
     }
   }
-  button('Copy changes', () => copy(toLino(schema, getValues())));
-  button('Paste changes', () => {
-    const parsed = fromLino(schema, changes.value);
+  button('Copy changes', () => copy(exportText()));
+  const exportText = () =>
+    options.codec?.write(getValues()) ?? toLino(schema, getValues());
+  const importText = (text) => {
+    const parsed = options.codec
+      ? options.codec.read(text, { base: getValues() })
+      : text.trimStart().startsWith('{')
+        ? fromLegacyJson(schema, text, { version: schema.version })
+        : fromLino(schema, text);
     if (
       !parsed.ok ||
       parsed.rejected.length ||
-      parsed.diagnostics.some((d) => d.severity === 'error')
+      parsed.diagnostics?.some((d) => d.severity === 'error')
     ) {
       status.textContent = 'Invalid settings. No changes applied.';
+      return false;
+    }
+    if (!commit(parsed.values)) {
+      return false;
+    }
+    status.textContent = 'Changes applied';
+    return true;
+  };
+  button('Paste changes', () => importText(changes.value));
+  const file = node('input');
+  file.type = 'file';
+  file.accept = '.lino,.json,text/plain,application/json';
+  file.setAttribute('aria-label', 'Import settings');
+  file.addEventListener('change', async () => {
+    const selected = file.files?.[0];
+    if (!selected) {
       return;
     }
-    commit(parsed.values);
-    status.textContent = 'Changes applied';
+    try {
+      const text = await selected.text();
+      if (!isDestroyed()) {
+        importText(text);
+      }
+    } catch {
+      if (!isDestroyed()) {
+        status.textContent = 'Could not read settings';
+      }
+    }
+    file.value = '';
+  });
+  button('Export settings', () => {
+    const url = win.URL.createObjectURL(
+      new win.Blob([exportText()], { type: 'text/plain' })
+    );
+    const link = node('a');
+    link.href = url;
+    link.download = options.codec ? 'settings.txt' : 'settings.lino';
+    link.click();
+    link.remove();
+    win.setTimeout(() => win.URL.revokeObjectURL(url), 0);
   });
   button('Copy share link', () => {
     try {
@@ -158,5 +202,5 @@ export function createSharing({
       status.textContent = error.message;
     }
   });
-  return { changes, status };
+  return { changes, status, importText, exportText };
 }

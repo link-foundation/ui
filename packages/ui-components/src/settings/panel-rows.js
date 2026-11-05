@@ -20,6 +20,18 @@ export function panelNodes(doc, element) {
   return { node, button };
 }
 
+function createTabs({ section, node, button, group, setTab }) {
+  if (section.tabs?.length) {
+    const tabs = node('div', undefined, group);
+    tabs.setAttribute('role', 'group');
+    tabs.setAttribute('aria-label', `${section.label ?? section.id} tabs`);
+    for (const tab of section.tabs) {
+      const choose = button(tab, () => setTab(section.id, tab), tabs);
+      choose.dataset.tab = tab;
+    }
+  }
+}
+
 export function createRows({
   node,
   button,
@@ -28,11 +40,17 @@ export function createRows({
   commit,
   getValues,
   isPeeking,
+  options,
+  setTab,
 }) {
   const rows = new Map();
   const sections = new Map();
   const body = node('div');
-  for (const section of buildPanelModel(schema, getValues()).sections) {
+  body.className = 'settings-sections';
+  body.style.setProperty('--settings-columns', String(options.columns ?? 1));
+  for (const section of buildPanelModel(schema, getValues(), {
+    includeAll: true,
+  }).sections) {
     const group = node('details', undefined, body);
     group.open = true;
     node('summary', section.label ?? section.id, group);
@@ -44,8 +62,19 @@ export function createRows({
       group
     );
     sections.set(section.id, group);
+    createTabs({ section, node, button, group, setTab });
+    const groups = new Map();
     for (const field of section.fields) {
-      const row = node('div', undefined, group);
+      let parent = group;
+      if (field.props.group) {
+        if (!groups.has(field.props.group)) {
+          const fieldset = node('fieldset', undefined, group);
+          node('legend', String(field.props.group), fieldset);
+          groups.set(field.props.group, fieldset);
+        }
+        parent = groups.get(field.props.group);
+      }
+      const row = node('div', undefined, parent);
       row.className = 'settings-row';
       row.dataset.key = field.key;
       const title = node('div', undefined, row);
@@ -55,7 +84,8 @@ export function createRows({
       }
       const container = node('div', undefined, row);
       container.className = 'settings-control';
-      const control = mountField(
+      const mount = options.mountControl ?? mountField;
+      const control = mount(
         container,
         field,
         getValues()[field.key],
@@ -75,7 +105,21 @@ export function createRows({
         () => commit({ [field.key]: field.default }),
         row
       );
-      rows.set(field.key, { row, control, output, marker, resetButton });
+      const preview =
+        field.props.preview &&
+        options.mountPreview?.({
+          container: node('div', undefined, row),
+          field,
+          values: getValues(),
+        });
+      rows.set(field.key, {
+        row,
+        control,
+        output,
+        marker,
+        resetButton,
+        preview,
+      });
     }
   }
   return { rows, sections };
@@ -96,11 +140,17 @@ export function refreshRows(
     entry.marker.hidden = !changed;
     entry.resetButton.disabled = !changed || peeking;
     entry.output.textContent = `${Array.isArray(shown[key]) ? shown[key].join(', ') : shown[key]}${schema.fields.get(key).unit ?? ''}`;
+    entry.preview?.update(shown, schema.fields.get(key));
     if (updateControls) {
       entry.control.update(shown[key]);
     }
   }
   for (const [key, group] of sections) {
     group.hidden = !visibleSections.has(key);
+    for (const fieldset of group.querySelectorAll('fieldset')) {
+      fieldset.hidden = [...fieldset.querySelectorAll('.settings-row')].every(
+        (row) => row.hidden
+      );
+    }
   }
 }

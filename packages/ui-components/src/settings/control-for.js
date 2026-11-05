@@ -24,5 +24,15 @@ export function controlFor(field) {
       props[key] = field[key];
     }
   }
+  for (const key of [
+    'fallback',
+    'palette',
+    'menu-min-width',
+    'menu-max-height',
+  ]) {
+    if (field.props?.[key] !== undefined) {
+      props[key] = field.props?.[key];
+    }
+  }
   return { element, props };
 }
