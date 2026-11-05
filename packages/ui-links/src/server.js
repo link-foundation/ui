@@ -47,7 +47,7 @@ import {
   parseLino,
 } from './lino.js';
 import { createNames } from './names.js';
-import { withPermissions } from './permissions.js';
+import { forbidden, withPermissions } from './permissions.js';
 import { runQuery, transact } from './query.js';
 
 const OPERATIONS = new Set([
@@ -163,6 +163,27 @@ export function createLinksServer({
   };
 }
 
+/**
+ * A names store shared by every subject, as one subject sees it: a name of a
+ * link it may not refer to is unknown, and taking it over is refused.
+ */
+function namesOfView(names, view) {
+  const hidden = (name) => {
+    const id = names.getByName(name);
+    return id !== null && !view.canReference(id);
+  };
+  return {
+    ...names,
+    getByName: (name) => (hidden(name) ? null : names.getByName(name)),
+    setName(id, name) {
+      if (hidden(name)) {
+        throw forbidden('hidden name');
+      }
+      return names.setName(id, name);
+    },
+  };
+}
+
 /** Reading addresses and restrictions as the subject of a session sees them. */
 function createReader(view, names) {
   const address = (text) => {
@@ -216,9 +237,8 @@ function createReader(view, names) {
 }
 
 /** The operations of the protocol for one session. */
-function createOperations(server, state, { view, reader, write }) {
+function createOperations(server, state, { names, reader, view, write }) {
   const { policy, authenticate } = server;
-  const names = server.names.withLinks?.(view) ?? server.names;
   const { address, visibleLink, restrictionOf, select } = reader;
   return {
     count: (arg) => [
@@ -424,7 +444,9 @@ function openSession(server, { subject = null, onPush = null } = {}) {
   const view = policy
     ? withPermissions(links, policy, () => state.subject)
     : links;
-  const names = server.names.withLinks?.(view) ?? server.names;
+  const names =
+    server.names.withLinks?.(view) ??
+    (policy ? namesOfView(server.names, view) : server.names);
   const context = { links: view, base: links, names, autoCreate };
   const readable = (link) =>
     !policy || (server.policyWatch ?? policy).canRead(state.subject, link);
@@ -436,6 +458,7 @@ function openSession(server, { subject = null, onPush = null } = {}) {
   };
   const write = (fn, ref = String) => report(transact(context, fn), ref);
   const operations = createOperations(server, state, {
+    names,
     view,
     reader: createReader(view, names),
     write,

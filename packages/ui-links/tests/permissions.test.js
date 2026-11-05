@@ -95,7 +95,8 @@ describe('permissions', () => {
   });
 
   it('keeps the hierarchy from who may write its values', () => {
-    const { links, names, policy, t, v } = world();
+    const { links, markers, names, policy, t, v } = world();
+    allow(links, markers, 'reference', t.User, t.Admin);
     const view = withPermissions(links, policy, v.alice);
     const extendsMarker = names.getByName('Extends');
     const [pair] = allLinks(links, [undefined, t.Shared, t.Public]);
@@ -121,6 +122,9 @@ describe('permissions', () => {
     const { rules, markers } = world();
     expect(
       errorCode(() => allow(rules, markers, 'read', markers.allowRead, 1))
+    ).toBe('bad-request');
+    expect(
+      errorCode(() => allow(rules, markers, 'read', markers.allowReference, 1))
     ).toBe('bad-request');
     expect(errorCode(() => allow(rules, markers, 'own', 1, 1))).toBe(
       'bad-request'
