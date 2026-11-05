@@ -1,0 +1,4 @@
+demo: document
+  chip-outlined: chip 'In review'
+    variant outlined
+    tone primary

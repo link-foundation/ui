@@ -4,6 +4,7 @@
  * each one is documented by the vocabulary, a catalog entry and a story.
  */
 
+/* global URL */
 import { readFileSync } from 'node:fs';
 import { describe, it, expect } from 'test-anywhere';
 import { parse } from '@link-foundation/ui-core';

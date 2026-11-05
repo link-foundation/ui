@@ -8,7 +8,7 @@
 
 /** Machine text by control kind. */
 export const CONTROL_MACHINES = Object.freeze({
-  'button': `button-machine: machine
+  button: `button-machine: machine
   initial idle
   context
     disabled false
@@ -29,7 +29,7 @@ export const CONTROL_MACHINES = Object.freeze({
     on pointerleave leave
     on pointercancel leave
 `,
-  'checkbox': `checkbox-machine: machine
+  checkbox: `checkbox-machine: machine
   initial ready
   context
     checked false
@@ -47,7 +47,7 @@ export const CONTROL_MACHINES = Object.freeze({
       context checked
     on change toggle
 `,
-  'chip': `chip-machine: machine
+  chip: `chip-machine: machine
   initial present
   context
     disabled false
@@ -91,7 +91,7 @@ export const CONTROL_MACHINES = Object.freeze({
   part indicator
     on change pick
 `,
-  'combobox': `combobox-machine: machine
+  combobox: `combobox-machine: machine
   initial closed
   context
     disabled false
@@ -278,7 +278,7 @@ export const CONTROL_MACHINES = Object.freeze({
     key Space select
     on press select
 `,
-  'select': `select-machine: machine
+  select: `select-machine: machine
   initial closed
   context
     disabled false
@@ -385,7 +385,7 @@ export const CONTROL_MACHINES = Object.freeze({
       state
     on click pick
 `,
-  'slider': `slider-machine: machine
+  slider: `slider-machine: machine
   initial idle
   context
     disabled false
@@ -485,7 +485,7 @@ export const CONTROL_MACHINES = Object.freeze({
     on pointerup release
     on lostpointercapture release
 `,
-  'switch': `switch-machine: machine
+  switch: `switch-machine: machine
   initial ready
   context
     checked false

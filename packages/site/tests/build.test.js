@@ -67,7 +67,7 @@ test(
           if (page === 'components/') {
             assert.equal(
               document.querySelectorAll('[data-component]').length,
-              19
+              21
             );
             const frame = document.querySelector('#component-gallery iframe');
             const matrixPath = path.resolve(

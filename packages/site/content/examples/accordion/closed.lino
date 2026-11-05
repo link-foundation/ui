@@ -1,0 +1,3 @@
+demo: document
+  accordion-closed: accordion 'Shipping'
+    accordion-closed-text: text 'Two to five days.'
