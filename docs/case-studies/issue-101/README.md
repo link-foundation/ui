@@ -24,6 +24,11 @@ operation, the package `@link-foundation/ui-links`, and ui-store documents in
 any links storage. Everything beyond it is 18 issues in this repository and
 in link-cli.
 
+The accepted follow-up work is now complete. The
+[issue-109 audit](../issue-109/README.md) maps every requirement to its
+implementation and checks, records the explicit rejection of browser
+SQLite/OPFS, and explains the sync defect fixed during final verification.
+
 ## Contents
 
 | Path                                                         | What it holds                                                                                                                                |

@@ -6,6 +6,11 @@ The issues were created from the files in [`issues/`](issues/), one per
 issue, in two repositories, with GitHub's "blocked by" relations and
 sub-issues, including across the repositories.
 
+The accepted work is now done; see the
+[completion audit](../../issue-109/README.md) for evidence and the explicit
+rejection of browser SQLite/OPFS (#111). The tables preserve the original
+plan and dependency relationships.
+
 ## The issues
 
 | Key | Issue                                                                  | Type    | Title                                                                                                         | Blocked by    |

@@ -110,5 +110,8 @@ its view, and
 says a subject "may refer to a type it cannot read". From that source it has the
 same leak for references; this was read, not run against clink. The decision
 is brought there in
-[link-cli#161](https://github.com/link-foundation/link-cli/issues/161), and until it lands this is a listed difference in the
-[package README](../../../packages/ui-links/README.md#compatibility-with-link-cli).
+[link-cli#161](https://github.com/link-foundation/link-cli/issues/161).
+It is now implemented in clink 2.1.1. The shared contract in
+`packages/ui-links/tests/clink.test.js` and the permissions example exercise
+denied and granted references on both servers, including that a reference
+grant leaves its target unreadable. It is no longer a compatibility difference.
