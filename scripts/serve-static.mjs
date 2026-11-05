@@ -106,6 +106,7 @@ export function defaultMounts(root) {
     ['examples', 'ui-dom'],
     ['examples', 'animation'],
     ['examples', 'themes'],
+    ['examples', 'deepcase'],
     ['assets', 'classic-themes'],
     ['node_modules', 'links-notation', 'dist'],
     ['node_modules', '@material', 'material-color-utilities'],

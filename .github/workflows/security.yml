@@ -190,6 +190,7 @@ jobs:
         directory:
           [
             '.',
+            examples/deepcase,
             examples/universal-app,
             examples/react,
             examples/react-native,
