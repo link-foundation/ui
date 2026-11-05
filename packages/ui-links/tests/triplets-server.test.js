@@ -4,6 +4,7 @@
  */
 
 import { readFileSync } from 'node:fs';
+import { URL } from 'node:url';
 import { describe, it, expect } from 'test-anywhere';
 import { ArityRange, BinaryLinoOptions } from 'links-notation';
 import {
@@ -374,7 +375,7 @@ describe('triplet mode', () => {
   it('refuses an argument that is not a number with its text', () => {
     const session = server().session();
     expect(session.request('(create: (a 0 0))')).toBe(
-      "(error: 'expected a number, found ''a''')"
+      `(error: "expected a number, found 'a'")`
     );
     expect(session.request('(delete: (1 2))')).toBe(
       "(error: 'expected a number, found (1 2)')"

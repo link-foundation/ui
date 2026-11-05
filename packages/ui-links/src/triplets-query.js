@@ -153,9 +153,7 @@ function solve(triplets, names, patterns, bindings, matched, solutions) {
   for (const triplet of triplets.eachTriplet({ index, type, from, to })) {
     const next = new Map(bindings);
     const found = [triplet.index, triplet.type, triplet.from, triplet.to];
-    if (
-      references.every((reference, at) => bind(next, reference, found[at]))
-    ) {
+    if (references.every((reference, at) => bind(next, reference, found[at]))) {
       matched.push(triplet.index);
       solve(triplets, names, rest, next, matched, solutions);
       matched.pop();

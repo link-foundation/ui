@@ -174,7 +174,9 @@ describe('withTriplets', () => {
     expect(doublets(triplets).length).toBe(size);
     expectNoOrphans(triplets);
   });
+});
 
+describe('withTriplets over updates and deletes', () => {
   it('keeps the address through an update and collects the old pair', () => {
     const triplets = store();
     const p = people(triplets);
@@ -244,9 +246,11 @@ describe('withTriplets', () => {
     const ab = triplets.createTriplet(p.knows, p.alice, p.bob);
     const bc = triplets.createTriplet(p.knows, p.bob, p.carol);
     const about = triplets.createTriplet(p.knows, ab, bc);
-    expect(
-      triplets.deleteTriplet(p.alice).map(({ index }) => index)
-    ).toEqual([p.alice, ab, about]);
+    expect(triplets.deleteTriplet(p.alice).map(({ index }) => index)).toEqual([
+      p.alice,
+      ab,
+      about,
+    ]);
     expect(triplets.isTriplet(bc)).toBe(true);
     expectNoOrphans(triplets);
     // A cycle: two triplets that use each other.
@@ -275,7 +279,10 @@ describe('withTriplets', () => {
         () => triplets.createTriplet(marker),
         `The type ${marker} is not a triplet.`,
       ],
-      [() => triplets.createTriplet(pair), `The type ${pair} is not a triplet.`],
+      [
+        () => triplets.createTriplet(pair),
+        `The type ${pair} is not a triplet.`,
+      ],
       [
         () => triplets.createTriplet(p.knows, 10000),
         'The from part 10000 is not a triplet.',
@@ -351,8 +358,7 @@ describe('withTriplets against a triplet store', () => {
     const { stored } = reference;
     const random = createRandom(151);
     const idsOf = () => [...stored.keys()].sort((a, b) => a - b);
-    const part = (ids) =>
-      random(4) === 0 ? 0 : ids[random(ids.length)];
+    const part = (ids) => (random(4) === 0 ? 0 : ids[random(ids.length)]);
     const root = triplets.createTripletPoint();
     stored.set(root, [root, 0, 0]);
     const protectedIds = new Set([root]);
@@ -361,40 +367,47 @@ describe('withTriplets against a triplet store', () => {
       stored.set(type, [root, 0, 0]);
       protectedIds.add(type);
     }
-    let [creates, updates, deletes] = [0, 0, 0];
+    const counts = { creates: 0, updates: 0, deletes: 0 };
+    const pick = (ids) => ids[random(ids.length)];
+    const create = (ids) => {
+      const parts = [pick(ids), part(ids), part(ids)];
+      const index = triplets.createTriplet(...parts);
+      expect(stored.has(index)).toBe(false);
+      stored.set(index, parts);
+      counts.creates++;
+    };
+    const update = (index, ids) => {
+      const parts = [pick(ids), part(ids), part(ids)];
+      triplets.updateTriplet(index, ...parts);
+      stored.set(index, parts);
+      counts.updates++;
+    };
+    const remove = (index) => {
+      const deleted = triplets.deleteTriplet(index);
+      const before = stored.size;
+      reference.delete(index);
+      expect(deleted.length).toBe(before - stored.size);
+      counts.deletes++;
+    };
     for (let step = 0; step < 1600 || stored.size < 1000; step++) {
       const ids = idsOf();
       const choice = step >= 1600 ? 0 : random(10);
       if (choice <= 6) {
-        const type = ids[random(ids.length)];
-        const from = part(ids);
-        const to = part(ids);
-        const index = triplets.createTriplet(type, from, to);
-        expect(stored.has(index)).toBe(false);
-        stored.set(index, [type, from, to]);
-        creates++;
-      } else if (choice <= 8) {
-        const index = ids[random(ids.length)];
-        if (!protectedIds.has(index)) {
-          const type = ids[random(ids.length)];
-          const from = part(ids);
-          const to = part(ids);
-          triplets.updateTriplet(index, type, from, to);
-          stored.set(index, [type, from, to]);
-          updates++;
-        }
+        create(ids);
       } else {
-        const index = ids[random(ids.length)];
+        const index = pick(ids);
         if (!protectedIds.has(index)) {
-          const deleted = triplets.deleteTriplet(index);
-          const before = stored.size;
-          reference.delete(index);
-          expect(deleted.length).toBe(before - stored.size);
-          deletes++;
+          if (choice <= 8) {
+            update(index, ids);
+          } else {
+            remove(index);
+          }
         }
       }
     }
-    expect(creates > 1000 && updates > 100 && deletes > 50).toBe(true);
+    expect(
+      counts.creates > 1000 && counts.updates > 100 && counts.deletes > 50
+    ).toBe(true);
     expect(stored.size >= 1000).toBe(true);
 
     expect(triplets.eachTriplet()).toEqual(reference.each());

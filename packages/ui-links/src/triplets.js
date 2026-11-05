@@ -87,7 +87,7 @@ const isAuxiliary = ({ kind }) =>
 const leadsOn = ({ kind }) => kind === 'pair' || kind === 'duplicate-pair';
 
 /** What deleting `first` deletes, `first` first: it and what uses it. */
-function cascadeOf(triplets, first) {
+export function cascadeOf(triplets, first) {
   const deleted = [first];
   const seen = new Set([first.index]);
   for (let at = 0; at < deleted.length; at++) {
@@ -124,17 +124,8 @@ function ensurePart(triplets, part, itself, name) {
 
 const notATriplet = (index) => refused(`Link ${index} is not a triplet.`);
 
-/**
- * Triplets over the doublets of `links`.
- * @param {any} links  any storage, or a layer over one
- * @param {object} [options]
- * @param {any} [options.names]  the names store of the markers; by default the
- *   names are kept as doublets of `links`, so they persist with the data
- * @param {TripletMarkers} [options.markers]  the markers, when already known
- */
-export function withTriplets(links, options = {}) {
-  const names = options.names ?? createLinksNames(links);
-  const markers = options.markers ?? tripletMarkers(links, names);
+/** Reading the encoding: what a doublet is, and the triplets it holds. */
+function createTripletReader(links, markers) {
   const isMarker = (id) => id === markers.pair || id === markers.nothing;
   const encode = (part) => (part === NULL ? markers.nothing : part);
   const decode = (part) => (part === markers.nothing ? NULL : part);
@@ -166,38 +157,27 @@ export function withTriplets(links, options = {}) {
     );
   };
 
-  /** What `link` is in the encoding, by its sources alone. */
-  const role = (link) => {
-    const foreign = { kind: 'foreign' };
-    if (isMarker(link.id)) {
-      return { kind: 'marker' };
-    }
-    if (link.from_id === markers.pair) {
-      return { kind: 'wrapper' };
-    }
-    if (link.from_id === NULL || link.from_id === markers.nothing) {
-      return foreign;
-    }
-    const source = stored(link.from_id);
-    if (source === null) {
-      return foreign;
-    }
+  /** What a doublet is by its source: made on a pair, or nothing yet. */
+  const roleBySource = (source) => {
     if (source.from_id === markers.pair) {
       return { kind: 'pair' };
     }
     if (isWrapper(source.from_id)) {
       return { kind: 'duplicate-pair' };
     }
-    if (isPair(source.from_id)) {
-      // The source is a duplicate pair: nothing of ours has one.
-      return foreign;
-    }
+    // The source is a duplicate pair: nothing of ours has one.
+    return isPair(source.from_id) ? { kind: 'foreign' } : null;
+  };
+
+  /** What a doublet is that is neither a marker nor made on a pair. */
+  const roleByTarget = (link) => {
     if (link.to_id === link.id) {
       return {
         kind: 'triplet',
         triplet: { index: link.id, type: link.from_id, from: 0, to: 0 },
       };
     }
+    const foreign = { kind: 'foreign' };
     const target = stored(link.to_id);
     if (target === null || isMarker(target.id)) {
       return foreign;
@@ -212,11 +192,87 @@ export function withTriplets(links, options = {}) {
     return foreign;
   };
 
+  /** What `link` is in the encoding, by its sources alone. */
+  const role = (link) => {
+    if (isMarker(link.id)) {
+      return { kind: 'marker' };
+    }
+    if (link.from_id === markers.pair) {
+      return { kind: 'wrapper' };
+    }
+    const source =
+      link.from_id === markers.nothing ? null : stored(link.from_id);
+    if (source === null) {
+      return { kind: 'foreign' };
+    }
+    return roleBySource(source) ?? roleByTarget(link);
+  };
+
   const tripletOf = (link) => {
     const found = role(link);
     return found.kind === 'triplet' ? found.triplet : null;
   };
 
+  /** The triplets on `pair`: outers `(T pair)` and duplicates `(pair i)`. */
+  const tripletsOnPair = (pair) => {
+    const found = allLinks(links, { to_id: pair }).map(tripletOf);
+    for (const duplicate of allLinks(links, { from_id: pair })) {
+      const outer = stored(duplicate.to_id);
+      if (outer?.to_id === duplicate.id) {
+        found.push(tripletOf(outer));
+      }
+    }
+    return found.filter((triplet) => triplet !== null);
+  };
+
+  /** The triplets with `from` or `to` set, or `null` when neither says. */
+  const candidatesOnParts = (from, to) => {
+    if (from !== null && to !== null && (from !== NULL || to !== NULL)) {
+      const wrapper = search(links, markers.pair, encode(from));
+      const pair = wrapper && search(links, wrapper.id, encode(to));
+      return pair ? tripletsOnPair(pair.id) : [];
+    }
+    if (from !== null && from !== NULL) {
+      const wrapper = search(links, markers.pair, from);
+      return wrapper
+        ? allLinks(links, { from_id: wrapper.id }).flatMap((pair) =>
+            tripletsOnPair(pair.id)
+          )
+        : [];
+    }
+    if (to !== null && to !== NULL) {
+      return allLinks(links, { to_id: to })
+        .filter((pair) => isWrapper(pair.from_id))
+        .flatMap((pair) => tripletsOnPair(pair.id));
+    }
+    return null;
+  };
+
+  /** The triplets a restriction reaches without reading every doublet. */
+  const candidatesOf = ({ index, type, from, to }) => {
+    if (index !== null) {
+      const link = stored(index);
+      const found = link && tripletOf(link);
+      return found ? [found] : [];
+    }
+    const onParts = candidatesOnParts(from, to);
+    if (onParts !== null) {
+      return onParts;
+    }
+    const everything =
+      type === null
+        ? allLinks(links)
+        : type !== NULL && !isMarker(type)
+          ? allLinks(links, { from_id: type })
+          : [];
+    return everything.map(tripletOf).filter((triplet) => triplet !== null);
+  };
+
+  return { isMarker, encode, stored, role, tripletOf, candidatesOf };
+}
+
+/** Writing the encoding: the doublets a triplet needs, and collecting them. */
+function createTripletWriter(links, markers, { encode, stored, role }) {
   /** The doublet `(source target)`, created when missing. */
   const getOrCreate = (source, target) => {
     const found = search(links, source, target);
@@ -244,18 +300,6 @@ export function withTriplets(links, options = {}) {
       );
     }
     links.update(index, source, target);
-  };
-
-  /** The triplets on `pair`: outers `(T pair)` and duplicates `(pair i)`. */
-  const tripletsOnPair = (pair) => {
-    const found = allLinks(links, { to_id: pair }).map(tripletOf);
-    for (const duplicate of allLinks(links, { from_id: pair })) {
-      const outer = stored(duplicate.to_id);
-      if (outer?.to_id === duplicate.id) {
-        found.push(tripletOf(outer));
-      }
-    }
-    return found.filter((triplet) => triplet !== null);
   };
 
   const usages = (id) =>
@@ -296,39 +340,24 @@ export function withTriplets(links, options = {}) {
     }
   };
 
-  /** The triplets a restriction reaches without reading every doublet. */
-  const candidatesOf = ({ index, type, from, to }) => {
-    if (index !== null) {
-      const link = stored(index);
-      const found = link && tripletOf(link);
-      return found ? [found] : [];
-    }
-    if (from !== null && to !== null && (from !== NULL || to !== NULL)) {
-      const wrapper = search(links, markers.pair, encode(from));
-      const pair = wrapper && search(links, wrapper.id, encode(to));
-      return pair ? tripletsOnPair(pair.id) : [];
-    }
-    if (from !== null && from !== NULL) {
-      const wrapper = search(links, markers.pair, from);
-      return wrapper
-        ? allLinks(links, { from_id: wrapper.id }).flatMap((pair) =>
-            tripletsOnPair(pair.id)
-          )
-        : [];
-    }
-    if (to !== null && to !== NULL) {
-      return allLinks(links, { to_id: to })
-        .filter((pair) => isWrapper(pair.from_id))
-        .flatMap((pair) => tripletsOnPair(pair.id));
-    }
-    const everything =
-      type === null
-        ? allLinks(links)
-        : type !== NULL && !isMarker(type)
-          ? allLinks(links, { from_id: type })
-          : [];
-    return everything.map(tripletOf).filter((triplet) => triplet !== null);
-  };
+  return { getOrCreate, pairOf, setOuter, usages, collect };
+}
+
+/**
+ * Triplets over the doublets of `links`.
+ * @param {any} links  any storage, or a layer over one
+ * @param {object} [options]
+ * @param {any} [options.names]  the names store of the markers; by default the
+ *   names are kept as doublets of `links`, so they persist with the data
+ * @param {TripletMarkers} [options.markers]  the markers, when already known
+ */
+export function withTriplets(links, options = {}) {
+  const names = options.names ?? createLinksNames(links);
+  const markers = options.markers ?? tripletMarkers(links, names);
+  const reader = createTripletReader(links, markers);
+  const { stored, role, tripletOf, candidatesOf } = reader;
+  const { getOrCreate, pairOf, setOuter, usages, collect } =
+    createTripletWriter(links, markers, reader);
 
   const view = decorate(links, {
     markers,
@@ -497,9 +526,7 @@ export function withTripletPermissions(
 ) {
   const who = typeof subject === 'function' ? subject : () => subject;
   const owns = (link) =>
-    link.from_id === link.id &&
-    link.to_id === link.id &&
-    created.has(link.id);
+    link.from_id === link.id && link.to_id === link.id && created.has(link.id);
   const doublets = withPermissions(triplets.doublets, policy, who, {
     created,
     owns,
@@ -523,8 +550,7 @@ export function withTripletPermissions(
     readable,
     over: (other) =>
       withTripletPermissions(triplets.over(other), policy, who, created),
-    roleOf: (id) =>
-      readable(outerOf(id)) ? triplets.roleOf(id) : null,
+    roleOf: (id) => (readable(outerOf(id)) ? triplets.roleOf(id) : null),
     getTriplet: (index) =>
       readable(outerOf(index)) ? triplets.getTriplet(index) : null,
     isTriplet: (index) => view.getTriplet(index) !== null,
@@ -562,10 +588,7 @@ export function withTripletPermissions(
       }
       // Only an empty triplet has itself as its target.
       const target = from === NULL && to === NULL ? index : NULL;
-      if (
-        !writable(outerOf(index)) ||
-        !writable(linkOf(index, type, target))
-      ) {
+      if (!writable(outerOf(index)) || !writable(linkOf(index, type, target))) {
         throw forbidden(`update ${index}`);
       }
       ensurePart(view, from, index, 'from');
