@@ -34,7 +34,9 @@ CLINK=clink npx playwright test --config examples/deepcase/playwright.config.mjs
 
 The check requires 22 actual Cytoscape nodes, writes and deletes a value through
 the adapter, waits for each change in the graph label, and rejects browser
-exceptions. It saves `test-results/deepcase-clink.png`. To refresh the reviewed
+exceptions. It checks keyboard access to **Fit graph** and runs a WCAG axe audit;
+the browser host labels the upstream file input. It saves
+`test-results/deepcase-clink.png`. To refresh the reviewed
 image, set `DEEPCASE_SCREENSHOT=docs/screenshots/deepcase-clink.png`.
 
 ![Upstream Deepcase graph on clink](../../docs/screenshots/deepcase-clink.png)

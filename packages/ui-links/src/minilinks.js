@@ -61,6 +61,7 @@ export function deepObservable(start) {
 }
 
 function decorateRow(ml, input, applies) {
+  input = input.toPlain?.() ?? input;
   const row = {
     type_id: undefined,
     from_id: undefined,

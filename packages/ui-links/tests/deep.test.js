@@ -57,6 +57,13 @@ describe('minilinks compatibility', () => {
     other.apply(rows.slice(0, 2), 'one');
     other.apply(rows.slice(1), 'two');
     expect(other.byId[3]._applies).toEqual(['one', 'two']);
+    const seen = [];
+    const subscription = other
+      .subscribe(3)
+      .subscribe((data) => seen.push(data));
+    other.apply(other.query(3), 'one');
+    expect(seen.length).toBe(1);
+    subscription.unsubscribe();
     other.apply([], 'one');
     expect(other.links.map((l) => l.id)).toEqual([3, 5]);
     other.apply([], 'two');
