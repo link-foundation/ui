@@ -1447,3 +1447,8 @@ application-defined array types registered through `defineFieldType` of
 `ui-settings`; the example demonstrates this without adding schema types.
 Paste changes validates a complete diff document before applying it; absent
 fields restore defaults. Clipboard failures reveal a selectable text field.
+
+See [control and settings integration contracts](../../docs/case-studies/issue-210/contracts.md)
+for external labels, popup sizing, live editors, rich panel extensions, normalization
+and compatibility codec hooks. The [rich panel example](../ui-components/examples/rich-settings.html)
+demonstrates conditional fields, section tabs, previews and whole-section columns.

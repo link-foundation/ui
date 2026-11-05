@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="data:," />
+    <title>Control integration contracts</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "@floating-ui/dom": "/node_modules/@floating-ui/dom/dist/floating-ui.dom.mjs",
+          "@floating-ui/core": "/node_modules/@floating-ui/core/dist/floating-ui.core.mjs",
+          "@floating-ui/utils": "/node_modules/@floating-ui/utils/dist/floating-ui.utils.mjs",
+          "@floating-ui/utils/dom": "/node_modules/@floating-ui/utils/dist/floating-ui.utils.dom.mjs",
+          "@link-foundation/ui-settings": "/packages/ui-settings/src/index.js",
+          "@link-foundation/ui-config": "/packages/ui-config/src/index.js",
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "@link-foundation/ui-store": "/packages/ui-store/src/index.js",
+          "@link-foundation/ui-dom": "/packages/ui-dom/src/index.js",
+          "@link-foundation/ui-style": "/packages/ui-style/src/index.js",
+          "@link-foundation/ui-tokens": "/packages/ui-tokens/src/index.js",
+          "@link-foundation/ui-tokens/themes": "/packages/ui-tokens/src/themes/index.js",
+          "links-notation": "/node_modules/links-notation/dist/index.js"
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="../src/controls/styles.css" />
+    <link rel="stylesheet" href="../src/settings/settings.css" />
+    <style>
+      body {
+        margin: 0;
+        font: 16px system-ui;
+        background: #fff;
+        color: #111;
+      }
+      main {
+        padding: 12px;
+      }
+      #clip {
+        display: block;
+        margin-top: 130px;
+        height: 80px;
+        overflow: hidden;
+        border: 1px solid #555;
+      }
+      ui-select {
+        display: block;
+        width: 200px;
+      }
+      ui-select [data-part='listbox'] {
+        background: white;
+        color: #111;
+        border: 1px solid #555;
+      }
+      ui-option {
+        display: block;
+        padding: 8px;
+      }
+      ui-option[data-active] {
+        background: #ddd;
+      }
+      #editors {
+        margin-top: 30px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1 style="font-size: 16px; margin: 0">Control integration contracts</h1>
+      <label id="clip">Palette<span id="select"></span></label>
+      <button id="next">Next field</button>
+      <div id="editors"></div>
+    </main>
+    <script type="module">
+      import { mountControls } from '../src/controls/index.js';
+      import { formatLinks } from '@link-foundation/ui-core';
+      if (new URL(location.href).searchParams.has('fallback'))
+        HTMLElement.prototype.showPopover = undefined;
+      const options = Array.from({ length: 12 }, (_, i) => ({
+        id: `p${i}`,
+        values: [
+          'option',
+          `Palette ${i}`,
+          ...(i === 1 ? [['disabled', 'true']] : []),
+        ],
+      }));
+      globalThis.mounted = mountControls(
+        document.querySelector('#select'),
+        formatLinks([
+          {
+            id: 'palette',
+            values: [
+              'select',
+              'Palette',
+              ['external-label', 'true'],
+              ['aria-label', 'Palette'],
+              ['list-label', 'Options: Palette'],
+              ['menu-min-width', '280'],
+              ['menu-max-height', '320'],
+              ['value', 'p0'],
+              ...options,
+            ],
+          },
+        ])
+      );
+      globalThis.editors = mountControls(
+        document.querySelector('#editors'),
+        `n: number-field 'Size'
+  fallback 5
+  step 0.1
+c: color-field 'Accent'
+  value '#1256ab'
+  palette
+    Ocean '#1256ab'
+    Sand '#eecbaa'`
+      );
+      document.body.dataset.ready = 'true';
+    </script>
+  </body>
+</html>
