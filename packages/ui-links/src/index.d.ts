@@ -510,7 +510,8 @@ export interface TripletsReads {
   countTriplets(query?: TripletQuery): number;
 }
 export interface TripletsWrites {
-  createTriplet(type?: number, from?: number, to?: number): number;
+  /** `(i: type from to)`; `type` must be a triplet. */
+  createTriplet(type: number, from?: number, to?: number): number;
   createTripletPoint(): number;
   /** The triplet as it was before. */
   updateTriplet(index: number, type: number, from: number, to: number): Triplet;
@@ -533,7 +534,7 @@ export interface TripletsView
 }
 export function tripletMarkers(
   links: LinksStorage,
-  names?: NamesStore
+  names: NamesStore
 ): TripletMarkers;
 export function matchesTriplet(triplet: Triplet, query?: TripletQuery): boolean;
 /** What deleting `first` deletes, `first` first: it and what uses it. */
@@ -606,6 +607,8 @@ export interface PendingTripletWrite {
   changes: TripletChange[];
 }
 export interface SyncedTriplets extends TripletsReads, TripletsWrites {
+  /** Without parts it is a point, like `createTripletPoint`. */
+  createTriplet(type?: number, from?: number, to?: number): number;
   create(type?: number, from?: number, to?: number): number;
   update(index: number, type: number, from: number, to: number): number;
   delete(index: number): number;

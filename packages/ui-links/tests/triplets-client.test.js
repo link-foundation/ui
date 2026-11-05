@@ -1,6 +1,7 @@
 /** The synced triplets client against the reference server, in one process. */
 import { describe, it, expect } from 'test-anywhere';
 import {
+  ANY,
   BREAK,
   CONTINUE,
   connectInProcess,
@@ -9,6 +10,7 @@ import {
   createNames,
   createSyncedTriplets,
   LinksError,
+  MAX_ADDRESS,
 } from '@link-foundation/ui-links';
 import { world } from './helpers.js';
 
@@ -361,5 +363,217 @@ describe('createSyncedTriplets without a connection', () => {
     expect(client.connected).toBe(false);
     expect(client.pending).toBe(1);
     expect(errors).toEqual([['The line is down', null]]);
+  });
+});
+
+/** A transport whose requests can wait: `hold()` until `release()`. */
+function holdable(server) {
+  const inner = connectInProcess(server);
+  let gate = null;
+  let open = () => {};
+  return {
+    transport: {
+      ...inner,
+      send: async (text) => {
+        await gate;
+        return inner.send(text);
+      },
+    },
+    hold() {
+      gate = new Promise((resolve) => {
+        open = resolve;
+      });
+    },
+    release() {
+      gate = null;
+      open();
+    },
+  };
+}
+
+const onServer = (server, index) =>
+  server.session().request(`(each: (${index}))`);
+
+/** A type, a triplet `i` of it, and two more types, all answered. */
+async function typed(client) {
+  const [a, q, r] = [
+    client.createTripletPoint(),
+    client.createTripletPoint(),
+    client.createTripletPoint(),
+  ];
+  const i = client.createTriplet(a);
+  await client.flush();
+  return {
+    a: client.resolve(a),
+    q: client.resolve(q),
+    r: client.resolve(r),
+    i: client.resolve(i),
+  };
+}
+
+describe('createSyncedTriplets keeps to what the server said', () => {
+  it('never gives a temporary address the value that means any', async () => {
+    const client = createSyncedTriplets();
+    const point = client.createTripletPoint();
+    const made = [point];
+    for (let n = 0; n < 8; n++) {
+      made.push(client.createTriplet(point));
+    }
+    expect(made.includes(ANY)).toBe(false);
+    expect(made.every((index) => index <= MAX_ADDRESS)).toBe(true);
+    client.deleteTriplet(made[8]);
+    expect(client.countTriplets()).toBe(8);
+  });
+
+  it('takes an update of its own that the server took after a push', async () => {
+    const server = running();
+    const other = clientOf(server);
+    const { q, r, i } = await typed(other);
+    const { transport, hold, release } = holdable(server);
+    const client = createSyncedTriplets({ transport });
+    await client.subscribe([]);
+
+    hold();
+    client.updateTriplet(i, q, 0, 0);
+    other.updateTriplet(i, r, 0, 0);
+    await other.flush();
+    expect(client.getTriplet(i).type).toBe(q);
+    release();
+    await client.flush();
+    expect(onServer(server, i)).toBe(`(${i}: ${q} 0 0)`);
+    expect(client.getTriplet(i).type).toBe(q);
+  });
+
+  it('keeps a triplet that left one subscription for another', async () => {
+    const server = running();
+    const writer = clientOf(server);
+    const { a, q, i } = await typed(writer);
+    for (const order of [
+      [[], [null, a]],
+      [[null, a], []],
+    ]) {
+      writer.updateTriplet(i, a, 0, 0);
+      await writer.flush();
+      const client = clientOf(server);
+      await client.subscribe(order[0]);
+      await client.subscribe(order[1]);
+      writer.updateTriplet(i, q, 0, 0);
+      await writer.flush();
+      expect(client.getTriplet(i)).toEqual({
+        index: i,
+        type: q,
+        from: 0,
+        to: 0,
+      });
+    }
+  });
+
+  it('still drops a triplet deleted under both subscriptions', async () => {
+    const server = running();
+    const writer = clientOf(server);
+    const { a, i } = await typed(writer);
+    const client = clientOf(server);
+    await client.subscribe([]);
+    await client.subscribe([null, a]);
+    writer.deleteTriplet(i);
+    await writer.flush();
+    expect(client.getTriplet(i)).toBe(null);
+  });
+});
+
+describe('createSyncedTriplets after a refusal', () => {
+  it('forgets a refused update, with an accepted one before or after it', async () => {
+    const server = running();
+    const client = clientOf(server);
+    const { a, q, i } = await typed(client);
+    const errors = [];
+    client.onError((error) => errors.push(error.message));
+
+    client.updateTriplet(i, 99999, 0, 0);
+    client.updateTriplet(i, q, 0, 0);
+    await client.flush();
+    expect(client.getTriplet(i).type).toBe(q);
+    expect(onServer(server, i)).toBe(`(${i}: ${q} 0 0)`);
+
+    client.updateTriplet(i, a, 0, 0);
+    client.updateTriplet(i, 99999, 0, 0);
+    await client.flush();
+    expect(client.getTriplet(i).type).toBe(a);
+
+    client.updateTriplet(i, 99998, 0, 0);
+    client.updateTriplet(i, 99999, 0, 0);
+    await client.flush();
+    expect(client.getTriplet(i).type).toBe(a);
+    expect(errors.length).toBe(4);
+  });
+
+  it('undoes a refused update to what another client wrote meanwhile', async () => {
+    const server = running();
+    const other = clientOf(server);
+    const { q, i } = await typed(other);
+    const { transport, hold, release } = holdable(server);
+    const client = createSyncedTriplets({ transport });
+    await client.subscribe([]);
+
+    hold();
+    client.updateTriplet(i, 99999, 0, 0);
+    other.updateTriplet(i, q, 0, 0);
+    await other.flush();
+    release();
+    await client.flush();
+    expect(onServer(server, i)).toBe(`(${i}: ${q} 0 0)`);
+    expect(client.getTriplet(i).type).toBe(q);
+  });
+
+  it('leaves no phantom of a refused create, whatever came after it', async () => {
+    const server = running();
+    const client = clientOf(server);
+    const errors = [];
+    client.onError((error) => errors.push(error.message));
+
+    const deleted = client.createTriplet(99999, 0, 0);
+    client.deleteTriplet(deleted);
+    const updated = client.createTriplet(99999, 0, 0);
+    client.updateTriplet(updated, 99998, 0, 0);
+    const user = client.createTriplet(99999, 0, 0);
+    const child = client.createTriplet(user, 0, 0);
+    await client.flush();
+
+    expect(lines(client)).toEqual([]);
+    expect(client.pending).toBe(0);
+    for (const temp of [deleted, updated, user, child]) {
+      expect(client.isTemporary(temp)).toBe(false);
+      expect(client.getTriplet(temp)).toBe(null);
+    }
+    expect(errors.length).toBe(6);
+    expect(server.session().request('(count: ())')).toBe('(count: 0)');
+  });
+});
+
+describe('createSyncedTriplets with old addresses and queued writes', () => {
+  it('loads under the writes still queued', async () => {
+    const server = running();
+    const client = clientOf(server);
+    const { q, r, i } = await typed(client);
+    client.updateTriplet(i, q, 0, 0);
+    client.updateTriplet(i, r, 0, 0);
+    await client.load();
+    expect(client.getTriplet(i).type).toBe(r);
+    await client.flush();
+    expect(client.getTriplet(i).type).toBe(r);
+    expect(onServer(server, i)).toBe(`(${i}: ${r} 0 0)`);
+  });
+
+  it('reads with a temporary address that has its real one', async () => {
+    const client = clientOf(running());
+    const point = client.createTripletPoint();
+    const one = client.createTriplet(point);
+    await client.flush();
+    const real = client.resolve(one);
+    expect(
+      client.eachTriplet({ type: point }).some((t) => t.index === real)
+    ).toBe(true);
+    expect(client.eachTriplet([one]).length).toBe(1);
+    expect(client.countTriplets({ index: one })).toBe(1);
   });
 });

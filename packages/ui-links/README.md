@@ -480,8 +480,10 @@ client.deleteTriplet(alice);
   `onRemap(listener)` tell about it, and the old address keeps working in the
   calls of the client.
 - A refused write is undone (`origin: 'rollback'`) and told to
-  `onError(listener)` with the words of the server. `onChange(listener)` gets
-  every change of the cache.
+  `onError(listener)` with the words of the server. A later write that uses a
+  triplet whose create was refused is refused with it. Reads are what the server
+  said with the queued writes on top, so an undo cannot bring back an old value.
+  `onChange(listener)` gets every change of the cache.
 - `query(text)` runs a substitution query after the queued writes, and brings
   its changes into the cache.
 - Writes wait without a connection; `connect(transport)` sends them, subscribes

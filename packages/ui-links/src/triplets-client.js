@@ -5,7 +5,8 @@
  * Like the synced client of links: reads answer from the cache, and writes
  * apply to it at once and go to the server one at a time. A new triplet has a
  * temporary address, counted down from the largest, until the server gives it
- * a real one. A refused write is undone, and told to `onError`. Writes made
+ * a real one. A refused write is undone, and told to `onError`; so is a later
+ * write that uses a triplet whose create was refused. Writes made
  * without a connection wait for the next one; that connection reads every
  * readable triplet again.
  *
@@ -26,11 +27,10 @@ import {
   restrictionLino,
   withProperties,
 } from './client-wire.js';
+import { MAX_ADDRESS } from './constants.js';
 import { BREAK, CONTINUE, LinksError } from './links.js';
 import { formatLino, parseLino } from './lino.js';
 import { cascadeOf, matchesTriplet } from './triplets.js';
-
-const MAX_ADDRESS = 0xffffffff;
 
 const expected = (shape, value) =>
   new LinksError(
@@ -73,14 +73,26 @@ function tripletChanges(document, ref = numberOf) {
 const sameTriplet = (a, b) =>
   a.type === b.type && a.from === b.from && a.to === b.to;
 
+/** The triplets of `map` that satisfy `query`, by address. */
+const eachIn = (map, query) =>
+  [...map.values()]
+    .filter((triplet) => matchesTriplet(triplet, query))
+    .sort((a, b) => a.index - b.index);
+
 /**
- * The writes into the cache that do not go to the server: triplets the server
- * sent, real addresses for temporary ones, refused writes undone.
+ * What the client knows, in two layers: `base` is what the server has said,
+ * and `cache`, what reads see, is `base` with the writes still queued replayed
+ * on it. An answer of the server changes `base` and replays the rest, so a
+ * refused write only has to leave the queue: nothing keeps a value from before
+ * it that could have gone stale.
  */
-function createTripletCache(emit) {
+function createTripletCache(emit, queue) {
   const cache = new Map();
+  const base = new Map();
   const real = new Map();
+  const refused = new Set();
   const resolve = (index) => real.get(index) ?? index;
+  const open = (entry) => !entry.done;
 
   const put = (triplet, origin) => {
     const before = cache.get(triplet.index) ?? null;
@@ -97,25 +109,88 @@ function createTripletCache(emit) {
     }
   };
 
+  const replay = (map, entry) => {
+    const index = resolve(entry.index);
+    if (entry.kind === 'delete') {
+      const first = map.get(index);
+      if (first !== undefined) {
+        const reads = { eachTriplet: (query) => eachIn(map, query) };
+        cascadeOf(reads, first).forEach((t) => map.delete(t.index));
+      }
+    } else if (
+      (entry.kind === 'create' || map.has(index)) &&
+      ![entry.type, entry.from, entry.to].some((part) => refused.has(part))
+    ) {
+      map.set(index, {
+        index,
+        type: entry.point ? index : resolve(entry.type),
+        from: resolve(entry.from),
+        to: resolve(entry.to),
+      });
+    }
+  };
+  const settle = (origin) => {
+    const next = new Map(base);
+    queue.filter(open).forEach((entry) => replay(next, entry));
+    for (const index of [...cache.keys()]) {
+      if (!next.has(index)) {
+        remove(index, origin);
+      }
+    }
+    next.forEach((triplet) => put(triplet, origin));
+  };
+  /** Bring changes into `base`; `applies` may leave one out. */
+  const learn = (changes, applies = () => true) => {
+    const direct = !queue.some(open);
+    for (const change of changes.filter(applies)) {
+      const { before, after } = change;
+      if (after === null) {
+        base.delete(before.index);
+      } else {
+        base.set(after.index, after);
+      }
+      if (direct && after === null) {
+        remove(before.index, 'remote');
+      } else if (direct) {
+        put(after, 'remote');
+      }
+    }
+    if (!direct) {
+      settle('remote');
+    }
+  };
+
   return {
     cache,
     real,
+    refused,
     resolve,
-    put,
-    remove,
-    /** Apply the changes the server reports. */
+    /** Changes the server answered to this client: they are simply so. */
+    learn,
+    /**
+     * Changes pushed to a subscription. One that says a triplet left it says
+     * nothing of the triplet once `base` holds another value of it: a wider
+     * subscription has told where it went.
+     */
     applyRemote(changes) {
-      for (const { before, after } of changes) {
-        if (after === null) {
-          remove(before.index, 'remote');
-        } else {
-          put(after, 'remote');
-        }
-      }
+      learn(changes, ({ before, after }) => {
+        const known = base.get(before?.index);
+        return (
+          after !== null || known === undefined || sameTriplet(known, before)
+        );
+      });
     },
-    /** Move the triplet at `temp` to `index`, and every use of `temp` with it. */
-    remap(temp, index) {
+    /** A snapshot of everything readable, taken with nothing queued. */
+    replaceBase(triplets) {
+      base.clear();
+      triplets.forEach((triplet) => base.set(triplet.index, triplet));
+      settle('remote');
+    },
+    /** The server's answer to a create: `temp` is `created.index` from now on. */
+    remap(temp, created) {
+      const { index } = created;
       real.set(temp, index);
+      base.set(index, created);
       const swap = (part) => (part === temp ? index : part);
       for (const triplet of [...cache.values()]) {
         const moved = {
@@ -130,50 +205,55 @@ function createTripletCache(emit) {
           emit(triplet, moved, 'remap');
         }
       }
+      settle('remote');
     },
-    /** Undo the local changes of a refused write, newest first. */
+    /** The write the server has answered no longer replays. */
+    settled(entry) {
+      entry.done = true;
+    },
+    /** A refused write leaves what reads see, and takes its users with it. */
     undo(changes) {
-      for (const { before, after } of [...changes].reverse()) {
-        if (before === null) {
-          remove(resolve(after.index), 'rollback');
-        } else {
-          put(
-            {
-              index: resolve(before.index),
-              type: resolve(before.type),
-              from: resolve(before.from),
-              to: resolve(before.to),
-            },
-            'rollback'
-          );
-        }
+      const entry = queue.find((queued) => queued.changes === changes);
+      entry.done = true;
+      if (entry.kind === 'create') {
+        refused.add(entry.index);
       }
+      settle('rollback');
     },
   };
 }
 
 /** How a write of triplets goes to the server. */
 function createTripletSender({ writer, request, remapped }) {
-  const { resolve } = writer;
+  const { resolve, refused } = writer;
   const parts = (entry) =>
     [entry.type, entry.from, entry.to].map((part) => String(resolve(part)));
+  const ask = async (entry, document) => {
+    const reply = await request(document);
+    writer.settled(entry);
+    return tripletChanges(reply);
+  };
 
   return async (entry) => {
-    const index = String(resolve(entry.index));
-    if (entry.kind === 'create') {
-      const [created] = tripletChanges(
-        await request(
-          entry.point
-            ? op('create', '0', '0', '0')
-            : op('create', ...parts(entry))
-        )
+    const lost = [entry.index, entry.type, entry.from, entry.to].find((part) =>
+      refused.has(part)
+    );
+    if (lost !== undefined) {
+      throw new LinksError(
+        'bad-request',
+        `The write that created ${lost} was refused.`
       );
-      writer.remap(entry.index, created.after.index);
+    }
+    const index = String(resolve(entry.index));
+    const sent = entry.point ? ['0', '0', '0'] : parts(entry);
+    if (entry.kind === 'create') {
+      const [created] = await ask(entry, op('create', ...sent));
+      writer.remap(entry.index, created.after);
       remapped(entry.index, created.after.index);
     } else if (entry.kind === 'update') {
-      await request(op('update', index, ...parts(entry)));
+      writer.learn(await ask(entry, op('update', index, ...sent)));
     } else {
-      writer.applyRemote(tripletChanges(await request(op('delete', index))));
+      writer.learn(await ask(entry, op('delete', index)));
     }
   };
 }
@@ -184,10 +264,22 @@ function createTripletOperations({ writer, outbox, allocate, changed, emit }) {
   const notATriplet = (index) =>
     new LinksError('bad-request', `Link ${index} is not a triplet.`);
   const getTriplet = (index) => cache.get(resolve(index)) ?? null;
-  const eachTriplet = (query) =>
-    [...cache.values()]
-      .filter((triplet) => matchesTriplet(triplet, query))
-      .sort((a, b) => a.index - b.index);
+  const resolved = (query) => {
+    if (query === undefined || query === null) {
+      return query;
+    }
+    if (Array.isArray(query)) {
+      return query.map(resolve);
+    }
+    const { index, type, from, to } = query;
+    return {
+      index: resolve(index),
+      type: resolve(type),
+      from: resolve(from),
+      to: resolve(to),
+    };
+  };
+  const eachTriplet = (query) => eachIn(cache, resolved(query));
 
   const insert = (entry) => {
     changed();
@@ -297,7 +389,7 @@ function createRemoteTriplets({
       await ready();
       const reply = await request(op('each', restrictionLino(restriction)));
       const triplets = reply.map((line) => tripletFromLino(line, numberOf));
-      triplets.forEach((triplet) => writer.put(triplet, 'remote'));
+      writer.learn(triplets.map((after) => ({ before: null, after })));
       return triplets;
     },
     /** How many triplets of a restriction the server has. */
@@ -340,7 +432,7 @@ function createRemoteTriplets({
         document,
         (value) => addresses.get(value) ?? numberOf(value)
       );
-      writer.applyRemote(changes);
+      writer.learn(changes);
       return changes;
     },
   };
@@ -354,10 +446,10 @@ function createRemoteTriplets({
  */
 export function createSyncedTriplets({ transport = null } = {}) {
   const { listeners, call, emit } = createListeners();
-  const writer = createTripletCache(emit);
+  const queue = [];
+  const writer = createTripletCache(emit, queue);
   const subscriptions = new Map();
   const remoteSubscriptions = { ids: new Map(), transport: null };
-  const queue = [];
   const nothing = () => {};
   const persisted = async () => {};
   let nextTemp = MAX_ADDRESS;
@@ -368,7 +460,8 @@ export function createSyncedTriplets({ transport = null } = {}) {
   let current = null;
   let stopPush = null;
 
-  const isTemporary = (index) => index > nextTemp && !writer.real.has(index);
+  const isTemporary = (index) =>
+    index > nextTemp && !writer.real.has(index) && !writer.refused.has(index);
   const disconnect = () => {
     stopPush?.();
     stopPush = null;
@@ -394,16 +487,8 @@ export function createSyncedTriplets({ transport = null } = {}) {
     disconnect,
     report: (error, write) => call('error', error, write),
   });
-  const reconcile = (reply) => {
-    const triplets = reply.map((line) => tripletFromLino(line, numberOf));
-    const indexes = new Set(triplets.map(({ index }) => index));
-    for (const index of [...writer.cache.keys()]) {
-      if (!indexes.has(index)) {
-        writer.remove(index, 'remote');
-      }
-    }
-    triplets.forEach((triplet) => writer.put(triplet, 'remote'));
-  };
+  const reconcile = (reply) =>
+    writer.replaceBase(reply.map((line) => tripletFromLino(line, numberOf)));
 
   const synced = withProperties(
     createTripletOperations({

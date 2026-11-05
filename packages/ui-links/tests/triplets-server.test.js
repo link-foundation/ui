@@ -8,6 +8,7 @@ import { URL } from 'node:url';
 import { describe, it, expect } from 'test-anywhere';
 import { ArityRange, BinaryLinoOptions } from 'links-notation';
 import {
+  ANY,
   canonicalTriplets,
   createLinksServer,
   createMemoryLinks,
@@ -281,6 +282,24 @@ describe('triplet mode with permissions', () => {
 describe('triplet mode', () => {
   const server = () =>
     createLinksServer({ links: createMemoryLinks(), triplets: true });
+
+  it('matches nothing with a reserved number in a query', () => {
+    const session = server().session();
+    session.request('(create: (0 0 0))');
+    session.request('(create: (0 0 0))');
+    for (const pattern of [`(${ANY}: * * *)`, `(${ANY} * *)`]) {
+      expect(session.request(`(${pattern} ())`)).toBe('');
+    }
+    expect(session.request('(count: ())')).toBe('(count: 2)');
+  });
+
+  it('shows its view as `triplets`, and has none in the other mode', () => {
+    const running = server();
+    expect(running.triplets.createTripletPoint()).toBe(3);
+    expect(createLinksServer({ links: createMemoryLinks() }).triplets).toBe(
+      undefined
+    );
+  });
 
   it('packs a push for a binary client of two to three references', () => {
     const options = new BinaryLinoOptions(false, new ArityRange(2, 3), false);

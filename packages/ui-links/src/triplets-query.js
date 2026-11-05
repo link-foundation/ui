@@ -15,9 +15,8 @@
  * link-cli's `rust/src/triplets/query.rs`, with the same messages.
  */
 
+import { MAX_ADDRESS } from './constants.js';
 import { exists, LinksError } from './links.js';
-
-const MAX_ADDRESS = 0xffffffff;
 
 /** A LiNo value as one shape: a reference is a link without values. */
 const linkOf = (value) =>

@@ -169,6 +169,8 @@ export function createLinksServer({
     links,
     names,
     policy,
+    /** The triplets of `links` in triplet mode; `undefined` otherwise. */
+    triplets: server.triplets ?? undefined,
     /**
      * A connection: requests run as its subject.
      * @param {object} [options]
