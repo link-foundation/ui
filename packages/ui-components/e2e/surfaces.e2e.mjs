@@ -183,16 +183,48 @@ test('reduced motion stops the ring and drops the accordion animation', async ({
   const indicator = page.locator(
     '#light ui-progress[shape="circular"][data-indeterminate] [data-part="indicator"]'
   );
-  const open = page.locator(
-    '#light ui-accordion [data-part="content"][data-state="open"]'
-  );
+  const returns = page
+    .locator('#light')
+    .getByRole('button', { name: 'Returns' });
+  const content = page
+    .locator('#light ui-accordion')
+    .nth(1)
+    .locator('[data-part="content"]');
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await expect(indicator).toHaveCSS('animation-name', 'ui-progress-spin');
   expect(await seconds(indicator)).toBeGreaterThan(0);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   // The theme's motion tokens collapse to zero: the ring stands still.
   expect(await seconds(indicator)).toBe(0);
-  await expect(open).toHaveCSS('animation-name', 'none');
+  await returns.focus();
+  await page.keyboard.press('Enter');
+  await expect(returns).toHaveAttribute('aria-expanded', 'false');
+  await page.keyboard.press('Enter');
+  await expect(content).toHaveAttribute('data-state', 'open');
+  await expect(content).toHaveCSS('animation-name', 'none');
+});
+
+test('an accordion animates a change, not its first paint', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.reload();
+  await expect(page.locator('body')).toHaveAttribute('data-ready', 'true');
+  const returns = page
+    .locator('#light')
+    .getByRole('button', { name: 'Returns' });
+  const content = page
+    .locator('#light ui-accordion')
+    .nth(1)
+    .locator('[data-part="content"]');
+  await expect(content).toHaveAttribute('data-state', 'open');
+  await expect(content).toHaveCSS('animation-name', 'none');
+  await returns.focus();
+  await page.keyboard.press('Enter');
+  await expect(returns).toHaveAttribute('aria-expanded', 'false');
+  await page.keyboard.press('Enter');
+  await expect(returns).toHaveAttribute('aria-expanded', 'true');
+  await expect(content).toHaveCSS('animation-name', 'ui-accordion-open');
 });
 
 test('forced colors keep the parts and the focus ring visible', async ({

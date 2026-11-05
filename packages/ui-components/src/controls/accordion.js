@@ -8,7 +8,9 @@
  *
  * Enter, Space and a click toggle it. ArrowDown, ArrowUp, Home and End move
  * between the headers of the sibling accordions, which form a group.
- * Every change commits `open` as a `ui-change` event.
+ * Every change commits `open` as a `ui-change` event. Only a change after
+ * mounting animates (`data-animated`): a section that mounts open has its
+ * text at full contrast from the first frame.
  *
  *   (shipping: accordion Shipping (open true) (heading-level 2)
  *     (details: text 'Two to five days.'))
@@ -67,6 +69,9 @@ function onHeaderKey(event) {
 }
 
 function render(control) {
+  if (control.mounted) {
+    setAttr(control.parts.content, 'data-animated', true);
+  }
   if (!control.driven) {
     commitValue(control, 'open', control.service.state === 'open');
   }
@@ -146,6 +151,7 @@ export const ACCORDION_KIND = Object.freeze({
       const open = flagOf(el, 'open');
       driveControl(control, open ? 'open' : 'close', open, disabled);
     }
+    control.mounted = true;
   },
   destroy(node) {
     controlOf(node)?.parts.trigger.removeEventListener('keydown', onHeaderKey);

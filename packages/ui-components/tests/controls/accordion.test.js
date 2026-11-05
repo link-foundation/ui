@@ -77,6 +77,15 @@ describe('accordion', () => {
     });
   }
 
+  it('animates a change but not the state it mounted in', () => {
+    const t = mountDoc(`  (a: accordion Returns (open true))`);
+    const content = t.part('a', 'content');
+    expect(content.getAttribute('data-state')).toBe('open');
+    expect(content.hasAttribute('data-animated')).toBe(false);
+    t.part('a', 'trigger').click();
+    expect(content.hasAttribute('data-animated')).toBe(true);
+  });
+
   it('closes on Escape from the section and returns focus', () => {
     const t = mountDoc(`  (a: accordion Shipping (open true) (b: button Go))`);
     const trigger = t.part('a', 'trigger');

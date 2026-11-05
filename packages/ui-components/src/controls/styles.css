@@ -899,7 +899,7 @@
   padding: 0.25rem 1rem 1rem;
 }
 
-:where(ui-accordion) [data-part='content'][data-state='open'] {
+:where(ui-accordion) [data-part='content'][data-animated][data-state='open'] {
   animation: ui-accordion-open var(--motion-duration-short, 150ms) ease-out;
 }
 
@@ -928,7 +928,7 @@
     animation-duration: calc(var(--motion-duration-long, 500ms) * 12);
   }
 
-  :where(ui-accordion) [data-part='content'][data-state='open'] {
+  :where(ui-accordion) [data-part='content'][data-animated][data-state='open'] {
     animation: none;
   }
 
