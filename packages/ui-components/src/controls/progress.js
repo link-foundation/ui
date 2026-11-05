@@ -53,7 +53,11 @@ export const PROGRESS_KIND = Object.freeze({
     }
     if (has('shape')) {
       const shape = atomOf(el, 'shape');
-      setAttr(node, 'shape', PROGRESS_SHAPES.includes(shape) ? shape : 'linear');
+      setAttr(
+        node,
+        'shape',
+        PROGRESS_SHAPES.includes(shape) ? shape : 'linear'
+      );
     }
     if (has('value') || has('max')) {
       const max = Math.max(Number.MIN_VALUE, numberOf(el, 'max', 100));

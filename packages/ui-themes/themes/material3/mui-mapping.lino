@@ -99,12 +99,54 @@ map Drawer
   kind drawer
   status partial
 map AppBar
-  status none
+  kind app-bar
+  prop position static
+    position static
+  prop position sticky
+    position sticky
+  prop position fixed
+    position fixed
+  prop color default
+    tone surface
+  prop color primary
+    tone primary
+  status partial
 map Tabs
   kind tabs
   status partial
 map Card
-  status none
+  kind card
+  prop variant elevation
+    variant elevated
+  prop variant outlined
+    variant outlined
+  status partial
+map Paper
+  kind paper
+  prop elevation *
+    elevation *
+  prop variant elevation
+    variant elevated
+  prop variant outlined
+    variant outlined
+  prop square *
+    square *
+  status partial
+map Container
+  kind container
+  prop maxWidth xs
+    size extra-small
+  prop maxWidth sm
+    size small
+  prop maxWidth md
+    size medium
+  prop maxWidth lg
+    size large
+  prop maxWidth xl
+    size extra-large
+  prop disableGutters true
+    gutters false
+  status partial
 map List
   kind list
   status partial
@@ -112,7 +154,31 @@ map Table
   kind table
   status partial
 map Chip
-  status none
+  kind chip
+  prop label *
+    label *
+  prop onDelete *
+    removable true
+  prop variant filled
+    variant filled
+  prop variant outlined
+    variant outlined
+  prop color default
+    tone neutral
+  prop color primary
+    tone primary
+  prop color error
+    tone error
+  prop disabled *
+    disabled *
+  status partial
+map Accordion
+  kind accordion
+  prop expanded *
+    open *
+  prop disabled *
+    disabled *
+  status partial
 map Avatar
   kind avatar
   prop src *
@@ -141,6 +207,10 @@ map Typography
   status partial
 map CircularProgress
   kind progress
+  prop variant determinate
+    shape circular
+  prop variant indeterminate
+    shape circular
   prop value *
     value *
   status partial

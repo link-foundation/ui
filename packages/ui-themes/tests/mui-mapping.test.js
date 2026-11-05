@@ -16,7 +16,7 @@ it('covers every requested MUI component with real registered kinds and explicit
   registerControls(kinds);
   const rows = await getMuiMapping();
   const required =
-    'Button IconButton TextField Checkbox Radio RadioGroup Switch Slider Select Dialog Menu Tooltip Snackbar Drawer AppBar Tabs Card List Table Chip Avatar Badge Box Stack Grid Typography CircularProgress'.split(
+    'Button IconButton TextField Checkbox Radio RadioGroup Switch Slider Select Dialog Menu Tooltip Snackbar Drawer AppBar Tabs Card Paper Container List Table Chip Accordion Avatar Badge Box Stack Grid Typography CircularProgress'.split(
       ' '
     );
   assert.equal(new Set(rows.map((r) => r.component)).size, rows.length);
@@ -50,5 +50,26 @@ it('keeps the generated mapping documentation current', async () => {
       'utf8'
     ),
     await mappingMarkdown()
+  );
+});
+it('maps the surfaces, chip, accordion and the ring to their tested kinds', async () => {
+  const rows = new Map((await getMuiMapping()).map((r) => [r.component, r]));
+  const kinds = {
+    Container: 'container',
+    Paper: 'paper',
+    Card: 'card',
+    AppBar: 'app-bar',
+    Chip: 'chip',
+    Accordion: 'accordion',
+    CircularProgress: 'progress',
+  };
+  for (const [component, kind] of Object.entries(kinds)) {
+    assert.equal(rows.get(component).kind, kind);
+    assert.equal(rows.get(component).status, 'partial');
+  }
+  assert.ok(
+    rows
+      .get('CircularProgress')
+      .props.some(({ target }) => target.name === 'shape')
   );
 });

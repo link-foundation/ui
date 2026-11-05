@@ -738,8 +738,7 @@
 :where(ui-progress)[shape='circular'] [data-part='indicator'] {
   inline-size: 100%;
   background: conic-gradient(
-    var(--color-primary, Highlight)
-      calc(var(--ui-progress-value, 0) * 1turn),
+    var(--color-primary, Highlight) calc(var(--ui-progress-value, 0) * 1turn),
     var(--color-surface-variant, GrayText) 0
   );
   mask: radial-gradient(

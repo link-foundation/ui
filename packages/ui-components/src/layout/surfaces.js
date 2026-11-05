@@ -12,7 +12,15 @@
  */
 
 import { defineKind } from '@link-foundation/ui-dom';
-import { atomOf, flagOf, make, numberOf, setAttr, setText, uid } from './dom.js';
+import {
+  atomOf,
+  flagOf,
+  make,
+  numberOf,
+  setAttr,
+  setText,
+  uid,
+} from './dom.js';
 
 /** Mirror an enum property as an attribute, `fallback` unless it is valid. */
 function setEnum(node, el, name, values, fallback) {
@@ -76,8 +84,18 @@ defineKind('card', {
     const subtitled = setPartText(header.children[1], atomOf(el, 'subtitle'));
     setAttr(header, 'hidden', !titled && !subtitled);
     setAttr(node, 'role', titled ? 'group' : undefined);
-    setAttr(node, 'aria-labelledby', titled ? title.getAttribute('id') : undefined);
-    setEnum(node, el, 'variant', ['elevated', 'filled', 'outlined'], 'elevated');
+    setAttr(
+      node,
+      'aria-labelledby',
+      titled ? title.getAttribute('id') : undefined
+    );
+    setEnum(
+      node,
+      el,
+      'variant',
+      ['elevated', 'filled', 'outlined'],
+      'elevated'
+    );
   },
 });
 

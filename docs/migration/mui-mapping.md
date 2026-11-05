@@ -21,45 +21,47 @@ Import layout, overlays and data to register their renderers, and call
 exported vocabularies. All translations need behavior and visual review;
 sharing a kind name does not promise complete MUI API parity.
 
-| MUI component      | Framework element           | Notes                                                                                            |
-| ------------------ | --------------------------- | ------------------------------------------------------------------------------------------------ |
-| Button             | `button`                    | #34; label and press action.                                                                     |
-| IconButton         | `icon-button`               | #34; supply an accessible `label`.                                                               |
-| TextField          | `text-field`                | #34; multiline uses `text-area`.                                                                 |
-| Checkbox           | `checkbox`                  | #34; `checked` also accepts `mixed`.                                                             |
-| Switch             | `switch`                    | #34; `checked` is boolean.                                                                       |
-| Radio / RadioGroup | `radio` / `radio-group`     | #34; group owns value/name.                                                                      |
-| Select             | `select`                    | #34; children are `option` links.                                                                |
-| Slider             | `slider`                    | #34; min/max/step/value.                                                                         |
-| Autocomplete       | `combobox`                  | #34; review free-solo/multiple gaps.                                                             |
-| Typography         | `text`                      | Core; style typography; preserve heading semantics in host.                                      |
-| Box                | `stack`                     | #36; flex container, not polymorphic HTML.                                                       |
-| Stack              | `stack`                     | #36; row → horizontal, column → vertical.                                                        |
-| Grid               | `grid`                      | #36; explicit tracks; no automatic 12-column prop mapping.                                       |
-| Container          | no equivalent yet           | [#164](https://github.com/link-foundation/ui/issues/164); keep host width wrapper.               |
-| Paper              | no equivalent yet           | [#164](https://github.com/link-foundation/ui/issues/164); surface styles alone are partial.      |
-| Card               | no equivalent yet           | [#164](https://github.com/link-foundation/ui/issues/164); retain composition.                    |
-| Dialog             | `dialog`                    | #35; title/body/actions, native modal focus.                                                     |
-| Menu               | `menu`                      | #35; translate trigger, anchor and items manually.                                               |
-| Popover            | `popover`                   | #35; review anchor/placement and dismissal.                                                      |
-| Tooltip            | `tooltip`                   | #35; preserve accessible trigger relationship.                                                   |
-| Snackbar           | `toast`                     | #35; use queue API for transient messages.                                                       |
-| Tabs               | `tabs`                      | #35; use documented tab/panel relationships.                                                     |
-| AppBar             | no equivalent yet           | [#164](https://github.com/link-foundation/ui/issues/164); app-shell is navigation, not AppBar.   |
-| Drawer             | `drawer`                    | #35; review side, modality and focus.                                                            |
-| List               | `list`                      | #37; items/template data API, not arbitrary ListItem JSX.                                        |
-| Table              | `table`                     | #37; columns/items API; preserve caption and selection.                                          |
-| Avatar             | `avatar`                    | #34; `src` → `source`, fallback `name`.                                                          |
-| Chip               | no equivalent yet           | [#164](https://github.com/link-foundation/ui/issues/164); badge has no removal behavior.         |
-| Badge              | `badge`                     | #34; badgeContent → value; host owns overlay placement.                                          |
-| CircularProgress   | `progress` (semantics only) | [#164](https://github.com/link-foundation/ui/issues/164); no circular equivalent yet.            |
-| LinearProgress     | `progress`                  | #34; omit value for indeterminate.                                                               |
-| Accordion          | no equivalent yet           | [#164](https://github.com/link-foundation/ui/issues/164); disclosure machine is not a component. |
+| MUI component      | Framework element             | Notes                                                                                                                                                                                                                |
+| ------------------ | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Button             | `button`                      | #34; label and press action.                                                                                                                                                                                         |
+| IconButton         | `icon-button`                 | #34; supply an accessible `label`.                                                                                                                                                                                   |
+| TextField          | `text-field`                  | #34; multiline uses `text-area`.                                                                                                                                                                                     |
+| Checkbox           | `checkbox`                    | #34; `checked` also accepts `mixed`.                                                                                                                                                                                 |
+| Switch             | `switch`                      | #34; `checked` is boolean.                                                                                                                                                                                           |
+| Radio / RadioGroup | `radio` / `radio-group`       | #34; group owns value/name.                                                                                                                                                                                          |
+| Select             | `select`                      | #34; children are `option` links.                                                                                                                                                                                    |
+| Slider             | `slider`                      | #34; min/max/step/value.                                                                                                                                                                                             |
+| Autocomplete       | `combobox`                    | #34; review free-solo/multiple gaps.                                                                                                                                                                                 |
+| Typography         | `text`                        | Core; style typography; preserve heading semantics in host.                                                                                                                                                          |
+| Box                | `stack`                       | #36; flex container, not polymorphic HTML.                                                                                                                                                                           |
+| Stack              | `stack`                       | #36; row → horizontal, column → vertical.                                                                                                                                                                            |
+| Grid               | `grid`                        | #36; explicit tracks; no automatic 12-column prop mapping.                                                                                                                                                           |
+| Container          | `container`                   | [#164](https://github.com/link-foundation/ui/issues/164); maxWidth → size, disableGutters → gutters.                                                                                                                 |
+| Paper              | `paper`                       | [#164](https://github.com/link-foundation/ui/issues/164); elevation 0–5, variant, square.                                                                                                                            |
+| Card               | `card`                        | [#164](https://github.com/link-foundation/ui/issues/164); CardHeader → title, subheader → subtitle; other card parts are children.                                                                                   |
+| Dialog             | `dialog`                      | #35; title/body/actions, native modal focus.                                                                                                                                                                         |
+| Menu               | `menu`                        | #35; translate trigger, anchor and items manually.                                                                                                                                                                   |
+| Popover            | `popover`                     | #35; review anchor/placement and dismissal.                                                                                                                                                                          |
+| Tooltip            | `tooltip`                     | #35; preserve accessible trigger relationship.                                                                                                                                                                       |
+| Snackbar           | `toast`                       | #35; use queue API for transient messages.                                                                                                                                                                           |
+| Tabs               | `tabs`                        | #35; use documented tab/panel relationships.                                                                                                                                                                         |
+| AppBar             | `app-bar`                     | [#164](https://github.com/link-foundation/ui/issues/164); position, color → tone; Toolbar content is children.                                                                                                       |
+| Drawer             | `drawer`                      | #35; review side, modality and focus.                                                                                                                                                                                |
+| List               | `list`                        | #37; items/template data API, not arbitrary ListItem JSX.                                                                                                                                                            |
+| Table              | `table`                       | #37; columns/items API; preserve caption and selection.                                                                                                                                                              |
+| Avatar             | `avatar`                      | #34; `src` → `source`, fallback `name`.                                                                                                                                                                              |
+| Chip               | `chip`                        | [#164](https://github.com/link-foundation/ui/issues/164); onDelete → `removable` and `(on change ...)`; no clickable chip, icon or avatar slot.                                                                      |
+| Badge              | `badge`                       | #34; badgeContent → value; host owns overlay placement.                                                                                                                                                              |
+| CircularProgress   | `progress` `(shape circular)` | [#164](https://github.com/link-foundation/ui/issues/164); omit value for indeterminate; size and thickness are `--ui-progress-size` and `--ui-progress-ring`.                                                        |
+| LinearProgress     | `progress`                    | #34; omit value for indeterminate.                                                                                                                                                                                   |
+| Accordion          | `accordion`                   | [#164](https://github.com/link-foundation/ui/issues/164); expanded → open, onChange → `(on change ...)`; AccordionSummary → label, AccordionDetails → children; one disclosure, so exclusive groups stay host logic. |
 
 Basic controls came from [#34](https://github.com/link-foundation/ui/issues/34),
 overlays from [#35](https://github.com/link-foundation/ui/issues/35), layouts
-from [#36](https://github.com/link-foundation/ui/issues/36) and data display
-from [#37](https://github.com/link-foundation/ui/issues/37). Gap rows link the
+from [#36](https://github.com/link-foundation/ui/issues/36), data display
+from [#37](https://github.com/link-foundation/ui/issues/37) and the surfaces,
+chip, accordion and circular progress from
+[#164](https://github.com/link-foundation/ui/issues/164). Gap rows link the
 upstream feature issue; keep the old implementation while it remains open.
 The smaller [generated #48 mapping](../themes/material3.md) lists only its
 explicit prop translations, not every manual composition described here.

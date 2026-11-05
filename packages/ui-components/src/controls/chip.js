@@ -104,7 +104,8 @@ export const CHIP_KIND = Object.freeze({
       setAttr(
         remove,
         'aria-label',
-        atomOf(el, 'remove-label') ?? `Remove ${atomOf(el, 'label') ?? ''}`.trim()
+        atomOf(el, 'remove-label') ??
+          `Remove ${atomOf(el, 'label') ?? ''}`.trim()
       );
     }
     if (has('value')) {
@@ -112,7 +113,11 @@ export const CHIP_KIND = Object.freeze({
     }
     if (has('variant')) {
       const variant = atomOf(el, 'variant');
-      setAttr(node, 'variant', CHIP_VARIANTS.includes(variant) ? variant : 'filled');
+      setAttr(
+        node,
+        'variant',
+        CHIP_VARIANTS.includes(variant) ? variant : 'filled'
+      );
     }
     if (has('tone')) {
       const tone = atomOf(el, 'tone');

@@ -106,7 +106,9 @@ describe('app-bar', () => {
   });
 
   it('takes a position and a tone, ignoring unknown values', async () => {
-    const good = await mountOne(`(x: app-bar A (position sticky) (tone primary))`);
+    const good = await mountOne(
+      `(x: app-bar A (position sticky) (tone primary))`
+    );
     expect(good.target.getAttribute('position')).toBe('sticky');
     expect(good.target.getAttribute('tone')).toBe('primary');
     const bad = await mountOne(`(x: app-bar A (position floating))`);

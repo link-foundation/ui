@@ -55,7 +55,11 @@ function onHeaderKey(event) {
   if (event.defaultPrevented || altKey || ctrlKey || metaKey || shiftKey) {
     return;
   }
-  const next = headerFor(event.key, currentTarget, currentTarget.closest('ui-accordion'));
+  const next = headerFor(
+    event.key,
+    currentTarget,
+    currentTarget.closest('ui-accordion')
+  );
   if (next) {
     event.preventDefault();
     next.focus();
@@ -106,6 +110,7 @@ export const ACCORDION_KIND = Object.freeze({
       render,
     });
     control.label = label;
+    control.heading = heading;
     control.value = false;
     control.service.use({
       focus(target) {
@@ -127,7 +132,7 @@ export const ACCORDION_KIND = Object.freeze({
     if (has('heading-level')) {
       const level = Math.trunc(numberOf(el, 'heading-level', 3));
       setAttr(
-        trigger.parentElement,
+        control.heading,
         'aria-level',
         String(Math.min(6, Math.max(1, level)))
       );

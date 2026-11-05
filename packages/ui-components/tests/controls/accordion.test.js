@@ -142,6 +142,7 @@ describe('accordion', () => {
   });
 
   it('renders to static HTML, open or closed', () => {
+    const diagnostics = [];
     const html = renderToHTML(
       parse(
         `(a: accordion One (open true) (x: text Body))
@@ -149,13 +150,14 @@ describe('accordion', () => {
 (c: chip Ada (removable true))
 (d: chip Bob (removed true))`,
         { vocabulary: controlsVocabulary() }
-      )
+      ),
+      { onDiagnostic: (d) => diagnostics.push(d.code) }
     );
+    expect(diagnostics).toEqual([]);
     expect(html).toContain('<ui-accordion data-link-id="a"');
     expect(html).toContain('aria-expanded="true"');
     expect(html).toContain('Body');
     expect(html).toContain('aria-label="Remove Ada"');
-    expect(html).not.toContain('ui-unknown');
-    expect(html).toContain('<ui-chip data-link-id="d" hidden=""');
+    expect(html).toMatch(/<ui-chip data-link-id="d"[^>]* hidden=""/u);
   });
 });
