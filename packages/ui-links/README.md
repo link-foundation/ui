@@ -224,6 +224,25 @@ The links that wire the type hierarchy are of type `Extends`, so whoever may
 write them may change the hierarchy: give `Anything` writes to administrators
 only, or keep the rules in a storage of their own.
 
+A reference needs a right too: without it an address answers `Link not found`,
+whether a hidden link is there or nothing is. A subject may refer to what it may
+read, to itself, to the `Object` of a rule it holds (`User` writes `Note` is
+enough to type links as `Note`), and to what a rule marked
+`(r: AllowReference g)` covers: `Object` and the links of type `Object`.
+
+```js
+allow(links, markers, 'reference', User, Secret); // may link to, not read
+```
+
+That rule does not allow reading the link. A reference a link already holds may
+stay, and choosing the address of a new link is a reference as well. The name of
+a link the subject may not refer to answers as an unknown name.
+`allow(links, markers, 'reference', markers.anything, markers.anything)` lets
+every subject refer to everything, as before. A custom policy without
+`canReference` allows references to readable links only. The decision, and what
+it does not hide, are in
+[the case study](../../docs/case-studies/issue-119/README.md).
+
 ## The links server
 
 `createLinksServer({ links, names?, policy?, authenticate?, autoCreate? })`
@@ -258,9 +277,9 @@ Two extensions serve clients that keep a partial copy:
 
 An error is `(error: 'message')`. Every request is atomic and runs as the
 session's subject: with a policy, a session sees and changes only what its
-subject may. References are checked, and failed requests undone, in the
-storage under the permission view, so a subject may use a type it may not
-read (and so may learn that an address exists).
+subject may. A reference it may not make answers `Link not found`, as a
+missing address does. Failed requests are undone in the storage under the
+permission view.
 
 With `createPolicy`, rule and hierarchy writes through the server also push
 links that become readable as creations and links that become hidden as
@@ -409,6 +428,9 @@ The remaining differences by design:
   `(((m a) (m a))) (((p a) (p a)))` the new `p` is link 1; here the update
   deletes link 4 and `p` takes the freed address 4 (the memory storage, like
   doublets-web, reuses the last freed address first).
+- A reference needs a right here (`AllowReference`, see
+  [Permissions](#permissions)). Released clink checks references below its view,
+  so a subject can use a hidden link there and tell it from a missing one.
 - `load` and `name-links` are ui-links extensions for names stored as links.
   The synced client falls back to `each` and sidecar name resolution when a
   server does not implement them. The two name encodings are independent.

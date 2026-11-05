@@ -280,6 +280,7 @@ export function point(
 export interface PermissionMarkers {
   allowRead: number;
   allowWrite: number;
+  allowReference: number;
   anything: number;
 }
 export interface Policy {
@@ -295,6 +296,11 @@ export interface Policy {
   };
   canRead(subject: number | null, link: Link): boolean;
   canWrite(subject: number | null, link: Link): boolean;
+  /**
+   * Whether the subject may refer to the link without reading it. Without it
+   * a view answers an unreadable address as a missing one.
+   */
+  canReference?(subject: number | null, link: Link): boolean;
   canCreate(subject: number | null): boolean;
 }
 export function forbidden(what: string): LinksError;
@@ -306,13 +312,14 @@ export function createPolicy(options: {
 /**
  * The storage as `subject` sees it. A link created through the view is the
  * subject's own while its source is 0; `forget(id)` drops that claim when
- * the link is gone.
+ * the link is gone. A reference the subject may not make (`canReference`)
+ * throws `not-found`, the same as a missing address.
  */
 export function withPermissions<T extends LinksStorage>(
   links: T,
   policy: Policy,
   subject: number | null | (() => number | null)
-): T & { forget(id: number): void };
+): T & { forget(id: number): void; canReference(id: number): boolean };
 export function permissionMarkers(
   links: LinksStorage,
   names: NamesStore
@@ -321,7 +328,7 @@ export function permissionMarkers(
 export function allow(
   rules: LinksStorage,
   markers: PermissionMarkers,
-  access: 'read' | 'write',
+  access: 'read' | 'write' | 'reference',
   subject: number,
   object: number
 ): number;

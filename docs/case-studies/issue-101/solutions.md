@@ -229,10 +229,11 @@ including the issues, was done in pull request #108.
   rule covers, so a link a subject created is its own while it is untyped;
   `forget(id)` drops the claim when the link is gone, so a later link at that
   address is not the subject's (commits `c95a502`, `5aaf3f3`).
-- **References are checked below the view.** A subject may give its links a
-  type it may not read. The consequence is that it may learn that an address
-  exists. Whether that needs a rule of its own is
-  [ui#119](https://github.com/link-foundation/ui/issues/119).
+- **A reference needs a right.** A subject may give its links a type it may
+  not read only with a rule that covers it (`AllowReference`, or any rule
+  naming the type); otherwise the address answers as a missing one. Decided in
+  [ui#119](https://github.com/link-foundation/ui/issues/119), see
+  [its case study](../issue-119/README.md).
 - **Deviations from link-cli** are listed in the
   [package README](../../../packages/ui-links/README.md#compatibility-with-link-cli):
   the address `set-name` answers, address reuse, and the protocol
