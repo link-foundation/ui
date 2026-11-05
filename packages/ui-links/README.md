@@ -411,6 +411,84 @@ A transport is `{ send(text): Promise<text>, onPush?(listener), close?() }`:
 `await connectLinks('host:port')` from `@link-foundation/ui-links/tcp` over
 TCP.
 
+## Triplets
+
+`withTriplets(links, { names?, markers? })` is a view of triplets
+`(index: type from to)` over the doublets of any storage. The encoding is
+link-cli's ([`docs/TRIPLETS.md`](https://github.com/link-foundation/link-cli/blob/main/docs/TRIPLETS.md)),
+so a store written by one reads the same in the other. The view keeps the
+storage interface, for the doublets underneath, and adds:
+
+- `createTriplet(type, from?, to?)`, `createTripletPoint()` (its own type),
+  `createTripletPointAt(address)`;
+- `getTriplet(index)`, `isTriplet(index)`, `roleOf(address)`;
+- `updateTriplet(index, type, from, to)` → the triplet before;
+- `deleteTriplet(index)` → every triplet removed, as deleting one removes
+  those that use it as a type or a part;
+- `eachTriplet(query?)`, `countTriplets(query?)`, where a query is
+  `{ index, type, from, to }` or an array in that order.
+
+`withTripletPermissions(view, policy, subject)` keeps a subject to what it may
+read and write. `runQuery` reads three-part links when `context.links` is such
+a view:
+
+```text
+() ((3: 3 0 0))                   create a point at an address
+() ((Person 0 0))                  create, with the name of its type
+((10: 4 5 6)) ((10: 4 6 5))       update
+((10: 4 5 6)) ()                  delete
+(($i: Person $f $t)) (($i: Person $f $t))   read
+```
+
+### The triplet mode of the server
+
+`createLinksServer({ links, names?, triplets: true })` speaks the conversation
+of link-cli's [`docs/protocol/triplets.txt`](https://github.com/link-foundation/link-cli/blob/main/docs/protocol/triplets.txt),
+in text and in the binary protocol with every option, like
+`clink --serve --triplets`. `tests/triplets-server.test.js` replays a copy of
+that file against it. `server.triplets` is the view.
+
+### The synced triplets client
+
+`createSyncedTriplets({ transport? })` keeps a copy of part of such a server,
+as `createSyncedLinks` does for links, and its `create`, `update`, `delete`,
+`count` and `each` work on triplets:
+
+```js
+import { createSyncedTriplets } from '@link-foundation/ui-links';
+import { connectLinks } from '@link-foundation/ui-links/tcp';
+
+const client = createSyncedTriplets({
+  transport: await connectLinks('127.0.0.1:8080'),
+});
+await client.subscribe();
+const person = client.createTripletPoint();
+const alice = client.createTriplet(person);
+await client.flush();
+client.resolve(alice); // its real address
+client.eachTriplet({ type: client.resolve(person) });
+client.deleteTriplet(alice);
+```
+
+- `getTriplet`, `isTriplet`, `eachTriplet`, `countTriplets`, `count` and `each`
+  read the cache; `load(restriction)`, `remoteCount(restriction)` and
+  `subscribe(restriction)` ask the server, a restriction being
+  `[index, type, from, to]`. `unsubscribe(id)` stops the pushes.
+- Writes change the cache at once and wait in an outbox; `flush()` resolves
+  when they are answered, and `pending` counts them. A new triplet has a
+  temporary address until the server answers: `isTemporary`, `resolve` and
+  `onRemap(listener)` tell about it, and the old address keeps working in the
+  calls of the client.
+- A refused write is undone (`origin: 'rollback'`) and told to
+  `onError(listener)` with the words of the server. `onChange(listener)` gets
+  every change of the cache.
+- `query(text)` runs a substitution query after the queued writes, and brings
+  its changes into the cache.
+- Writes wait without a connection; `connect(transport)` sends them, subscribes
+  again and reads every readable triplet again.
+
+The copy lives in memory: it has no persistence yet, unlike `openSyncedLinks`.
+
 ## Compatibility with link-cli
 
 The protocol, the query language, the names sidecar and the text format are
@@ -443,7 +521,7 @@ Ownership is shared behavior, rather than a protocol deviation.
 ### Verify against a released server
 
 ```sh
-CARGO_BUILD_JOBS=1 cargo install link-cli --version 1.3.0 --locked
+CARGO_BUILD_JOBS=1 cargo install link-cli --version 1.5.0 --locked
 CLINK=clink node --test --test-timeout=30000 packages/ui-links/tests/client.test.js packages/ui-links/tests/clink.test.js
 node examples/ui-links-permissions.mjs --server clink
 ```
@@ -452,8 +530,10 @@ node examples/ui-links-permissions.mjs --server clink
 shared client contract uses identical data, names, rules and tokens against
 both servers, with rules in the data and in a separate file. It checks guest
 and authenticated reads, refused writes and cache rollback, temporary-address
-remapping, subscription delivery, permission loss and unsubscribe. Without
-`CLINK`, the external-server tests visibly skip; CI installs Rust 1.3.0 and
+remapping, subscription delivery, permission loss and unsubscribe. The synced
+triplets client does its creates, reads, updates, deletes and queries through
+`clink --serve --triplets` the same way. Without
+`CLINK`, the external-server tests visibly skip; CI installs Rust 1.5.0 and
 runs them on Node.js, Bun and Deno, then runs the permissions example against
 both servers. Each fixture uses a temporary directory and an ephemeral local
 TCP port, and closes its connections and server before removing its own data.
