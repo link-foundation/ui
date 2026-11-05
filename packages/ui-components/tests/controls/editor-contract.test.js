@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { renderToHTML } from '@link-foundation/ui-dom';
+import { CONTROL_KIND_SPECS } from '../../src/controls/index.js';
 import { mountDoc, typeInto, press, microtasks } from '../support/controls.js';
 
 test('live numbers preserve drafts across store echoes, inherit and step via buttons', async () => {
@@ -44,4 +46,25 @@ test('color accepts keyboard RGB and named palette buttons', async () => {
   buttons[1].click();
   assert.deepEqual(t.prop('c', 'value'), ['#eecbaa']);
   t.mounted.destroy();
+});
+
+test('extended editors and external labels retain server rendering', () => {
+  const diagnostics = [];
+  const html = renderToHTML(
+    `n: number-field Size
+  disabled true
+c: color-field Accent
+  palette
+    Ocean '#1256ab'
+s: select Pick
+  external-label true
+  aria-label Palette
+  list-label 'Options: Palette'
+  a: option Alpha`,
+    { kinds: CONTROL_KIND_SPECS, onDiagnostic: (d) => diagnostics.push(d) }
+  );
+  assert.deepEqual(diagnostics, []);
+  assert.match(html, /aria-label="Increase"[^>]*disabled/);
+  assert.match(html, />Ocean<\/button>/);
+  assert.match(html, /aria-label="Options: Palette"/);
 });

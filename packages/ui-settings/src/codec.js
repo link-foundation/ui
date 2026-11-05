@@ -20,7 +20,7 @@
 
 import { formatLinks } from '@link-foundation/ui-core';
 
-import { coerce, formatValue } from './coerce.js';
+import { formatValue } from './coerce.js';
 import { applySharedLook } from './presets.js';
 import { migrate } from './migrate.js';
 import { clausesOf, diagnostic, rawOf, readRecords } from './read.js';
@@ -107,16 +107,24 @@ export function fromLino(schema, text, options = {}) {
     if (name === 'version' && args.length === 1) {
       version = Number(args[0]);
     } else if (name !== '' && !Object.hasOwn(stored, name)) {
-      const raw = rawOf(args);
-      const field = schema.fields.get(name);
-      const parsed = field
-        ? coerce(field, raw, { ...field.normalization, primitives: 'coerce' })
-        : { ok: false };
-      stored[name] = parsed.ok ? parsed.value : raw;
+      stored[name] = rawOf(args);
     }
   }
+  // LiNo atoms are text, including keys renamed by a migration.
+  const atomSchema = {
+    ...schema,
+    fields: new Map(
+      [...schema.fields].map(([key, field]) => [
+        key,
+        {
+          ...field,
+          normalization: { ...field.normalization, primitives: 'coerce' },
+        },
+      ])
+    ),
+  };
   const out = migrate(
-    schema,
+    atomSchema,
     {
       version: Number.isInteger(version) ? version : undefined,
       values: stored,

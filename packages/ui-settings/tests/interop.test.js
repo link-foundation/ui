@@ -6,6 +6,7 @@ import { parse } from '@link-foundation/ui-core';
 import {
   readSchema,
   merge,
+  migrate,
   fromLino,
   toLino,
   applyToRoot,
@@ -208,4 +209,30 @@ n:
   assert.equal(bound.get('n'), null);
   bound.reset();
   assert.equal(bound.get('n'), 4);
+});
+
+test('strict policy preserves renamed LiNo atoms and schema old defaults', () => {
+  const { schema } = readSchema(
+    `s: schema
+  version 2
+n:
+  type number
+  default 5
+migration
+  from 1
+  to 2
+  rename old n
+  old-default n 2`,
+    { normalization: { primitives: 'strict' } }
+  );
+  assert.equal(fromLino(schema, 'settings\n  version 1\n  old 3').values.n, 3);
+  assert.equal(migrate(schema, { version: 1, values: { n: 2 } }).values.n, 5);
+  assert.equal(
+    migrate(schema, { version: 1, values: {} }, { look: true }).values.n,
+    2
+  );
+  assert.deepEqual(
+    migrate(schema, { version: 1, values: { n: '3' } }).rejected,
+    ['n']
+  );
 });

@@ -13,6 +13,7 @@
 import {
   changesOf,
   partOf,
+  setText,
   flagOf,
   commitValue,
   maybeNumber,
@@ -108,7 +109,7 @@ export const NUMBER_FIELD_KIND = Object.freeze({
             type: 'button',
             'aria-label': label,
           });
-          button.textContent = name === 'increment' ? '+' : '−';
+          setText(button, name === 'increment' ? '+' : '−');
           node.appendChild(button);
           parts[name] = button;
         }
@@ -128,8 +129,10 @@ export const NUMBER_FIELD_KIND = Object.freeze({
       }
     }
     for (const name of ['increment', 'decrement']) {
-      control.parts[name].disabled =
-        flagOf(el, 'disabled') || flagOf(el, 'readonly');
+      control.parts[name].toggleAttribute(
+        'disabled',
+        flagOf(el, 'disabled') || flagOf(el, 'readonly')
+      );
     }
     control.assign(range);
     if (has('value')) {

@@ -92,9 +92,9 @@ function updateNaming(control, el, has) {
     ].some(has)
   ) {
     const external = flagOf(el, 'external-label');
-    control.parts.label.hidden = external;
+    control.parts.label.toggleAttribute('hidden', external);
     if (external) {
-      control.parts.label.textContent = '';
+      setText(control.parts.label, '');
     }
     setAttr(input, 'aria-label', atomOf(el, 'aria-label'));
     setAttr(

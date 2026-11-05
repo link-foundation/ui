@@ -15,6 +15,7 @@ import {
   setAttr,
   stopControl,
   textOf,
+  setText,
 } from './dom.js';
 import { formatColor as formatHex } from './color.js';
 import { createTextControl, inputOf, updateTextControl } from './text-field.js';
@@ -104,7 +105,7 @@ export const COLOR_FIELD_KIND = Object.freeze({
     );
     if (has('palette')) {
       const palette = control.parts.palette;
-      palette.replaceChildren();
+      setText(palette, '');
       for (const pair of el.props.get('palette') ?? []) {
         const values = Array.isArray(pair) ? pair : pair?.values;
         if (!Array.isArray(values) || values.length !== 2) {
@@ -116,7 +117,7 @@ export const COLOR_FIELD_KIND = Object.freeze({
           continue;
         }
         const button = partOf(ctx.document, 'button', null, { type: 'button' });
-        button.textContent = name;
+        setText(button, name);
         button.addEventListener('click', () => {
           if (!control.service.context.disabled) {
             control.assign({ value: color, invalid: false });
@@ -125,9 +126,12 @@ export const COLOR_FIELD_KIND = Object.freeze({
         palette.appendChild(button);
       }
     }
-    control.parts.palette.hidden = control.parts.palette.children.length === 0;
+    control.parts.palette.toggleAttribute(
+      'hidden',
+      control.parts.palette.children.length === 0
+    );
     for (const button of control.parts.palette.children) {
-      button.disabled = control.service.context.disabled;
+      button.toggleAttribute('disabled', control.service.context.disabled);
     }
     if (has('value')) {
       const hex = formatHex(textOf(el, 'value'));
