@@ -1,0 +1,4 @@
+demo: document
+  chip-removable: chip 'Ada Lovelace'
+    value ada
+    removable true

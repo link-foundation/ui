@@ -1,0 +1,4 @@
+demo: document
+  accordion-open: accordion 'Returns'
+    open true
+    accordion-open-text: text 'Free within thirty days.'

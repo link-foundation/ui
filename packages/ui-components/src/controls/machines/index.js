@@ -47,6 +47,27 @@ export const CONTROL_MACHINES = Object.freeze({
       context checked
     on change toggle
 `,
+  chip: `chip-machine: machine
+  initial present
+  context
+    disabled false
+  state present
+    on remove
+      target removed
+      when not-disabled
+  state removed
+    on restore
+      target present
+  part root
+    attr data-state
+      state
+  part remove
+    key Enter remove
+    key Space remove
+    key Delete remove
+    key Backspace remove
+    on press remove
+`,
   'color-field': `color-field-machine: machine
   initial idle
   context

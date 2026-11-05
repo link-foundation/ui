@@ -53,7 +53,9 @@
   ui-combobox,
   ui-progress,
   ui-badge,
-  ui-avatar
+  ui-avatar,
+  ui-chip,
+  ui-accordion
 ) {
   font: inherit;
   color: var(--color-on-surface, CanvasText);
@@ -95,7 +97,9 @@
     ui-switch,
     ui-select,
     ui-combobox,
-    ui-radio
+    ui-radio,
+    ui-chip,
+    ui-accordion
   )
   [data-part]:focus-visible,
 :where(ui-slider) [data-part='thumb']:focus-visible,
@@ -717,9 +721,224 @@
   box-shadow: none;
 }
 
+/* progress as a ring: the same parts, same ARIA, another drawing. */
+:where(ui-progress)[shape='circular'] {
+  --ui-progress-size: 3rem;
+  --ui-progress-ring: 0.375rem;
+  min-width: 0;
+  align-items: center;
+}
+
+:where(ui-progress)[shape='circular'] [data-part='track'] {
+  block-size: var(--ui-progress-size);
+  inline-size: var(--ui-progress-size);
+  background: none;
+}
+
+:where(ui-progress)[shape='circular'] [data-part='indicator'] {
+  inline-size: 100%;
+  background: conic-gradient(
+    var(--color-primary, Highlight) calc(var(--ui-progress-value, 0) * 1turn),
+    var(--color-surface-variant, GrayText) 0
+  );
+  mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - var(--ui-progress-ring) - 0.5px),
+    #000 calc(100% - var(--ui-progress-ring))
+  );
+  transition: none;
+}
+
+:where(ui-progress)[shape='circular'][data-indeterminate]
+  [data-part='indicator'] {
+  inline-size: 100%;
+  background: conic-gradient(
+    var(--color-primary, Highlight) 0.3turn,
+    var(--color-surface-variant, GrayText) 0
+  );
+  animation-name: ui-progress-spin;
+}
+
+@keyframes ui-progress-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+/* chip */
+:where(ui-chip) {
+  display: inline-flex;
+  max-inline-size: 100%;
+  vertical-align: middle;
+}
+
+:where(ui-chip)[hidden] {
+  display: none;
+}
+
+:where(ui-chip) > [data-part='root'] {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-block-size: 2rem;
+  min-inline-size: 0;
+  padding-inline: 0.75rem;
+  border: 1px solid transparent;
+  border-radius: var(--shape-corner-small, 8px);
+  background: var(--color-surface-variant, Canvas);
+  color: var(--color-on-surface-variant, CanvasText);
+  font-size: var(--type-label-medium-size, 0.875rem);
+}
+
+:where(ui-chip)[tone='primary'] > [data-part='root'] {
+  background: var(--color-primary-container, Canvas);
+  color: var(--color-on-primary-container, CanvasText);
+}
+
+:where(ui-chip)[tone='error'] > [data-part='root'] {
+  background: var(--color-error, Canvas);
+  color: var(--color-on-error, CanvasText);
+}
+
+:where(ui-chip)[variant='outlined'] > [data-part='root'] {
+  border-color: currentColor;
+  background: transparent;
+  color: var(--color-on-surface, CanvasText);
+}
+
+:where(ui-chip)[tone='primary'][variant='outlined'] > [data-part='root'] {
+  color: var(--color-primary, CanvasText);
+}
+
+:where(ui-chip)[tone='error'][variant='outlined'] > [data-part='root'] {
+  color: var(--color-error, CanvasText);
+}
+
+:where(ui-chip)[disabled] > [data-part='root'] {
+  border-style: dashed;
+  border-color: currentColor;
+}
+
+:where(ui-chip) [data-part='label'] {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:where(ui-chip) [data-part='remove'] {
+  flex: none;
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  margin-inline: 0.125rem -0.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--shape-corner-full, 999px);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: 1;
+  cursor: pointer;
+}
+
+:where(ui-chip) [data-part='remove']:hover:not(:disabled) {
+  background: color-mix(in srgb, currentColor 16%, transparent);
+}
+
+:where(ui-chip) [data-part='remove']:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* accordion */
+:where(ui-accordion) {
+  display: block;
+  border-block-end: 1px solid var(--color-outline-variant, CanvasText);
+}
+
+:where(ui-accordion) [data-part='trigger'] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  inline-size: 100%;
+  min-block-size: 3rem;
+  padding: 0.5rem 1rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: var(--type-weight-strong, 600);
+  text-align: start;
+  cursor: pointer;
+}
+
+:where(ui-accordion) [data-part='trigger']:hover:not(:disabled) {
+  background: var(--color-surface-variant, Canvas);
+}
+
+:where(ui-accordion) [data-part='trigger']:disabled {
+  color: var(--color-disabled, GrayText);
+  cursor: not-allowed;
+}
+
+:where(ui-accordion) [data-part='indicator'] {
+  flex: none;
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  border-block-end: 2px solid currentColor;
+  border-inline-end: 2px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform var(--ui-control-transition);
+}
+
+:where(ui-accordion) [aria-expanded='true'] [data-part='indicator'] {
+  transform: rotate(-135deg);
+}
+
+:where(ui-accordion) [data-part='content'] {
+  padding: 0.25rem 1rem 1rem;
+}
+
+:where(ui-accordion) [data-part='content'][data-animated][data-state='open'] {
+  animation: ui-accordion-open var(--motion-duration-short, 150ms) ease-out;
+}
+
+/* The machine holds `closing` for 500ms; the fade is what fills it. */
+:where(ui-accordion) [data-part='content'][data-state='closing'] {
+  animation: ui-accordion-close var(--motion-duration-short, 150ms) ease-in
+    forwards;
+}
+
+@keyframes ui-accordion-open {
+  from {
+    opacity: 0;
+    transform: translateY(-0.25rem);
+  }
+}
+
+@keyframes ui-accordion-close {
+  to {
+    display: none;
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   :where(ui-progress)[data-indeterminate] [data-part='indicator'] {
     animation-duration: calc(var(--motion-duration-long, 500ms) * 12);
+  }
+
+  :where(ui-accordion) [data-part='content'][data-animated][data-state='open'] {
+    animation: none;
+  }
+
+  :where(ui-accordion) [data-part='content'][data-state='closing'] {
+    display: none;
+    animation: none;
+  }
+
+  :where(ui-accordion) [data-part='indicator'] {
+    transition: none;
   }
 }
 
@@ -728,8 +947,9 @@
   :where(ui-button, ui-icon-button) > [data-part='root'],
   :where(ui-switch) [data-part='track'],
   :where(ui-checkbox, ui-radio) [data-part='indicator'],
-  :where(ui-progress) [data-part='track'],
-  :where(ui-badge) > [data-part='root'] {
+  :where(ui-progress):not([shape='circular']) [data-part='track'],
+  :where(ui-badge) > [data-part='root'],
+  :where(ui-chip) > [data-part='root'] {
     border: 1px solid ButtonText;
   }
 
@@ -764,5 +984,17 @@
   :disabled {
     color: GrayText;
     opacity: 1;
+  }
+
+  :where(ui-progress)[shape='circular'] [data-part='indicator'] {
+    background: conic-gradient(
+      Highlight calc(var(--ui-progress-value, 0) * 1turn),
+      GrayText 0
+    );
+  }
+
+  :where(ui-progress)[shape='circular'][data-indeterminate]
+    [data-part='indicator'] {
+    background: conic-gradient(Highlight 0.3turn, GrayText 0);
   }
 }

@@ -1,0 +1,11 @@
+container-stories: stories
+  component container
+  story default
+    container
+      size medium
+      container-text: text 'Centered content.'
+  story full-without-gutters
+    container
+      size full
+      gutters false
+      container-full-text: text 'Edge to edge.'

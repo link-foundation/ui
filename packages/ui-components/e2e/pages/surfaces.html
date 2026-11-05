@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="data:," />
+    <title>Material 3 surfaces, chips, accordions and rings</title>
+    <!--
+      No bundler: serve the repository with `node scripts/serve-static.mjs`
+      and open
+      http://127.0.0.1:4173/packages/ui-components/e2e/pages/surfaces.html
+    -->
+    <script type="importmap">
+      {
+        "imports": {
+          "@material/material-color-utilities": "/node_modules/@material/material-color-utilities/index.js",
+          "@floating-ui/dom": "/node_modules/@floating-ui/dom/dist/floating-ui.dom.browser.mjs",
+          "@floating-ui/core": "/node_modules/@floating-ui/core/dist/floating-ui.core.browser.mjs",
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "@link-foundation/ui-store": "/packages/ui-store/src/index.js",
+          "@link-foundation/ui-style": "/packages/ui-style/src/index.js",
+          "@link-foundation/ui-tokens": "/packages/ui-tokens/src/index.js",
+          "@link-foundation/ui-tokens/themes": "/packages/ui-tokens/src/themes/index.js",
+          "@link-foundation/ui-themes": "/packages/ui-themes/src/index.js",
+          "@link-foundation/ui-dom": "/packages/ui-dom/src/index.js",
+          "links-notation": "/node_modules/links-notation/dist/index.js"
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="../../src/controls/styles.css" />
+    <link rel="stylesheet" href="../../src/layout/layout.css" />
+    <style>
+      body {
+        margin: 0;
+        padding: 24px;
+        background: #f5f3f8;
+        color: #202027;
+        font:
+          16px/1.5 Arial,
+          sans-serif;
+      }
+      h1 {
+        margin: 0 0 16px;
+        font-size: 32px;
+        font-weight: 400;
+      }
+      h2 {
+        margin: 0 0 8px;
+        font-size: 20px;
+        font-weight: 400;
+      }
+      .gallery {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+      }
+      section {
+        min-width: 0;
+      }
+      [data-theme='material3'] {
+        padding: 16px;
+        border-radius: var(--shape-corner-large);
+        background: var(--color-surface);
+        color: var(--color-on-surface);
+        font-family: var(--type-font-family);
+      }
+      ui-container > * {
+        margin-block-end: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Surfaces, chips, accordions and rings</h1>
+      <div class="gallery">
+        <section aria-labelledby="light-title">
+          <h2 id="light-title">Light</h2>
+          <div id="light"></div>
+        </section>
+        <section aria-labelledby="dark-title">
+          <h2 id="dark-title">Dark</h2>
+          <div id="dark"></div>
+        </section>
+        <section aria-labelledby="contrast-title">
+          <h2 id="contrast-title">High contrast</h2>
+          <div id="contrast"></div>
+        </section>
+      </div>
+    </main>
+    <script type="module" src="./surfaces.js"></script>
+  </body>
+</html>

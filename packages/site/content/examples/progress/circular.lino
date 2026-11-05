@@ -1,0 +1,4 @@
+demo: document
+  progress-circular: progress 'Syncing'
+    shape circular
+    value 40

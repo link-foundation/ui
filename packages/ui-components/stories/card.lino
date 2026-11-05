@@ -1,0 +1,10 @@
+card-stories: stories
+  component card
+  story default
+    card 'Starter plan'
+      subtitle 'For small teams'
+      card-text: text 'Two seats and one project.'
+  story outlined
+    card 'Team plan'
+      variant outlined
+      card-team-actions: button 'Choose'

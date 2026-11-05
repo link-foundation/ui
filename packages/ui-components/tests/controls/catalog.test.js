@@ -17,6 +17,7 @@ import {
   storiesDocument,
   storyId,
 } from '../../src/controls/index.js';
+import { REFERENCE_MACHINES } from '../../src/behavior/machines/index.js';
 import { mountDoc } from '../support/controls.js';
 
 const pkg = (file) => fileURLToPath(new URL(`../../${file}`, import.meta.url));
@@ -29,8 +30,8 @@ const storySets = KINDS.map((kind) =>
 );
 
 describe('control catalog', () => {
-  it('has the 19 basic controls of #34', () => {
-    expect(KINDS.length).toBe(19);
+  it('has the 19 basic controls of #34, chip and accordion', () => {
+    expect(KINDS.length).toBe(21);
   });
 
   it('has an entry per kind, in kinds.lino order, and nothing else', () => {
@@ -57,18 +58,22 @@ describe('control catalog', () => {
     expect(missing).toEqual([]);
   });
 
-  it('has a machine for every stateful kind and none for the others', () => {
-    const stateful = KINDS.filter((kind) => controlKindMeta(kind).machine);
-    expect(Object.keys(CONTROL_MACHINES).sort()).toEqual([...stateful].sort());
+  it('has its own machine file or a shared machine, and nothing stale', () => {
+    const own = KINDS.filter(
+      (kind) => controlKindMeta(kind).machine === `${kind}-machine`
+    );
+    expect(Object.keys(CONTROL_MACHINES).sort()).toEqual([...own].sort());
     for (const kind of KINDS) {
       const { machine } = controlKindMeta(kind);
       expect(existsSync(pkg(`src/controls/machines/${kind}.lino`))).toBe(
-        machine !== null
+        own.includes(kind)
       );
-      if (machine !== null) {
+      if (own.includes(kind)) {
         expect(CONTROL_MACHINES[kind]).toMatch(
           new RegExp(`^${machine}: machine$`, 'mu')
         );
+      } else if (machine !== null) {
+        expect(Object.keys(REFERENCE_MACHINES)).toContain(machine);
       }
     }
   });

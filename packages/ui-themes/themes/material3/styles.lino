@@ -150,6 +150,289 @@ material3-styles: theme
       elevation 102
     state pressed
       elevation 102
+  style
+    selector
+      data-part root
+      within
+        type chip
+        variant filled
+        tone neutral
+    background
+      token color.secondary-container
+    color
+      token color.on-secondary-container
+    radius
+      token shape.corner.small
+    font-size
+      token type.label.large.size
+    font-weight
+      token type.label.large.weight
+  style
+    selector
+      data-part root
+      within
+        type chip
+        variant filled
+        tone primary
+    background
+      token color.primary-container
+    color
+      token color.on-primary-container
+    radius
+      token shape.corner.small
+    font-size
+      token type.label.large.size
+    font-weight
+      token type.label.large.weight
+  style
+    selector
+      data-part root
+      within
+        type chip
+        variant filled
+        tone error
+    background
+      token color.error-container
+    color
+      token color.on-error-container
+    radius
+      token shape.corner.small
+    font-size
+      token type.label.large.size
+    font-weight
+      token type.label.large.weight
+  style
+    selector
+      data-part root
+      within
+        type chip
+        variant outlined
+        tone neutral
+    background
+      token color.surface
+    color
+      token color.on-surface-variant
+    radius
+      token shape.corner.small
+    font-size
+      token type.label.large.size
+    font-weight
+      token type.label.large.weight
+    border-width 1px
+    border-color
+      token color.outline
+  style
+    selector
+      data-part root
+      within
+        type chip
+        variant outlined
+        tone primary
+    background
+      token color.surface
+    color
+      token color.primary
+    radius
+      token shape.corner.small
+    font-size
+      token type.label.large.size
+    font-weight
+      token type.label.large.weight
+    border-width 1px
+    border-color
+      token color.outline
+  style
+    selector
+      data-part root
+      within
+        type chip
+        variant outlined
+        tone error
+    background
+      token color.surface
+    color
+      token color.error
+    radius
+      token shape.corner.small
+    font-size
+      token type.label.large.size
+    font-weight
+      token type.label.large.weight
+    border-width 1px
+    border-color
+      token color.outline
+  style
+    selector
+      data-part trigger
+      within
+        type accordion
+    color
+      token color.on-surface
+    font-size
+      token type.title.medium.size
+    font-weight
+      token type.title.medium.weight
+  style
+    selector
+      data-part content
+      within
+        type accordion
+    color
+      token color.on-surface-variant
+    font-size
+      token type.body.medium.size
+  style
+    selector
+      type card
+      variant elevated
+    background
+      token color.surface-container-low
+    color
+      token color.on-surface
+    radius
+      token shape.corner.medium
+    elevation 1
+  style
+    selector
+      type card
+      variant filled
+    background
+      token color.surface-container-highest
+    color
+      token color.on-surface
+    radius
+      token shape.corner.medium
+  style
+    selector
+      type card
+      variant outlined
+    background
+      token color.surface
+    color
+      token color.on-surface
+    radius
+      token shape.corner.medium
+    border-width 1px
+    border-color
+      token color.outline-variant
+  style
+    selector
+      data-part title
+      within
+        type card
+    font-size
+      token type.title.large.size
+    font-weight
+      token type.title.large.weight
+  style
+    selector
+      data-part subtitle
+      within
+        type card
+    color
+      token color.on-surface-variant
+    font-size
+      token type.body.medium.size
+  style
+    selector
+      type paper
+      variant elevated
+      elevation 0
+    background
+      token color.surface
+    color
+      token color.on-surface
+    elevation 0
+  style
+    selector
+      type paper
+      variant elevated
+      elevation 1
+    background
+      token color.surface-container-low
+    color
+      token color.on-surface
+    elevation 1
+  style
+    selector
+      type paper
+      variant elevated
+      elevation 2
+    background
+      token color.surface-container
+    color
+      token color.on-surface
+    elevation 2
+  style
+    selector
+      type paper
+      variant elevated
+      elevation 3
+    background
+      token color.surface-container-high
+    color
+      token color.on-surface
+    elevation 3
+  style
+    selector
+      type paper
+      variant elevated
+      elevation 4
+    background
+      token color.surface-container-high
+    color
+      token color.on-surface
+    elevation 4
+  style
+    selector
+      type paper
+      variant elevated
+      elevation 5
+    background
+      token color.surface-container-highest
+    color
+      token color.on-surface
+    elevation 5
+  style
+    selector
+      type paper
+      variant outlined
+    background
+      token color.surface
+    color
+      token color.on-surface
+    border-width 1px
+    border-color
+      token color.outline-variant
+  style
+    selector
+      data-part root
+      within
+        type app-bar
+        tone surface
+    background
+      token color.surface-container
+    color
+      token color.on-surface
+  style
+    selector
+      data-part root
+      within
+        type app-bar
+        tone primary
+    background
+      token color.primary
+    color
+      token color.on-primary
+  style
+    selector
+      data-part title
+      within
+        type app-bar
+    font-size
+      token type.title.large.size
+    font-weight
+      token type.title.large.weight
   token elevation.101
     shadow
       color '#00000014'

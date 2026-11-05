@@ -1,0 +1,14 @@
+accordion-stories: stories
+  component accordion
+  story closed
+    accordion 'Shipping'
+      accordion-shipping-text: text 'Two to five days.'
+  story open
+    accordion 'Returns'
+      open true
+      heading-level 4
+      accordion-returns-text: text 'Free within thirty days.'
+  story disabled
+    accordion 'Warranty'
+      disabled true
+      accordion-warranty-text: text 'Two years.'

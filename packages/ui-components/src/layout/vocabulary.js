@@ -104,6 +104,44 @@ app-shell: kind
   property drawer element-ref
   property label string
   children any
+
+container: kind
+  description 'Centers its content up to a maximum inline size, with gutters.'
+  property size
+    enum extra-small small medium large extra-large full
+  property gutters boolean
+  property style element-ref
+  children any
+
+paper: kind
+  description 'A plain surface: elevated from 0 to 5, or outlined.'
+  property elevation number
+  property variant
+    enum elevated outlined
+  property square boolean
+  property style element-ref
+  children any
+
+card: kind
+  description 'A surface for one subject: an optional title and subtitle, then any content.'
+  positional title
+  property title string
+  property subtitle string
+  property variant
+    enum elevated filled outlined
+  property style element-ref
+  children any
+
+app-bar: kind
+  description 'The bar at the top of a page or a section: a title, then any content.'
+  positional title
+  property title string
+  property position
+    enum static sticky fixed
+  property tone
+    enum surface primary
+  property style element-ref
+  children any
 `;
 
 /** The common properties of the dialect (`note`), declared on every kind. */

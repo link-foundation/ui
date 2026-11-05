@@ -28,12 +28,13 @@ Components of the associative UI framework, written in
   with the [links-visuals](https://github.com/konard/links-visuals)
   geometry, as SVG or on a canvas, with its own zoom and pan.
 - **Layout and windowing** (`./layout`, `./layout.css`): `stack`, `grid`,
-  `split`, `tab-group`, `dock`, `window` and `app-shell` kinds for ui-dom,
+  `split`, `tab-group`, `dock`, `window`, `app-shell` and the surfaces
+  `container`, `paper`, `card` and `app-bar`, as kinds for ui-dom,
   a layer manager, and dock layouts saved as Links Notation.
 - **Basic controls** (`./controls`, `./controls.css`): button,
   icon-button, label, link, text-field, text-area, number-field,
   color-field, checkbox, radio-group, switch, slider, select, combobox,
-  progress, badge and avatar as ui-dom kinds over native elements, each
+  progress (a bar or a ring), badge, avatar, chip and accordion as ui-dom kinds over native elements, each
   with its WAI-ARIA pattern, a LiNo machine and stories
   ([Basic controls](#basic-controls)).
 - **Icons** (`./icons`): a public-domain icon set of our own, the icon
@@ -736,6 +737,10 @@ The gallery `examples/layout.html` (served with
 | `dock`      | `(dock (persist designer.layout) (left: region (size 16rem) (panels toolbox outline)) ...)`    | Panels docked left, right, top, bottom and center; each region shows its panels as tabs. A panel can move to another region, float, close and come back; the layout is saved under `persist`. |
 | `window`    | `(window (title Inspector) (open false) (x 120) (y 96) (width 360) (height 280) ...)`          | A floating, movable, resizable non-modal dialog. It stays inside the viewport and is raised by the layer manager.                                                                             |
 | `app-shell` | `(app-shell (breakpoints 640 1024) (bottom-bar tabs) (rail rail-nav) (drawer drawer-nav) ...)` | A bottom bar up to the first breakpoint, a rail up to the second one and a drawer from it on. The shell fills the viewport, its content scrolls, and it writes its `mode` attribute.          |
+| `container` | `(page: container (size medium) ...)`                                                          | A centred column: `size` extra-small to extra-large or full, `gutters`                                                                                                                        |
+| `paper`     | `(note: paper (elevation 2) ...)`                                                              | A surface: `elevation` 0 to 5, `variant` elevated or outlined, `square`                                                                                                                       |
+| `card`      | `(plan: card Starter (subtitle 'For one') ...)`                                                | A surface with a title and a subtitle, a group named by its title; `variant` elevated, filled or outlined                                                                                     |
+| `app-bar`   | `(top: app-bar Inbox (position sticky) ...)`                                                   | A native `<header>` with a title and actions; `position` static, sticky or fixed, `tone` surface or primary                                                                                   |
 
 Parse layout documents with `{ vocabulary: layoutVocabulary() }` so their
 properties are checked; `LAYOUT_VOCABULARY_TEXT` is the same vocabulary as
@@ -883,26 +888,28 @@ one `setProp` (one transaction per user change), then the element's
 with ui-dom for `mountDocument`; parse with
 `{ vocabulary: controlsVocabulary() }` to check their properties.
 
-| Kind           | Element and role                               | Keyboard                                                                     |
-| -------------- | ---------------------------------------------- | ---------------------------------------------------------------------------- |
-| `button`       | `<button type=button>`                         | Enter, Space                                                                 |
-| `icon-button`  | `<button aria-label>`; no `label` is an error  | Enter, Space                                                                 |
-| `label`        | `<label for>` of a control                     |                                                                              |
-| `link`         | `<a href>`; unsafe URLs are never followed     | Enter                                                                        |
-| `text-field`   | `<input>` and its `<label>`                    | commits on Enter or leaving; Escape restores                                 |
-| `text-area`    | `<textarea>` and its `<label>`                 | commits on leaving; Escape restores                                          |
-| `number-field` | `<input role=spinbutton>`                      | arrows step (Shift ×10), PageUp/PageDown, Home/End                           |
-| `color-field`  | a hex `<input>` and `<input type=color>`       | commits a normalised `#rrggbb`                                               |
-| `checkbox`     | `<input type=checkbox>`, `(checked mixed)`     | Space                                                                        |
-| `radio-group`  | `radiogroup` of `radio`s, one tab stop         | arrows move and check, Space checks                                          |
-| `switch`       | `<button role=switch aria-checked>`            | Space, Enter                                                                 |
-| `slider`       | `slider` with `aria-valuenow/min/max/text`     | arrows step (Shift ×10), PageUp/PageDown, Home/End                           |
-| `select`       | select-only `combobox` and a `listbox`         | arrows, Home/End open and move, Enter/Space choose, Escape closes, typeahead |
-| `combobox`     | `<input role=combobox>` with list autocomplete | typing filters, arrows move, Enter chooses, Escape closes or clears          |
-| `option`       | `option` of a select or a combobox             |                                                                              |
-| `progress`     | `progressbar`; no `value` is indeterminate     |                                                                              |
-| `badge`        | a short status text with a `tone`              |                                                                              |
-| `avatar`       | `<img alt>`, or initials with `role=img`       |                                                                              |
+| Kind           | Element and role                                                           | Keyboard                                                                                          |
+| -------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `button`       | `<button type=button>`                                                     | Enter, Space                                                                                      |
+| `icon-button`  | `<button aria-label>`; no `label` is an error                              | Enter, Space                                                                                      |
+| `label`        | `<label for>` of a control                                                 |                                                                                                   |
+| `link`         | `<a href>`; unsafe URLs are never followed                                 | Enter                                                                                             |
+| `text-field`   | `<input>` and its `<label>`                                                | commits on Enter or leaving; Escape restores                                                      |
+| `text-area`    | `<textarea>` and its `<label>`                                             | commits on leaving; Escape restores                                                               |
+| `number-field` | `<input role=spinbutton>`                                                  | arrows step (Shift ×10), PageUp/PageDown, Home/End                                                |
+| `color-field`  | a hex `<input>` and `<input type=color>`                                   | commits a normalised `#rrggbb`                                                                    |
+| `checkbox`     | `<input type=checkbox>`, `(checked mixed)`                                 | Space                                                                                             |
+| `radio-group`  | `radiogroup` of `radio`s, one tab stop                                     | arrows move and check, Space checks                                                               |
+| `switch`       | `<button role=switch aria-checked>`                                        | Space, Enter                                                                                      |
+| `slider`       | `slider` with `aria-valuenow/min/max/text`                                 | arrows step (Shift ×10), PageUp/PageDown, Home/End                                                |
+| `select`       | select-only `combobox` and a `listbox`                                     | arrows, Home/End open and move, Enter/Space choose, Escape closes, typeahead                      |
+| `combobox`     | `<input role=combobox>` with list autocomplete                             | typing filters, arrows move, Enter chooses, Escape closes or clears                               |
+| `option`       | `option` of a select or a combobox                                         |                                                                                                   |
+| `progress`     | `progressbar`, bar or `(shape circular)` ring; no `value` is indeterminate |                                                                                                   |
+| `badge`        | a short status text with a `tone`                                          |                                                                                                   |
+| `avatar`       | `<img alt>`, or initials with `role=img`                                   |                                                                                                   |
+| `chip`         | a `<button aria-label>` removes it; `ui-change` of `removed`               | Enter, Space, Delete and Backspace remove; focus moves to the next chip                           |
+| `accordion`    | heading, `<button aria-expanded aria-controls>`, `region`                  | Enter and Space toggle; arrows, Home and End move between headers; Escape closes from the section |
 
 Every input control has a `name` and takes part in its native `<form>`
 (`FormData`). The key bindings of `bindKeys` ignore keys typed in text
