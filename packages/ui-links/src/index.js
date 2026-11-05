@@ -30,6 +30,7 @@ export * from './doublets-web.js';
 export * from './decorators.js';
 export * from './triplets.js';
 export * from './triplets-query.js';
+export * from './triplets-server.js';
 export * from './names.js';
 export * from './links-names.js';
 export * from './lino.js';
