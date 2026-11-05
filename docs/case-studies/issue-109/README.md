@@ -43,7 +43,7 @@ visibly skip without it, and run with it in the `clink-client` CI job.
 | [#118](https://github.com/link-foundation/ui/issues/118) | Minilinks/DeepClient API, Hasura predicates and all six relations locally and on server, linked values and permission checks, optimistic remaps, ported cases and the actual Deepcase main view on clink. | `deep*.js`; `deep.test.js` ports minilinks cases and verifies named applies and remaps. `deep-clink.test.js` exercises real GraphQL queries, persisted strings/numbers/objects, permission grants and streaming subscriptions. The [Deepcase example](../../../examples/deepcase/README.md) builds the published main graph and original React hooks; its browser check verifies live values, deletion, keyboard use and accessibility against clink. |
 | #109 completion                                          | All accepted sub-issues closed and the issue-101 roadmap marked done.                                                                                                                                     | This inventory records completion and the explicit #111 rejection. `docs/ROADMAP.md` and its generator mark the section done; `tests/issue-101-roadmap.test.js` checks that regeneration preserves it.                                                                                                                                                                                                                                                |
 
-## Defect found and fixed
+## Defects found and fixed
 
 [Bug #207](https://github.com/link-foundation/ui/issues/207) exposed stale
 rollback records in the doublets client. Unlike the triplets client, it
@@ -72,6 +72,16 @@ refusals and transport failures. These existing opt-in hooks provide tracing
 without logging by default. The regression transport holds individual sends
 to reproduce races deterministically without timers or stress workloads.
 
+[Bug #208](https://github.com/link-foundation/ui/issues/208) was exposed by the
+new reference-permission parity check. `allow()` created a duplicate pair when
+a type link already held `(subject object)`. Released clink merges duplicate
+doublets during import, so the later grant pointed at a removed address. The
+helper now reuses existing pairs and marks, matching clink's permission helper.
+Two new `permissions.test.js` cases fail before the fix and pass afterward;
+they cover shared and separate stores, repeated grants and reference rights
+without read access. The same unchanged clink contract fails before this fix
+and passes after it, including the initially failing shared-data grant.
+
 ## Verification commands and limits
 
 ```sh
@@ -85,8 +95,9 @@ node examples/ui-links-permissions.mjs --server clink
 ```
 
 The PR's CI runs supply the released-server and browser evidence for its
-exact commit. CI builds clink with one Cargo job; local validation avoids
-rebuilding Rust within the development container's memory limit. The final
+exact commit. CI builds clink with one Cargo job. A focused local reproduction
+also uses released clink 2.1.1, built with one Cargo job, no debug information
+and a 1.5 GiB per-process virtual-memory limit. The final
 run URLs and check results are recorded in [PR #206](https://github.com/link-foundation/ui/pull/206).
 
 The existing durability boundary remains adapter `flush()`. Delivery is at

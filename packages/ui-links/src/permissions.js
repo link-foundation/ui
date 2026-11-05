@@ -36,6 +36,7 @@ import {
   linkOf,
   normalizeQuery,
   notFound,
+  search,
 } from './links.js';
 
 /**
@@ -259,7 +260,8 @@ export function permissionMarkers(links, names) {
 
 /**
  * Write a rule: `subject` may `access` (`'read'`, `'write'` or
- * `'reference'`) links of `object`. Returns the address of the rule pair.
+ * `'reference'`) links of `object`. Reuses the pair and mark when present;
+ * returns the address of the rule pair.
  * @param {any} rules
  * @param {PermissionMarkers} markers
  */
@@ -280,9 +282,16 @@ export function allow(rules, markers, access, subject, object) {
     // A pair from a marker would read as a mark.
     throw new LinksError('bad-request', 'A marker cannot be a subject');
   }
-  const rule = rules.create();
-  rules.update(rule, subject, object);
-  const mark = rules.create();
-  rules.update(mark, marker, rule);
+  const pair = (source, target) => {
+    const existing = search(rules, source, target);
+    if (existing !== null) {
+      return existing.id;
+    }
+    const id = rules.create();
+    rules.update(id, source, target);
+    return id;
+  };
+  const rule = pair(subject, object);
+  pair(marker, rule);
   return rule;
 }

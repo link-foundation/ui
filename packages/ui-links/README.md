@@ -215,6 +215,10 @@ const policy = createPolicy({ rules: links, markers, types });
 const asAlice = withPermissions(links, policy, alice);
 ```
 
+`allow()` reuses an existing rule pair and mark. Repeating a grant leaves the
+store unchanged, and a type link that already represents the rule pair keeps
+its address when the data is imported into clink.
+
 `withPermissions` hides what the subject may not read (a hidden link is as
 missing as a deleted one) and refuses a write it may not do with `forbidden`,
 the storage unchanged. An update needs the right to write the link before and
