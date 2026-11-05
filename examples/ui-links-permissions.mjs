@@ -130,6 +130,18 @@ try {
     throw new Error('Subscription did not deliver the new note');
   }
   console.log('the boss sees the new note:', received);
+
+  // A hidden link answers as a missing one, unless a rule allows referring to
+  // it. Released clink does not have that rule yet.
+  if (!external) {
+    const session = server.session({ subject: v.alice });
+    const link = (target) => session.request(`(create: (${t.Note} ${target}))`);
+    console.log('link to a missing address:', link(9999));
+    console.log('link to the hidden plan:', link(v.plan));
+    allow(links, markers, 'reference', t.User, t.Secret);
+    console.log('link to it with a rule:', link(v.plan));
+    console.log('still hidden:', session.request(`(each: (${v.plan}))`) === '');
+  }
 } finally {
   for (const transport of transports) {
     await transport.close();

@@ -104,7 +104,8 @@ const isLeaf = (p) => p.source === null;
  * When `context.links` is a restricted view (`withPermissions`),
  * `context.base` is the storage under it: references are checked and writes
  * undone there, since a link the subject may not read still exists, and
- * undoing the subject's own writes needs no permission.
+ * undoing the subject's own writes needs no permission. Whether the subject
+ * may refer to an address at all is the view's check, on every write.
  * @returns {Change[]}
  */
 export function transact(context, fn) {

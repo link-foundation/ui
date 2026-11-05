@@ -10,6 +10,12 @@
  * system: through sub-types and multiple inheritance; the links that wire
  * the hierarchy are of type `Extends`.
  *
+ * A rule marked `(r: AllowReference g)` lets the subjects refer to `Object`
+ * and to the links of type `Object` without reading them. A subject may also
+ * refer to what it may read, to itself and to the `Object` of any rule it
+ * holds: `User` writes `Note` is enough to type links as `Note`. Any other
+ * address answers `Link not found`, whether a link is there or not.
+ *
  * The markers are points of the data (`permissionMarkers`), so every
  * address a rule holds is an address of the data. The rules (the pairs and
  * the marks) live in the same storage as the data or in another one (a
@@ -23,7 +29,9 @@ import { point } from './types.js';
 import { watchPolicy } from './policy-watch.js';
 import {
   decorate,
+  ensureCreated,
   getLink,
+  isAddress,
   LinksError,
   linkOf,
   normalizeQuery,
@@ -32,7 +40,7 @@ import {
 
 /**
  * @typedef {{ id: number, from_id: number, to_id: number }} Link
- * @typedef {{ allowRead: number, allowWrite: number, anything: number }} PermissionMarkers
+ * @typedef {{ allowRead: number, allowWrite: number, allowReference: number, anything: number }} PermissionMarkers
  */
 
 export const forbidden = (what) =>
@@ -82,6 +90,20 @@ export function createPolicy({ rules, markers, types }) {
       allows(markers.allowWrite, subject, link),
     /** Whether `subject` may write `link` (as it is or as it will be). */
     canWrite: (subject, link) => allows(markers.allowWrite, subject, link),
+    /**
+     * Whether `subject` may refer to `link` without reading it: it is the
+     * subject, the object of a rule it holds, or `AllowReference` covers it.
+     * Reading allows referring (`withPermissions` checks both).
+     */
+    canReference: (subject, link) =>
+      link.id === subject ||
+      allows(markers.allowReference, subject, link) ||
+      [markers.allowRead, markers.allowWrite, markers.allowReference].some(
+        (marker) =>
+          granted(marker).some(
+            (rule) => rule.to_id === link.id && isSubject(subject, rule.from_id)
+          )
+      ),
     /** Whether `subject` may write anything at all: it may create links. */
     canCreate: (subject) =>
       granted(markers.allowWrite).some((rule) =>
@@ -93,7 +115,10 @@ export function createPolicy({ rules, markers, types }) {
 /**
  * The storage as `subject` sees it: `each` and `count` skip what it may not
  * read; a write it may not do throws `forbidden`, the storage unchanged.
- * An update needs the right to write the link before and after it. A link
+ * An update needs the right to write the link before and after it, and a
+ * reference it adds needs the right to refer to that address; without it the
+ * address is `not-found`, so a hidden link answers as a missing one does. So
+ * does choosing the address of a new link (`createAt`). A link
  * the subject created through this view is its own while it has no type
  * (its source is 0), so undoing the update that typed it makes it its own
  * again. `forget(id)` drops that claim when the link is gone (deleted or its
@@ -110,6 +135,26 @@ export function withPermissions(links, policy, subject) {
   const own = (link) => link.from_id === NULL && created.has(link.id);
   const readable = (link) => own(link) || policy.canRead(who(), link);
   const writable = (link) => own(link) || policy.canWrite(who(), link);
+  /** A missing address is judged as an untyped link: only `Anything` covers it. */
+  const canReference = (id) => {
+    const link = getLink(links, id) ?? linkOf(id, NULL, NULL);
+    return readable(link) || policy.canReference?.(who(), link) === true;
+  };
+  /** The references `before` does not hold yet need the right. */
+  const checkReferences = (before, source, target) => {
+    for (const part of [source, target]) {
+      if (
+        part !== NULL &&
+        part !== before.id &&
+        part !== before.from_id &&
+        part !== before.to_id &&
+        isAddress(part) &&
+        !canReference(part)
+      ) {
+        throw notFound(part);
+      }
+    }
+  };
   /** The stored link; a hidden one is as missing as a deleted one. */
   const visible = (id) => {
     const link = getLink(links, id);
@@ -145,12 +190,14 @@ export function withPermissions(links, policy, subject) {
       }
       if (own(before) && source === NULL) {
         // Still without a type: still its creator's own.
+        checkReferences(before, source, target);
         return links.update(id, source, target);
       }
       const after = linkOf(id, source, target);
       if (!writable(before) || !policy.canWrite(who(), after)) {
         throw forbidden(`update ${id}`);
       }
+      checkReferences(before, source, target);
       return links.update(id, source, target);
     },
     delete(id) {
@@ -165,23 +212,30 @@ export function withPermissions(links, policy, subject) {
     forget(id) {
       created.delete(id);
     },
+    canReference,
   };
-  if (typeof links.createAt === 'function') {
-    methods.createAt = (id) => {
-      if (!policy.canCreate(who())) {
-        throw forbidden('create');
-      }
-      const result = links.createAt(id);
-      created.add(id);
-      return result;
-    };
-  }
+  // Without it `ensureCreated` would create links up to the address through the
+  // view, and stop at a hidden one: this check is needed on every storage.
+  methods.createAt = (id) => {
+    if (!policy.canCreate(who())) {
+      throw forbidden('create');
+    }
+    if (isAddress(id) && !canReference(id)) {
+      throw notFound(id);
+    }
+    if (typeof links.createAt === 'function') {
+      links.createAt(id);
+    } else if (!ensureCreated(links, id)) {
+      throw new LinksError('exists', `Link ${id} exists`);
+    }
+    created.add(id);
+  };
   return decorate(links, methods);
 }
 
 /**
- * The markers of the permission rules by name: `AllowRead`, `AllowWrite` and
- * `Anything`, points of the data created when missing.
+ * The markers of the permission rules by name: `AllowRead`, `AllowWrite`,
+ * `AllowReference` and `Anything`, points of the data created when missing.
  * @param {any} links  the storage of the data
  * @param {any} names  its names store
  * @returns {PermissionMarkers}
@@ -190,25 +244,34 @@ export function permissionMarkers(links, names) {
   return {
     allowRead: point(links, names, 'AllowRead'),
     allowWrite: point(links, names, 'AllowWrite'),
+    allowReference: point(links, names, 'AllowReference'),
     anything: point(links, names, 'Anything'),
   };
 }
 
 /**
- * Write a rule: `subject` may `access` (`'read'` or `'write'`) links of
- * `object`. Returns the address of the rule pair.
+ * Write a rule: `subject` may `access` (`'read'`, `'write'` or
+ * `'reference'`) links of `object`. Returns the address of the rule pair.
  * @param {any} rules
  * @param {PermissionMarkers} markers
  */
 export function allow(rules, markers, access, subject, object) {
-  if (access !== 'read' && access !== 'write') {
+  const marker = {
+    read: markers.allowRead,
+    write: markers.allowWrite,
+    reference: markers.allowReference,
+  }[access];
+  if (marker === undefined) {
     throw new LinksError('bad-request', `Unknown access: ${access}`);
   }
-  if (subject === markers.allowRead || subject === markers.allowWrite) {
+  if (
+    subject === markers.allowRead ||
+    subject === markers.allowWrite ||
+    subject === markers.allowReference
+  ) {
     // A pair from a marker would read as a mark.
     throw new LinksError('bad-request', 'A marker cannot be a subject');
   }
-  const marker = access === 'write' ? markers.allowWrite : markers.allowRead;
   const rule = rules.create();
   rules.update(rule, subject, object);
   const mark = rules.create();
