@@ -19,11 +19,9 @@ import { bindMachine } from '../a11y/bind-machine.js';
 import { interpret } from '../behavior/interpret.js';
 import { createMachine } from '../behavior/parse-machine.js';
 import { atomOf, flagOf, isLive, numberOf, setText } from '../layout/dom.js';
-
-export { setText };
 import { CONTROL_MACHINES } from './machines/index.js';
 
-export { atomOf, flagOf, isLive, numberOf };
+export { atomOf, flagOf, isLive, numberOf, setText };
 
 /** The prefix of the DOM ids of control parts. */
 export const ID_PREFIX = 'ui-control';
