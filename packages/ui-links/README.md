@@ -576,7 +576,8 @@ WebSocket implementations, and both `graphql-ws` and `graphql-transport-ws`
 protocols. Optional `trace(operation)` observes HTTP requests; it is off by
 default. `guest()` obtains a token. Mutations use the existing optimistic
 triplets outbox; queued native values flush after owner ids remap. Call
-`deep.flush()` after reconnecting to flush value edits as well.
+`await synced.reconnect()` after a disconnection, then `await deep.flush()` to
+flush value edits as well.
 
 This is the data API subset, not the entire deeplinks SDK: remote code
 execution, handler installation, the full Next app and arbitrary GraphQL

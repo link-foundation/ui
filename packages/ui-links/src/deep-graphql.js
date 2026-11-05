@@ -538,6 +538,9 @@ export function createSyncedDeepLinks(options) {
   const synced = createSyncedTriplets({ transport });
   remote.valueStore = (client) => graphqlValueStore(remote, client);
   Object.defineProperty(synced, 'deep', { value: remote });
+  Object.defineProperty(synced, 'reconnect', {
+    value: () => synced.connect(transport),
+  });
   Object.defineProperty(synced, 'close', {
     value: () => {
       synced.disconnect();

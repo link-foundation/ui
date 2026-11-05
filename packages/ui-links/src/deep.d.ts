@@ -171,4 +171,4 @@ export function createSyncedDeepLinks(options: {
     query: string;
     variables: Record<string, unknown>;
   }) => void;
-}): SyncedTriplets & { close(): void };
+}): SyncedTriplets & { reconnect(): Promise<void>; close(): void };

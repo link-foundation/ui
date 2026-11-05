@@ -44,6 +44,41 @@ function readOnlyRules() {
     ]),
   ]);
 }
+test('remaps offline native links and linked values on reconnect (set CLINK)', async () => {
+  const server = await startDeepClink({ rows });
+  const synced = createSyncedDeepLinks({ url: server.url });
+  const deep = createDeepClient(synced);
+  try {
+    await deep.select({});
+    await synced.flush();
+    synced.disconnect();
+    const first = (
+      await deep.insert({ type_id: 1, string: { data: { value: 'offline' } } })
+    ).data[0].id;
+    const second = (
+      await deep.insert({
+        type_id: 1,
+        from_id: first,
+        number: { data: { value: 0 } },
+      })
+    ).data[0].id;
+    expect(synced.isTemporary(first)).toBe(true);
+    expect(deep.ml.byId[second].number.value).toBe(0);
+    await synced.reconnect();
+    await deep.flush();
+    const real = synced.resolve(first);
+    expect(real > 0).toBe(true);
+    expect(deep.ml.byId[synced.resolve(second)].from_id).toBe(real);
+    expect((await deep.select(real)).data[0].string.value).toBe('offline');
+    expect(
+      (await deep.select(synced.resolve(second))).data[0].number.value
+    ).toBe(0);
+  } finally {
+    deep.close();
+    synced.close();
+    await server.close();
+  }
+});
 describe('DeepClient against released clink (set CLINK)', () => {
   test('reads actual permission grants and refuses a write without permission', async () => {
     const rules = readOnlyRules();
