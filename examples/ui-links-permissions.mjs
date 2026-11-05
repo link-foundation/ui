@@ -2,7 +2,7 @@
 // permissions are links, and synced clients that see only what their user
 // may read.
 // Run: node examples/ui-links-permissions.mjs [--server clink]
-// CLINK may select the path of a released clink (Rust 1.3.0 or newer).
+// CLINK may select the path of a released clink (Rust 2.1.1 or newer).
 import {
   allow,
   allLinks,
@@ -13,6 +13,7 @@ import {
   createPolicy,
   createSyncedLinks,
   permissionMarkers,
+  parseLino,
   typeMarkers,
   typeSystem,
 } from '@link-foundation/ui-links';
@@ -131,16 +132,34 @@ try {
   }
   console.log('the boss sees the new note:', received);
 
-  // A hidden link answers as a missing one, unless a rule allows referring to
-  // it. Released clink does not have that rule yet.
-  if (!external) {
-    const session = server.session({ subject: v.alice });
-    const link = (target) => session.request(`(create: (${t.Note} ${target}))`);
-    console.log('link to a missing address:', link(9999));
-    console.log('link to the hidden plan:', link(v.plan));
-    allow(links, markers, 'reference', t.User, t.Secret);
-    console.log('link to it with a rule:', link(v.plan));
-    console.log('still hidden:', session.request(`(each: (${v.plan}))`) === '');
+  // Both servers require a reference right without revealing hidden targets.
+  const link = (target) =>
+    transports[1].send(`(create: (${t.Note} ${target}))`);
+  const missing = await link(9999);
+  const hidden = await link(v.plan);
+  console.log('link to a missing address:', missing);
+  console.log('link to the hidden plan:', hidden);
+  const missingError = parseLino(missing)[0];
+  const hiddenError = parseLino(hidden)[0];
+  if (
+    missingError?.id !== 'error' ||
+    hiddenError?.id !== 'error' ||
+    missingError.values[0] !== 'Link not found: 9999' ||
+    hiddenError.values[0] !== `Link not found: ${v.plan}`
+  ) {
+    throw new Error('Hidden and absent references must have the same error');
+  }
+  const pair = boss.create();
+  boss.update(pair, t.User, t.Secret);
+  const grant = boss.create();
+  boss.update(grant, markers.allowReference, pair);
+  await boss.flush();
+  const allowed = await link(v.plan);
+  console.log('link to it with a rule:', allowed);
+  const stillHidden = (await transports[1].send(`(each: (${v.plan}))`)) === '';
+  console.log('still hidden:', stillHidden);
+  if (parseLino(allowed)[0]?.id === 'error' || !stillHidden) {
+    throw new Error('A reference grant must allow linking without reading');
   }
 } finally {
   for (const transport of transports) {

@@ -60,6 +60,22 @@ describe('permissions', () => {
       expect(policy.canCreate(alice)).toBe(true);
       expect(policy.canCreate(null)).toBe(false);
     });
+
+    it(`reuses rule pairs and marks (rules ${separateRules ? 'apart' : 'with the data'})`, () => {
+      const { links, rules, markers, policy, t, v } = world({ separateRules });
+      const rule = allow(rules, markers, 'reference', t.User, t.Admin);
+      // Admin's type link already is the pair (User Admin) in shared data.
+      if (!separateRules) {
+        expect(rule).toBe(t.Admin);
+      }
+      expect(allLinks(rules, [undefined, t.User, t.Admin]).length).toBe(1);
+      const before = allLinks(rules);
+      expect(allow(rules, markers, 'reference', t.User, t.Admin)).toBe(rule);
+      expect(allLinks(rules)).toEqual(before);
+      const boss = allLinks(links, [v.boss])[0];
+      expect(policy.canReference(v.alice, boss)).toBe(true);
+      expect(policy.canRead(v.alice, boss)).toBe(false);
+    });
   }
 
   it('shows a subject only what it may read', () => {

@@ -215,6 +215,10 @@ const policy = createPolicy({ rules: links, markers, types });
 const asAlice = withPermissions(links, policy, alice);
 ```
 
+`allow()` reuses an existing rule pair and mark. Repeating a grant leaves the
+store unchanged, and a type link that already represents the rule pair keeps
+its address when the data is imported into clink.
+
 `withPermissions` hides what the subject may not read (a hidden link is as
 missing as a deleted one) and refuses a write it may not do with `forbidden`,
 the storage unchanged. An update needs the right to write the link before and
@@ -354,6 +358,10 @@ in `cache` (a memory storage by default) and has the storage interface itself:
   address (`onRemap`, `resolve(id)`, `isTemporary(id)`).
 - A write the server refuses is undone in the cache (`origin: 'rollback'`)
   and reported to `onError(error, write)`; the writes after it still go.
+  Server replies, pushes and loads update the confirmed state beneath queued
+  edits, so refusing an edit preserves newer observations and later edits.
+  Writes depending on a refused create are refused too, without leaving
+  temporary links in the cache.
 - `query(text)` runs a substitution query on the server after the queued
   writes; its changes come into the cache.
 - `onChange({ before, after, origin })` reports every change of the cache.
@@ -399,6 +407,8 @@ loads without a checkpoint. Use one active client per adapter namespace.
 
 The server's answer wins: refused writes retain the existing rollback and error
 notifications, then reconnect reconciles against the readable server snapshot.
+Rollback records are rebased on server observations and persisted with the
+remaining queue, so that a reload preserves the same confirmed state.
 Acknowledged creates keep their remap before a self-reference update, so that
 step can resume after reload. Delivery remains at least once: a connection lost
 after the server commits but before its acknowledgement can replay a write
@@ -601,9 +611,6 @@ The remaining differences by design:
   `(((m a) (m a))) (((p a) (p a)))` the new `p` is link 1; here the update
   deletes link 4 and `p` takes the freed address 4 (the memory storage, like
   doublets-web, reuses the last freed address first).
-- A reference needs a right here (`AllowReference`, see
-  [Permissions](#permissions)). Released clink checks references below its view,
-  so a subject can use a hidden link there and tell it from a missing one.
 - `load` and `name-links` are ui-links extensions for names stored as links.
   The synced client falls back to `each` and sidecar name resolution when a
   server does not implement them. The two name encodings are independent.
@@ -612,6 +619,9 @@ Both servers keep an untyped new link owned by the session that created it.
 Between connections, a client that did not subscribe keeps what it loaded
 until it loads again. Reconnect refreshes all readable links.
 Ownership is shared behavior, rather than a protocol deviation.
+Reference permissions (`AllowReference`, see [Permissions](#permissions)) are
+also shared with clink 2.1.1, following
+[link-cli#161](https://github.com/link-foundation/link-cli/issues/161).
 
 ### Verify against a released server
 
@@ -625,7 +635,8 @@ node examples/ui-links-permissions.mjs --server clink
 shared client contract uses identical data, names, rules and tokens against
 both servers, with rules in the data and in a separate file. It checks guest
 and authenticated reads, refused writes and cache rollback, temporary-address
-remapping, subscription delivery, permission loss and unsubscribe. The synced
+remapping, subscription delivery, permission loss, unsubscribe, and reference
+grants that leave their targets unreadable. The synced
 triplets client does its creates, reads, updates, deletes and queries through
 `clink --serve --triplets` the same way. Without
 `CLINK`, the external-server tests visibly skip; CI installs clink 2.1.1 and

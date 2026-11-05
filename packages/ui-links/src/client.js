@@ -37,16 +37,9 @@ import {
   withProperties,
 } from './client-wire.js';
 import { persistLinks } from './persist.js';
+import { createCacheWriter } from './client-cache.js';
 import { deleteCascade } from './decorators.js';
-import {
-  allLinks,
-  decorate,
-  ensureCreated,
-  getLink,
-  linkOf,
-  LinksError,
-  notFound,
-} from './links.js';
+import { decorate, getLink, linkOf, LinksError, notFound } from './links.js';
 import { formatLino, group, parseLino } from './lino.js';
 import { createMemoryLinks } from './memory.js';
 import { createLinksNames } from './links-names.js';
@@ -135,98 +128,6 @@ export function connectInProcess(server, { subject = null } = {}) {
   };
 }
 
-/**
- * The writes into the cache that do not go to the server: links the server
- * sent, real addresses for temporary ones, refused writes undone.
- */
-function createCacheWriter(cache, emit, remaps) {
-  /** Temporary address → real address. */
-  const real = new Map(remaps);
-  const resolve = (id) => real.get(id) ?? id;
-
-  const put = (link, origin) => {
-    const before = getLink(cache, link.id);
-    if (before === null) {
-      ensureCreated(cache, link.id);
-    }
-    cache.update(link.id, link.from_id, link.to_id);
-    if (
-      before === null ||
-      before.from_id !== link.from_id ||
-      before.to_id !== link.to_id
-    ) {
-      emit(before, getLink(cache, link.id), origin);
-    }
-  };
-  const remove = (id, origin) => {
-    const before = getLink(cache, id);
-    if (before !== null) {
-      cache.delete(id);
-      emit(before, null, origin);
-    }
-  };
-
-  return {
-    real,
-    resolve,
-    put,
-    remove,
-    refreshNames(ids, metadata) {
-      for (const mark of createLinksNames(cache).bindings(ids)) {
-        remove(mark.id, 'remote');
-      }
-      metadata.forEach((value) => put(linkFromLino(value), 'remote'));
-    },
-    /** Apply the changes the server reports. */
-    applyRemote(changes) {
-      for (const { before, after } of changes) {
-        if (after === null) {
-          remove(before.id, 'remote');
-        } else {
-          put(after, 'remote');
-        }
-      }
-    },
-    /** Move the link at `temp` to `id`, and every use of `temp` with it. */
-    remap(temp, id) {
-      real.set(temp, id);
-      const link = getLink(cache, temp);
-      if (link === null) {
-        return;
-      }
-      const swap = (x) => (x === temp ? id : x);
-      if (getLink(cache, id) === null) {
-        ensureCreated(cache, id);
-      }
-      cache.update(id, swap(link.from_id), swap(link.to_id));
-      const users = [
-        ...allLinks(cache, { from_id: temp }),
-        ...allLinks(cache, { to_id: temp }),
-      ];
-      for (const user of users) {
-        const now = getLink(cache, user.id);
-        if (now !== null && now.id !== temp) {
-          cache.update(now.id, swap(now.from_id), swap(now.to_id));
-        }
-      }
-      cache.delete(temp);
-      emit(link, getLink(cache, id), 'remap');
-    },
-    /** Undo the local changes of a refused write, newest first. */
-    undo(changes) {
-      for (const change of [...changes].reverse()) {
-        const was = change.before;
-        if (was === null) {
-          remove(resolve(change.after.id), 'rollback');
-        } else {
-          const at = resolve(was.id);
-          put(linkOf(at, resolve(was.from_id), resolve(was.to_id)), 'rollback');
-        }
-      }
-    },
-  };
-}
-
 /** How a write of links goes to the server. */
 function createLinkSender({ writer, request, durable, remapped }) {
   const { resolve } = writer;
@@ -241,30 +142,47 @@ function createLinkSender({ writer, request, durable, remapped }) {
         await request(self ? op('create', '0', '0') : op('create', s, t))
       );
       real = created.after.id;
-      writer.remap(entry.id, real);
+      writer.remap(entry.id, created.after);
       remapped(entry.id, real);
       await durable();
     }
     if (self) {
       const id = String(real);
       const swap = (part, text) => (part === entry.id ? id : text);
-      await request(
-        op('update', id, swap(entry.source, s), swap(entry.target, t))
+      writer.settled(
+        entry,
+        changesFromLino(
+          await request(
+            op('update', id, swap(entry.source, s), swap(entry.target, t))
+          )
+        )
       );
+    } else {
+      writer.settled(entry, []);
     }
   };
 
   /** Send one write; bring its answer into the cache. */
   return async (entry) => {
+    const lost = writer.lost(entry);
+    if (lost !== undefined) {
+      throw new LinksError(
+        'bad-request',
+        `The write that created ${lost} was refused.`
+      );
+    }
     const id = String(resolve(entry.id));
     if (entry.kind === 'create') {
       await sendCreate(entry);
     } else if (entry.kind === 'update') {
       const s = String(resolve(entry.source));
       const t = String(resolve(entry.target));
-      await request(op('update', id, s, t));
+      writer.settled(
+        entry,
+        changesFromLino(await request(op('update', id, s, t)))
+      );
     } else {
-      writer.applyRemote(changesFromLino(await request(op('delete', id))));
+      writer.settled(entry, changesFromLino(await request(op('delete', id))));
     }
   };
 }
@@ -319,15 +237,8 @@ function createOptimisticStorage(
 }
 
 /** A fresh snapshot replaces the cache, as far as it differs. */
-function reconcileLinks(cache, writer, reply) {
-  const links = reply.map((v) => linkFromLino(v));
-  const ids = new Set(links.map((l) => l.id));
-  for (const link of allLinks(cache)) {
-    if (!ids.has(link.id)) {
-      writer.remove(link.id, 'remote');
-    }
-  }
-  links.forEach((link) => writer.put(link, 'remote'));
+function reconcileLinks(writer, reply) {
+  writer.replaceBase(reply.map((v) => linkFromLino(v)));
 }
 
 /** Reads, subscriptions and substitution queries use the active connection. */
@@ -387,11 +298,14 @@ function createRemoteMethods({
         document,
         (value) => addresses.get(value) ?? numberOf(value)
       );
-      writer.applyRemote(changes);
+      writer.learn(changes);
       const ids = changes.flatMap(({ after }) =>
         after ? [after.id, after.from_id, after.to_id] : []
       );
-      writer.refreshNames(ids, await requestNameLinks(request, ids));
+      writer.refreshNames(
+        ids,
+        (await requestNameLinks(request, ids)).map((v) => linkFromLino(v))
+      );
       return changes;
     },
   };
@@ -436,10 +350,10 @@ async function loadLinks(request, writer, restriction) {
     metadata = [];
   }
   const links = data.map((value) => linkFromLino(value));
-  links.forEach((link) => writer.put(link, 'remote'));
+  writer.learn(links.map((after) => ({ before: null, after })));
   writer.refreshNames(
     links.flatMap((link) => [link.id, link.from_id, link.to_id]),
-    metadata
+    metadata.map((v) => linkFromLino(v))
   );
   return links;
 }
@@ -458,7 +372,7 @@ export function createSyncedLinks({
   durable = async () => {},
 } = {}) {
   const { listeners, call, emit } = createListeners();
-  const writer = createCacheWriter(cache, emit, state.real);
+  const writer = createCacheWriter(cache, emit, state, () => checkpoint());
   let nextTemp = state.nextTemp;
   const subscriptions = new Map(state.subscriptions);
   const remoteSubscriptions = { ids: new Map(), transport: null };
@@ -469,7 +383,8 @@ export function createSyncedLinks({
         nextTemp,
         connected: state.connected,
         real: [...writer.real],
-        queue: state.queue,
+        refused: [...writer.refused],
+        queue: state.queue.filter((entry) => !entry.done),
         subscriptions: [...subscriptions],
         nextSubscription,
       })
@@ -479,7 +394,8 @@ export function createSyncedLinks({
   let current = null;
   let stopPush = null;
 
-  const isTemporary = (id) => id > nextTemp && !writer.real.has(id);
+  const isTemporary = (id) =>
+    id > nextTemp && !writer.real.has(id) && !writer.refused.has(id);
   const disconnect = () => {
     stopPush?.();
     stopPush = null;
@@ -542,7 +458,7 @@ export function createSyncedLinks({
           outbox,
           request,
           writer,
-          reconcile: (reply) => reconcileLinks(cache, writer, reply),
+          reconcile: (reply) => reconcileLinks(writer, reply),
           subscriptions,
           remoteSubscriptions,
           transport: next,

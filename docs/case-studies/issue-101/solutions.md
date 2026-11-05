@@ -10,6 +10,13 @@ issue. The research behind the choices is in
 [research/deep-foundation.md](research/deep-foundation.md) and
 [research/link-cli.md](research/link-cli.md).
 
+This records the original MVP and its plan. The
+[issue-109 completion audit](../issue-109/README.md) supersedes the planned
+work and historical limits below: accepted follow-ups are implemented,
+including WebSockets, durable sync, live documents, permission-change pushes,
+names as links, released-clink connectivity, triplets and Deep. Browser
+SQLite/OPFS was explicitly rejected in #111.
+
 ## R1–R6: `setPositional` in ui-store (the issue body)
 
 Built in commit `4c2bcd8`, as the issue specified.
@@ -279,7 +286,7 @@ storage under the view for the reference check and the rollback; the tests
   reproduces both errors with CRLF text. A clone with `core.autocrlf=true`
   gave CRLF files before the fix and LF files after it.
 
-## Known limits
+## Historical MVP limits (resolved by issue 109)
 
 - **Pushes after rule changes**
   ([ui#113](https://github.com/link-foundation/ui/issues/113)). The server
