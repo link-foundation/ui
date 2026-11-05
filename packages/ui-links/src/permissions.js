@@ -127,12 +127,20 @@ export function createPolicy({ rules, markers, types }) {
  * @param {any} links
  * @param {ReturnType<typeof createPolicy>} policy
  * @param {number | null | (() => number | null)} subject
+ * @param {object} [options]
+ * @param {Set<number>} [options.created]  the addresses of the links created
+ *   through this view, for a layer that shares them (`withTripletPermissions`)
+ * @param {(link: Link) => boolean} [options.owns]  what else is the subject's own
  */
-export function withPermissions(links, policy, subject) {
+export function withPermissions(
+  links,
+  policy,
+  subject,
+  { created = new Set(), owns = () => false } = {}
+) {
   const who = typeof subject === 'function' ? subject : () => subject;
-  /** The addresses of the links created through this view. */
-  const created = new Set();
-  const own = (link) => link.from_id === NULL && created.has(link.id);
+  const own = (link) =>
+    (link.from_id === NULL && created.has(link.id)) || owns(link);
   const readable = (link) => own(link) || policy.canRead(who(), link);
   const writable = (link) => own(link) || policy.canWrite(who(), link);
   /** A missing address is judged as an untyped link: only `Anything` covers it. */
