@@ -42,3 +42,6 @@ export * from './framing.js';
 export * from './server.js';
 export * from './client.js';
 export * from './triplets-client.js';
+export { createMinilinks } from './minilinks.js';
+export { createDeepClient } from './deep-client.js';
+export { createSyncedDeepLinks } from './deep-graphql.js';
