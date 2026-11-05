@@ -21,6 +21,7 @@ export const emptyClientState = () => ({
   connected: false,
   nextTemp: MAX_ADDRESS,
   real: [],
+  refused: [],
   queue: [],
   subscriptions: [],
   nextSubscription: 1,
@@ -36,6 +37,7 @@ export function writeClientState(state) {
         'remaps',
         state.real.map(([a, b]) => group([String(a), String(b)]))
       ),
+      named('refused', state.refused.map(String)),
       named(
         'subscriptions',
         state.subscriptions.map(([id, restriction]) =>
@@ -78,6 +80,7 @@ export function readClientState(text) {
     nextTemp: Number(fields.get('next')[0]),
     nextSubscription: Number(fields.get('subscription-counter')[0]),
     real: fields.get('remaps').map((v) => v.map(Number)),
+    refused: (fields.get('refused') ?? []).map(Number),
     subscriptions: fields
       .get('subscriptions')
       .map((v) => [

@@ -2,6 +2,8 @@
 import { describe, it, expect } from 'test-anywhere';
 import {
   allLinks,
+  allow,
+  changesFromLino,
   connectInProcess,
   createLinksServer,
   createMemoryLinks,
@@ -27,12 +29,49 @@ async function until(check) {
   return check();
 }
 
+/** Reference rights never grant read access, on either protocol server. */
+async function checkReferences(transport, alice, boss, fixture, separateRules) {
+  const { t, v, markers } = fixture;
+  const reference = async (target) =>
+    parseLino(await transport.send(`(create: (${t.Note} ${target}))`));
+  for (const target of [99999, v.secret]) {
+    expect(await reference(target)).toEqual([
+      { id: 'error', values: [`Link not found: ${target}`] },
+    ]);
+  }
+  expect(changesFromLino(await reference(v.boss))[0].after.to_id).toBe(v.boss);
+  expect(await alice.load([v.boss])).toEqual([]);
+  if (!separateRules) {
+    const pair = boss.create();
+    boss.update(pair, t.User, t.Secret);
+    const grant = boss.create();
+    boss.update(grant, markers.allowReference, pair);
+    await boss.flush();
+    expect(changesFromLino(await reference(v.secret))[0].after.to_id).toBe(
+      v.secret
+    );
+    expect(await alice.load([v.secret])).toEqual([]);
+  }
+}
+
+function referenceWorld(separateRules) {
+  const fixture = world({ separateRules });
+  allow(
+    fixture.rules,
+    fixture.markers,
+    'reference',
+    fixture.t.User,
+    fixture.t.Admin
+  );
+  return fixture;
+}
+
 for (const backend of ['reference', 'clink']) {
   for (const separateRules of [false, true]) {
     describe(`${backend} synced client (rules ${separateRules ? 'apart' : 'in data'})`, () => {
       const test = backend === 'clink' && !process.env.CLINK ? it.skip : it;
       test('authenticates, filters, rolls back and synchronizes (set CLINK for released-server coverage)', async () => {
-        const fixture = world({ separateRules });
+        const fixture = referenceWorld(separateRules);
         const { links, names, policy, t, v } = fixture;
         const tokens = new Map([
           ['alice-token', v.alice],
@@ -120,6 +159,14 @@ for (const backend of ['reference', 'clink']) {
           boss.delete(id);
           await boss.flush();
           expect(await boss.load([id])).toEqual([]);
+
+          await checkReferences(
+            transports[1],
+            alice,
+            boss,
+            fixture,
+            separateRules
+          );
         } finally {
           for (const transport of transports) {
             await transport.close();
