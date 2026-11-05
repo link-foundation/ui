@@ -1177,16 +1177,24 @@ jobs:
       - name: Install released server with permissions and subscriptions
         env:
           CARGO_BUILD_JOBS: '1'
-        run: cargo install link-cli --version 1.5.0 --locked
+        run: cargo install link-cli --version 2.1.1 --locked
       - name: Replay client tests against both servers on Node, Bun and Deno
         env:
           CLINK: clink
         run: |
-          node --test --test-timeout=30000 packages/ui-links/tests/client.test.js packages/ui-links/tests/clink.test.js
-          bun test --timeout 30000 packages/ui-links/tests/client.test.js packages/ui-links/tests/clink.test.js
-          deno test -A packages/ui-links/tests/client.test.js packages/ui-links/tests/clink.test.js
+          node --test --test-timeout=30000 packages/ui-links/tests/client.test.js packages/ui-links/tests/clink.test.js packages/ui-links/tests/deep.test.js packages/ui-links/tests/deep-clink.test.js
+          bun test --timeout 30000 packages/ui-links/tests/client.test.js packages/ui-links/tests/clink.test.js packages/ui-links/tests/deep.test.js packages/ui-links/tests/deep-clink.test.js
+          deno test -A packages/ui-links/tests/client.test.js packages/ui-links/tests/clink.test.js packages/ui-links/tests/deep.test.js packages/ui-links/tests/deep-clink.test.js
           node examples/ui-links-permissions.mjs
           node examples/ui-links-permissions.mjs --server clink
+      - name: Load the upstream Deepcase main graph through ui-links
+        env:
+          CLINK: clink
+        run: |
+          npm --prefix examples/deepcase ci --ignore-scripts --legacy-peer-deps --no-audit --no-fund
+          node examples/deepcase/build.mjs
+          npx playwright install --with-deps chromium
+          npx playwright test --config examples/deepcase/playwright.config.mjs
 
   # GitHub reports jobs killed by timeout-minutes as cancelled rather than
   # failed. Observe every job and excuse only cancellations that the tested

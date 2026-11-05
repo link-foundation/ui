@@ -491,6 +491,99 @@ client.deleteTriplet(alice);
 
 The copy lives in memory: it has no persistence yet, unlike `openSyncedLinks`.
 
+## DeepClient and minilinks
+
+`createDeepClient(synced)` adapts the synced triplets client to Deep's data API.
+It adds no React or Apollo runtime dependency. `deep.ml` and `deep.minilinks`
+are the same local collection. The runnable
+[Deepcase example](../../examples/deepcase/README.md) imports the real upstream
+main graph and React hooks and connects them to clink through this API.
+
+```js
+import {
+  createDeepClient,
+  createSyncedDeepLinks,
+} from '@link-foundation/ui-links';
+
+// clink --db deep.links --serve 127.0.0.1:3006 --graphql --deep-package core.json
+const synced = createSyncedDeepLinks({
+  url: 'http://127.0.0.1:3006/v1/graphql',
+});
+const deep = createDeepClient(synced);
+await deep.guest();
+const type = await deep.id('@deep-foundation/core', 'Type');
+const {
+  data: [link],
+} = await deep.insert({
+  type_id: type,
+  string: { data: { value: 'Hello' } },
+});
+const subscription = deep.subscribe({ type_id: type }).subscribe({
+  next: ({ data }) => console.log(data),
+  error: console.error,
+});
+await deep.update({ link_id: link.id }, { value: '' }, { table: 'strings' });
+await deep.select({ _not: { string: { value: { _eq: 'Hello' } } } });
+await deep.delete(link.id);
+subscription.unsubscribe();
+deep.close();
+synced.close();
+```
+
+- `select`, `insert`, `update`, `delete` resolve to `{ data, loading: false }`;
+  refused writes reject and remove their optimistic changes. `subscribe`
+  delivers this shape through an observable with idempotent `unsubscribe()`.
+  `close()` disposes the adapter's listeners and subscriptions; its caller
+  still owns the underlying synced client's connection.
+- Inserts accept nested `type`, `from`, `to`, `in`, `out`, `typed` data and
+  `string`, `number`, `object` value data. Value tables use `link_id` and
+  `value`. Numbers must be finite; objects must be JSON serializable.
+  Explicit insert ids are refused: the synced client owns address allocation.
+- Queries support `_and`, `_or`, `_not`, `_eq`, `_in`, `_is_null` and all six
+  link relations (`from`, `to`, `type`, `in`, `out`, `typed`). The local engine
+  also supports inequalities, `_nin`, `_contains`, ordering, distinct values,
+  offset and limit. Unknown comparisons reject, including on an empty cache.
+  `{ remote: false }` queries only the cache. `{ aggregate: 'count' }` counts
+  matching rows. `_id: ['package', 'name']` expands a cached package path.
+- `createMinilinks()` can be used independently: `add`, `update`, `remove`,
+  `query`, `subscribe`, and `apply(rows, name)`. Applies retain shared rows
+  until every owning apply releases them. Rows expose relation getters,
+  `value`, `toPlain()` and `inByType`/`outByType`; the collection exposes
+  `byId`, `byFrom`, `byTo`, `byType` and its event emitter.
+- Temporary addresses and dependent references follow `synced.resolve`.
+  Named applies survive remapping; refused creates leave no ghost rows.
+  `idLocal(package, ...names)` uses cached string names;
+  `await id(package, ...names)` loads the readable network first. A trailing
+  `true` permits a missing path and returns 0.
+- On a regular `createSyncedTriplets`, queries fetch readable candidates with
+  an identity substitution and evaluate the complete predicate locally.
+  Values are actual triplets: namespace/kind markers, linked UTF-16 bit lists,
+  and owner-to-text links. They survive another client's reload and owner
+  deletion cascades through the storage's triplet rules.
+- `can(object, subject, action)` delegates to `options.policy` on the LiNo
+  transport, including inherited types. Actions are `read`, `write`,
+  `reference`, or numeric ids mapped by `options.actions`. With the GraphQL
+  transport it queries clink's permission grants; `read`/`write` resolve
+  the core `AllowSelect`/`AllowUpdate` ids. A server without policy grants
+  answers false. A permission check never substitutes for server enforcement.
+
+`createSyncedDeepLinks` uses clink 2.1.1's `/v1/graphql` endpoint and sends
+normalized Hasura predicates. Its ids are **Deep ids**, mapped by the server;
+use a separate synced client for physical LiNo addresses. Native strings,
+numbers and objects are linked values in clink, independent of the LiNo-only
+UTF-16 encoding. It supports bearer tokens, extra headers, injected fetch and
+WebSocket implementations, and both `graphql-ws` and `graphql-transport-ws`
+protocols. Optional `trace(operation)` observes HTTP requests; it is off by
+default. `guest()` obtains a token. Mutations use the existing optimistic
+triplets outbox; queued native values flush after owner ids remap. Call
+`await synced.reconnect()` after a disconnection, then `await deep.flush()` to
+flush value edits as well.
+
+This is the data API subset, not the entire deeplinks SDK: remote code
+execution, handler installation, the full Next app and arbitrary GraphQL
+selection generation are not provided. The optional example bridges the
+original Apollo React hooks to the subset and verifies a real rendered graph.
+
 ## Compatibility with link-cli
 
 The protocol, the query language, the names sidecar and the text format are
@@ -523,7 +616,7 @@ Ownership is shared behavior, rather than a protocol deviation.
 ### Verify against a released server
 
 ```sh
-CARGO_BUILD_JOBS=1 cargo install link-cli --version 1.5.0 --locked
+CARGO_BUILD_JOBS=1 cargo install link-cli --version 2.1.1 --locked
 CLINK=clink node --test --test-timeout=30000 packages/ui-links/tests/client.test.js packages/ui-links/tests/clink.test.js
 node examples/ui-links-permissions.mjs --server clink
 ```
@@ -535,7 +628,7 @@ and authenticated reads, refused writes and cache rollback, temporary-address
 remapping, subscription delivery, permission loss and unsubscribe. The synced
 triplets client does its creates, reads, updates, deletes and queries through
 `clink --serve --triplets` the same way. Without
-`CLINK`, the external-server tests visibly skip; CI installs Rust 1.5.0 and
+`CLINK`, the external-server tests visibly skip; CI installs clink 2.1.1 and
 runs them on Node.js, Bun and Deno, then runs the permissions example against
 both servers. Each fixture uses a temporary directory and an ephemeral local
 TCP port, and closes its connections and server before removing its own data.

@@ -171,6 +171,14 @@ reserve action and the jwt/guest remote schemas;
 [research/deep-foundation.md](research/deep-foundation.md#the-deep-standard)).
 link-cli#153 states that schema as the contract.
 
+The DeepClient portion is implemented in ui-links: local Hasura predicates,
+all six relations, named applies and optimistic remapping over synced triplets.
+Linked values work over both the LiNo and GraphQL transports. Permission checks
+use the policy layer. The [Deepcase example](../../../examples/deepcase/README.md)
+loads the published main graph and original React hooks against released clink;
+its browser check verifies a live value update in the graph. The ported minilinks
+cases and released-server tests are in `packages/ui-links/tests/deep*.test.js`.
+
 ## R18, R19, R22: the roadmap and the MVP
 
 **MVP (R19, R22).** The doublets client and server are in this repository

@@ -1,6 +1,7 @@
 /**
  * Type declarations of `@link-foundation/ui-links` (see README.md).
  */
+export * from './deep.js';
 
 // Constants (doublets-web's numbers)
 

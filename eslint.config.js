@@ -112,6 +112,7 @@ export default [
     files: [
       'examples/ui-dom/**/*.js',
       'examples/animation/**/*.js',
+      'examples/deepcase/**/*.js',
       'packages/*/examples/**/*.{js,mjs}',
     ],
     languageOptions: {
@@ -119,6 +120,9 @@ export default [
         document: 'readonly',
         window: 'readonly',
         URL: 'readonly',
+        URLSearchParams: 'readonly',
+        localStorage: 'readonly',
+        location: 'readonly',
       },
     },
   },
