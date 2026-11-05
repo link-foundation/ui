@@ -1,0 +1,10 @@
+app-bar-stories: stories
+  component app-bar
+  story default
+    app-bar 'Inbox'
+      position static
+      app-bar-text: text 'Three unread.'
+  story primary
+    app-bar 'Settings'
+      tone primary
+      app-bar-action: button 'Save'

@@ -18,7 +18,9 @@
 import { bindMachine } from '../a11y/bind-machine.js';
 import { interpret } from '../behavior/interpret.js';
 import { createMachine } from '../behavior/parse-machine.js';
-import { atomOf, flagOf, isLive, numberOf } from '../layout/dom.js';
+import { atomOf, flagOf, isLive, numberOf, setText } from '../layout/dom.js';
+
+export { setText };
 import { CONTROL_MACHINES } from './machines/index.js';
 
 export { atomOf, flagOf, isLive, numberOf };
@@ -68,20 +70,6 @@ export function setAttr(node, name, value) {
     node.removeAttribute(name);
   } else if (node.getAttribute(name) !== String(value)) {
     node.setAttribute(name, String(value));
-  }
-}
-
-/** Replace the text of a node (no markup is ever parsed). */
-export function setText(node, text) {
-  const value = text ?? '';
-  if (node.textContent === value && node.childNodes.length <= 1) {
-    return;
-  }
-  for (const child of [...node.childNodes]) {
-    node.removeChild(child);
-  }
-  if (value !== '') {
-    node.appendChild(node.ownerDocument.createTextNode(value));
   }
 }
 
@@ -137,7 +125,8 @@ const controls = new WeakMap();
  * @param {object} el  the element model
  * @param {object} ctx  the kind context
  * @param {object} options
- * @param {string} options.kind  the control kind (its machine)
+ * @param {string} [options.kind]  the control kind (its own machine)
+ * @param {object} [options.machine]  a parsed shared machine instead
  * @param {Record<string, HTMLElement>} options.parts  part elements
  * @param {HTMLElement} options.target  where `ui-change` is dispatched
  *   (the kind's event target)
@@ -149,7 +138,7 @@ const controls = new WeakMap();
  */
 export function startControl(node, el, ctx, options) {
   const report = (d) => ctx.diagnostic(d.code, d.severity, d.at);
-  const service = interpret(controlMachine(options.kind), {
+  const service = interpret(options.machine ?? controlMachine(options.kind), {
     actions: options.actions,
     guards: CONTROL_GUARDS,
     context: options.context,
@@ -237,6 +226,20 @@ export function commitValue(
     control.value = value;
     control.commit(property, value);
   }
+}
+
+/**
+ * Bring the machine of a control to a value its element property holds:
+ * nothing is committed back, and `disabled` (which only stops the user)
+ * does not stop the host.
+ */
+export function driveControl(control, event, value, disabled) {
+  control.driven = true;
+  control.assign({ disabled: false });
+  control.service.send(event);
+  control.assign({ disabled });
+  control.value = value;
+  control.driven = false;
 }
 
 /** The text of a property, `fallback` when it is missing. */

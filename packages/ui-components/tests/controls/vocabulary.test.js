@@ -51,6 +51,8 @@ describe('control kinds', () => {
       'progress',
       'badge',
       'avatar',
+      'chip',
+      'accordion',
     ]);
     expect(controlKindMeta('switch')).toEqual({
       machine: 'switch-machine',

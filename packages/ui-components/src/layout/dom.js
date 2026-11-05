@@ -206,6 +206,20 @@ export function setAttr(node, name, value) {
   }
 }
 
+/** Replace the text of a node (no markup is ever parsed). */
+export function setText(node, text) {
+  const value = text ?? '';
+  if (node.textContent === value && node.childNodes.length <= 1) {
+    return;
+  }
+  for (const child of [...node.childNodes]) {
+    node.removeChild(child);
+  }
+  if (value !== '') {
+    node.appendChild(node.ownerDocument.createTextNode(value));
+  }
+}
+
 /** The storage of the render (`options.layout.storage`), or `null`. */
 export function storageOf(ctx) {
   const storage = ctx.options?.layout?.storage;

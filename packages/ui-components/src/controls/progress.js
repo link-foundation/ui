@@ -5,9 +5,16 @@
  *
  *   (upload: progress 'Uploading' (value 40))
  *   (busy: progress 'Loading')
+ *
+ * `(shape circular)` draws the same progressbar as a ring; the ARIA is the
+ * same in both shapes.
+ *
+ *   (sync: progress 'Syncing' (shape circular) (value 40))
+ *   (spinner: progress 'Loading' (shape circular))
  */
 
 import {
+  atomOf,
   changesOf,
   numberOf,
   partId,
@@ -15,6 +22,8 @@ import {
   setAttr,
   updateLabel,
 } from './dom.js';
+
+export const PROGRESS_SHAPES = Object.freeze(['linear', 'circular']);
 
 export const PROGRESS_KIND = Object.freeze({
   tag: 'ui-progress',
@@ -41,6 +50,10 @@ export const PROGRESS_KIND = Object.freeze({
     const [label, track] = node.children;
     if (has('label')) {
       updateLabel(label, el, ctx);
+    }
+    if (has('shape')) {
+      const shape = atomOf(el, 'shape');
+      setAttr(node, 'shape', PROGRESS_SHAPES.includes(shape) ? shape : 'linear');
     }
     if (has('value') || has('max')) {
       const max = Math.max(Number.MIN_VALUE, numberOf(el, 'max', 100));

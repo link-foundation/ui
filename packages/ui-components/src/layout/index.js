@@ -35,6 +35,7 @@ import './stack.js';
 import './grid.js';
 import './split.js';
 import './panel.js';
+import './surfaces.js';
 import './tab-group.js';
 import './window.js';
 import './dock.js';

@@ -27,7 +27,9 @@ export type ControlKind =
   | 'option'
   | 'progress'
   | 'badge'
-  | 'avatar';
+  | 'avatar'
+  | 'chip'
+  | 'accordion';
 
 /** The machine and the ARIA role of a control kind (`null` when none). */
 export interface ControlKindMeta {
@@ -122,6 +124,9 @@ export function isUrl(href: string): boolean;
 /** Hide the options of a listbox whose label does not contain the text. */
 export function filterOptions(listbox: Element, text: string): void;
 export const BADGE_TONES: readonly ['neutral', 'primary', 'error'];
+export const CHIP_TONES: readonly ['neutral', 'primary', 'error'];
+export const CHIP_VARIANTS: readonly ['filled', 'outlined'];
+export const PROGRESS_SHAPES: readonly ['linear', 'circular'];
 
 /* Stories and the catalog */
 

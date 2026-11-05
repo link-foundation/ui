@@ -354,11 +354,13 @@ option: kind
   children none
 
 progress: kind
-  description 'Shows how far a task is; without a value it is indeterminate.'
+  description 'Shows how far a task is, as a bar or a ring; without a value it is indeterminate.'
   positional label
   property label string
   property value number
   property max number
+  property shape
+    enum linear circular
   property style element-ref
   children none
 
@@ -381,6 +383,74 @@ avatar: kind
     enum small medium large
   property style element-ref
   children none
+
+chip: kind
+  description 'A compact label, with an optional action that removes it.'
+  positional label
+  property label string
+  property value string
+  property variant
+    enum filled outlined
+  property tone
+    enum neutral primary error
+  property removable boolean
+  property remove-label string
+  property removed boolean
+  property disabled boolean
+  property style element-ref
+  property on action multi
+  property bind any
+  children none
+
+accordion: kind
+  description 'A heading that shows or hides its section (one disclosure); siblings form a group.'
+  positional label
+  property label string
+  property open boolean
+  property disabled boolean
+  property heading-level number
+  property style element-ref
+  property on action multi
+  property bind any
+  children any
+
+container: kind
+  description 'Centers its content up to a maximum inline size, with gutters.'
+  property size
+    enum extra-small small medium large extra-large full
+  property gutters boolean
+  property style element-ref
+  children any
+
+paper: kind
+  description 'A plain surface: elevated from 0 to 5, or outlined.'
+  property elevation number
+  property variant
+    enum elevated outlined
+  property square boolean
+  property style element-ref
+  children any
+
+card: kind
+  description 'A surface for one subject: an optional title and subtitle, then any content.'
+  positional title
+  property title string
+  property subtitle string
+  property variant
+    enum elevated filled outlined
+  property style element-ref
+  children any
+
+app-bar: kind
+  description 'The bar at the top of a page or a section: a title, then any content.'
+  positional title
+  property title string
+  property position
+    enum static sticky fixed
+  property tone
+    enum surface primary
+  property style element-ref
+  children any
 
 navigate: action
   description 'Go to an element id or a quoted URL.'

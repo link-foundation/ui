@@ -13,10 +13,12 @@
 
 import { defineKind } from '@link-foundation/ui-dom';
 import { mountBehavior } from '../behavior/dom.js';
+import { ACCORDION_KIND } from './accordion.js';
 import { AVATAR_KIND } from './avatar.js';
 import { BADGE_KIND } from './badge.js';
 import { BUTTON_KIND } from './button.js';
 import { CHECKBOX_KIND } from './checkbox.js';
+import { CHIP_KIND } from './chip.js';
 import { COLOR_FIELD_KIND } from './color-field.js';
 import { COMBOBOX_KIND } from './combobox.js';
 import { ICON_BUTTON_KIND } from './icon-button.js';
@@ -48,6 +50,8 @@ export { formatNumber, readNumber } from './number-field.js';
 export { fractionOf, valueText } from './slider.js';
 export { filterOptions } from './combobox.js';
 export { BADGE_TONES } from './badge.js';
+export { CHIP_TONES, CHIP_VARIANTS } from './chip.js';
+export { PROGRESS_SHAPES } from './progress.js';
 export {
   parseCatalog,
   parseStories,
@@ -74,6 +78,8 @@ export const CONTROL_KIND_SPECS = Object.freeze({
   combobox: COMBOBOX_KIND,
   option: OPTION_KIND,
   progress: PROGRESS_KIND,
+  chip: CHIP_KIND,
+  accordion: ACCORDION_KIND,
   badge: BADGE_KIND,
   avatar: AVATAR_KIND,
 });

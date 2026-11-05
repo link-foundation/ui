@@ -1,0 +1,11 @@
+paper-stories: stories
+  component paper
+  story default
+    paper
+      elevation 2
+      paper-text: text 'A raised surface.'
+  story outlined-square
+    paper
+      variant outlined
+      square true
+      paper-outlined-text: text 'A flat surface.'

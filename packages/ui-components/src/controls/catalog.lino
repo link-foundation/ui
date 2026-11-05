@@ -74,3 +74,11 @@ avatar: control
   title 'Avatar'
   stories avatar-stories
   apg none
+chip: control
+  title 'Chip'
+  stories chip-stories
+  apg none
+accordion: control
+  title 'Accordion'
+  stories accordion-stories
+  apg accordion

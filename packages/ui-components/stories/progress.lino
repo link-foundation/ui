@@ -5,3 +5,10 @@ progress-stories: stories
       value 60
   story indeterminate
     progress 'Loading'
+  story circular-determinate
+    progress 'Syncing'
+      shape circular
+      value 60
+  story circular-indeterminate
+    progress 'Waiting'
+      shape circular

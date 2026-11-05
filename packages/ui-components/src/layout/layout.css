@@ -16,6 +16,9 @@
   --ui-dock-center-min-width: 12rem;
   --ui-focus-ring: 3px solid var(--color-primary, Highlight);
   --ui-layout-transition: var(--motion-duration-short, 150ms) ease;
+  --ui-container-gutter: 1.5rem;
+  --ui-app-bar-height: 4rem;
+  --ui-app-bar-layer: 10;
 }
 
 /* A rendered child that is hidden stays hidden whatever its display. */
@@ -397,5 +400,162 @@
 
   .ui-tab-strip [role='tab'][aria-selected='true'] {
     border-bottom-color: Highlight;
+  }
+}
+
+/* container: a centred column of a set width. */
+:where(ui-container) {
+  display: block;
+  box-sizing: border-box;
+  inline-size: 100%;
+  margin-inline: auto;
+  padding-inline: var(--ui-container-gutter);
+}
+
+:where(ui-container)[gutters='false'] {
+  padding-inline: 0;
+}
+
+:where(ui-container)[size='extra-small'] {
+  max-inline-size: 30rem;
+}
+
+:where(ui-container)[size='small'] {
+  max-inline-size: 40rem;
+}
+
+:where(ui-container)[size='medium'] {
+  max-inline-size: 56rem;
+}
+
+:where(ui-container)[size='large'] {
+  max-inline-size: 75rem;
+}
+
+:where(ui-container)[size='extra-large'] {
+  max-inline-size: 96rem;
+}
+
+/* paper and card: surfaces that take their depth from the elevation tokens. */
+:where(ui-paper, ui-card) {
+  display: block;
+  box-sizing: border-box;
+  border: 1px solid transparent;
+  border-radius: var(--shape-corner-medium, 12px);
+  background: var(--color-surface, Canvas);
+  color: var(--color-on-surface, CanvasText);
+}
+
+:where(ui-paper) {
+  padding: 1rem;
+}
+
+:where(ui-paper)[square] {
+  border-radius: 0;
+}
+
+:where(ui-paper)[elevation='1'],
+:where(ui-card)[variant='elevated'] {
+  box-shadow: var(--elevation-level1, 0 1px 3px rgb(0 0 0 / 30%));
+}
+
+:where(ui-paper)[elevation='2'] {
+  box-shadow: var(--elevation-level2, 0 2px 6px rgb(0 0 0 / 30%));
+}
+
+:where(ui-paper)[elevation='3'] {
+  box-shadow: var(--elevation-level3, 0 4px 8px rgb(0 0 0 / 30%));
+}
+
+:where(ui-paper)[elevation='4'] {
+  box-shadow: var(--elevation-level4, 0 6px 10px rgb(0 0 0 / 30%));
+}
+
+:where(ui-paper)[elevation='5'] {
+  box-shadow: var(--elevation-level5, 0 8px 12px rgb(0 0 0 / 30%));
+}
+
+:where(ui-paper, ui-card)[variant='outlined'] {
+  border-color: var(--color-outline-variant, CanvasText);
+  box-shadow: none;
+}
+
+:where(ui-card)[variant='filled'] {
+  background: var(--color-surface-variant, Canvas);
+  color: var(--color-on-surface-variant, CanvasText);
+}
+
+:where(ui-card) > [data-part='header'] {
+  padding: 1rem 1rem 0;
+}
+
+:where(ui-card) [data-part='title'] {
+  font-size: 1.25rem;
+  font-weight: var(--type-weight-strong, 600);
+}
+
+:where(ui-card) [data-part='subtitle'] {
+  color: var(--color-on-surface-variant, CanvasText);
+  font-size: 0.875rem;
+}
+
+:where(ui-card) > [data-part='content'] {
+  padding: 1rem;
+}
+
+/* app-bar: the bar at the top of a page or a view. */
+:where(ui-app-bar) {
+  display: block;
+}
+
+:where(ui-app-bar)[position='sticky'] {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: var(--ui-app-bar-layer);
+}
+
+:where(ui-app-bar)[position='fixed'] {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline: 0;
+  z-index: var(--ui-app-bar-layer);
+}
+
+:where(ui-app-bar) > [data-part='root'] {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-block-size: var(--ui-app-bar-height);
+  padding-inline: 1rem;
+  background: var(--color-surface-container, Canvas);
+  color: var(--color-on-surface, CanvasText);
+}
+
+:where(ui-app-bar)[tone='primary'] > [data-part='root'] {
+  background: var(--color-primary, Highlight);
+  color: var(--color-on-primary, HighlightText);
+}
+
+:where(ui-app-bar) [data-part='title'] {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  font-size: 1.25rem;
+  font-weight: var(--type-weight-strong, 600);
+}
+
+:where(ui-app-bar) > [data-part='root'] > [data-part='content'] {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+:where(ui-card, ui-app-bar) [data-part][hidden] {
+  display: none;
+}
+
+@media (forced-colors: active) {
+  :where(ui-paper, ui-card),
+  :where(ui-app-bar) > [data-part='root'] {
+    border: 1px solid CanvasText;
   }
 }

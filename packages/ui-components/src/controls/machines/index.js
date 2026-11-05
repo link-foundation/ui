@@ -8,7 +8,7 @@
 
 /** Machine text by control kind. */
 export const CONTROL_MACHINES = Object.freeze({
-  button: `button-machine: machine
+  'button': `button-machine: machine
   initial idle
   context
     disabled false
@@ -29,7 +29,7 @@ export const CONTROL_MACHINES = Object.freeze({
     on pointerleave leave
     on pointercancel leave
 `,
-  checkbox: `checkbox-machine: machine
+  'checkbox': `checkbox-machine: machine
   initial ready
   context
     checked false
@@ -46,6 +46,27 @@ export const CONTROL_MACHINES = Object.freeze({
     attr data-state
       context checked
     on change toggle
+`,
+  'chip': `chip-machine: machine
+  initial present
+  context
+    disabled false
+  state present
+    on remove
+      target removed
+      when not-disabled
+  state removed
+    on restore
+      target present
+  part root
+    attr data-state
+      state
+  part remove
+    key Enter remove
+    key Space remove
+    key Delete remove
+    key Backspace remove
+    on press remove
 `,
   'color-field': `color-field-machine: machine
   initial idle
@@ -70,7 +91,7 @@ export const CONTROL_MACHINES = Object.freeze({
   part indicator
     on change pick
 `,
-  combobox: `combobox-machine: machine
+  'combobox': `combobox-machine: machine
   initial closed
   context
     disabled false
@@ -257,7 +278,7 @@ export const CONTROL_MACHINES = Object.freeze({
     key Space select
     on press select
 `,
-  select: `select-machine: machine
+  'select': `select-machine: machine
   initial closed
   context
     disabled false
@@ -364,7 +385,7 @@ export const CONTROL_MACHINES = Object.freeze({
       state
     on click pick
 `,
-  slider: `slider-machine: machine
+  'slider': `slider-machine: machine
   initial idle
   context
     disabled false
@@ -464,7 +485,7 @@ export const CONTROL_MACHINES = Object.freeze({
     on pointerup release
     on lostpointercapture release
 `,
-  switch: `switch-machine: machine
+  'switch': `switch-machine: machine
   initial ready
   context
     checked false

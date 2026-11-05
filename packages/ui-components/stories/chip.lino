@@ -1,0 +1,19 @@
+chip-stories: stories
+  component chip
+  story plain
+    chip 'Design'
+  story removable
+    chip 'Ada Lovelace'
+      value ada
+      removable true
+  story outlined
+    chip 'In review'
+      variant outlined
+      tone primary
+      removable true
+      remove-label 'Clear the status'
+  story disabled
+    chip 'Archived'
+      tone error
+      removable true
+      disabled true

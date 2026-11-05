@@ -1,0 +1,12 @@
+container-catalog: component-entry
+  kind container
+  story 'packages/ui-components/stories/container.lino'
+paper-catalog: component-entry
+  kind paper
+  story 'packages/ui-components/stories/paper.lino'
+card-catalog: component-entry
+  kind card
+  story 'packages/ui-components/stories/card.lino'
+app-bar-catalog: component-entry
+  kind app-bar
+  story 'packages/ui-components/stories/app-bar.lino'

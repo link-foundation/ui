@@ -48,3 +48,31 @@ describe('progress', () => {
     });
   });
 });
+
+describe('progress shape', () => {
+  it('is linear unless asked for a ring', () => {
+    const t = mountDoc(`  (a: progress 'A' (value 1))
+  (b: progress 'B' (shape square) (value 1))`);
+    expect(t.node('a').getAttribute('shape')).toBe('linear');
+    expect(t.node('b').getAttribute('shape')).toBe('linear');
+  });
+
+  it('keeps the determinate ARIA in a ring', () => {
+    const t = mountDoc(`  (up: progress 'Upload' (shape circular) (value 60))`);
+    expect(t.codes()).toEqual([]);
+    expect(t.node('up').getAttribute('shape')).toBe('circular');
+    expect(attrs(t.part('up', 'track'), ARIA)).toEqual({
+      role: 'progressbar',
+      'aria-valuenow': '60',
+      'aria-valuemin': '0',
+      'aria-valuemax': '100',
+    });
+  });
+
+  it('leaves the value out of an indeterminate ring', () => {
+    const t = mountDoc(`  (busy: progress 'Busy' (shape circular))`);
+    expect(t.node('busy').hasAttribute('data-indeterminate')).toBe(true);
+    expect(t.part('busy', 'track').hasAttribute('aria-valuenow')).toBe(false);
+    expect(t.part('busy', 'track').getAttribute('role')).toBe('progressbar');
+  });
+});
