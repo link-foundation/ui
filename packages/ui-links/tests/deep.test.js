@@ -95,6 +95,37 @@ describe('minilinks compatibility', () => {
   });
 });
 
+it('updates values from independently created offline namespaces', async () => {
+  const server = createLinksServer({
+    links: createMemoryLinks(),
+    triplets: true,
+  });
+  const clients = [createSyncedTriplets(), createSyncedTriplets()];
+  const deep = clients.map((client) => createDeepClient(client));
+  try {
+    const ids = [];
+    for (const client of deep) {
+      ids.push(
+        (await client.insert({ string: { data: { value: 'a' } } })).data[0].id
+      );
+    }
+    for (const client of clients) {
+      await client.connect(connectInProcess(server));
+    }
+    const owner = clients[1].resolve(ids[1]);
+    await deep[0].select({});
+    await deep[0].update(
+      { link_id: owner },
+      { value: 'b' },
+      { table: 'strings' }
+    );
+    expect((await deep[0].select(owner)).data[0].string.value).toBe('b');
+  } finally {
+    deep.forEach((client) => client.close());
+    clients.forEach((client) => client.disconnect());
+  }
+});
+
 describe('DeepClient over synced triplets', () => {
   it('validates nested values before writing and resolves named package paths', async () => {
     const synced = createSyncedTriplets();

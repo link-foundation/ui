@@ -120,7 +120,11 @@ export function createDeepValues(synced) {
     },
     set(owner, kind, value) {
       const text = deepValueText(kind, value);
-      const ns = ensure();
+      const existing = valueRows().find(
+        (entry) =>
+          entry.row.from === synced.resolve(owner) && entry.kind === kind
+      );
+      const ns = existing?.ns ?? ensure();
       let tail = ns.root;
       for (let i = 0; i < text.length; i++) {
         const code = text.charCodeAt(i);
@@ -133,10 +137,6 @@ export function createDeepValues(synced) {
               ?.index ?? synced.createTriplet(ns.root, tail, to);
         }
       }
-      const existing = valueRows().find(
-        (entry) =>
-          entry.row.from === synced.resolve(owner) && entry.kind === kind
-      );
       if (existing) {
         synced.updateTriplet(
           existing.row.index,
