@@ -69,6 +69,7 @@ export function createRows({
       if (field.props.group) {
         if (!groups.has(field.props.group)) {
           const fieldset = node('fieldset', undefined, group);
+          fieldset.className = 'settings-group';
           node('legend', String(field.props.group), fieldset);
           groups.set(field.props.group, fieldset);
         }
@@ -147,7 +148,7 @@ export function refreshRows(
   }
   for (const [key, group] of sections) {
     group.hidden = !visibleSections.has(key);
-    for (const fieldset of group.querySelectorAll('fieldset')) {
+    for (const fieldset of group.querySelectorAll('.settings-group')) {
       fieldset.hidden = [...fieldset.querySelectorAll('.settings-row')].every(
         (row) => row.hidden
       );

@@ -32,6 +32,23 @@ const click = (view, text) =>
     .find((b) => b.textContent === text)
     .click();
 
+test('panel grouping keeps vector and chip editor fieldsets visible', () => {
+  const view = setup();
+  try {
+    for (const key of ['offset', 'tags']) {
+      const fieldset = view.panel.element.querySelector(
+        `[data-key="${key}"] fieldset`
+      );
+      assert.ok(fieldset);
+      assert.equal(fieldset.hidden, false);
+      view.panel.update({ title: 'Refresh all rows' });
+      assert.equal(fieldset.hidden, false);
+    }
+  } finally {
+    view.close();
+  }
+});
+
 test('panel validates paste atomically and restores a diff in a fresh panel', () => {
   const a = setup();
   const b = setup();

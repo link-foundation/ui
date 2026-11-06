@@ -1010,7 +1010,7 @@
 }
 :where(ui-number-field)
   > :is([data-part='increment'], [data-part='decrement']) {
-  min-width: 2.5rem;
-  min-height: 2.5rem;
+  min-width: var(--ui-control-height);
+  min-height: var(--ui-control-height);
   font: inherit;
 }
