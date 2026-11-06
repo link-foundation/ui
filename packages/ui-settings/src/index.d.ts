@@ -20,7 +20,13 @@ export interface ApplyTarget {
   dataAttr?: string;
 }
 
+export interface NormalizationPolicy {
+  primitives?: 'coerce' | 'strict';
+  numbers?: 'snap' | 'clamp';
+}
+
 export interface SettingField {
+  normalization?: NormalizationPolicy;
   key: string;
   type: string;
   default: unknown;
@@ -40,6 +46,8 @@ export interface SettingField {
 }
 
 export interface SettingsSection {
+  tabs?: string[];
+  level?: string;
   id: string;
   label?: string;
   description?: string;
@@ -71,6 +79,7 @@ export interface SettingsSchema {
 export type SettingsValues = Record<string, unknown>;
 
 export interface ReadOptions {
+  normalization?: NormalizationPolicy;
   /** The largest input read, in characters. */
   maxInputSize?: number;
 }
@@ -102,7 +111,11 @@ export function defineFieldType(
 export function fieldType(name: string): Readonly<FieldType> | undefined;
 export function fieldTypes(): string[];
 
-export function coerce(field: SettingField, raw: unknown): CoerceResult;
+export function coerce(
+  field: SettingField,
+  raw: unknown,
+  policy?: NormalizationPolicy
+): CoerceResult;
 export function equalValue(
   field: SettingField,
   a: unknown,
@@ -224,19 +237,21 @@ export function attributeName(name: string): string;
 export function applyToRoot(
   schema: SettingsSchema,
   values: SettingsValues,
-  root?: Element
+  root?: HTMLElement,
+  options?: { project?: SettingsProjection }
 ): void;
 export function paintSnapshot(
   schema: SettingsSchema,
-  values: SettingsValues
+  values: SettingsValues,
+  options?: { includeAll?: boolean }
 ): string;
 export function beforePaintScript(
   schema: SettingsSchema,
-  options?: { storageKey?: string }
+  options?: BeforePaintOptions
 ): string;
 export function beforePaintScriptHash(
   schemaOrScript: SettingsSchema | string,
-  options?: { storageKey?: string }
+  options?: BeforePaintOptions
 ): Promise<string>;
 
 export function assertEverySettingUsed(
@@ -258,3 +273,31 @@ export function bindConfig(
   schema: SettingsSchema,
   options?: { target?: string; layer?: EditableLayer }
 ): BoundSettings;
+
+export type SettingsProjection = (values: SettingsValues) => {
+  css?: Record<string, string | number | null>;
+  attributes?: Record<string, string | number | null>;
+};
+export interface BeforePaintOptions {
+  storageKey?: string;
+  /** Serialized into the script: use a standalone function or preloaded globals. */
+  readStorage?: (text: string | null) => unknown;
+  project?: SettingsProjection;
+}
+export function createSettingsCodec(
+  schema: SettingsSchema,
+  codec: {
+    decode(text: string): unknown;
+    encode(values: SettingsValues): string;
+  }
+): {
+  read(
+    text: string,
+    options?: { base?: SettingsValues; look?: boolean }
+  ): {
+    ok: boolean;
+    values: SettingsValues;
+    rejected: string[];
+  };
+  write(values: SettingsValues): string;
+};

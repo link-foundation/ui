@@ -29,6 +29,34 @@ export const attributeName = (name) =>
 const applied = (schema) =>
   [...schema.fields.values()].filter((field) => field.apply.length > 0);
 
+/** Write only changed declarations; null restores inherited CSS. */
+function writeCss(root, name, value) {
+  if (value === null || value === undefined) {
+    if (root.style.getPropertyValue(name)) {
+      root.style.removeProperty(name);
+    }
+  } else if (root.style.getPropertyValue(name) !== String(value)) {
+    root.style.setProperty(name, String(value));
+  }
+}
+function writeAttr(root, name, value) {
+  if (value === null || value === undefined) {
+    if (root.hasAttribute(name)) {
+      root.removeAttribute(name);
+    }
+  } else if (root.getAttribute(name) !== String(value)) {
+    root.setAttribute(name, String(value));
+  }
+}
+function applyProjection(root, projection) {
+  for (const [name, value] of Object.entries(projection?.css ?? {})) {
+    writeCss(root, name, value);
+  }
+  for (const [name, value] of Object.entries(projection?.attributes ?? {})) {
+    writeAttr(root, name, value);
+  }
+}
+
 /**
  * Set the CSS variables and data attributes of the values (missing or
  * invalid values: the defaults) on a root element.
@@ -36,7 +64,7 @@ const applied = (schema) =>
  * @param {SettingsValues} values
  * @param {HTMLElement} [root] default: `document.documentElement`
  */
-export function applyToRoot(schema, values, root) {
+export function applyToRoot(schema, values, root, { project } = {}) {
   const element = root ?? globalThis.document?.documentElement;
   if (!element) {
     throw new TypeError('applyToRoot needs a root element');
@@ -46,16 +74,22 @@ export function applyToRoot(schema, values, root) {
     const value = all[field.key];
     for (const target of field.apply) {
       if (target.cssVar) {
-        element.style.setProperty(target.cssVar, cssValue(field, value));
+        writeCss(
+          element,
+          target.cssVar,
+          value === null ? null : cssValue(field, value)
+        );
       }
       if (target.dataAttr) {
-        element.setAttribute(
+        writeAttr(
+          element,
           attributeName(target.dataAttr),
-          formatValue(field, value).join(' ')
+          value === null ? null : formatValue(field, value).join(' ')
         );
       }
     }
   }
+  applyProjection(element, project?.(all));
 }
 
 /**
@@ -64,10 +98,10 @@ export function applyToRoot(schema, values, root) {
  * @param {SettingsSchema} schema
  * @param {SettingsValues} values
  */
-export function paintSnapshot(schema, values) {
+export function paintSnapshot(schema, values, { includeAll = false } = {}) {
   const changed = diff(schema, merge(schema, values, undefined).values);
   const out = {};
-  for (const field of applied(schema)) {
+  for (const field of includeAll ? schema.fields.values() : applied(schema)) {
     if (Object.hasOwn(changed, field.key)) {
       out[field.key] = changed[field.key];
     }
@@ -82,10 +116,11 @@ export function paintSnapshot(schema, values) {
  * @param {Array<object>} rules
  * @param {string} key
  */
-function paintFromStorage(rules, key) {
+function paintFromStorage(rules, key, readStorage, project) {
   let stored = {};
   try {
-    const parsed = JSON.parse(globalThis.localStorage.getItem(key) || '{}');
+    const raw = globalThis.localStorage.getItem(key);
+    const parsed = readStorage ? readStorage(raw) : JSON.parse(raw || '{}');
     if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
       stored = parsed;
     }
@@ -102,7 +137,7 @@ function paintFromStorage(rules, key) {
       return undefined;
     }
     n = Math.min(rule.max ?? n, Math.max(rule.min ?? n, n));
-    if (rule.step > 0) {
+    if (rule.step > 0 && rule.numbers !== 'clamp') {
       const base = rule.min ?? 0;
       const places = Math.max(decimals(rule.step), decimals(base));
       n = Number(
@@ -113,6 +148,9 @@ function paintFromStorage(rules, key) {
     return n;
   };
   const check = (rule, raw) => {
+    if (rule.nullable && raw === null) {
+      return null;
+    }
     if (rule.t === 'range' || rule.t === 'number') {
       return number(rule, raw);
     }
@@ -130,6 +168,7 @@ function paintFromStorage(rules, key) {
     return rule.t === 'text' && typeof raw === 'string' ? raw : undefined;
   };
   const root = globalThis.document.documentElement;
+  const all = {};
   for (const rule of rules) {
     let value;
     try {
@@ -139,17 +178,43 @@ function paintFromStorage(rules, key) {
     } catch {
       value = undefined;
     }
+    all[rule.k] = value === undefined ? rule.default : value;
     for (const [kind, name, fixed] of rule.a) {
       const numeric = rule.t === 'range' || rule.t === 'number';
       let text = fixed;
-      if (value !== undefined) {
+      if (value === null) {
+        text = null;
+      } else if (value !== undefined) {
         text = String(value) + (kind === 'css' && numeric ? rule.u || '' : '');
       }
       if (kind === 'css') {
-        root.style.setProperty(name, text);
+        if (text === null) {
+          root.style.removeProperty(name);
+        } else if (root.style.getPropertyValue(name) !== text) {
+          root.style.setProperty(name, text);
+        }
       } else {
-        root.setAttribute(name, text);
+        if (text === null) {
+          root.removeAttribute(name);
+        } else if (root.getAttribute(name) !== text) {
+          root.setAttribute(name, text);
+        }
       }
+    }
+  }
+  const projected = project?.(all);
+  for (const [name, value] of Object.entries(projected?.css ?? {})) {
+    if (value === null) {
+      root.style.removeProperty(name);
+    } else {
+      root.style.setProperty(name, String(value));
+    }
+  }
+  for (const [name, value] of Object.entries(projected?.attributes ?? {})) {
+    if (value === null) {
+      root.removeAttribute(name);
+    } else {
+      root.setAttribute(name, String(value));
     }
   }
 }
@@ -157,19 +222,28 @@ function paintFromStorage(rules, key) {
 
 /** The rules the script needs: one per applied field. */
 function paintRules(schema) {
-  return applied(schema).map((field) => {
+  return [...schema.fields.values()].map((field) => {
     const builtIn = BUILT_IN_TYPES.includes(field.type);
     const rule = {
       k: field.key,
+      default: field.default,
+      nullable: field.props.nullable === 'true',
+      numbers: field.normalization?.numbers,
       // A custom type is not checked in the script: it gets its default.
       t: builtIn ? field.type : '',
       a: field.apply.map((target) =>
         target.cssVar
-          ? ['css', target.cssVar, cssValue(field, field.default)]
+          ? [
+              'css',
+              target.cssVar,
+              field.default === null ? null : cssValue(field, field.default),
+            ]
           : [
               'attr',
               attributeName(target.dataAttr),
-              formatValue(field, field.default).join(' '),
+              field.default === null
+                ? null
+                : formatValue(field, field.default).join(' '),
             ]
       ),
     };
@@ -204,11 +278,13 @@ const inlineJson = (value) =>
  */
 export function beforePaintScript(
   schema,
-  { storageKey = PAINT_STORAGE_KEY } = {}
+  { storageKey = PAINT_STORAGE_KEY, readStorage, project } = {}
 ) {
   const rules = inlineJson(paintRules(schema));
   const key = inlineJson(String(storageKey));
-  return `(function(){try{(${paintFromStorage.toString()})(${rules},${key});}catch(e){}})();`;
+  const callable = (fn) => (fn ? `(${fn.toString()})` : 'undefined');
+  const source = `(function(){try{(${paintFromStorage.toString()})(${rules},${key},${callable(readStorage)},${callable(project)});}catch(e){}})();`;
+  return source.replace(/<\/script/gi, (match) => match.replace('/', '\\/'));
 }
 
 /**

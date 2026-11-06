@@ -47,13 +47,10 @@ describe('number-field', () => {
     press(input, 'ArrowDown');
     press(input, 'ArrowDown');
     expect(input.value).toBe('2');
-    press(input, 'End');
-    expect(t.prop('qty', 'value')).toEqual(['10']);
-    press(input, 'ArrowUp');
-    expect(t.prop('qty', 'value')).toEqual(['10']);
-    press(input, 'Home');
-    expect(t.prop('qty', 'value')).toEqual(['0']);
-    expect(t.transactions.length).toBe(5);
+    expect(press(input, 'End').defaultPrevented).toBe(false);
+    expect(press(input, 'Home').defaultPrevented).toBe(false);
+    expect(t.prop('qty', 'value')).toEqual(['2']);
+    expect(t.transactions.length).toBe(3);
   });
 
   it('clamps typed numbers and marks text invalid', () => {

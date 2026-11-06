@@ -16,6 +16,7 @@ color-field-machine: machine
   part input
     attr aria-invalid
       context invalid
+    on input commit
     on change commit
     key Escape revert
   part indicator

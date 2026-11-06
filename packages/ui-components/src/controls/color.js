@@ -44,3 +44,24 @@ export function parseHex(value) {
   const channel = (i) => Number.parseInt(hex.slice(i, i + 2), 16);
   return { r: channel(1), g: channel(3), b: channel(5) };
 }
+
+/** Hex or CSS integer RGB input, normalized to #rrggbb. */
+export function formatColor(value) {
+  const hex = formatHex(value);
+  if (hex) {
+    return hex;
+  }
+  if (typeof value !== 'string') {
+    return null;
+  }
+  const rgb = /^rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i.exec(
+    value.trim()
+  );
+  if (!rgb) {
+    return null;
+  }
+  const channels = rgb.slice(1).map(Number);
+  return channels.every((n) => n <= 255)
+    ? `#${channels.map((n) => n.toString(16).padStart(2, '0')).join('')}`
+    : null;
+}

@@ -299,3 +299,8 @@ The site keeps flat dotted keys (`{ "liquid.blur": 24 }`) in storage and in
 ## License
 
 [Unlicense](LICENSE)
+
+See [control and settings integration contracts](../../docs/case-studies/issue-210/contracts.md)
+for external labels, popup sizing, live editors, rich panel extensions, normalization
+and compatibility codec hooks. The [rich panel example](../ui-components/examples/rich-settings.html)
+demonstrates conditional fields, section tabs, previews and whole-section columns.

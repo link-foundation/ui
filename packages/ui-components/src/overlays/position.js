@@ -6,6 +6,7 @@ import {
   flip,
   offset,
   shift,
+  size,
 } from '@floating-ui/dom';
 
 export function virtualAnchor(x, y, contextElement) {
@@ -36,7 +37,28 @@ export function createPositioner(
         middleware: [
           offset(options.offset ?? 8),
           flip(),
-          shift({ padding: 8 }),
+          // Keep sized menus inside the viewport even when scrolling hides the anchor.
+          shift({ padding: 8, crossAxis: Boolean(options.size) }),
+          ...(options.size
+            ? [
+                size({
+                  padding: 8,
+                  apply({ availableWidth, availableHeight, rects }) {
+                    if (!active) {
+                      return;
+                    }
+                    const bounds = options.size();
+                    Object.assign(floating.style, {
+                      boxSizing: 'border-box',
+                      width: `${Math.max(0, Math.min(availableWidth, Math.max(rects.reference.width, bounds.minWidth ?? 0)))}px`,
+                      maxWidth: `${Math.max(0, availableWidth)}px`,
+                      maxHeight: `${Math.max(0, Math.min(availableHeight, bounds.maxHeight ?? Infinity))}px`,
+                      overflowY: 'auto',
+                    });
+                  },
+                }),
+              ]
+            : []),
         ],
       });
       if (active) {

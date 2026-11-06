@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="data:," />
+    <title>Rich settings extensions</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "@floating-ui/dom": "/node_modules/@floating-ui/dom/dist/floating-ui.dom.mjs",
+          "@floating-ui/core": "/node_modules/@floating-ui/core/dist/floating-ui.core.mjs",
+          "@floating-ui/utils": "/node_modules/@floating-ui/utils/dist/floating-ui.utils.mjs",
+          "@floating-ui/utils/dom": "/node_modules/@floating-ui/utils/dist/floating-ui.utils.dom.mjs",
+          "@link-foundation/ui-settings": "/packages/ui-settings/src/index.js",
+          "@link-foundation/ui-config": "/packages/ui-config/src/index.js",
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "@link-foundation/ui-store": "/packages/ui-store/src/index.js",
+          "@link-foundation/ui-dom": "/packages/ui-dom/src/index.js",
+          "@link-foundation/ui-style": "/packages/ui-style/src/index.js",
+          "@link-foundation/ui-tokens": "/packages/ui-tokens/src/index.js",
+          "@link-foundation/ui-tokens/themes": "/packages/ui-tokens/src/themes/index.js",
+          "links-notation": "/node_modules/links-notation/dist/index.js"
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="../src/controls/styles.css" />
+    <link rel="stylesheet" href="../src/settings/settings.css" />
+    <style>
+      body {
+        margin: 0;
+        padding: 1rem;
+        font: 16px system-ui;
+        color: #1d1b20;
+        background: #f4f0fa;
+      }
+      main {
+        max-width: 78rem;
+        margin: auto;
+      }
+      settings-panel {
+        max-inline-size: none;
+      }
+      settings-panel .settings-row {
+        grid-template-columns: minmax(0, 1fr) auto;
+      }
+      .settings-control {
+        grid-column: 1 / -1;
+      }
+      .frame-preview {
+        grid-column: 1 / -1;
+        height: 90px;
+        display: grid;
+        place-items: center;
+        background: repeating-conic-gradient(#eee 0% 25%, #fff 0% 50%) 0 / 16px
+          16px;
+      }
+      .frame-preview span {
+        border: 3px solid #6750a4;
+        padding: 8px 20px;
+        background: transparent;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Rich settings extensions</h1>
+      <p>
+        Whole sections move between columns. Frame controls reveal conditional
+        fields and a transparent preview.
+      </p>
+      <div id="panel"></div>
+    </main>
+    <script type="module" src="./rich-settings.js"></script>
+  </body>
+</html>

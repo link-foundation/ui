@@ -998,3 +998,41 @@
     background: conic-gradient(Highlight 0.3turn, GrayText 0);
   }
 }
+
+/* Keep pointer steppers beside the text editor. */
+:where(ui-number-field) {
+  display: inline-grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  min-width: calc(3 * var(--ui-control-height) + 2 * var(--ui-control-gap));
+}
+:where(ui-number-field) > [data-part='input'] {
+  min-width: 0;
+  width: 100%;
+}
+:where(ui-number-field) > [data-part='label'] {
+  grid-column: 1 / -1;
+}
+:where(ui-number-field)
+  > :is([data-part='increment'], [data-part='decrement']) {
+  min-width: var(--ui-control-height);
+  min-height: var(--ui-control-height);
+  font: inherit;
+}
+
+:where(ui-color-field) > [data-part='rgb']:not([hidden]) {
+  display: grid;
+  gap: var(--ui-control-gap);
+  grid-column: 1 / -1;
+}
+:where(ui-color-field) [data-part='rgb'] > div {
+  display: grid;
+  grid-template-columns: minmax(4em, 1fr) minmax(4em, 2fr) 5em;
+  align-items: center;
+  gap: var(--ui-control-gap);
+}
+:where(ui-color-field) [data-part='rgb'] input {
+  min-width: 0;
+  width: 100%;
+  min-height: var(--ui-control-height);
+}

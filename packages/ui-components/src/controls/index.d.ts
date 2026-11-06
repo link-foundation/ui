@@ -95,12 +95,17 @@ export function decimalsOf(value: number): number;
 /** The value a key moves a numeric control to; `null` for other keys. */
 export function nextValue(
   key: string,
-  state?: NumericRange & { value?: number; shift?: boolean; rtl?: boolean }
+  state?: NumericRange & {
+    value?: number;
+    shift?: boolean;
+    rtl?: boolean;
+    snapping?: 'nearest' | 'directional';
+  }
 ): number | null;
 export function formatNumber(value: unknown): string;
 export function readNumber(
   text: string,
-  range?: NumericRange
+  range?: NumericRange & { normalization?: 'snap' | 'clamp' }
 ): { value: number | null; invalid: false } | { invalid: true };
 /** The fraction (0–1) of the range a value is at. */
 export function fractionOf(
@@ -153,3 +158,6 @@ export function storiesDocument(
   sets: readonly StorySet[],
   options?: { id?: string }
 ): string;
+
+/** Hex or integer rgb(r, g, b) normalized to #rrggbb. */
+export function formatColor(value: unknown): string | null;

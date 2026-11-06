@@ -79,7 +79,7 @@ const STEPS = Object.freeze({
  * not change the value (the caller lets it through).
  * @param {string} key  a `KeyboardEvent.key`
  * @param {{value?: number, min?: number, max?: number, step?: number,
- *   shift?: boolean, rtl?: boolean}} state  `value` NaN (an empty field)
+ *   shift?: boolean, rtl?: boolean, snapping?: 'nearest'|'directional'}} state  `value` NaN (an empty field)
  *   starts from the minimum, else 0
  * @returns {number|null}
  */
@@ -102,6 +102,24 @@ export function nextValue(key, state = {}) {
     multiple *= SHIFT_FACTOR;
   }
   const base = Number.isFinite(state.min) ? state.min : 0;
-  const value = clampStep(finite(state.value, base), range);
+  const raw = finite(state.value, base);
+  if (state.snapping === 'directional') {
+    const step = stepOf(state.step);
+    const bounded = Math.min(
+      finite(state.max, Infinity),
+      Math.max(finite(state.min, -Infinity), raw)
+    );
+    const ticks = (bounded - base) / step;
+    const tolerance = Math.min(
+      1e-7,
+      Number.EPSILON * Math.max(1, Math.abs(ticks)) * 8
+    );
+    const origin =
+      multiple > 0
+        ? Math.floor(ticks + tolerance)
+        : Math.ceil(ticks - tolerance);
+    return clampStep(base + (origin + multiple) * step, range);
+  }
+  const value = clampStep(raw, range);
   return clampStep(value + multiple * stepOf(state.step), range);
 }

@@ -1447,3 +1447,20 @@ application-defined array types registered through `defineFieldType` of
 `ui-settings`; the example demonstrates this without adding schema types.
 Paste changes validates a complete diff document before applying it; absent
 fields restore defaults. Clipboard failures reveal a selectable text field.
+
+See [control and settings integration contracts](../../docs/case-studies/issue-210/contracts.md)
+for external labels, popup sizing, live editors, rich panel extensions, normalization
+and compatibility codec hooks. The [rich panel example](../ui-components/examples/rich-settings.html)
+demonstrates conditional fields, section tabs, previews and whole-section columns.
+
+Settings panels accept a `messages` string/function catalog for generated chrome
+and field-specific editor actions; `panel.setMessages(catalog)` changes language
+without losing values. Color editors include grouped RGB sliders and numeric
+channels (field property `rgb false` hides them). Number controls and `nextValue`
+accept `snapping: 'directional'` to step continuous imported values to the next
+tick in the requested direction. See the [integration contracts](../../docs/case-studies/issue-210/contracts.md).
+
+For continuous typed values, use `normalization clamp` on number fields or
+`readNumber(text, { ...range, normalization: 'clamp' })`. This is independent of
+key/pointer snapping; generated editors inherit the schema engine's
+`normalization.numbers` policy. The default remains step-snapped.

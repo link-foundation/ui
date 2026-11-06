@@ -63,7 +63,10 @@ export function bindConfig(
       .explain(target, field.key)
       .filter((entry) => layers.includes(entry.layer));
     for (const entry of entries.reverse()) {
-      const result = coerce(field, rawOf(entry.value));
+      const result = coerce(field, rawOf(entry.value), {
+        ...field.normalization,
+        primitives: 'coerce',
+      });
       if (result.ok) {
         return result.value;
       }
@@ -71,13 +74,15 @@ export function bindConfig(
     return undefined;
   };
 
-  const baseline = (field) => fromLayers(field, below) ?? field.default;
+  const fallback = (value, otherwise) =>
+    value === undefined ? otherwise : value;
+  const baseline = (field) => fallback(fromLayers(field, below), field.default);
 
   /** Every resolved value (invalid overrides fall through to the default). */
   const values = () => {
     const out = {};
     for (const field of schema.fields.values()) {
-      out[field.key] = fromLayers(field, ORDER) ?? baseline(field);
+      out[field.key] = fallback(fromLayers(field, ORDER), baseline(field));
     }
     return out;
   };

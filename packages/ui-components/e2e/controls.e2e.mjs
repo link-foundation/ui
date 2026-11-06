@@ -167,6 +167,9 @@ test.describe('ui-components controls with the keyboard only', () => {
     await page.keyboard.press('ArrowUp');
     await lastChange(page, 'quantity.value=3');
     await page.keyboard.press('End');
+    await lastChange(page, 'quantity.value=3');
+    await expect(quantity).toHaveAttribute('aria-valuenow', '3');
+    await page.keyboard.press('PageUp');
     await lastChange(page, 'quantity.value=10');
     await expect(quantity).toHaveAttribute('aria-valuenow', '10');
 

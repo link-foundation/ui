@@ -106,3 +106,21 @@ settings-panel summary {
     color-scheme: dark;
   }
 }
+
+settings-panel .settings-sections {
+  display: grid;
+  grid-template-columns: repeat(var(--settings-columns, 1), minmax(0, 1fr));
+  align-items: start;
+  gap: 1rem;
+}
+settings-panel .settings-sections > details {
+  min-inline-size: 0;
+}
+settings-panel .settings-sections fieldset {
+  display: block;
+}
+@media (max-width: 700px) {
+  settings-panel .settings-sections {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

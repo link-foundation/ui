@@ -1,0 +1,17 @@
+---
+'@link-foundation/ui-components': minor
+'@link-foundation/ui-settings': minor
+'@link-foundation/ui-core': patch
+---
+
+Fix select keyboard, focus, labeling and viewport sizing contracts. Add live
+number drafts, inherited fallback stepping, RGB and named color palettes, rich
+settings panel extension hooks, saved looks and before-link recovery. Expose
+settings normalization policies, compatibility codecs and before-paint readers,
+and changed-only CSS projection with inheritance and derived values.
+
+Expose directional numeric snapping, grouped RGB sliders and channel editors,
+and replaceable message catalogs for panel chrome and field-specific actions.
+
+Keep continuous typed number values with an independent opt-in clamp policy;
+generated number editors inherit the settings engine normalization policy.

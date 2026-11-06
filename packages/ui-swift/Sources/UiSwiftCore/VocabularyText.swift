@@ -228,6 +228,13 @@ number-field: kind
   property on action multi
   property bind any
   children none
+  property fallback number
+  property snapping
+    enum nearest directional
+  property increment-label string
+  property decrement-label string
+  property normalization
+    enum snap clamp
 
 color-field: kind
   description 'A hex colour text input with the native colour picker.'
@@ -242,6 +249,14 @@ color-field: kind
   property on action multi
   property bind any
   children none
+  property palette any
+  property readonly boolean
+  property rgb boolean
+  property palette-label string
+  property rgb-label string
+  property red-label string
+  property green-label string
+  property blue-label string
 
 checkbox: kind
   description 'A box that is checked, unchecked or mixed.'
@@ -329,6 +344,13 @@ select: kind
   property on action multi
   property bind any
   children any
+  property external-label boolean
+  property aria-label string
+  property aria-labelledby string
+  property list-label string
+  property list-labelledby string
+  property menu-min-width number
+  property menu-max-height number
 
 combobox: kind
   description 'A text input that filters a list of options.'

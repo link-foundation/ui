@@ -41,7 +41,7 @@ export {
   CONTROL_KINDS_TEXT,
 } from './vocabulary.js';
 export { CONTROL_MACHINES } from './machines/index.js';
-export { formatHex, parseHex } from './color.js';
+export { formatHex, parseHex, formatColor } from './color.js';
 export { clampStep, decimalsOf, nextValue } from './numeric-keys.js';
 export { ID_PREFIX, partId } from './dom.js';
 export { initialsOf } from './avatar.js';

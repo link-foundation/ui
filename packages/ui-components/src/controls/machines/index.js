@@ -86,6 +86,7 @@ export const CONTROL_MACHINES = Object.freeze({
   part input
     attr aria-invalid
       context invalid
+    on input commit
     on change commit
     key Escape revert
   part indicator
@@ -202,8 +203,12 @@ export const CONTROL_MACHINES = Object.freeze({
     readonly false
     invalid false
   state ready
+    on type
+      do read-draft
+      when editable
     on commit
       do read-value
+      when editable
     on revert
       do restore-value
       when editable
@@ -249,6 +254,7 @@ export const CONTROL_MACHINES = Object.freeze({
       context max
     attr aria-invalid
       context invalid
+    on input type
     on change commit
     key ArrowUp arrow-up
     key ArrowDown arrow-down
@@ -256,9 +262,11 @@ export const CONTROL_MACHINES = Object.freeze({
     key Shift+ArrowDown shift-arrow-down
     key PageUp page-up
     key PageDown page-down
-    key Home home
-    key End end
     key Escape revert
+  part increment
+    on click arrow-up
+  part decrement
+    on click arrow-down
 `,
   'radio-group': `radio-group-machine: machine
   initial ready
@@ -314,6 +322,16 @@ export const CONTROL_MACHINES = Object.freeze({
       do open-list
         activate last
       when not-disabled
+    on page-next
+      target open
+      do open-list
+        activate pageNext
+      when not-disabled
+    on page-previous
+      target open
+      do open-list
+        activate pagePrevious
+      when not-disabled
     on commit
       target open
       do open-list
@@ -331,7 +349,7 @@ export const CONTROL_MACHINES = Object.freeze({
       do close-list
     on blur
       target closed
-      do close-list
+      do select-active close-list
     on next
       do
         activate next
@@ -344,6 +362,12 @@ export const CONTROL_MACHINES = Object.freeze({
     on last
       do
         activate last
+    on page-next
+      do
+        activate pageNext
+    on page-previous
+      do
+        activate pagePrevious
     on typeahead
       do typeahead
     on commit
@@ -369,8 +393,8 @@ export const CONTROL_MACHINES = Object.freeze({
     key Alt+ArrowUp commit
     key Home first
     key End last
-    key PageDown last
-    key PageUp first
+    key PageDown page-next
+    key PageUp page-previous
     key Enter commit
     key Space commit
     key Escape close

@@ -119,3 +119,36 @@ describe('decimalsOf', () => {
     expect(decimalsOf(Infinity)).toBe(0);
   });
 });
+
+it('directional snapping consumes the first tick without skipping continuous imports', () => {
+  const state = {
+    value: 0.075,
+    min: 0,
+    max: 1,
+    step: 0.01,
+    snapping: 'directional',
+  };
+  expect(nextValue('ArrowUp', state)).toBe(0.08);
+  expect(nextValue('ArrowDown', state)).toBe(0.07);
+  expect(nextValue('PageUp', state)).toBe(0.17);
+  expect(nextValue('PageDown', state)).toBe(0);
+  expect(nextValue('ArrowUp', { ...state, shift: true })).toBe(0.17);
+  expect(nextValue('ArrowRight', { ...state, rtl: true })).toBe(0.07);
+  expect(nextValue('ArrowUp', { ...state, value: 0.07 })).toBe(0.08);
+  expect(nextValue('ArrowDown', { ...state, value: 0.07 })).toBe(0.06);
+  expect(nextValue('ArrowUp', { ...state, value: 1 })).toBe(1);
+  expect(nextValue('ArrowDown', { ...state, value: 0 })).toBe(0);
+  expect(
+    nextValue('ArrowUp', { value: -0.025, step: 0.01, snapping: 'directional' })
+  ).toBe(-0.02);
+  expect(
+    nextValue('ArrowDown', {
+      value: 0.075,
+      min: 0.005,
+      step: 0.01,
+      snapping: 'directional',
+    })
+  ).toBe(0.065);
+  // Existing nearest-grid behavior stays available and remains the default.
+  expect(nextValue('ArrowUp', { ...state, snapping: 'nearest' })).toBe(0.09);
+});

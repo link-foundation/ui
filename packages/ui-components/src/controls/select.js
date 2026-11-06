@@ -57,6 +57,15 @@ function render(control) {
 /** Send a printable key to the typeahead (the machine binds no letters). */
 function typeaheadKeys(control, list, input) {
   const onKeyDown = (event) => {
+    if (
+      event.key === 'Tab' &&
+      !event.ctrlKey &&
+      !event.altKey &&
+      !event.metaKey
+    ) {
+      control.service.send('blur');
+      return;
+    }
     const plain = !event.ctrlKey && !event.altKey && !event.metaKey;
     if (!plain || [...event.key].length !== 1 || event.key === ' ') {
       return;
@@ -70,9 +79,52 @@ function typeaheadKeys(control, list, input) {
   return () => input.removeEventListener('keydown', onKeyDown);
 }
 
+function updateNaming(control, el, has) {
+  const { input } = control.parts;
+  if (
+    [
+      'label',
+      'external-label',
+      'aria-label',
+      'aria-labelledby',
+      'list-label',
+      'list-labelledby',
+    ].some(has)
+  ) {
+    const external = flagOf(el, 'external-label');
+    control.parts.label.toggleAttribute('hidden', external);
+    if (external) {
+      setText(control.parts.label, '');
+    }
+    setAttr(input, 'aria-label', atomOf(el, 'aria-label'));
+    setAttr(
+      input,
+      'aria-labelledby',
+      atomOf(el, 'aria-labelledby') ??
+        (external || atomOf(el, 'aria-label')
+          ? undefined
+          : partId(el.id, 'label'))
+    );
+    setAttr(control.parts.listbox, 'aria-label', atomOf(el, 'list-label'));
+    setAttr(
+      control.parts.listbox,
+      'aria-labelledby',
+      atomOf(el, 'list-labelledby') ??
+        (external || atomOf(el, 'list-label')
+          ? undefined
+          : partId(el.id, 'label'))
+    );
+  }
+  for (const name of ['menu-min-width', 'menu-max-height']) {
+    if (has(name)) {
+      control.node.style.setProperty(`--${name}`, atomOf(el, name) ?? '');
+    }
+  }
+}
+
 export const SELECT_KIND = Object.freeze({
   tag: 'ui-select',
-  childrenSlot: (node) => node.children[2],
+  childrenSlot: (node) => controlOf(node).parts.listbox,
   attributes: { disabled: 'boolean', invalid: 'boolean' },
   create(el, ctx) {
     const doc = ctx.document;
@@ -115,11 +167,14 @@ export const SELECT_KIND = Object.freeze({
     if (control.live) {
       const disconnect = connectListbox(list, control, () => render(control));
       const untype = typeaheadKeys(control, list, input);
+      const focus = () => input.focus({ preventScroll: true });
+      input.addEventListener('click', focus, true);
       const unpopover = connectListPopover(control);
       const stop = control.stop;
       control.stop = () => {
         disconnect();
         untype();
+        input.removeEventListener('click', focus, true);
         unpopover();
         stop();
       };
@@ -131,9 +186,13 @@ export const SELECT_KIND = Object.freeze({
     const has = changesOf(node, changed);
     const control = controlOf(node);
     const { input } = control.parts;
-    if (has('label')) {
+    if (
+      (has('label') || has('external-label')) &&
+      !flagOf(el, 'external-label')
+    ) {
       updateLabel(control.parts.label, el, ctx);
     }
+    updateNaming(control, el, has);
     if (has('name')) {
       setAttr(control.hidden, 'name', atomOf(el, 'name'));
     }
@@ -164,6 +223,7 @@ export const SELECT_KIND = Object.freeze({
     } else {
       render(control);
     }
+    control.syncListPopover?.();
   },
   destroy: stopControl,
 });

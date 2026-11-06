@@ -110,8 +110,21 @@ export function fromLino(schema, text, options = {}) {
       stored[name] = rawOf(args);
     }
   }
+  // LiNo atoms are text, including keys renamed by a migration.
+  const atomSchema = {
+    ...schema,
+    fields: new Map(
+      [...schema.fields].map(([key, field]) => [
+        key,
+        {
+          ...field,
+          normalization: { ...field.normalization, primitives: 'coerce' },
+        },
+      ])
+    ),
+  };
   const out = migrate(
-    schema,
+    atomSchema,
     {
       version: Number.isInteger(version) ? version : undefined,
       values: stored,
@@ -249,4 +262,31 @@ export function fromShareHash(schema, hash, viewerValues) {
     return { ...shared, values: viewer };
   }
   return { ...shared, values: applySharedLook(schema, viewer, shared.values) };
+}
+
+/** Adapt an existing storage/object codec while retaining framework validation. */
+export function createSettingsCodec(schema, { decode, encode }) {
+  return {
+    read(text, { base, look = false } = {}) {
+      try {
+        const raw = decode(text);
+        if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+          throw new TypeError('Expected settings object');
+        }
+        const result = merge(schema, base, raw);
+        return {
+          ok: result.rejected.length === 0,
+          ...result,
+          values: look
+            ? applySharedLook(schema, base, result.values)
+            : result.values,
+        };
+      } catch {
+        return { ok: false, ...merge(schema, base, undefined) };
+      }
+    },
+    write(values) {
+      return encode(diff(schema, merge(schema, values, undefined).values));
+    },
+  };
 }

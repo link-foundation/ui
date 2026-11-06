@@ -47,7 +47,7 @@ export function createTextControl(el, ctx, spec) {
   });
   node.appendChild(label);
   node.appendChild(input);
-  const extra = spec.children?.(doc, node) ?? {};
+  const extra = spec.children?.(doc, node, () => control) ?? {};
   const control = startControl(node, el, ctx, {
     kind: spec.kind,
     parts: { label, input, ...extra },

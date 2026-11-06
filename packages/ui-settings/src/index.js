@@ -25,6 +25,7 @@ export { applyPreset, activePreset, applySharedLook } from './presets.js';
 export { randomize } from './random.js';
 export { migrate } from './migrate.js';
 export {
+  createSettingsCodec,
   toLino,
   fromLino,
   fromLegacyJson,

@@ -49,7 +49,10 @@ function equalsOldDefault(schema, key, value, raw) {
     return String(value) === String(raw);
   }
   const a = coerce(field, value);
-  const b = coerce(field, raw);
+  const b = coerce(field, raw, {
+    ...field.normalization,
+    primitives: 'coerce',
+  });
   return a.ok && b.ok && equalValue(field, a.value, b.value);
 }
 
@@ -67,7 +70,14 @@ function runMigration(schema, migration, values, look) {
       // A look written against the old defaults: an unset key showed the
       // old default, and still does.
       if (!Object.hasOwn(values, key) && !UNSAFE_KEYS.includes(key)) {
-        values[key] = raw;
+        const field = schema.fields.get(key);
+        const parsed =
+          field &&
+          coerce(field, raw, {
+            ...field.normalization,
+            primitives: 'coerce',
+          });
+        values[key] = parsed?.ok ? parsed.value : raw;
       }
     } else if (
       Object.hasOwn(values, key) &&

@@ -4,6 +4,7 @@ import {
   randomize,
   toLino,
   fromLino,
+  fromLegacyJson,
   toShareHash,
 } from '@link-foundation/ui-settings';
 
@@ -12,6 +13,7 @@ export function createToolbar({
   button,
   schema,
   options,
+  messages,
   win,
   commit,
   getValues,
@@ -21,8 +23,8 @@ export function createToolbar({
   const toolbar = node('div');
   toolbar.className = 'settings-toolbar';
   const presets = node('select', undefined, toolbar);
-  presets.setAttribute('aria-label', 'Preset');
-  const custom = node('option', 'Custom', presets);
+  messages.attr(presets, 'aria-label', 'preset');
+  const custom = node('option', messages.message('custom'), presets);
   custom.value = '';
   for (const preset of schema.presets.values()) {
     const option = node('option', preset.label ?? preset.id, presets);
@@ -34,28 +36,29 @@ export function createToolbar({
     }
   });
   button(
-    'Randomize',
+    messages.message('randomize'),
     () =>
       commit(
         randomize(schema, getValues(), {
           random: options.random ?? Math.random,
+          locked: options.randomLocked,
         })
       ),
     toolbar
   );
   button(
-    'Reset everything',
+    messages.message('resetAll'),
     () => {
       const confirm =
         options.confirmReset ??
-        (() => win.confirm('Reset every setting to its default?'));
+        (() => win.confirm(messages.text('confirmReset')));
       if (confirm()) {
         commit(defaults(schema));
       }
     },
     toolbar
   );
-  const peek = button('Peek defaults', () => {}, toolbar);
+  const peek = button(messages.message('peek'), () => {}, toolbar);
   const startPeek = () => {
     if (!isPeeking()) {
       setPeek(true);
@@ -99,22 +102,23 @@ export function createSharing({
   button,
   schema,
   options,
+  messages,
   win,
   commit,
   getValues,
   isDestroyed,
 }) {
-  node('h3', 'Your changes');
+  node('h3', messages.message('changes'));
   const changes = node('textarea');
   changes.rows = 6;
   changes.spellcheck = false;
-  changes.setAttribute('aria-label', 'Your changes');
+  messages.attr(changes, 'aria-label', 'changes');
   const status = node('p');
   status.setAttribute('role', 'status');
   const fallback = node('input');
   fallback.readOnly = true;
   fallback.hidden = true;
-  fallback.setAttribute('aria-label', 'Copy text');
+  messages.attr(fallback, 'aria-label', 'copyText');
   async function copy(text) {
     try {
       if (!win.navigator.clipboard?.writeText) {
@@ -122,7 +126,7 @@ export function createSharing({
       }
       await win.navigator.clipboard.writeText(text);
       if (!isDestroyed()) {
-        status.textContent = 'Copied';
+        messages.content(status, 'copied');
       }
     } catch {
       if (isDestroyed()) {
@@ -132,31 +136,75 @@ export function createSharing({
       fallback.value = text;
       fallback.focus();
       fallback.select();
-      status.textContent = 'Select and copy this text';
+      messages.content(status, 'copyFallback');
     }
   }
-  button('Copy changes', () => copy(toLino(schema, getValues())));
-  button('Paste changes', () => {
-    const parsed = fromLino(schema, changes.value);
+  button(messages.message('copyChanges'), () => copy(exportText()));
+  const exportText = () =>
+    options.codec?.write(getValues()) ?? toLino(schema, getValues());
+  const importText = (text) => {
+    const parsed = options.codec
+      ? options.codec.read(text, { base: getValues() })
+      : text.trimStart().startsWith('{')
+        ? fromLegacyJson(schema, text, { version: schema.version })
+        : fromLino(schema, text);
     if (
       !parsed.ok ||
       parsed.rejected.length ||
-      parsed.diagnostics.some((d) => d.severity === 'error')
+      parsed.diagnostics?.some((d) => d.severity === 'error')
     ) {
-      status.textContent = 'Invalid settings. No changes applied.';
+      messages.content(status, 'invalid');
+      return false;
+    }
+    if (!commit(parsed.values)) {
+      return false;
+    }
+    messages.content(status, 'applied');
+    return true;
+  };
+  button(messages.message('pasteChanges'), () => importText(changes.value));
+  const file = node('input');
+  file.type = 'file';
+  file.hidden = true;
+  file.accept = '.lino,.json,text/plain,application/json';
+  messages.attr(file, 'aria-label', 'import');
+  button(messages.message('import'), () => file.click());
+  file.addEventListener('change', async () => {
+    const selected = file.files?.[0];
+    if (!selected) {
       return;
     }
-    commit(parsed.values);
-    status.textContent = 'Changes applied';
+    try {
+      const text = await selected.text();
+      if (!isDestroyed()) {
+        importText(text);
+      }
+    } catch {
+      if (!isDestroyed()) {
+        messages.content(status, 'readError');
+      }
+    }
+    file.value = '';
   });
-  button('Copy share link', () => {
+  button(messages.message('export'), () => {
+    const url = win.URL.createObjectURL(
+      new win.Blob([exportText()], { type: 'text/plain' })
+    );
+    const link = node('a');
+    link.href = url;
+    link.download = options.codec ? 'settings.txt' : 'settings.lino';
+    link.click();
+    link.remove();
+    win.setTimeout(() => win.URL.revokeObjectURL(url), 0);
+  });
+  button(messages.message('share'), () => {
     try {
       const url = new win.URL(options.shareUrl ?? win.location.href);
       url.hash = toShareHash(schema, getValues());
       void copy(url.href);
-    } catch (error) {
-      status.textContent = error.message;
+    } catch {
+      messages.content(status, 'shareError');
     }
   });
-  return { changes, status };
+  return { changes, status, importText, exportText };
 }
