@@ -1004,6 +1004,11 @@
   display: inline-grid;
   grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
+  min-width: calc(3 * var(--ui-control-height) + 2 * var(--ui-control-gap));
+}
+:where(ui-number-field) > [data-part='input'] {
+  min-width: 0;
+  width: 100%;
 }
 :where(ui-number-field) > [data-part='label'] {
   grid-column: 1 / -1;
