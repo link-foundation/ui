@@ -2,11 +2,17 @@ import { reset, isDefault } from '@link-foundation/ui-settings';
 import { buildPanelModel } from './panel-model.js';
 import { mountField } from './field-control.js';
 
-export function panelNodes(doc, element) {
+export function panelNodes(doc, element, messages) {
   const node = (tag, text, parent = element) => {
     const result = doc.createElement(tag);
     if (text !== undefined) {
-      result.textContent = text;
+      if (typeof text === 'function') {
+        messages.bind(() => {
+          result.textContent = text();
+        });
+      } else {
+        result.textContent = text;
+      }
     }
     parent.append(result);
     return result;
@@ -20,11 +26,46 @@ export function panelNodes(doc, element) {
   return { node, button };
 }
 
-function createTabs({ section, node, button, group, setTab }) {
+export function createPanelHeader({
+  doc,
+  element,
+  options,
+  messages,
+  close,
+  onSearch,
+}) {
+  element.setAttribute('role', 'region');
+  if (options.label) {
+    element.setAttribute('aria-label', options.label);
+  } else {
+    messages.attr(element, 'aria-label', 'settings');
+  }
+  const { node, button } = panelNodes(doc, element, messages);
+  const heading = node('h2', options.label ?? messages.message('settings'));
+  heading.tabIndex = -1;
+  if (options.mode === 'drawer') {
+    button(messages.message('close'), close);
+  }
+  const search = node('input');
+  search.type = 'search';
+  messages.bind(() => {
+    search.placeholder = messages.text('search');
+  });
+  messages.attr(search, 'aria-label', 'search');
+  search.addEventListener('input', onSearch);
+  const count = node('p');
+  count.setAttribute('aria-live', 'polite');
+  count.setAttribute('aria-atomic', 'true');
+  return { node, button, heading, search, count };
+}
+
+function createTabs({ section, node, button, group, setTab, messages }) {
   if (section.tabs?.length) {
     const tabs = node('div', undefined, group);
     tabs.setAttribute('role', 'group');
-    tabs.setAttribute('aria-label', `${section.label ?? section.id} tabs`);
+    messages.attr(tabs, 'aria-label', 'tabs', {
+      label: section.label ?? section.id,
+    });
     for (const tab of section.tabs) {
       const choose = button(tab, () => setTab(section.id, tab), tabs);
       choose.dataset.tab = tab;
@@ -42,6 +83,7 @@ export function createRows({
   isPeeking,
   options,
   setTab,
+  messages,
 }) {
   const rows = new Map();
   const sections = new Map();
@@ -57,12 +99,12 @@ export function createRows({
     // Reset includes filtered-out fields too.
     const keys = section.fields.map((f) => f.key);
     button(
-      `Reset ${section.label ?? section.id}`,
+      messages.message('reset', { label: section.label ?? section.id }),
       () => commit(reset(schema, getValues(), keys)),
       group
     );
     sections.set(section.id, group);
-    createTabs({ section, node, button, group, setTab });
+    createTabs({ section, node, button, group, setTab, messages });
     const groups = new Map();
     for (const field of section.fields) {
       let parent = group;
@@ -95,14 +137,17 @@ export function createRows({
             commit({ [field.key]: value });
           }
         },
-        `${id}-${rows.size}`
+        `${id}-${rows.size}`,
+        { messages }
       );
       const output = node('output', undefined, row);
-      output.setAttribute('aria-label', `${field.label ?? field.key} value`);
-      const marker = node('span', 'Changed', title);
+      messages.attr(output, 'aria-label', 'value', {
+        label: field.label ?? field.key,
+      });
+      const marker = node('span', messages.message('changed'), title);
       marker.className = 'settings-changed';
       const resetButton = button(
-        `Reset ${field.label ?? field.key}`,
+        messages.message('reset', { label: field.label ?? field.key }),
         () => commit({ [field.key]: field.default }),
         row
       );

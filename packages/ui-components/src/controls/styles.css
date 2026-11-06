@@ -1019,3 +1019,20 @@
   min-height: var(--ui-control-height);
   font: inherit;
 }
+
+:where(ui-color-field) > [data-part='rgb']:not([hidden]) {
+  display: grid;
+  gap: var(--ui-control-gap);
+  grid-column: 1 / -1;
+}
+:where(ui-color-field) [data-part='rgb'] > div {
+  display: grid;
+  grid-template-columns: minmax(4em, 1fr) minmax(4em, 2fr) 5em;
+  align-items: center;
+  gap: var(--ui-control-gap);
+}
+:where(ui-color-field) [data-part='rgb'] input {
+  min-width: 0;
+  width: 100%;
+  min-height: var(--ui-control-height);
+}

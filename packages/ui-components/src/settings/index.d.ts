@@ -26,12 +26,69 @@ export interface FieldControl {
   update(value: unknown): void;
   destroy(): void;
 }
+export type SettingsMessageKey =
+  | 'settings'
+  | 'close'
+  | 'search'
+  | 'preset'
+  | 'custom'
+  | 'randomize'
+  | 'resetAll'
+  | 'confirmReset'
+  | 'peek'
+  | 'changes'
+  | 'copyText'
+  | 'copied'
+  | 'copyFallback'
+  | 'copyChanges'
+  | 'pasteChanges'
+  | 'invalid'
+  | 'applied'
+  | 'import'
+  | 'readError'
+  | 'export'
+  | 'share'
+  | 'shareError'
+  | 'lookName'
+  | 'looks'
+  | 'saveLook'
+  | 'applyLook'
+  | 'deleteLook'
+  | 'beforeLink'
+  | 'reset'
+  | 'tabs'
+  | 'value'
+  | 'changed'
+  | 'count'
+  | 'rejected'
+  | 'increment'
+  | 'decrement'
+  | 'palette'
+  | 'rgb'
+  | 'red'
+  | 'green'
+  | 'blue'
+  | 'number'
+  | 'remove'
+  | 'add';
+export interface SettingsMessageParams {
+  label?: string;
+  count?: number;
+  keys?: string[];
+}
+export type SettingsMessages = Partial<
+  Record<
+    SettingsMessageKey,
+    string | ((params: SettingsMessageParams) => string)
+  >
+>;
 export interface SettingsPanelOptions extends PanelModelOptions {
   document?: Document;
   values?: SettingsValues;
   target?: SettingsTarget;
   mode?: 'page' | 'drawer';
   label?: string;
+  messages?: SettingsMessages;
   previewRoot?: HTMLElement;
   project?: SettingsProjection;
   onPreview?: (values: SettingsValues, root: HTMLElement) => void;
@@ -95,6 +152,7 @@ export function createSettingsPanel(
   update(changes: SettingsValues): void;
   setTab(section: string, tab: string): void;
   setLevel(level?: string): void;
+  setMessages(messages: SettingsMessages): void;
   saveLook(name: string): void;
   applyLook(name: string): void;
   applyShared(

@@ -158,3 +158,46 @@ and before paint. With the default snapshot format, write `paintSnapshot(schema,
 { includeAll: true })` when the projection uses fields without apply targets.
 The generated script is safe inside a script element and its
 CSP hash includes both hooks. Treat hook code as trusted application code.
+
+## Directional stepping and localized editors
+
+`nextValue(key, { value, min, max, step, snapping: 'directional' })` takes the
+first grid tick in the requested direction rather than rounding to the nearest
+tick before stepping. For `value: 0.075, step: 0.01`, ArrowUp returns `0.08` and
+ArrowDown returns `0.07`. Page/Shift multiples include that first tick. Omit
+`snapping` or use `'nearest'` for the existing behavior. Number controls accept
+the same `snapping` property and `increment-label` / `decrement-label` for
+field-specific localized accessible names.
+
+Color controls accept `rgb true` to show a grouped red/green/blue chooser with
+keyboard sliders and integer editors (0–255). All channels, the text editor,
+native picker and palette share one normalized hex value. `rgb-label`,
+`red-label`, `green-label`, `blue-label` and `palette-label` name these controls
+independently; disabled/readonly fields disable the channel controls. Panel
+color editors enable the chooser by default; set the field's `rgb false` to hide it.
+
+`createSettingsPanel(schema, { messages })` accepts a partial catalog whose keys
+are typed by `SettingsMessageKey`. Values are strings or functions receiving
+structured `{ label, count, keys }` parameters. Missing keys use English defaults.
+Functions may call the host's ui-i18n formatter; the panel adds no language
+registry or parsing convention. The catalog covers toolbar, search, counts,
+reset confirmations, share/import/export statuses, saved looks, collection
+actions and field-specific editor names. `formatCount` still takes precedence
+over the catalog's `count`. Schema labels, tab names, presets and palette names
+are supplied by the host.
+
+```js
+const panel = createSettingsPanel(schema, {
+  messages: {
+    settings: 'Настройки',
+    search: 'Поиск настроек',
+    increment: ({ label }) => `Увеличить ${label}`,
+    decrement: ({ label }) => `Уменьшить ${label}`,
+  },
+});
+panel.setMessages(englishCatalog);
+```
+
+`setMessages` replaces the catalog and updates existing chrome, current status
+and editor names without replacing the panel or losing values/saved looks.
+Custom controls retain their existing lifecycle and can use the host's catalog.

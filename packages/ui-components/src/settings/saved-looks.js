@@ -9,6 +9,7 @@ import {
 export function createSavedLooks({
   schema,
   options,
+  messages,
   node,
   button,
   getValues,
@@ -19,9 +20,9 @@ export function createSavedLooks({
   const bar = node('div');
   bar.className = 'settings-toolbar';
   const name = node('input', undefined, bar);
-  name.setAttribute('aria-label', 'Look name');
+  messages.attr(name, 'aria-label', 'lookName');
   const select = node('select', undefined, bar);
-  select.setAttribute('aria-label', 'Saved looks');
+  messages.attr(select, 'aria-label', 'looks');
   const refresh = () => {
     select.replaceChildren();
     for (const key of looks.keys()) {
@@ -49,10 +50,10 @@ export function createSavedLooks({
       );
     }
   };
-  button('Save look', () => saveLook(name.value), bar);
-  button('Apply saved look', () => applyLook(select.value), bar);
+  button(messages.message('saveLook'), () => saveLook(name.value), bar);
+  button(messages.message('applyLook'), () => applyLook(select.value), bar);
   button(
-    'Delete saved look',
+    messages.message('deleteLook'),
     () => {
       looks.delete(select.value);
       options.onLooksChange?.(Object.fromEntries(looks));
@@ -60,7 +61,11 @@ export function createSavedLooks({
     },
     bar
   );
-  const restore = button('Before the link', restoreBeforeLink, bar);
+  const restore = button(
+    messages.message('beforeLink'),
+    restoreBeforeLink,
+    bar
+  );
   restore.disabled = true;
   function restoreBeforeLink() {
     if (beforeLink) {

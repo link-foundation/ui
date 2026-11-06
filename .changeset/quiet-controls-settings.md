@@ -9,3 +9,6 @@ number drafts, inherited fallback stepping, RGB and named color palettes, rich
 settings panel extension hooks, saved looks and before-link recovery. Expose
 settings normalization policies, compatibility codecs and before-paint readers,
 and changed-only CSS projection with inheritance and derived values.
+
+Expose directional numeric snapping, grouped RGB sliders and channel editors,
+and replaceable message catalogs for panel chrome and field-specific actions.

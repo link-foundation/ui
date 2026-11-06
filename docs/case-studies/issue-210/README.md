@@ -1,6 +1,8 @@
 # Issue 210 implementation and verification plan
 
-The issue has no Dependencies section, comments or required sub-issues. PR 213
+The issue has no Dependencies section or required sub-issues. The consumer
+follow-up comment of 2026-11-06 adds directional snapping, localized chrome
+and grouped RGB editing to the acceptance inventory. PR 213
 has no conversation comments, inline comments or reviews at the initial audit.
 The consumer draft is evidence of contracts only: no unlicensed site code is
 copied here.
@@ -49,7 +51,7 @@ for a behavior correction (select keys and number text-editing keys).
 | Existing storage key/object-codec compatibility before paint                                                             | Public codec/readStorage hooks validate decoded values; tests exercise a custom key and standalone before-paint reader. Hosts can supply the official object-codec/parser without a parallel normalization engine. |
 | Public API and release                                                                                                   | [Integration contracts](contracts.md), package READMEs, public declarations, runnable examples and a changeset for all three changed published packages.                                                           |
 
-The new browser contract suite passes all ten cases in Chromium and WebKit.
+The new browser contract suite covers twelve cases in Chromium and WebKit.
 The existing control screenshot suite passes all eight cases after updating
 baselines for the visible number step buttons. No consumer source or images
 were copied. The following screenshots were generated from this repository's
@@ -60,8 +62,28 @@ own fixtures:
 - [Fixed popup](after-short-menu.png): top 8, height 173, width 280 inside the
   same 390 × 320 viewport.
 - [Rich panel](rich-panel.png): whole-section columns and transparent frame preview.
+- [Localized RGB panel](localized-rgb-panel.png): live Russian channel/action names.
 
 Run the focused browser coverage with
 `npx playwright test tests/e2e/control-contracts.spec.js --workers=1`.
 The four repository gates and CI results are recorded in
 [PR 213](https://github.com/link-foundation/ui/pull/213).
+
+## Consumer follow-up
+
+- Directional snapping: `nextValue` accepts `snapping: 'directional'`; the
+  number-field property uses the same policy. A continuous `0.075` with step
+  `0.01` reaches `0.08` upward and `0.07` downward. Page/Shift multiples count
+  the first directional tick; default nearest snapping stays compatible.
+  `experiments/issue-210-directional.mjs` reproduces the original skipped tick
+  and verifies the correction. Unit regressions cover bounds, offsets, RTL,
+  negative numbers and floating-point grid noise.
+- Generated chrome uses `SettingsPanelOptions.messages` and `setMessages` with
+  string/function catalogs. `settings/messages.test.js` verifies every generated
+  button name, search, status updates, field-specific steppers, channels and
+  value preservation across language changes. Hosts can delegate functions to
+  ui-i18n; schema labels, tabs, presets and palette names remain host data.
+- Color fields expose opt-in `rgb` sliders and integer inputs for all channels;
+  the generated panel enables them by default (`rgb false` opts out). Unit and
+  browser regressions synchronize sliders, numbers, hex text and named palettes,
+  including keyboard changes, translated labels and disabled controls.

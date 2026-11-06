@@ -95,7 +95,12 @@ export function decimalsOf(value: number): number;
 /** The value a key moves a numeric control to; `null` for other keys. */
 export function nextValue(
   key: string,
-  state?: NumericRange & { value?: number; shift?: boolean; rtl?: boolean }
+  state?: NumericRange & {
+    value?: number;
+    shift?: boolean;
+    rtl?: boolean;
+    snapping?: 'nearest' | 'directional';
+  }
 ): number | null;
 export function formatNumber(value: unknown): string;
 export function readNumber(

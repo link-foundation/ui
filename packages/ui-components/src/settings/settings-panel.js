@@ -1,8 +1,10 @@
 import { merge, diff } from '@link-foundation/ui-settings';
 import { createSavedLooks } from './saved-looks.js';
 import { refreshPanel } from './panel-refresh.js';
-import { createRows, panelNodes } from './panel-rows.js';
+import { createRows, createPanelHeader } from './panel-rows.js';
 import { createToolbar, createSharing } from './panel-actions.js';
+
+import { createMessages } from './messages.js';
 
 let sequence = 0;
 
@@ -20,41 +22,35 @@ export function createSettingsPanel(schema, options = {}) {
   const doc = options.document ?? globalThis.document;
   const win = doc.defaultView;
   const id = `settings-${++sequence}`;
+  const messages = createMessages(options.messages);
   const element = doc.createElement('settings-panel');
   const mode = options.mode ?? 'page';
   element.dataset.mode = mode;
-  element.setAttribute('role', 'region');
-  element.setAttribute('aria-label', options.label ?? 'Settings');
   let values = initialValues(schema, options);
   const tabs = { ...options.tabs };
   let level = options.level;
   let peeking = false;
   let opener;
   let destroyed = false;
-  const { node, button } = panelNodes(doc, element);
-  const heading = node('h2', options.label ?? 'Settings');
-  heading.tabIndex = -1;
+  const { node, button, heading, search, count } = createPanelHeader({
+    doc,
+    element,
+    options,
+    messages,
+    close: () => close(),
+    onSearch: () => refresh(false),
+  });
   const close = () => {
     endPeek();
     element.hidden = true;
     opener?.focus();
   };
-  if (mode === 'drawer') {
-    button('Close settings', close);
-  }
-  const search = node('input');
-  search.type = 'search';
-  search.placeholder = 'Search settings';
-  search.setAttribute('aria-label', 'Search settings');
-  search.addEventListener('input', () => refresh(false));
-  const count = node('p');
-  count.setAttribute('aria-live', 'polite');
-  count.setAttribute('aria-atomic', 'true');
   const context = {
     node,
     button,
     schema,
     options,
+    messages,
     win,
     commit,
     getValues: () => values,
@@ -103,7 +99,7 @@ export function createSettingsPanel(schema, options = {}) {
       );
     }
     if (result.rejected.length) {
-      status.textContent = `Invalid settings: ${result.rejected.join(', ')}`;
+      messages.content(status, 'rejected', { keys: result.rejected });
       return false;
     }
     if (options.target) {
@@ -142,6 +138,10 @@ export function createSettingsPanel(schema, options = {}) {
     exportText,
     ...saved,
     setTab,
+    setMessages(catalog) {
+      messages.update(catalog);
+      refresh();
+    },
     setLevel(next) {
       level = next;
       refresh();

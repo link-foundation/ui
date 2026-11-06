@@ -3,7 +3,7 @@ import { buildPanelModel } from './panel-model.js';
 import { refreshRows } from './panel-rows.js';
 
 export function refreshPanel(
-  { schema, options },
+  { schema, options, messages },
   { rows, sections, search, count, presets, peek, changes },
   { values, peeking, tabs, level },
   updateControls
@@ -24,7 +24,8 @@ export function refreshPanel(
     updateControls,
   });
   count.textContent =
-    options.formatCount?.(model) ?? `${model.changedCount} changed settings`;
+    options.formatCount?.(model) ??
+    messages.text('count', { count: model.changedCount });
   for (const [id, group] of sections) {
     const tab = tabs[id] ?? schema.sections.find((s) => s.id === id)?.tabs?.[0];
     for (const button of group.querySelectorAll('[data-tab]')) {

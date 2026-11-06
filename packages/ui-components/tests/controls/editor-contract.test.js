@@ -68,3 +68,52 @@ s: select Pick
   assert.match(html, />Ocean<\/button>/);
   assert.match(html, /aria-label="Options: Palette"/);
 });
+
+test('directional number stepping and translated action names follow store updates', async () => {
+  const t = mountDoc(`n: number-field Opacity
+  value 0.075
+  min 0
+  max 1
+  step 0.01
+  snapping directional
+  increment-label 'Увеличить непрозрачность'
+  decrement-label 'Уменьшить непрозрачность'`);
+  t.part('n', 'increment').click();
+  await microtasks();
+  assert.deepEqual(t.prop('n', 'value'), ['0.08']);
+  assert.equal(
+    t.part('n', 'increment').getAttribute('aria-label'),
+    'Увеличить непрозрачность'
+  );
+  press(t.part('n', 'input'), 'ArrowDown');
+  assert.deepEqual(t.prop('n', 'value'), ['0.07']);
+  t.mounted.destroy();
+});
+
+test('grouped RGB sliders and numeric channels synchronize text, palettes and disabled state', async () => {
+  const t = mountDoc(`c: color-field Accent
+  value '#1256ab'
+  rgb true
+  rgb-label 'Каналы акцента'
+  red-label Красный
+  palette
+    Sand '#eecbaa'`);
+  const red = t.part('c', 'red-range');
+  assert.equal(red.value, '18');
+  assert.equal(red.getAttribute('aria-label'), 'Красный');
+  typeInto(red, '255');
+  await microtasks();
+  assert.deepEqual(t.prop('c', 'value'), ['#ff56ab']);
+  assert.equal(t.part('c', 'red-number').value, '255');
+  typeInto(t.part('c', 'green-number'), '0');
+  await microtasks();
+  assert.equal(t.part('c', 'input').value, '#ff00ab');
+  t.part('c', 'palette').querySelector('button').click();
+  assert.equal(red.value, '238');
+  assert.equal(t.part('c', 'blue-number').value, '170');
+  t.mounted.store.setProp('c', 'disabled', ['true']);
+  await microtasks();
+  assert.equal(red.disabled, true);
+  assert.equal(t.part('c', 'green-number').disabled, true);
+  t.mounted.destroy();
+});

@@ -169,3 +169,62 @@ test('panel clipboard and file actions round-trip changes and reject invalid fil
     page.getByRole('spinbutton', { name: 'Radius', exact: true })
   ).toHaveValue('18');
 });
+
+test('panel language changes retain values and localize field-specific steppers and RGB editors', async ({
+  page,
+}) => {
+  await page.goto('/packages/ui-components/examples/rich-settings.html');
+  await expect(page.locator('body')).toHaveAttribute('data-ready', 'true');
+  await page.evaluate(() =>
+    globalThis.panel.setMessages({
+      settings: 'Настройки',
+      search: 'Поиск настроек',
+      randomize: 'Случайные значения',
+      increment: ({ label }) => `Увеличить ${label}`,
+      decrement: ({ label }) => `Уменьшить ${label}`,
+      red: ({ label }) => `${label}: красный`,
+      green: ({ label }) => `${label}: зелёный`,
+      blue: ({ label }) => `${label}: синий`,
+      rgb: ({ label }) => `${label}: каналы RGB`,
+      palette: ({ label }) => `${label}: палитра`,
+    })
+  );
+  await expect(
+    page.getByRole('region', { name: 'Настройки', exact: true })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('searchbox', { name: 'Поиск настроек' })
+  ).toBeVisible();
+  const radius = page.getByRole('spinbutton', { name: 'Radius', exact: true });
+  await page
+    .getByRole('button', { name: 'Увеличить Radius', exact: true })
+    .click();
+  await expect(radius).toHaveValue('19');
+  const red = page.getByRole('slider', {
+    name: 'Accent: красный',
+    exact: true,
+  });
+  await red.focus();
+  await red.press('ArrowRight');
+  await expect(red).toHaveValue('104');
+  await expect(
+    page.getByRole('spinbutton', {
+      name: 'Accent: красный (0–255)',
+      exact: true,
+    })
+  ).toHaveValue('104');
+  await page
+    .getByRole('spinbutton', { name: 'Accent: зелёный (0–255)', exact: true })
+    .fill('0');
+  await expect(
+    page.getByRole('textbox', { name: 'Accent', exact: true })
+  ).toHaveValue('#6800a4');
+  await page.getByRole('button', { name: 'Ocean', exact: true }).click();
+  await expect(red).toHaveValue('18');
+  await expectAccessible(page);
+  await page.evaluate(() => globalThis.panel.setMessages({}));
+  await expect(
+    page.getByRole('button', { name: 'Increase Radius', exact: true })
+  ).toBeVisible();
+  await expect(radius).toHaveValue('19');
+});

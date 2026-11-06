@@ -4,12 +4,48 @@ import { mountControls } from '../controls/index.js';
 import { controlFor } from './control-for.js';
 
 /** Mount the existing basic controls; vectors and chips compose native inputs. */
-export function mountField(container, field, value, onChange, id) {
+export function mountField(
+  container,
+  field,
+  value,
+  onChange,
+  id,
+  { messages } = {}
+) {
   const doc = container.ownerDocument;
   const { element, props } = controlFor(field);
+  const numberLabel = () =>
+    messages?.text('number', { label: props.label }) ?? `${props.label} number`;
   if (element === 'vector' || element === 'chips') {
-    return mountCollection(container, field, value, onChange, element);
+    return mountCollection(
+      container,
+      field,
+      value,
+      onChange,
+      element,
+      messages
+    );
   }
+  if (element === 'color-field') {
+    props.rgb ??= true;
+  }
+  const editorLabels = () => {
+    const names =
+      element === 'number-field'
+        ? ['increment', 'decrement']
+        : element === 'color-field'
+          ? ['palette', 'rgb', 'red', 'green', 'blue']
+          : [];
+    return Object.fromEntries(
+      names
+        .map((key) => [
+          `${key}-label`,
+          messages?.text(key, { label: props.label }),
+        ])
+        .filter(([, value]) => value !== undefined)
+    );
+  };
+  Object.assign(props, editorLabels());
   const property = element === 'switch' ? 'checked' : 'value';
   const clauses = Object.entries(props)
     .filter(([key]) => !['options', 'unit'].includes(key))
@@ -33,13 +69,14 @@ export function mountField(container, field, value, onChange, id) {
     },
   ]);
   const mounted = mountControls(container, source);
+  let labelsRevision = messages?.revision;
   const change = (event) => onChange(event.detail.value);
   container.addEventListener('ui-change', change);
   let number;
   if (element === 'slider') {
     number = doc.createElement('input');
     number.type = 'number';
-    number.setAttribute('aria-label', `${props.label} number`);
+    number.setAttribute('aria-label', numberLabel());
     for (const key of ['min', 'max', 'step']) {
       if (field[key] !== undefined) {
         number[key] = field[key];
@@ -53,6 +90,15 @@ export function mountField(container, field, value, onChange, id) {
   }
   return {
     update(next) {
+      if (labelsRevision !== messages?.revision) {
+        labelsRevision = messages?.revision;
+        for (const [key, label] of Object.entries(editorLabels())) {
+          mounted.store.setProp(id, key, [label]);
+        }
+      }
+      if (number) {
+        number.setAttribute('aria-label', numberLabel());
+      }
       if (next === null) {
         mounted.store.removeProp(id, property);
       } else {
@@ -69,9 +115,10 @@ export function mountField(container, field, value, onChange, id) {
   };
 }
 
-function mountCollection(container, field, value, onChange, element) {
+function mountCollection(container, field, value, onChange, element, messages) {
   const doc = container.ownerDocument;
   let current = value;
+  let lastMessages = messages?.revision;
   const render = () => {
     container.replaceChildren();
     const group = doc.createElement('fieldset');
@@ -94,7 +141,10 @@ function mountCollection(container, field, value, onChange, element) {
         const chip = doc.createElement('button');
         chip.type = 'button';
         chip.textContent = `${item} ×`;
-        chip.setAttribute('aria-label', `Remove ${item}`);
+        chip.setAttribute(
+          'aria-label',
+          messages?.text('remove', { label: item }) ?? `Remove ${item}`
+        );
         chip.addEventListener('click', () =>
           onChange(current.filter((_, i) => i !== index))
         );
@@ -103,10 +153,16 @@ function mountCollection(container, field, value, onChange, element) {
     }
     if (element === 'chips') {
       const input = doc.createElement('input');
-      input.setAttribute('aria-label', `Add ${legend.textContent}`);
+      input.setAttribute(
+        'aria-label',
+        messages?.text('add', { label: legend.textContent }) ??
+          `Add ${legend.textContent}`
+      );
       const add = doc.createElement('button');
       add.type = 'button';
-      add.textContent = `Add ${legend.textContent}`;
+      add.textContent =
+        messages?.text('add', { label: legend.textContent }) ??
+        `Add ${legend.textContent}`;
       add.addEventListener('click', () => {
         if (input.value.trim()) {
           onChange([...current, input.value.trim()]);
@@ -119,9 +175,11 @@ function mountCollection(container, field, value, onChange, element) {
   render();
   return {
     update(next) {
-      if (equalValue(field, current, next)) {
+      const nextMessages = messages?.revision;
+      if (equalValue(field, current, next) && lastMessages === nextMessages) {
         return;
       }
+      lastMessages = nextMessages;
       current = next;
       render();
     },

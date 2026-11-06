@@ -229,6 +229,10 @@ number-field: kind
   property bind any
   children none
   property fallback number
+  property snapping
+    enum nearest directional
+  property increment-label string
+  property decrement-label string
 
 color-field: kind
   description 'A hex colour text input with the native colour picker.'
@@ -244,6 +248,13 @@ color-field: kind
   property bind any
   children none
   property palette any
+  property readonly boolean
+  property rgb boolean
+  property palette-label string
+  property rgb-label string
+  property red-label string
+  property green-label string
+  property blue-label string
 
 checkbox: kind
   description 'A box that is checked, unchecked or mixed.'

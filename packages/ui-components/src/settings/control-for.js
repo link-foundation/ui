@@ -26,6 +26,8 @@ export function controlFor(field) {
   }
   for (const key of [
     'fallback',
+    'snapping',
+    'rgb',
     'palette',
     'menu-min-width',
     'menu-max-height',

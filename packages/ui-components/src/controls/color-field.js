@@ -16,7 +16,9 @@ import {
   stopControl,
   textOf,
   setText,
+  flagOf,
 } from './dom.js';
+import { createRgb, renderRgb, updateRgb } from './color-rgb.js';
 import { formatColor as formatHex } from './color.js';
 import { createTextControl, inputOf, updateTextControl } from './text-field.js';
 
@@ -56,7 +58,35 @@ function render(control) {
   if (indicator.value !== picked) {
     indicator.value = picked;
   }
+  renderRgb(control);
   commitValue(control);
+}
+
+function updatePalette(control, el, doc) {
+  const palette = control.parts.palette;
+  setText(palette, '');
+  for (const pair of el.props.get('palette') ?? []) {
+    const values = Array.isArray(pair) ? pair : pair?.values;
+    if (!Array.isArray(values) || values.length !== 2) {
+      continue;
+    }
+    const [name, raw] = values;
+    const color = formatHex(raw);
+    if (!color) {
+      continue;
+    }
+    const button = partOf(doc, 'button', null, { type: 'button' });
+    setText(button, name);
+    button.addEventListener('click', () => {
+      if (
+        !control.service.context.disabled &&
+        !control.service.context.readonly
+      ) {
+        control.assign({ value: color, invalid: false });
+      }
+    });
+    palette.appendChild(button);
+  }
 }
 
 export const COLOR_FIELD_KIND = Object.freeze({
@@ -73,7 +103,7 @@ export const COLOR_FIELD_KIND = Object.freeze({
         spellcheck: 'false',
         maxlength: '32',
       },
-      children: (doc, node) => {
+      children: (doc, node, getControl) => {
         const indicator = partOf(doc, 'input', 'indicator', {
           type: 'color',
           tabindex: '-1',
@@ -86,7 +116,7 @@ export const COLOR_FIELD_KIND = Object.freeze({
           'aria-label': 'Palette',
         });
         node.appendChild(palette);
-        return { indicator, palette };
+        return { indicator, palette, ...createRgb(doc, node, getControl) };
       },
       actions,
       render,
@@ -96,43 +126,23 @@ export const COLOR_FIELD_KIND = Object.freeze({
     const has = changesOf(node, changed);
     const { input, control } = updateTextControl(node, el, ctx, has);
     const { indicator } = control.parts;
-    if (has('disabled')) {
-      indicator.toggleAttribute('disabled', control.service.context.disabled);
-    }
+    const disabled = flagOf(el, 'disabled') || flagOf(el, 'readonly');
+    indicator.toggleAttribute('disabled', disabled);
     control.parts.palette.setAttribute(
       'aria-label',
-      `${textOf(el, 'label') || el.id} palette`
+      textOf(el, 'palette-label') || `${textOf(el, 'label') || el.id} palette`
     );
     if (has('palette')) {
-      const palette = control.parts.palette;
-      setText(palette, '');
-      for (const pair of el.props.get('palette') ?? []) {
-        const values = Array.isArray(pair) ? pair : pair?.values;
-        if (!Array.isArray(values) || values.length !== 2) {
-          continue;
-        }
-        const [name, raw] = values;
-        const color = formatHex(raw);
-        if (!color) {
-          continue;
-        }
-        const button = partOf(ctx.document, 'button', null, { type: 'button' });
-        setText(button, name);
-        button.addEventListener('click', () => {
-          if (!control.service.context.disabled) {
-            control.assign({ value: color, invalid: false });
-          }
-        });
-        palette.appendChild(button);
-      }
+      updatePalette(control, el, ctx.document);
     }
     control.parts.palette.toggleAttribute(
       'hidden',
       control.parts.palette.children.length === 0
     );
     for (const button of control.parts.palette.children) {
-      button.toggleAttribute('disabled', control.service.context.disabled);
+      button.toggleAttribute('disabled', disabled);
     }
+    updateRgb(control, el);
     if (has('value')) {
       const hex = formatHex(textOf(el, 'value'));
       setAttr(input, 'value', hex ?? '');

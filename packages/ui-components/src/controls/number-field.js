@@ -18,6 +18,7 @@ import {
   commitValue,
   maybeNumber,
   numberOf,
+  textOf,
   receive,
   stopControl,
 } from './dom.js';
@@ -29,6 +30,7 @@ const rangeOf = (context) => ({
   min: context.min ?? undefined,
   max: context.max ?? undefined,
   step: context.step ?? undefined,
+  snapping: context.snapping,
 });
 
 /** A number written back to the input (`''` for none). */
@@ -128,7 +130,15 @@ export const NUMBER_FIELD_KIND = Object.freeze({
         range[name] = maybeNumber(el, name);
       }
     }
+    if (has('snapping')) {
+      range.snapping = textOf(el, 'snapping');
+    }
     for (const name of ['increment', 'decrement']) {
+      control.parts[name].setAttribute(
+        'aria-label',
+        textOf(el, `${name}-label`) ||
+          (name === 'increment' ? 'Increase' : 'Decrease')
+      );
       control.parts[name].toggleAttribute(
         'disabled',
         flagOf(el, 'disabled') || flagOf(el, 'readonly')
