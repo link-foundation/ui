@@ -74,10 +74,7 @@
   "scripts": {
     "build": "node scripts/build-bookmarklet.mjs"
   },
-  "imports": {
-    "#read-asset": {
-      "browser": "./src/read-asset.browser.js",
-      "default": "./src/read-asset.js"
-    }
+  "browser": {
+    "./src/read-asset.js": "./src/read-asset.browser.js"
   }
 }

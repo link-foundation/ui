@@ -1,5 +1,5 @@
 /* global URL */
-import { readAsset } from '#read-asset';
+import { readAsset } from './read-asset.js';
 
 /** Read the shipped template in Node or a browser, without bundler-specific imports. */
 export async function loadAgentTemplate() {

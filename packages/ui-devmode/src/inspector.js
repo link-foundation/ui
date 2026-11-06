@@ -1,5 +1,5 @@
 /* global URL */
-import { readAsset } from '#read-asset';
+import { readAsset } from './read-asset.js';
 
 /**
  * The inspector panel: a host docked to the right of the page, resizable,
