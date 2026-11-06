@@ -1,3 +1,6 @@
+/* global URL */
+import { readAsset } from '#read-asset';
+
 /**
  * The inspector panel: a host docked to the right of the page, resizable,
  * whose shadow root holds the layout of `inspector.lino` rendered by ui-dom
@@ -149,16 +152,7 @@ export const LAYOUT_KINDS = Object.freeze({
  * @returns {Promise<string>}
  */
 export async function loadLayout() {
-  const url = new globalThis.URL('./inspector.lino', import.meta.url);
-  if (url.protocol === 'file:') {
-    const { readFile } = await import('node:fs/promises');
-    return readFile(url, 'utf8');
-  }
-  const response = await globalThis.fetch(url);
-  if (!response.ok) {
-    throw new Error(`Could not load ${url}: ${response.status}`);
-  }
-  return response.text();
+  return await readAsset(new URL('./inspector.lino', import.meta.url));
 }
 
 /** Make the tab buttons of the panels and wire the WAI-ARIA tabs keys. */

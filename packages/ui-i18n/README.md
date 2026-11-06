@@ -48,6 +48,13 @@ Requires Node.js 22.11 or later (the `engines` of lino-i18n 0.5.0), Bun or
 Deno. Everything except `loadCatalogDir` and `loadUiCatalogs` on `file:` URLs
 runs in browsers.
 
+Browser bundlers select the browser condition of the root entry. You can also
+import `@link-foundation/ui-i18n/browser` explicitly. Both provide the runtime
+message, localizer, vocabulary, lint and catalog parsing helpers, plus
+`loadUiCatalogs()` using `fetch`. The shipped catalog is tracked as an asset
+and works with emitted or inlined Vite assets. Filesystem-only
+`loadCatalogDir` and `UI_LOCALES_URL` stay on the default Node root entry.
+
 ## Writing messages: `(t ...)`
 
 A message stands where literal text would:

@@ -49,6 +49,13 @@ points. The overlay, the inspector and the model are loaded with a dynamic
 `import()` the first time dev mode opens. With `(enabled false)` they are never
 requested.
 
+External Vite applications can dynamically import
+`@link-foundation/ui-devmode/foreign` and call `mountForeignDevMode()` without
+conversion aliases or source transforms. The inspector layout and agent
+instruction template use static `new URL(..., import.meta.url)` references;
+Vite includes them in production output, including builds hosted at a subpath.
+Native Node ESM still reads these assets from disk.
+
 ## Opening dev mode
 
 | Entry point     | How                                                                                                                    |
