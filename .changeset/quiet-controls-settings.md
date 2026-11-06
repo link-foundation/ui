@@ -12,3 +12,6 @@ and changed-only CSS projection with inheritance and derived values.
 
 Expose directional numeric snapping, grouped RGB sliders and channel editors,
 and replaceable message catalogs for panel chrome and field-specific actions.
+
+Keep continuous typed number values with an independent opt-in clamp policy;
+generated number editors inherit the settings engine normalization policy.

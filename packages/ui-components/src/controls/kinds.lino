@@ -119,6 +119,8 @@ number-field: kind
     enum nearest directional
   property increment-label string
   property decrement-label string
+  property normalization
+    enum snap clamp
 
 color-field: kind
   description 'A hex colour text input with the native colour picker.'

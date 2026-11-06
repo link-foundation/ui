@@ -3,7 +3,8 @@
  * `type=number`, whose wheel and locale handling differ between
  * browsers). ArrowUp/ArrowDown step (×10 with Shift), PageUp/PageDown
  * move ten steps; Home/End and Shift+Page retain native text navigation.
- * Typed text commits on `input`, clamped to the range and step, while
+ * Typed text commits on `input`, clamped to the range (and step unless
+ * `normalization clamp`), while
  * the exact draft survives store echoes until the native `change`. Text
  * that is not a number makes the field invalid and keeps the last value.
  *
@@ -31,6 +32,7 @@ const rangeOf = (context) => ({
   max: context.max ?? undefined,
   step: context.step ?? undefined,
   snapping: context.snapping,
+  normalization: context.normalization,
 });
 
 /** A number written back to the input (`''` for none). */
@@ -44,9 +46,17 @@ export function readNumber(text, range) {
     return { value: null, invalid: false };
   }
   const number = Number(trimmed.replace(',', '.'));
-  return Number.isFinite(number)
-    ? { value: clampStep(number, range), invalid: false }
-    : { invalid: true };
+  if (!Number.isFinite(number)) {
+    return { invalid: true };
+  }
+  const value =
+    range?.normalization === 'clamp'
+      ? Math.min(
+          Number.isFinite(range.max) ? range.max : Infinity,
+          Math.max(Number.isFinite(range.min) ? range.min : -Infinity, number)
+        )
+      : clampStep(number, range);
+  return { value, invalid: false };
 }
 
 const actions = (input, getControl) => ({
@@ -130,8 +140,10 @@ export const NUMBER_FIELD_KIND = Object.freeze({
         range[name] = maybeNumber(el, name);
       }
     }
-    if (has('snapping')) {
-      range.snapping = textOf(el, 'snapping');
+    for (const name of ['snapping', 'normalization']) {
+      if (has(name)) {
+        range[name] = textOf(el, name);
+      }
     }
     for (const name of ['increment', 'decrement']) {
       control.parts[name].setAttribute(

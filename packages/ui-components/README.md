@@ -1459,3 +1459,8 @@ without losing values. Color editors include grouped RGB sliders and numeric
 channels (field property `rgb false` hides them). Number controls and `nextValue`
 accept `snapping: 'directional'` to step continuous imported values to the next
 tick in the requested direction. See the [integration contracts](../../docs/case-studies/issue-210/contracts.md).
+
+For continuous typed values, use `normalization clamp` on number fields or
+`readNumber(text, { ...range, normalization: 'clamp' })`. This is independent of
+key/pointer snapping; generated editors inherit the schema engine's
+`normalization.numbers` policy. The default remains step-snapped.

@@ -108,6 +108,15 @@
         `n: number-field 'Size'
   fallback 5
   step 0.1
+opacity: number-field Opacity
+  min 0
+  max 1
+  step 0.01
+  fallback 0.075
+  normalization clamp
+  snapping directional
+  increment-label 'Increase Opacity'
+  decrement-label 'Decrease Opacity'
 c: color-field 'Accent'
   value '#1256ab'
   palette

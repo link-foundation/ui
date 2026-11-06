@@ -105,7 +105,7 @@ export function nextValue(
 export function formatNumber(value: unknown): string;
 export function readNumber(
   text: string,
-  range?: NumericRange
+  range?: NumericRange & { normalization?: 'snap' | 'clamp' }
 ): { value: number | null; invalid: false } | { invalid: true };
 /** The fraction (0–1) of the range a value is at. */
 export function fractionOf(

@@ -19,6 +19,9 @@ export function controlFor(field) {
     throw new TypeError(`Unsupported settings control: ${field.type}`);
   }
   const props = { label: field.label ?? field.key };
+  if (element === 'number-field' && field.normalization?.numbers) {
+    props.normalization = field.normalization.numbers;
+  }
   for (const key of ['min', 'max', 'step', 'unit', 'options']) {
     if (field[key] !== undefined) {
       props[key] = field[key];

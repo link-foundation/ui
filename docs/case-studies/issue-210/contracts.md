@@ -201,3 +201,21 @@ panel.setMessages(englishCatalog);
 `setMessages` replaces the catalog and updates existing chrome, current status
 and editor names without replacing the panel or losing values/saved looks.
 Custom controls retain their existing lifecycle and can use the host's catalog.
+
+## Continuous typed values
+
+Typed-value normalization is independent of key snapping. Pass
+`readNumber('0.075', { min: 0, max: 1, step: 0.01, normalization: 'clamp' })`
+to retain `0.075`. The standalone number-field property is `normalization clamp`;
+omit it or use `normalization snap` to keep the original step-snapped behavior.
+Both live drafts and committed text use this policy. Empty text still yields
+null; invalid/non-finite text keeps the last value. Combine with `snapping
+directional` so ArrowUp/pointer increment reaches `0.08` without first
+quantizing a typed value. The two policies can be chosen independently.
+
+Generated number editors inherit `field.normalization.numbers`, set by
+`readSchema(text, { normalization: { numbers: 'clamp' } })`, so the panel sends
+continuous values to the same engine and preview rather than quantizing them
+in the editor. The `continuous-number.test.js` regressions fail before the fix
+and cover the public reader, live drafts/commits/clear/fallback stepping and
+actual generated-panel values. Browser tests also read the live store.

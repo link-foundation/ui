@@ -51,7 +51,7 @@ for a behavior correction (select keys and number text-editing keys).
 | Existing storage key/object-codec compatibility before paint                                                             | Public codec/readStorage hooks validate decoded values; tests exercise a custom key and standalone before-paint reader. Hosts can supply the official object-codec/parser without a parallel normalization engine. |
 | Public API and release                                                                                                   | [Integration contracts](contracts.md), package READMEs, public declarations, runnable examples and a changeset for all three changed published packages.                                                           |
 
-The new browser contract suite covers twelve cases in Chromium and WebKit.
+The new browser contract suite covers fourteen cases in Chromium and WebKit.
 The existing control screenshot suite passes all eight cases after updating
 baselines for the visible number step buttons. No consumer source or images
 were copied. The following screenshots were generated from this repository's
@@ -87,3 +87,17 @@ The four repository gates and CI results are recorded in
   the generated panel enables them by default (`rgb false` opts out). Unit and
   browser regressions synchronize sliders, numbers, hex text and named palettes,
   including keyboard changes, translated labels and disabled controls.
+
+The second consumer follow-up adds independent continuous typed normalization.
+`controls/continuous-number.test.js` reproduces three failures before the fix
+and passes afterward: public reader, live draft/commit/store behavior, and the
+generated editor inheriting the engine's clamp policy. The browser suite checks
+exact `0.075` store/preview values, clearing to null and directional pointer steps.
+
+The taller continuous-number fixture also reproduces WebKit scrolling the select
+trigger above the viewport. Sized menus now shift vertically as well as
+horizontally; the existing strict geometry assertion fails before this fix and
+passes afterward. `experiments/issue-210-menu-geometry.mjs` records bounded
+geometry and the before/after screenshots (`before-scrolled-menu.png` and
+`after-scrolled-menu.png`): menu y = 6 becomes y = 8, with its bottom at 312
+inside the 320-pixel viewport.

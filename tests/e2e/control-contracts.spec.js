@@ -228,3 +228,45 @@ test('panel language changes retain values and localize field-specific steppers 
   ).toBeVisible();
   await expect(radius).toHaveValue('19');
 });
+
+test('continuous typing reaches the live store and preview before directional stepping', async ({
+  page,
+}) => {
+  await page.goto('/packages/ui-components/examples/control-contracts.html');
+  const input = page.getByRole('spinbutton', { name: 'Opacity', exact: true });
+  await input.fill('0.075');
+  const stored = () =>
+    page.evaluate(
+      () =>
+        globalThis.editors.store
+          .get('opacity')
+          .properties.find((p) => p.name === 'value')?.values ?? null
+    );
+  await expect.poll(stored).toEqual(['0.075']);
+  await expect(input).toHaveAttribute('aria-valuenow', '0.075');
+  await input.press('Tab');
+  await expect(input).toHaveValue('0.075');
+  await expect.poll(stored).toEqual(['0.075']);
+  await page
+    .getByRole('button', { name: 'Increase Opacity', exact: true })
+    .click();
+  await expect(input).toHaveValue('0.08');
+  await input.fill('');
+  await expect.poll(stored).toBe(null);
+  await page
+    .getByRole('button', { name: 'Increase Opacity', exact: true })
+    .click();
+  await expect(input).toHaveValue('0.08');
+  await page.goto('/packages/ui-components/examples/rich-settings.html');
+  const radius = page.getByRole('spinbutton', { name: 'Radius', exact: true });
+  await radius.fill('0.075');
+  await expect
+    .poll(() => page.evaluate(() => globalThis.panel.values().radius))
+    .toBe(0.075);
+  await radius.press('Tab');
+  await expect(radius).toHaveValue('0.075');
+  await expect(page.locator('.frame-preview span')).toHaveCSS(
+    'border-radius',
+    '0.075px'
+  );
+});
