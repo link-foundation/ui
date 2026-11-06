@@ -7,7 +7,7 @@
  */
 
 import { parse } from '@link-foundation/ui-core';
-import { createStore } from '@link-foundation/ui-store';
+import { createStore } from '@link-foundation/ui-store/memory';
 import './kinds/basic.js';
 import { render } from './render.js';
 

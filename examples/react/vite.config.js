@@ -25,6 +25,10 @@ export default defineConfig({
         replacement: `${packages}ui-dom/src/html.js`,
       },
       {
+        find: '@link-foundation/ui-store/memory',
+        replacement: `${packages}ui-store/src/memory.js`,
+      },
+      {
         find: /^@link-foundation\/(ui-[a-z]+)$/,
         replacement: `${packages}$1/src/index.js`,
       },

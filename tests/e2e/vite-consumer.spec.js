@@ -5,11 +5,16 @@ import { expectAccessible } from '../ui/helpers.mjs';
 
 test.describe('external packed Vite consumer', () => {
   test.describe.configure({ timeout: 120_000 });
-  for (const inline of [false, true]) {
-    test(`opens the inspector with ${inline ? 'inlined' : 'emitted'} assets`, async ({
+  for (const { inline, withDoubletsWeb } of [
+    { inline: false, withDoubletsWeb: false },
+    { inline: true, withDoubletsWeb: false },
+    { inline: false, withDoubletsWeb: true },
+    { inline: true, withDoubletsWeb: true },
+  ]) {
+    test(`opens the inspector with ${inline ? 'inlined' : 'emitted'} assets and doublets-web ${withDoubletsWeb ? 'installed' : 'absent'}`, async ({
       page,
     }) => {
-      const consumer = await buildConsumer({ inline });
+      const consumer = await buildConsumer({ inline, withDoubletsWeb });
       let server;
       try {
         expect(consumer.warnings).toEqual([]);
@@ -23,6 +28,17 @@ test.describe('external packed Vite consumer', () => {
           }
         });
         await page.goto(server.resolvedUrls.local[0]);
+        await expect(page.locator('#rendered ui-text')).toHaveText(
+          'Mounted document'
+        );
+        await page.evaluate(() =>
+          globalThis.mountedStore.setPositional('greeting', [
+            'Updated document',
+          ])
+        );
+        await expect(page.locator('#rendered ui-text')).toHaveText(
+          'Updated document'
+        );
         await page
           .getByRole('button', { name: 'Open inspector', exact: true })
           .click();

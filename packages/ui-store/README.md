@@ -500,11 +500,16 @@ history of that tab.
 `createIdGenerator(usedIds?)` is the generator the store uses, exported for
 tools that need the same IDs.
 
-## In-memory entry for native bundlers
+## In-memory entry for browser and native bundlers
 
 `import { createStore } from '@link-foundation/ui-store/memory'` loads only the
 in-memory implementation. It has the same store API and avoids loading optional
-IndexedDB and WebAssembly adapters in React Native/Metro applications.
+IndexedDB and WebAssembly adapters in browser and React Native/Metro applications.
+It also exports `DEFAULT_ORIGIN` and `GENERATED_ID_PREFIX`, with the same values
+as the root entry. The DOM renderer uses this entry so installing the optional
+`doublets-web` peer does not require WASM bundler configuration for rendering.
+The root entry continues to export `openDoubletsWeb` and `copyToDoubletsWeb` for
+explicit use of that backend.
 
 ## License
 
