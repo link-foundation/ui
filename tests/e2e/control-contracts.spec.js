@@ -111,3 +111,61 @@ test('rich panel conditions, whole-section columns and transparent previews', as
   );
   await page.evaluate(() => globalThis.panel.destroy());
 });
+
+test('panel clipboard and file actions round-trip changes and reject invalid files', async ({
+  page,
+}) => {
+  await page.goto('/packages/ui-components/examples/rich-settings.html');
+  await expect(page.locator('body')).toHaveAttribute('data-ready', 'true');
+  await page.evaluate(() => {
+    Object.defineProperty(globalThis.navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText: async (text) => (globalThis.copiedSettings = text) },
+    });
+  });
+  await page.getByRole('button', { name: 'Copy changes', exact: true }).click();
+  await expect(
+    page.getByRole('status').filter({ hasText: 'Copied' })
+  ).toBeVisible();
+  const copied = await page.evaluate(() => globalThis.copiedSettings);
+  expect(copied).toContain('radius 18');
+  const downloadEvent = page.waitForEvent('download');
+  await page
+    .getByRole('button', { name: 'Export settings', exact: true })
+    .click();
+  const download = await downloadEvent;
+  expect(download.suggestedFilename()).toBe('settings.lino');
+  const chunks = [];
+  for await (const chunk of await download.createReadStream()) {
+    chunks.push(chunk);
+  }
+  expect(Buffer.concat(chunks).toString()).toBe(copied);
+  const file = page.getByLabel('Import settings', { exact: true });
+  await file.setInputFiles({
+    name: 'settings.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from('{"radius":7}'),
+  });
+  await expect(
+    page.getByRole('spinbutton', { name: 'Radius', exact: true })
+  ).toHaveValue('7');
+  await file.setInputFiles({
+    name: 'settings.lino',
+    mimeType: 'text/plain',
+    buffer: Buffer.from(copied),
+  });
+  await expect(
+    page.getByRole('spinbutton', { name: 'Radius', exact: true })
+  ).toHaveValue('18');
+  await file.setInputFiles({
+    name: 'invalid.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from('{"radius":2,"show-frame":"invalid"}'),
+  });
+  await expect(
+    page.getByRole('status').filter({ hasText: 'Invalid settings' })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('spinbutton', { name: 'Radius', exact: true })
+  ).toHaveValue('18');
+});
