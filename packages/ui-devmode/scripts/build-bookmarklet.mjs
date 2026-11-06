@@ -58,11 +58,6 @@ for (const [format, fileName, emptyOutDir] of [
     root,
     configFile: false,
     plugins,
-    resolve: {
-      alias: {
-        '@link-foundation/ui-convert': `${root}/../ui-convert/src/html/import.js`,
-      },
-    },
     build: {
       emptyOutDir,
       target: 'es2022',

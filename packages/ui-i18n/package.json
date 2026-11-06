@@ -5,10 +5,18 @@
   "type": "module",
   "exports": {
     ".": {
+      "browser": {
+        "types": "./src/browser.d.ts",
+        "default": "./src/browser.js"
+      },
       "types": "./src/index.d.ts",
       "default": "./src/index.js"
     },
-    "./locales/ui.lino": "./locales/ui.lino"
+    "./locales/ui.lino": "./locales/ui.lino",
+    "./browser": {
+      "types": "./src/browser.d.ts",
+      "default": "./src/browser.js"
+    }
   },
   "types": "./src/index.d.ts",
   "files": [

@@ -1,7 +1,7 @@
 import { observeDom, restoreOverrides, treeView } from './runtime.js';
 import { baseDocument, foreignRows, updateOriginals } from './properties.js';
 import { createConfig } from '@link-foundation/ui-config';
-import { importDom as defaultImportDom } from '@link-foundation/ui-convert';
+import { importDom as defaultImportDom } from '@link-foundation/ui-convert/browser';
 import { exportOverrides } from '../export.js';
 import { DevModeError } from '../model.js';
 import {

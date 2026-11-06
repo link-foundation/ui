@@ -20,6 +20,11 @@ All converters report the same diagnostic type as `@link-foundation/ui-core`:
 npm install @link-foundation/ui-convert
 ```
 
+For browser bundles, import `importDom`, `importHtml`, `mapHtmlElement` and
+`htmlVocabulary` from `@link-foundation/ui-convert/browser`. This typed entry
+avoids the Node exporters, component compiler dependencies and mapping assets
+of the full root entry. The root entry and CLI keep their existing APIs.
+
 ## HTML import
 
 `importHtml(text, options)` turns an HTML string into a dialect document. It
