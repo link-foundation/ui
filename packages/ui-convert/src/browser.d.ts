@@ -1,3 +1,4 @@
+/// <reference lib="dom" />
 export {
   importHtml,
   importDom,
@@ -14,4 +15,4 @@ export type {
   HtmlNode,
   MappingRule,
   Span,
-} from './index.js';
+} from './index.d.ts';

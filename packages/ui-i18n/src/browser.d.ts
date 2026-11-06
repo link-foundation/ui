@@ -35,4 +35,4 @@ export type {
   LocalizerOptions,
   Localizer,
   HardcodedTextDiagnostic,
-} from './index.js';
+} from './index.d.ts';
