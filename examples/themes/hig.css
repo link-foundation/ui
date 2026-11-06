@@ -40,8 +40,8 @@ ui-stack[direction='horizontal'] {
   align-items: center;
 }
 ui-number-field {
-  min-width: 80px;
-  width: 100px;
+  min-width: 160px;
+  width: 220px;
 }
 ui-number-field input {
   width: 100%;
