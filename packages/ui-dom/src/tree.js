@@ -10,7 +10,7 @@
  */
 
 import { themeFor } from './themes.js';
-import { GENERATED_ID_PREFIX } from '@link-foundation/ui-store';
+import { GENERATED_ID_PREFIX } from '@link-foundation/ui-store/memory';
 import { diagnostic } from './diagnostics.js';
 import { bindHandlers, handlersOf } from './events.js';
 import { UNKNOWN_KIND } from './kinds/basic.js';

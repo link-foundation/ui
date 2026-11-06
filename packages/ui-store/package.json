@@ -10,7 +10,7 @@
     },
     "./memory": {
       "types": "./src/memory.d.ts",
-      "default": "./src/store.js"
+      "default": "./src/memory.js"
     }
   },
   "types": "./src/index.d.ts",

@@ -4,6 +4,7 @@ import {
   mkdtemp,
   readFile,
   readdir,
+  rm,
   symlink,
   writeFile,
 } from 'node:fs/promises';
@@ -19,7 +20,10 @@ const require = createRequire(
 const { build, preview } = await import(require.resolve('vite'));
 
 /** Build real npm tarballs outside the workspace, without consumer aliases or transforms. */
-export async function buildConsumer({ inline = false } = {}) {
+export async function buildConsumer({
+  inline = false,
+  withDoubletsWeb = false,
+} = {}) {
   const root = await mkdtemp(path.join(tmpdir(), 'ui-vite-consumer-'));
   const modules = path.join(root, 'node_modules');
   await mkdir(path.join(modules, '@link-foundation'), { recursive: true });
@@ -65,7 +69,7 @@ export async function buildConsumer({ inline = false } = {}) {
   for (const name of await readdir(path.join(repo, 'node_modules'))) {
     if (
       name === '@link-foundation' ||
-      name === 'doublets-web' ||
+      (name === 'doublets-web' && !withDoubletsWeb) ||
       name.startsWith('.')
     ) {
       continue;
@@ -76,17 +80,24 @@ export async function buildConsumer({ inline = false } = {}) {
       'junction'
     );
   }
+  if (withDoubletsWeb) {
+    // Installed-peer cases require the actual peer package.
+    await readFile(path.join(modules, 'doublets-web/package.json'));
+  }
   await writeFile(
     path.join(root, 'package.json'),
     '{"type":"module","private":true}'
   );
   await writeFile(
     path.join(root, 'index.html'),
-    '<!doctype html><html lang="en"><title>External Vite consumer</title><body><main><h1 id="title">External application</h1><button id="open">Open inspector</button><p id="status" role="status">Ready</p></main><script type="module" src="/main.js"></script></body></html>'
+    '<!doctype html><html lang="en"><title>External Vite consumer</title><body><main><h1 id="title">External application</h1><button id="open">Open inspector</button><div id="rendered"></div><p id="status" role="status">Ready</p></main><script type="module" src="/main.js"></script></body></html>'
   );
   await writeFile(
     path.join(root, 'main.js'),
     `
+import { mountDocument } from '@link-foundation/ui-dom';
+const mounted = mountDocument(document.querySelector('#rendered'), "greeting: text 'Mounted document'");
+globalThis.mountedStore = mounted.store;
 import { createLocalizer as rootLocalizer } from '@link-foundation/ui-i18n';
 import { importDom } from '@link-foundation/ui-convert/browser';
 import { createLocalizer, message, loadUiCatalogs } from '@link-foundation/ui-i18n/browser';
@@ -110,17 +121,22 @@ document.querySelector('#open').onclick = globalThis.openInspector;
 `
   );
   const warnings = [];
-  await build({
-    root,
-    configFile: false,
-    logLevel: 'silent',
-    base: '/consumer/',
-    build: {
-      target: 'es2022',
-      assetsInlineLimit: inline ? 100000 : 0,
-      rollupOptions: { onwarn: (warning) => warnings.push(warning.message) },
-    },
-  });
+  try {
+    await build({
+      root,
+      configFile: false,
+      logLevel: 'silent',
+      base: '/consumer/',
+      build: {
+        target: 'es2022',
+        assetsInlineLimit: inline ? 100000 : 0,
+        rollupOptions: { onwarn: (warning) => warnings.push(warning.message) },
+      },
+    });
+  } catch (error) {
+    await rm(root, { recursive: true, force: true });
+    throw error;
+  }
   return {
     root,
     warnings,

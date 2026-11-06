@@ -7,7 +7,7 @@
  */
 
 import { parse } from '@link-foundation/ui-core';
-import { createStore } from '@link-foundation/ui-store';
+import { createStore } from '@link-foundation/ui-store/memory';
 import { createTree } from './tree.js';
 import { applyThemes } from './themes.js';
 
