@@ -110,7 +110,9 @@ it('mounts provider SVG in links-network and exports the identical preview after
   await node.ready;
   node.presentation = p;
   assert.equal(node.toSvg(), node.shadowRoot.querySelector('svg').outerHTML);
-  await node.layout();
+  const solving = node.layout();
+  assert.equal(node.ready, solving);
+  await node.ready;
   assert.equal(node.toSvg(), node.shadowRoot.querySelector('svg').outerHTML);
   assert.equal(node.pins.size, 1);
   node.remove();
@@ -155,4 +157,39 @@ it('retains pending settings when navigating before geometry completes', async (
   assert.equal(await settings, false);
   assert.equal(p.snapshot().input.options, input.options);
   assert.equal(p.snapshot().input.index, '25');
+});
+
+it('reports provider failures through network readiness and clears recovered diagnostics', async () => {
+  const { createDom } = await import('../support/dom.js');
+  const { defineLinksNetwork } =
+    await import('../../src/links-view/links-network.js');
+  const { window, document } = createDom();
+  defineLinksNetwork(window, { animator: { reducedMotion: () => true } });
+  const p = createNetworkPresentation({
+    geometry({ input }) {
+      if (input.items.some(({ id }) => id === 'fail')) {
+        throw new Error('backend failure');
+      }
+      return frame;
+    },
+    svg: () => '<svg></svg>',
+  });
+  await p.update({ items: [] });
+  const node = document.createElement('links-network');
+  document.body.append(node);
+  await node.ready;
+  node.presentation = p;
+  const errors = [];
+  node.addEventListener('layouterror', ({ detail }) => errors.push(detail));
+  node.items = [{ id: 'fail', source: 'fail', target: 'fail' }];
+  await assert.rejects(node.ready, /backend failure/u);
+  assert.equal(errors.length, 1);
+  assert.equal(node.diagnostics[0].message, 'backend failure');
+  assert.equal(p.snapshot().input.items.length, 0);
+  node.items = [];
+  await node.ready;
+  assert.deepEqual(node.diagnostics, []);
+  node.remove();
+  p.dispose();
+  window.close();
 });

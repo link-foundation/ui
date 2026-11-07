@@ -171,7 +171,11 @@ function requestLayout(node, state) {
       : Promise.resolve().then(() => ({
           positions: NETWORK_LAYOUTS[layout](state.network, job.options),
         }));
-  state.ready = task.then(apply).catch((error) => {
+  return networkReady(node, state, task.then(apply));
+}
+
+function networkReady(node, state, task) {
+  state.ready = task.catch((error) => {
     if (error.name === 'AbortError') {
       return;
     }
@@ -185,6 +189,13 @@ function requestLayout(node, state) {
   // diagnostics even if the caller does not await `ready`.
   state.ready.catch(() => {});
   return state.ready;
+}
+
+function presentationReady(node, state, input) {
+  const task = input
+    ? state.presentation.update(input)
+    : state.presentation.solve();
+  return networkReady(node, state, task);
 }
 
 function connectNetwork(node, state) {
@@ -288,6 +299,7 @@ function setPresentation(node, s, presentation) {
     if (!snapshot.frame) {
       return;
     }
+    s.diagnostics = [];
     s.network = buildNetwork(snapshot.input.items);
     s.positions = new Map(snapshot.frame.positions);
     s.pins = new Map(snapshot.frame.pins);
@@ -355,9 +367,7 @@ export function defineLinksNetwork(win = globalThis.window, options = {}) {
     }
     set items(links) {
       if (this.#state.presentation) {
-        this.#state.ready = this.#state.presentation.update({
-          items: [...links],
-        });
+        presentationReady(this, this.#state, { items: [...links] });
         return;
       }
       updateNetwork(this, this.#state, links);
@@ -426,7 +436,7 @@ export function defineLinksNetwork(win = globalThis.window, options = {}) {
     }
     layout() {
       if (this.#state.presentation) {
-        return this.#state.presentation.solve();
+        return presentationReady(this, this.#state);
       }
       return requestLayout(this, this.#state);
     }

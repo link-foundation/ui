@@ -49,7 +49,10 @@ LiNo schema.
 Assign a prepared presentation to `<links-network>.presentation` to render its
 SVG and expose its positions and solver pins. The element's `toSvg()` returns
 the same provider markup. `layout()` calls the provider's solver. Updating
-`items` forwards to the provider and is awaited via `ready`; store, raw links
+`items` forwards to the provider. Both item updates and `layout()` replace
+`ready`, so awaiting it also waits for solver pins before export. Failed jobs
+reject `ready`, emit `layouterror` and populate `diagnostics`; the next commit
+clears those diagnostics. Store, raw links
 and position setters require detaching the presentation. Detach an existing
 store before assigning a presentation; source attributes are ignored while a
 presentation owns the scene. The provider owns its
