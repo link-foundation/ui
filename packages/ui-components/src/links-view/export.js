@@ -66,7 +66,13 @@ export function networkToPng(
     Image = globalThis.Image,
   } = {}
 ) {
-  return networkToRaster(svg, { scale, document, URL, Image });
+  return networkToRaster(svg, {
+    scale,
+    document,
+    URL,
+    Image,
+    maxPixels: Number.MAX_SAFE_INTEGER,
+  });
 }
 
 function validateRaster({ type, scale, quality, maxPixels }) {

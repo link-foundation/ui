@@ -1,6 +1,6 @@
 import { it } from 'node:test';
 import assert from 'node:assert/strict';
-import { networkToRaster } from '../../src/links-view/export.js';
+import { networkToRaster, networkToPng } from '../../src/links-view/export.js';
 
 function environment(width = 100, height = 60) {
   const calls = [];
@@ -69,5 +69,15 @@ it('rejects oversized raster dimensions before allocating a canvas and releases 
   await assert.rejects(
     networkToRaster('<svg/>', { ...env, quality: -1 }),
     /quality/u
+  );
+});
+
+it('preserves legacy PNG dimensions above the new raster API default limit', async () => {
+  const env = environment(5000, 4000);
+  const blob = await networkToPng('<svg/>', 1, env);
+  assert.equal(blob.type, 'image/png');
+  assert.equal(
+    env.calls.some((call) => call[0] === 'canvas'),
+    true
   );
 });

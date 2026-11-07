@@ -37,7 +37,8 @@ at one revision before encoding; a custom raster provider receives both.
 Supported types are PNG, JPEG and WebP. The default encoder scales the SVG,
 adds the explicit background matte for JPEG, bounds allocation to 16,777,216
 pixels by default, rejects encoding fallback to a different MIME type, and
-always revokes the object URL. Fonts must be loaded or embedded by the host
+always revokes the object URL. The existing `networkToPng` helper retains its
+legacy dimension behavior; use the new raster API to configure a pixel limit. Fonts must be loaded or embedded by the host
 before preview/export; deterministic font embedding is a provider concern.
 
 `toLino()` exports index, options, positions, solver pins and bounds in nested
