@@ -57,7 +57,7 @@ export function networkToSvg(network, positions, style = {}) {
 }
 
 /** Rasterize an exported SVG locally; always release the object URL. */
-export async function networkToPng(
+export function networkToPng(
   svg,
   scale = 1,
   {
@@ -66,9 +66,41 @@ export async function networkToPng(
     Image = globalThis.Image,
   } = {}
 ) {
-  if (!(Number.isFinite(scale) && scale > 0)) {
-    throw new RangeError('PNG scale must be positive and finite');
+  return networkToRaster(svg, { scale, document, URL, Image });
+}
+
+function validateRaster({ type, scale, quality, maxPixels }) {
+  if (!['image/png', 'image/jpeg', 'image/webp'].includes(type)) {
+    throw new RangeError('Unsupported network raster format');
   }
+  if (!(Number.isFinite(scale) && scale > 0)) {
+    throw new RangeError('Raster scale must be positive and finite');
+  }
+  if (!(Number.isFinite(quality) && quality >= 0 && quality <= 1)) {
+    throw new RangeError('Raster quality must be between zero and one');
+  }
+  if (!(Number.isSafeInteger(maxPixels) && maxPixels > 0)) {
+    throw new RangeError('Raster pixel limit must be a positive safe integer');
+  }
+}
+
+/** Encode the same SVG as PNG, JPEG or WebP; JPEG gets an explicit matte.
+ * The pixel cap bounds allocation before touching the canvas.
+ */
+export async function networkToRaster(
+  svg,
+  {
+    type = 'image/png',
+    scale = 1,
+    quality = 0.92,
+    background = '#ffffff',
+    maxPixels = 16777216,
+    document = globalThis.document,
+    URL = globalThis.URL,
+    Image = globalThis.Image,
+  } = {}
+) {
+  validateRaster({ type, scale, quality, maxPixels });
   const blob = new globalThis.Blob([svg], { type: 'image/svg+xml' });
   const url = URL.createObjectURL(blob);
   try {
@@ -78,15 +110,28 @@ export async function networkToPng(
       image.onerror = () => reject(new Error('Unable to load network SVG'));
       image.src = url;
     });
+    const width = Math.ceil(image.width * scale);
+    const height = Math.ceil(image.height * scale);
+    if (!(width > 0 && height > 0 && width * height <= maxPixels)) {
+      throw new RangeError('Network raster exceeds pixel limit');
+    }
     const canvas = document.createElement('canvas');
-    canvas.width = Math.ceil(image.width * scale);
-    canvas.height = Math.ceil(image.height * scale);
-    canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext('2d');
+    if (type === 'image/jpeg') {
+      context.fillStyle = background;
+      context.fillRect(0, 0, width, height);
+    }
+    context.drawImage(image, 0, 0, width, height);
     return await new Promise((resolve, reject) =>
       canvas.toBlob(
         (result) =>
-          result ? resolve(result) : reject(new Error('PNG encoding failed')),
-        'image/png'
+          result?.type === type
+            ? resolve(result)
+            : reject(new Error(`Raster encoding failed: ${type}`)),
+        type,
+        quality
       )
     );
   } finally {

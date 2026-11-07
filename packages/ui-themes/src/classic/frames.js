@@ -72,3 +72,12 @@ export function frameStyle({
     },
   ]);
 }
+
+export {
+  FRAME_LEVELS,
+  FRAME_CORNERS,
+  FRAME_EDGES,
+  readFrames,
+  resolveFrame,
+  frameGeometry,
+} from './frame-schema.js';

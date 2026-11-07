@@ -554,6 +554,7 @@ export interface NetworkStore {
   ): () => void;
 }
 export interface LinksNetworkElement extends HTMLElement {
+  presentation: NetworkPresentation | null;
   items: NetworkLinkInput[];
   store: NetworkStore | null;
   links: { raw: readonly RawValue[] };
@@ -562,7 +563,7 @@ export interface LinksNetworkElement extends HTMLElement {
   readonly pins: NetworkPositions;
   readonly selection: NetworkId[];
   select(id: NetworkId | null, additive?: boolean): void;
-  readonly ready: Promise<void>;
+  readonly ready: Promise<void | boolean>;
   readonly diagnostics: { severity: string; message: string }[];
   view: View;
   readonly drawn: {
@@ -570,7 +571,7 @@ export interface LinksNetworkElement extends HTMLElement {
     links: number;
     view: View;
   } | null;
-  layout(): Promise<void>;
+  layout(): Promise<void | boolean>;
   requestDraw(): void;
   toSvg(): string;
   toPng(scale?: number): Promise<Blob>;
@@ -660,3 +661,76 @@ export function defineLinoNetwork(
   win?: Window & typeof globalThis,
   options?: LinoNetworkElementOptions
 ): { new (): LinoNetworkElement; prototype: LinoNetworkElement };
+
+// --------------------------------------- host geometry/solver/export providers
+export interface NetworkPresentationInput {
+  items: NetworkLinkInput[];
+  /** Decimal text preserves indexes beyond the safe Number range. */
+  index: string;
+  /** Opaque LiNo geometry, marker, solver, caption and export configuration. */
+  options: string;
+}
+export interface NetworkPresentationFrame {
+  positions: NetworkPositions;
+  pins: NetworkPositions;
+  bounds: { x: number; y: number; width: number; height: number };
+  [key: string]: unknown;
+}
+export interface NetworkPresentationSnapshot {
+  input: NetworkPresentationInput;
+  frame?: NetworkPresentationFrame;
+  revision: number;
+}
+export interface NetworkPresentationRequest extends NetworkPresentationSnapshot {
+  signal: AbortSignal;
+}
+export type NetworkRasterType = 'image/png' | 'image/jpeg' | 'image/webp';
+export interface NetworkRasterOptions {
+  type?: NetworkRasterType;
+  scale?: number;
+  quality?: number;
+  background?: string;
+  maxPixels?: number;
+  document?: Document;
+  URL?: typeof URL;
+  Image?: typeof Image;
+}
+export interface NetworkPresentationProvider {
+  geometry(
+    request: NetworkPresentationRequest
+  ): NetworkPresentationFrame | Promise<NetworkPresentationFrame>;
+  solve?(
+    request: NetworkPresentationRequest
+  ): NetworkPresentationFrame | Promise<NetworkPresentationFrame>;
+  svg(snapshot: NetworkPresentationSnapshot): string;
+  raster?(
+    request: NetworkPresentationSnapshot & {
+      svg: string;
+      type: NetworkRasterType;
+      options: NetworkRasterOptions;
+    }
+  ): Promise<Blob>;
+}
+export interface NetworkPresentation {
+  update(patch: Partial<NetworkPresentationInput>): Promise<boolean>;
+  solve(): Promise<boolean>;
+  snapshot(): NetworkPresentationSnapshot;
+  toSvg(): string;
+  toRaster(
+    type?: NetworkRasterType,
+    options?: NetworkRasterOptions
+  ): Promise<Blob>;
+  toLino(): string;
+  subscribe(
+    listener: (snapshot: NetworkPresentationSnapshot) => void
+  ): () => void;
+  dispose(): void;
+}
+export function createNetworkPresentation(
+  provider: NetworkPresentationProvider,
+  options?: { debug?: (message: string, data: object) => void }
+): NetworkPresentation;
+export function networkToRaster(
+  svg: string,
+  options?: NetworkRasterOptions
+): Promise<Blob>;

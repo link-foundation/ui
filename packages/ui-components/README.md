@@ -1464,3 +1464,11 @@ For continuous typed values, use `normalization clamp` on number fields or
 `readNumber(text, { ...range, normalization: 'clamp' })`. This is independent of
 key/pointer snapping; generated editors inherit the schema engine's
 `normalization.numbers` policy. The default remains step-snapped.
+
+### Host network presentation providers
+
+`createNetworkPresentation` connects geometry, collision solving and SVG/raster
+backends to a single transactional snapshot. Assign it to
+`linksNetwork.presentation` to share the preview and export scene. See the
+[provider contract](../../docs/spec/network-providers.md) for cancellation,
+large decimal indexes, LiNo settings and host ownership.
