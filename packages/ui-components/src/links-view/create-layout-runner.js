@@ -1,3 +1,4 @@
+/* global URL */
 /**
  * One worker per active key. Termination interrupts synchronous heavy layouts,
  * and releases its memory immediately.
@@ -8,10 +9,7 @@ export function createLayoutRunner({ createWorker } = {}) {
     createWorker ??
     (() =>
       new globalThis.Worker(
-        new globalThis.URL(
-          '../../dist/network-layout.worker.mjs',
-          import.meta.url
-        ),
+        new URL('../../dist/network-layout.worker.mjs', import.meta.url),
         { type: 'module' }
       ));
   const active = new Map();

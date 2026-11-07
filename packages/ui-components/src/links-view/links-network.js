@@ -1,3 +1,4 @@
+/* global URL */
 import { defineKind } from '@link-foundation/ui-dom';
 import { createAnimator } from './animator.js';
 import { createZoomPan } from './zoom-pan.js';
@@ -213,10 +214,7 @@ function connectNetwork(node, state) {
         state.options.createWorker ??
         (() =>
           new state.win.Worker(
-            new globalThis.URL(
-              '../../dist/network-layout.worker.mjs',
-              import.meta.url
-            ),
+            new URL('../../dist/network-layout.worker.mjs', import.meta.url),
             { type: 'module' }
           )),
     });
