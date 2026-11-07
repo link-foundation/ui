@@ -49,3 +49,12 @@ Its [source and license](https://github.com/material-foundation/material-color-u
 remain upstream; no Material Web, MUI, fonts or icons are bundled.
 Regenerate colors with `node packages/ui-themes/scripts/generate-material3.mjs`.
 The HIG themes are guided by the Apple Human Interface Guidelines and are not affiliated with or endorsed by Apple. They use system font names and our own values, with no bundled Apple assets. See [HIG tokens, controls and SwiftUI mapping](../../docs/themes/hig.md) and the [gallery](../../examples/themes/hig.html).
+
+## Independent frames and optical materials
+
+`readFrames`, `resolveFrame` and `frameGeometry` from `./classic/frames` support
+independent corners, edges, state overrides and explicit level inheritance.
+`./classic/materials` supplies material parameters, appearance presets and a
+shared opt-in animation/sound governor. See the
+[frame and material contract](../../docs/spec/frames.md) and the
+[original optical example](../../examples/themes/optical-frames/README.md).

@@ -89,7 +89,7 @@ export {
 export { createForceSimulation } from './layouts/force.js';
 export { createLayoutRunner } from './create-layout-runner.js';
 export { visibleLabels } from './labels.js';
-export { networkToSvg, networkToPng } from './export.js';
+export { networkToSvg, networkToPng, networkToRaster } from './export.js';
 export {
   LINKS_NETWORK_TAG,
   defineLinksNetwork,
@@ -101,3 +101,5 @@ export { networkVocabulary } from './network-vocabulary.js';
 
 export { linoToNetwork, networkToLino } from './lino-to-network.js';
 export { LINO_NETWORK_TAG, defineLinoNetwork } from './lino-network.js';
+
+export { createNetworkPresentation } from './presentation.js';

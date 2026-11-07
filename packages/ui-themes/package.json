@@ -12,6 +12,10 @@
     "./classic/frames": {
       "types": "./src/classic/frames.d.ts",
       "default": "./src/classic/frames.js"
+    },
+    "./classic/materials": {
+      "types": "./src/classic/materials.d.ts",
+      "default": "./src/classic/materials.js"
     }
   },
   "files": [

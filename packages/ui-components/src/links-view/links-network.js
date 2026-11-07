@@ -62,6 +62,8 @@ function makeState(node, win, options) {
     runner: null,
     zoom: null,
     drawn: null,
+    presentation: null,
+    unsubscribePresentation: null,
     diagnostics: [],
     ready: Promise.resolve(),
   };
@@ -130,6 +132,9 @@ function subscribeNetwork(node, state) {
 }
 
 function requestLayout(node, state) {
+  if (state.presentation) {
+    return Promise.resolve();
+  }
   if (!state.animator) {
     return Promise.resolve();
   }
@@ -144,6 +149,9 @@ function requestLayout(node, state) {
     },
   };
   const apply = (result) => {
+    if (state.presentation) {
+      return;
+    }
     state.diagnostics = state.diagnostics.filter((d) => d.code);
     state.positions = result.positions;
     for (const [id, point] of state.pins) {
@@ -164,7 +172,11 @@ function requestLayout(node, state) {
       : Promise.resolve().then(() => ({
           positions: NETWORK_LAYOUTS[layout](state.network, job.options),
         }));
-  state.ready = task.then(apply).catch((error) => {
+  return networkReady(node, state, task.then(apply));
+}
+
+function networkReady(node, state, task) {
+  state.ready = task.catch((error) => {
     if (error.name === 'AbortError') {
       return;
     }
@@ -178,6 +190,13 @@ function requestLayout(node, state) {
   // diagnostics even if the caller does not await `ready`.
   state.ready.catch(() => {});
   return state.ready;
+}
+
+function presentationReady(node, state, input) {
+  const task = input
+    ? state.presentation.update(input)
+    : state.presentation.solve();
+  return networkReady(node, state, task);
 }
 
 function connectNetwork(node, state) {
@@ -231,6 +250,10 @@ function connectNetwork(node, state) {
       node.requestDraw();
     });
   }
+  if (state.presentation) {
+    setPresentation(node, state, state.presentation);
+    return;
+  }
   if (state.store) {
     updateNetwork(node, state, storeNetworkLinks(state.store));
     subscribeNetwork(node, state);
@@ -247,6 +270,49 @@ function readSource(node, state) {
   updateNetwork(node, state, read.links);
 }
 
+function disconnectNetwork(s) {
+  s.unsubscribe?.();
+  s.unsubscribe = null;
+  s.unsubscribePresentation?.();
+  s.unsubscribePresentation = null;
+  s.runner?.dispose();
+  s.runner = null;
+  s.zoom?.destroy();
+  s.zoom = null;
+  s.animator?.destroy();
+  s.animator = null;
+  s.cleanup.forEach((fn) => fn());
+  s.cleanup = [];
+}
+
+function setPresentation(node, s, presentation) {
+  if (presentation && s.store) {
+    throw new Error('Detach the store before assigning a presentation');
+  }
+  s.unsubscribePresentation?.();
+  s.unsubscribePresentation = null;
+  s.presentation = presentation;
+  s.runner?.cancel('layout');
+  const apply = (snapshot) => {
+    if (!snapshot.frame) {
+      return;
+    }
+    s.diagnostics = [];
+    s.network = buildNetwork(snapshot.input.items);
+    s.positions = new Map(snapshot.frame.positions);
+    s.pins = new Map(snapshot.frame.pins);
+    s.shapesDirty = true;
+    s.resetSurface = true;
+    node.requestDraw();
+  };
+  if (presentation) {
+    s.unsubscribePresentation = presentation.subscribe(apply);
+    apply(presentation.snapshot());
+  } else {
+    s.resetSurface = true;
+    node.requestDraw();
+  }
+}
 /** Explicit definition; importing the package is safe without a DOM. */
 export function defineLinksNetwork(win = globalThis.window, options = {}) {
   const tag = options.tag ?? LINKS_NETWORK_TAG;
@@ -266,21 +332,14 @@ export function defineLinksNetwork(win = globalThis.window, options = {}) {
       connectNetwork(this, this.#state);
     }
     disconnectedCallback() {
-      const s = this.#state;
-      s.unsubscribe?.();
-      s.unsubscribe = null;
-      s.runner?.dispose();
-      s.runner = null;
-      s.zoom?.destroy();
-      s.zoom = null;
-      s.animator?.destroy();
-      s.animator = null;
-      s.cleanup.forEach((fn) => fn());
-      s.cleanup = [];
+      disconnectNetwork(this.#state);
     }
     attributeChangedCallback(name) {
       const s = this.#state;
       if (!this.isConnected) {
+        return;
+      }
+      if (s.presentation) {
         return;
       }
       if (name === 'lino') {
@@ -294,10 +353,21 @@ export function defineLinksNetwork(win = globalThis.window, options = {}) {
         this.requestDraw();
       }
     }
+    /** Host-supplied geometry/export backend. The host owns its lifetime. */
+    get presentation() {
+      return this.#state.presentation;
+    }
+    set presentation(presentation) {
+      setPresentation(this, this.#state, presentation);
+    }
     get items() {
       return [...this.#state.network.links.values()];
     }
     set items(links) {
+      if (this.#state.presentation) {
+        presentationReady(this, this.#state, { items: [...links] });
+        return;
+      }
       updateNetwork(this, this.#state, links);
       requestLayout(this, this.#state);
     }
@@ -305,6 +375,9 @@ export function defineLinksNetwork(win = globalThis.window, options = {}) {
       return this.#state.store;
     }
     set store(store) {
+      if (this.#state.presentation) {
+        throw new Error('Detach presentation before binding a store');
+      }
       const s = this.#state;
       s.unsubscribe?.();
       s.store = store;
@@ -313,6 +386,9 @@ export function defineLinksNetwork(win = globalThis.window, options = {}) {
       requestLayout(this, s);
     }
     set links(value) {
+      if (this.#state.presentation) {
+        throw new Error('Update the presentation input instead');
+      }
       const s = this.#state;
       s.config = readNetworkRaw(value.raw);
       updateNetwork(this, s, s.config.links);
@@ -325,6 +401,9 @@ export function defineLinksNetwork(win = globalThis.window, options = {}) {
       return new Map(this.#state.positions);
     }
     set positions(positions) {
+      if (this.#state.presentation) {
+        throw new Error('Presentation provider owns positions');
+      }
       this.#state.positions = new Map(positions);
       this.#state.shapesDirty = true;
       this.requestDraw();
@@ -354,6 +433,9 @@ export function defineLinksNetwork(win = globalThis.window, options = {}) {
       return this.#state.drawn;
     }
     layout() {
+      if (this.#state.presentation) {
+        return presentationReady(this, this.#state);
+      }
       return requestLayout(this, this.#state);
     }
     requestDraw() {
@@ -363,6 +445,9 @@ export function defineLinksNetwork(win = globalThis.window, options = {}) {
       });
     }
     toSvg() {
+      if (this.#state.presentation) {
+        return this.#state.presentation.toSvg();
+      }
       return networkToSvg(
         this.#state.network,
         this.#state.positions,
@@ -370,7 +455,9 @@ export function defineLinksNetwork(win = globalThis.window, options = {}) {
       );
     }
     toPng(scale = 1) {
-      return networkToPng(this.toSvg(), scale);
+      return this.#state.presentation
+        ? this.#state.presentation.toRaster('image/png', { scale })
+        : networkToPng(this.toSvg(), scale);
     }
   }
   win.customElements.define(tag, LinksNetwork);

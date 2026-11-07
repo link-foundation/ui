@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" />
+  <title>Independent optical frames</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 40px;
+      color: #e8f7ff;
+      background: repeating-linear-gradient(
+        45deg,
+        #153449 0 24px,
+        #214e64 24px 48px
+      );
+      font: 18px system-ui;
+    }
+    h1 {
+      font-size: 28px;
+    }
+    main {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 28px;
+      margin-top: 32px;
+    }
+    article {
+      position: relative;
+      width: 320px;
+      height: 200px;
+    }
+    .material,
+    .border {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .border {
+      color: #71e3ff;
+    }
+    .content {
+      position: relative;
+      padding: 42px;
+    }
+    .tiny {
+      width: 72px;
+      height: 28px;
+    }
+  </style>
+  <header>
+    <h1>Independent corners, edges and optical layers</h1>
+    <p>
+      The diagonal background continues through every cut. Text stays opaque.
+    </p>
+  </header>
+  <main id="frames"></main>
+  <script type="module" src="./dist/example.js"></script>
+</html>

@@ -201,6 +201,24 @@ function canvasTile(node, state, style) {
 
 export function drawNetwork(node, state) {
   const style = networkStyle(node, state);
+  if (state.presentation) {
+    if (!state.presentation.snapshot().frame) {
+      return;
+    }
+    const svg = state.presentation.toSvg();
+    if (state.surface.innerHTML !== svg) {
+      state.surface.innerHTML = svg;
+    }
+    state.drawn = {
+      renderer: 'svg',
+      links: state.network.links.size,
+      view: style.view,
+    };
+    node.dispatchEvent(
+      new state.win.CustomEvent('networkdraw', { detail: state.drawn })
+    );
+    return;
+  }
   if (state.shapesDirty) {
     state.shapes = networkShapes(
       state.network,
