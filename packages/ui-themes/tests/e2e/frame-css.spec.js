@@ -141,6 +141,17 @@ test('live size, independent shape, inheritance and property-registration fallba
     '[data-frame="block"] [data-frame-material]'
   );
   expect(blockClip).toContain('60px');
+  // Explicit widths override the tall shape's default half-size proportion.
+  await page.locator('html').evaluate((el) => {
+    el.setAttribute('data-frame-panel-top-left-shape', 'tall');
+  });
+  const tallPoints = (await clip(page))
+    .match(/-?\d+(?:\.\d+)?px/gu)
+    .map(parseFloat);
+  expect(tallPoints[32]).toBeCloseTo(100, 3);
+  await page.locator('html').evaluate((el) => {
+    el.setAttribute('data-frame-panel-top-left-shape', 'scoop');
+  });
   await expect(page.locator('main')).toHaveScreenshot('property-fallback.png');
   await page.locator('style').evaluate((el) => {
     el.textContent = el.textContent.replace(/@property [^{]+\{[^}]+\}/gu, '');

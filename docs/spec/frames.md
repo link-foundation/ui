@@ -34,7 +34,7 @@ Corners are `top-left`, `top-right`, `bottom-right`, `bottom-left`; edges are
 
 Sizes, widths, heights, strokes and gaps are nonnegative finite **pixels**,
 without the legacy helper's 48-unit cap. Width and height override size;
-tall halves the width and wide halves the height. To fit
+tall halves the default width and wide halves the default height. To fit
 small elements, `frameGeometry` scales all corner dimensions by the largest
 common factor no greater than one for which neighboring corners do not overlap.
 It returns a contour, CSS `clipPath`, fitted dimensions and a transparent SVG

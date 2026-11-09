@@ -1,6 +1,25 @@
 import { it } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFrames, resolveFrame } from '../src/classic/frame-schema.js';
+import {
+  readFrames,
+  resolveFrame,
+  frameGeometry,
+} from '../src/classic/frame-schema.js';
+
+it('keeps explicit dimensions independent of tall and wide default proportions', () => {
+  const frames = readFrames(`frames
+  panel
+    corner top-left tall
+      size 80
+      width 30
+    corner top-right wide
+      size 80
+      height 25
+`);
+  const geometry = frameGeometry(resolveFrame(frames, 'panel'), 320, 200);
+  assert.equal(geometry.corners['top-left'].width, 30);
+  assert.equal(geometry.corners['top-right'].height, 25);
+});
 
 const source = `frames
   panel

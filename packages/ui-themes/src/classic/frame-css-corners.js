@@ -76,6 +76,11 @@ function cornerPaint(ctx, level, id, corner, { patch, raw, adjacent }) {
     ? [values.at(-1)]
     : [];
 }
+function dimensionChanged(changed, key, value) {
+  return (
+    changed(key) || changed('size') || (changed('shape') && value === undefined)
+  );
+}
 export function cornerValues(ctx, level, frame, id, patch) {
   const name = FRAME_CORNERS[IDS.indexOf(id)];
   const c = frame.corners[name];
@@ -92,9 +97,14 @@ export function cornerValues(ctx, level, frame, id, patch) {
     }
   }
   for (const key of ['width', 'height']) {
-    if (changed(key) || changed('size')) {
+    if (dimensionChanged(changed, key, c[key])) {
       declarations.push(
-        set(key, c[key] === undefined ? v('size') : `${c[key]}px`)
+        set(
+          key,
+          c[key] === undefined
+            ? `calc(${v('size')} * ${v(key === 'width' ? 'wf' : 'hf')})`
+            : `${c[key]}px`
+        )
       );
     }
   }
@@ -110,10 +120,7 @@ export function cornerValues(ctx, level, frame, id, patch) {
   }
   // Derived values are recomputed on a state host so inherited scope values
   // cannot retain stale dimensions or paint when a state changes one input.
-  declarations.push(
-    [p('w'), `calc(${v('width')} * ${v('wf')})`],
-    [p('h'), `calc(${v('height')} * ${v('hf')})`]
-  );
+  declarations.push([p('w'), v('width')], [p('h'), v('height')]);
   declarations.push(
     ...cornerPaint(ctx, level, id, c, { patch, raw, adjacent })
   );

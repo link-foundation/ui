@@ -16,11 +16,11 @@ function sizedCorners(frame) {
       width:
         frame.mode === 'border'
           ? 0
-          : (c.width ?? c.size) * (c.shape === 'tall' ? 0.5 : 1),
+          : (c.width ?? c.size * (c.shape === 'tall' ? 0.5 : 1)),
       height:
         frame.mode === 'border'
           ? 0
-          : (c.height ?? c.size) * (c.shape === 'wide' ? 0.5 : 1),
+          : (c.height ?? c.size * (c.shape === 'wide' ? 0.5 : 1)),
     };
   });
 }
