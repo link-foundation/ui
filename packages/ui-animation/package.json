@@ -7,6 +7,30 @@
     ".": {
       "types": "./src/index.d.ts",
       "default": "./src/index.js"
+    },
+    "./backgrounds/starfield": {
+      "types": "./src/backgrounds/starfield.d.ts",
+      "default": "./src/backgrounds/starfield.js"
+    },
+    "./backgrounds/shader": {
+      "types": "./src/backgrounds/shader.d.ts",
+      "default": "./src/backgrounds/shader.js"
+    },
+    "./backgrounds/nebula": {
+      "types": "./src/backgrounds/nebula.d.ts",
+      "default": "./src/backgrounds/nebula.js"
+    },
+    "./backgrounds/beams": {
+      "types": "./src/backgrounds/beams.d.ts",
+      "default": "./src/backgrounds/beams.js"
+    },
+    "./backgrounds/rain": {
+      "types": "./src/backgrounds/rain.d.ts",
+      "default": "./src/backgrounds/rain.js"
+    },
+    "./backgrounds/grid": {
+      "types": "./src/backgrounds/grid.d.ts",
+      "default": "./src/backgrounds/grid.js"
     }
   },
   "types": "./src/index.d.ts",
@@ -40,10 +64,12 @@
   },
   "dependencies": {
     "@link-foundation/ui-core": "^0.0.0",
-    "@link-foundation/ui-store": "^0.0.0"
+    "@link-foundation/ui-store": "^0.0.0",
+    "@link-foundation/ui-themes": "^0.0.0"
   },
   "devDependencies": {
     "@link-foundation/ui-tokens": "^0.0.0",
+    "esbuild": "0.27.0",
     "jsdom": "^30.1.3",
     "test-anywhere": "^0.8.48"
   },

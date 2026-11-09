@@ -13,6 +13,7 @@ export type StateName =
   | 'hover'
   | 'focus'
   | 'pressed'
+  | 'active'
   | 'disabled'
   | 'selected'
   | 'checked';

@@ -1,8 +1,10 @@
 import { parseNested } from '@link-foundation/ui-core';
-import { corners, lines } from './frames.js';
+export { frameGeometry } from './frame-geometry.js';
+import { corners, lines } from './frame-vocabulary.js';
 
 export const FRAME_LEVELS = [
   'panel',
+  'block',
   'control',
   'button',
   'field',
@@ -20,7 +22,13 @@ export const FRAME_CORNERS = [
   'bottom-left',
 ];
 export const FRAME_EDGES = ['top', 'right', 'bottom', 'left'];
-const STATES = ['hover', 'active', 'selected', 'focus', 'disabled'];
+export const FRAME_STATES = [
+  'hover',
+  'active',
+  'selected',
+  'focus',
+  'disabled',
+];
 const blank = () => ({ corners: {}, edges: {}, states: {} });
 const atom = (link) => {
   if (!link || link.values.length) {
@@ -35,6 +43,59 @@ const nonnegative = (value) => {
   }
   return n;
 };
+export const FRAME_STYLES = ['solid', 'dashed', 'dotted', 'double'];
+export const FRAME_MODES = ['frame', 'own', 'border'];
+export const FRAME_LAYERS = ['above', 'below'];
+const enums = {
+  style: FRAME_STYLES,
+  mode: FRAME_MODES,
+  layer: FRAME_LAYERS,
+  line: lines,
+};
+const levelKeys = [
+  'style',
+  'mode',
+  'layer',
+  'opacity',
+  'stroke',
+  'min-width',
+  'max-width',
+  'min-height',
+  'max-height',
+  'fitScale',
+];
+const ranges = {
+  opacity: (n) => n <= 1,
+  fitScale: (n) => n <= 1,
+  scale: (n) => n >= 0.1 && n <= 1,
+  stroke: (n) => n <= 12,
+  'min-width': (n) => n <= 1600,
+  'max-width': (n) => n <= 1600,
+  'min-height': (n) => n <= 1600,
+  'max-height': (n) => n <= 1600,
+};
+function propertyValue(key, value) {
+  if (enums[key]) {
+    if (!enums[key].includes(value)) {
+      throw new TypeError(`Unknown frame ${key}: ${value}`);
+    }
+    return value;
+  }
+  if (key === 'color') {
+    return value;
+  }
+  if (
+    value === 'auto' &&
+    ['size', 'width', 'height', 'arm', 'stroke'].includes(key)
+  ) {
+    return value;
+  }
+  const n = nonnegative(value);
+  if (ranges[key] && !ranges[key](n)) {
+    throw new RangeError(`Invalid frame ${key}: ${value}`);
+  }
+  return n;
+}
 function readProperties(nodes, allowed) {
   const result = {};
   for (const node of nodes) {
@@ -46,8 +107,7 @@ function readProperties(nodes, allowed) {
     ) {
       throw new TypeError(`Unknown or duplicate frame property: ${key}`);
     }
-    const value = atom(node.values[1]);
-    result[key] = key === 'color' ? value : nonnegative(value);
+    result[key] = propertyValue(key, atom(node.values[1]));
   }
   return result;
 }
@@ -68,10 +128,17 @@ function readPart(result, kind, name, shape, properties) {
     ...readProperties(
       properties,
       isCorner
-        ? ['size', 'width', 'height', 'stroke', 'color']
-        : ['stroke', 'color', 'gap']
+        ? ['size', 'width', 'height', 'stroke', 'color', 'line', 'arm']
+        : ['stroke', 'color', 'gap', 'style']
     ),
   };
+  if (
+    isCorner &&
+    typeof collection[id].stroke === 'number' &&
+    !Number.isInteger(collection[id].stroke * 2)
+  ) {
+    throw new RangeError('Corner strokes use half-pixel steps');
+  }
 }
 function readLevel(nodes, state = false) {
   const result = blank();
@@ -81,16 +148,19 @@ function readLevel(nodes, state = false) {
     if (
       kind === 'extends' &&
       !state &&
-      node.values.length === 2 &&
+      node.values.length >= 2 &&
       !result.extends
     ) {
       result.extends = atom(name);
+      Object.assign(result, readProperties(node.values.slice(2), ['scale']));
     } else if (kind === 'state' && !state) {
       const id = atom(name);
-      if (!STATES.includes(id) || result.states[id]) {
+      if (!FRAME_STATES.includes(id) || result.states[id]) {
         throw new TypeError(`Unknown or duplicate frame state: ${id}`);
       }
       result.states[id] = readLevel(node.values.slice(2), true);
+    } else if (levelKeys.includes(kind) && !Object.hasOwn(result, kind)) {
+      Object.assign(result, readProperties([node], levelKeys));
     } else if (kind === 'corner' || kind === 'edge') {
       readPart(result, kind, name, shape, properties);
     } else {
@@ -115,21 +185,81 @@ export function readFrames(text) {
     if (result.has(name)) {
       throw new TypeError(`Duplicate frame level: ${name}`);
     }
-    result.set(name, readLevel(level.values.slice(1)));
+    const definition = readLevel(level.values.slice(1));
+    if (definition.extends && definition.scale === undefined) {
+      definition.scale = { block: 0.6, control: 0.35 }[name] ?? 1;
+    }
+    result.set(name, definition);
   }
   return result;
 }
 const merge = (target, patch) => {
+  for (const key of levelKeys) {
+    if (patch[key] !== undefined) {
+      target[key] = patch[key];
+    }
+  }
   for (const part of ['corners', 'edges']) {
     for (const [name, properties] of Object.entries(patch[part])) {
-      target[part][name] = { ...target[part][name], ...properties };
+      const explicit = Object.fromEntries(
+        Object.entries(properties).filter(
+          ([key, value]) => value !== 'auto' || key === 'stroke'
+        )
+      );
+      target[part][name] = { ...target[part][name], ...explicit };
     }
   }
 };
+const dimensions = ['size', 'width', 'height', 'arm'];
+function scaleCorners(cs, scale) {
+  for (const c of Object.values(cs)) {
+    for (const key of dimensions) {
+      if (typeof c[key] === 'number') {
+        c[key] *= scale;
+      }
+    }
+  }
+}
+function completeFrame(result) {
+  for (const edge of Object.values(result.edges)) {
+    if (edge.stroke === 'auto') {
+      edge.stroke = result.stroke === 'auto' ? 1 : result.stroke;
+    }
+    if (edge.style === 'auto') {
+      edge.style = result.style;
+    }
+  }
+  FRAME_CORNERS.forEach((id, i) => {
+    if (result.corners[id].stroke === 'auto') {
+      result.corners[id].stroke = result.edges[FRAME_EDGES[i]].stroke;
+    }
+  });
+}
+function mergeStates(result, chain, states) {
+  for (const state of states) {
+    chain.forEach((entry, index) => {
+      if (!entry.states[state]) {
+        return;
+      }
+      const statePatch = entry.states[state];
+      const patch = {
+        ...statePatch,
+        corners: Object.fromEntries(
+          Object.entries(statePatch.corners).map(([id, c]) => [id, { ...c }])
+        ),
+      };
+      const scale = chain
+        .slice(index + 1)
+        .reduce((value, child) => value * (child.scale ?? 1), 1);
+      scaleCorners(patch.corners, scale);
+      merge(result, patch);
+    });
+  }
+}
 /** Explicit inheritance only; ordered states override their inherited state. */
 export function resolveFrame(frames, level, states = []) {
   for (const state of states) {
-    if (!STATES.includes(state)) {
+    if (!FRAME_STATES.includes(state)) {
       throw new TypeError(`Unknown frame state: ${state}`);
     }
   }
@@ -149,142 +279,50 @@ export function resolveFrame(frames, level, states = []) {
     name = entry.extends;
   }
   const result = {
+    mode: 'own',
+    layer: 'above',
+    opacity: 1,
+    style: 'solid',
+    stroke: 1,
+    'min-width': 0,
+    'max-width': 0,
+    'min-height': 0,
+    'max-height': 0,
+    fitScale: 0.5,
     corners: Object.fromEntries(
       FRAME_CORNERS.map((id) => [
         id,
-        { shape: 'square', size: 0, stroke: 1, color: 'currentColor' },
+        {
+          shape: 'square',
+          size: 0,
+          stroke: 'auto',
+          color: 'currentColor',
+          line: 'accent',
+          arm: 8,
+        },
       ])
     ),
     edges: Object.fromEntries(
       FRAME_EDGES.map((id) => [
         id,
-        { line: 'line', stroke: 1, color: 'currentColor', gap: 8 },
+        {
+          line: 'line',
+          stroke: 'auto',
+          color: 'currentColor',
+          gap: 8,
+          style: 'auto',
+        },
       ])
     ),
   };
   for (const entry of chain) {
-    merge(result, entry);
-  }
-  for (const state of states) {
-    for (const entry of chain) {
-      if (entry.states[state]) {
-        merge(result, entry.states[state]);
-      }
-    }
-  }
-  return result;
-}
-const esc = (s) =>
-  String(s)
-    .replaceAll('&', '&amp;')
-    .replaceAll('"', '&quot;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;');
-
-function sizedCorners(frame) {
-  return FRAME_CORNERS.map((id) => {
-    const c = frame.corners[id];
-    return {
-      ...c,
-      width:
-        c.shape === 'square'
-          ? 0
-          : (c.width ?? c.size * (c.shape === 'tall' ? 0.5 : 1)),
-      height:
-        c.shape === 'square'
-          ? 0
-          : (c.height ?? c.size * (c.shape === 'wide' ? 0.5 : 1)),
-    };
-  });
-}
-
-/**
- * A transparent contour plus separate stroke paths. Apply clipPath to a material
- * layer and place borderSvg above it; neither layer paints an opaque cutout.
- */
-export function frameGeometry(frame, width, height) {
-  if (![width, height].every((n) => Number.isFinite(n) && n > 0)) {
-    throw new RangeError('Frame dimensions must be positive finite pixels');
-  }
-  const cs = sizedCorners(frame);
-  const scale = Math.min(
-    1,
-    width / Math.max(cs[0].width + cs[1].width, Number.EPSILON),
-    width / Math.max(cs[2].width + cs[3].width, Number.EPSILON),
-    height / Math.max(cs[0].height + cs[3].height, Number.EPSILON),
-    height / Math.max(cs[1].height + cs[2].height, Number.EPSILON)
-  );
-  for (const c of cs) {
-    c.width *= scale;
-    c.height *= scale;
-  }
-  // Each corner is described in local coordinates from (0,h) to (w,0).
-  const transforms = [
-    (x, y) => [x, y],
-    (x, y) => [width - y, x],
-    (x, y) => [width - x, height - y],
-    (x, y) => [y, height - x],
-  ];
-  const starts = [],
-    ends = [],
-    curves = [];
-  for (let i = 0; i < 4; i++) {
-    const c = cs[i];
-    const w = i % 2 ? c.height : c.width;
-    const h = i % 2 ? c.width : c.height;
-    const at = (x, y) => transforms[i](x, y).join(' ');
-    starts.push(at(0, h));
-    ends.push(at(w, 0));
-    const end = ends[i];
-    curves.push(
-      c.shape === 'round'
-        ? `Q ${at(0, 0)} ${end}`
-        : c.shape === 'scoop'
-          ? `Q ${at(w, h)} ${end}`
-          : c.shape === 'notch'
-            ? `L ${at(w / 2, h)} L ${at(w / 2, h / 2)} L ${at(w, h / 2)} L ${end}`
-            : `L ${end}`
+    scaleCorners(result.corners, entry.scale ?? 1);
+    merge(
+      result,
+      entry.mode === 'frame' ? { ...entry, corners: {}, edges: {} } : entry
     );
   }
-  let path = `M ${starts[0]} ${curves[0]}`;
-  for (let i = 1; i < 4; i++) {
-    path += ` L ${starts[i]} ${curves[i]}`;
-  }
-  path += ' Z';
-  const stroke = (d, c, extra = '') =>
-    `<path d="${esc(d)}" fill="none" stroke="${esc(c.color)}" stroke-width="${c.stroke}" ${extra}/>`;
-  let strokes = cs
-    .map((c, i) => stroke(`M ${starts[i]} ${curves[i]}`, c))
-    .join('');
-  for (let i = 0; i < 4; i++) {
-    const edge = frame.edges[FRAME_EDGES[i]];
-    if (edge.line === 'none') {
-      continue;
-    }
-    const next = (i + 1) % 4;
-    const a = ends[i].split(' ').map(Number),
-      b = starts[next].split(' ').map(Number);
-    const segment = (from, to) => `M ${from.join(' ')} L ${to.join(' ')}`;
-    const length = Math.hypot(b[0] - a[0], b[1] - a[1]);
-    if (edge.line === 'bracket' && length > 0) {
-      const f = Math.min(edge.gap, length / 2) / length;
-      const interpolate = (t) => a.map((v, j) => v + (b[j] - v) * t);
-      strokes += stroke(
-        `${segment(a, interpolate(f))} ${segment(interpolate(1 - f), b)}`,
-        edge
-      );
-    } else {
-      strokes += stroke(
-        segment(a, b),
-        edge,
-        edge.line === 'gap' ? `stroke-dasharray="${edge.gap} ${edge.gap}"` : ''
-      );
-    }
-  }
-  return {
-    path,
-    clipPath: `path("${path}")`,
-    corners: Object.fromEntries(FRAME_CORNERS.map((id, i) => [id, cs[i]])),
-    borderSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" aria-hidden="true">${strokes}</svg>`,
-  };
+  mergeStates(result, chain, states);
+  completeFrame(result);
+  return result;
 }

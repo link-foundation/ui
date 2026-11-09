@@ -1,0 +1,22 @@
+background: layers
+  stars
+    count 600
+    shape sparkle
+    size 5
+    glow 8
+    color '#b6caff'
+    motion drift
+    direction 110
+    speed 12
+    level 0.8
+  rain
+    density 0.3
+    color '#68d5d0'
+    level 0.4
+  beams
+    count 6
+    color '#889dff'
+    level 0.65
+  grid
+    level 0.6
+    period 40

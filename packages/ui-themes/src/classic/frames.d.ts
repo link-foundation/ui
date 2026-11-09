@@ -18,6 +18,7 @@ export function frameStyle(options?: {
 
 export type FrameLevel =
   | 'panel'
+  | 'block'
   | 'control'
   | 'button'
   | 'field'
@@ -36,24 +37,56 @@ export type FrameEdgeName = 'top' | 'right' | 'bottom' | 'left';
 export type FrameState = 'hover' | 'active' | 'selected' | 'focus' | 'disabled';
 export interface FrameCorner {
   shape: Corner;
-  size: number;
-  width?: number;
-  height?: number;
-  stroke: number;
+  size: number | 'auto';
+  width?: number | 'auto';
+  height?: number | 'auto';
+  line?: Line;
+  arm?: number | 'auto';
+  stroke: number | 'auto';
   color: string;
 }
+export type FrameEdgeStyle = 'solid' | 'dashed' | 'dotted' | 'double';
 export interface FrameEdge {
   line: Line;
-  stroke: number;
+  style?: FrameEdgeStyle;
+  stroke: number | 'auto';
   color: string;
   gap: number;
 }
-export interface ResolvedFrame {
-  corners: Record<FrameCornerName, FrameCorner>;
-  edges: Record<FrameEdgeName, FrameEdge>;
+export interface FrameOptions {
+  mode?: 'frame' | 'own' | 'border';
+  layer?: 'above' | 'below';
+  opacity?: number;
+  style?: FrameEdgeStyle;
+  stroke?: number | 'auto';
+  'min-width'?: number;
+  'max-width'?: number;
+  'min-height'?: number;
+  'max-height'?: number;
+  fitScale?: number;
 }
-export interface FrameDefinition {
+export interface ResolvedFrameCorner extends Omit<
+  FrameCorner,
+  'size' | 'width' | 'height' | 'arm' | 'stroke' | 'line'
+> {
+  size: number;
+  width?: number;
+  height?: number;
+  arm: number;
+  stroke: number;
+  line: Line;
+}
+export interface ResolvedFrameEdge extends Omit<FrameEdge, 'stroke' | 'style'> {
+  stroke: number;
+  style: FrameEdgeStyle;
+}
+export interface ResolvedFrame extends FrameOptions {
+  corners: Record<FrameCornerName, ResolvedFrameCorner>;
+  edges: Record<FrameEdgeName, ResolvedFrameEdge>;
+}
+export interface FrameDefinition extends FrameOptions {
   extends?: FrameLevel;
+  scale?: number;
   corners: Partial<Record<FrameCornerName, Partial<FrameCorner>>>;
   edges: Partial<Record<FrameEdgeName, Partial<FrameEdge>>>;
   states: Partial<Record<FrameState, FrameDefinition>>;
@@ -76,7 +109,35 @@ export function frameGeometry(
   clipPath: string;
   corners: Record<
     FrameCornerName,
-    FrameCorner & { width: number; height: number }
+    ResolvedFrameCorner & { width: number; height: number }
   >;
   borderSvg: string;
 };
+
+export interface FramesCssOptions {
+  levels?: Partial<Record<FrameLevel, string[]>>;
+  prefix?: string;
+  scope?: string;
+  boundaryAttribute?: string;
+  selected?: string[];
+}
+export interface FrameControl {
+  level: FrameLevel;
+  property?: string;
+  syntax?: string;
+  inherits?: boolean;
+  attribute?: string;
+  choices?: string[];
+}
+export function framesCss(
+  frames: Map<FrameLevel, FrameDefinition>,
+  options?: FramesCssOptions
+): {
+  properties: string;
+  base: string;
+  levels: Partial<Record<FrameLevel, string>>;
+  fit: string;
+  controls: FrameControl[];
+};
+/** Insert first in a transparent, positioned frame host; content follows. */
+export function frameLayers(): string;

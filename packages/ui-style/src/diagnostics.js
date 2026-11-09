@@ -24,7 +24,7 @@ const MESSAGES = {
   'invalid-value': (at) =>
     `The property "${at.property}"${rule(at)} has the invalid value${text(at)}; expected ${at.expected}`,
   'unknown-state': (at) =>
-    `The style${rule(at)} has the unknown state${text(at)}; a state is hover, focus, pressed, disabled, selected or checked`,
+    `The style${rule(at)} has the unknown state${text(at)}; a state is hover, focus, pressed (or active), disabled, selected or checked`,
   'invalid-condition': (at) =>
     `The ${at.block} block${rule(at)} has the invalid condition${text(at)}`,
   'css-syntax': (at) =>
