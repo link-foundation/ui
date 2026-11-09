@@ -1,15 +1,7 @@
 import { formatLinks } from '@link-foundation/ui-core';
 
-export const corners = [
-  'square',
-  'cut',
-  'tall',
-  'wide',
-  'round',
-  'scoop',
-  'notch',
-];
-export const lines = ['none', 'gap', 'line', 'accent', 'bracket'];
+import { corners, lines } from './frame-vocabulary.js';
+export { corners, lines };
 
 /** A single clipped surface paints corners and edges together: no opaque overlays.
  * @param {{corner?: string, line?: string, size?: number}} options
@@ -81,3 +73,5 @@ export {
   resolveFrame,
   frameGeometry,
 } from './frame-schema.js';
+
+export { framesCss, frameLayers } from './frame-css.js';

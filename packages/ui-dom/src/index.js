@@ -43,3 +43,5 @@ export function mountDocument(container, text, options = {}) {
     diagnostics: [...parsed.diagnostics, ...handle.diagnostics],
   };
 }
+
+export { observeFrameFit } from './frame-fit.js';

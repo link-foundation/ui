@@ -7,7 +7,7 @@
  * @typedef {import('@link-foundation/ui-core').UiNode} UiNode
  * @typedef {import('@link-foundation/ui-core').values.TypedValue} TypedValue
  *
- * @typedef {'hover'|'focus'|'pressed'|'disabled'|'selected'|'checked'} StateName
+ * @typedef {'hover'|'focus'|'pressed'|'active'|'disabled'|'selected'|'checked'} StateName
  *
  * @typedef {object} Selector
  * @property {string|null} type   the element kind, `(type button)`
