@@ -664,7 +664,7 @@ export function defineLinoNetwork(
 
 // --------------------------------------- host geometry/solver/export providers
 export interface NetworkPresentationInput {
-  items: NetworkLinkInput[];
+  items: NetworkLinkInput[] | import('./doublet.js').DoubletPair[];
   /** Decimal text preserves indexes beyond the safe Number range. */
   index: string;
   /** Opaque LiNo geometry, marker, solver, caption and export configuration. */
@@ -734,3 +734,22 @@ export function networkToRaster(
   svg: string,
   options?: NetworkRasterOptions
 ): Promise<Blob>;
+
+export {
+  createDoubletProvider,
+  doubletGeometry,
+  doubletOptionAvailability,
+  DOUBLET_MARKERS,
+  readDoubletOptions,
+} from './doublet.js';
+export type {
+  DoubletPair,
+  DoubletInput,
+  DoubletMarkerShape,
+  DoubletMarker,
+  DoubletOptions,
+  DoubletMarkerPlacement,
+  DoubletCurve,
+  FittedDoubletCurve,
+  DoubletFrame,
+} from './doublet.js';
