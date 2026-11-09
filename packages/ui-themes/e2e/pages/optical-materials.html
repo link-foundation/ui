@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Optical material contracts</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "links-notation": "/node_modules/links-notation/dist/index.js"
+        }
+      }
+    </script>
+    <style>
+      body {
+        margin: 0;
+        font: 18px system-ui;
+        color: #102030;
+        background: repeating-linear-gradient(
+          90deg,
+          #8bc6ec 0 10px,
+          #eef8ff 10px 20px
+        );
+      }
+      main {
+        padding: 32px;
+      }
+      h1 {
+        background: white;
+        padding: 12px;
+      }
+      .frame {
+        position: relative;
+        width: 360px;
+        height: 180px;
+        border: 3px solid #15334a;
+        border-radius: 24px;
+        overflow: hidden;
+        margin: 16px 0;
+      }
+      .surface {
+        position: absolute;
+        inset: 0;
+      }
+      .content {
+        position: relative;
+        margin: 28px;
+        padding: 12px;
+        background: #fff;
+      }
+      #items .item {
+        height: 20px;
+        backdrop-filter: blur(4px);
+      }
+      #items .item:hover {
+        backdrop-filter: blur(12px);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Optical materials</h1>
+      <div class="frame">
+        <div id="surface" class="surface"></div>
+        <p class="content">Content and frame retain their opacity.</p>
+      </div>
+      <div class="frame">
+        <div
+          id="static"
+          class="surface"
+          data-material
+          data-material-noise
+        ></div>
+        <p class="content">Static optical surface</p>
+      </div>
+      <div id="items" aria-hidden="true"></div>
+    </main>
+    <script type="module">
+      import * as materials from '/packages/ui-themes/src/classic/materials.js';
+      const material = materials.readMaterial(`sample: material
+  color '#ffffff'
+  opacity 0.6
+  blur 2
+  refraction 1
+  noise 0.12
+  saturation 140
+  sheen 0.3
+  sheen-angle 120
+  highlight 0.6
+  depth 0.2
+  depth-blur 24`);
+      const provider = materials.createRefractionProvider(document);
+      const surface = document.querySelector('#surface');
+      function paint(patch = {}, preferences = {}) {
+        const style = materials.materialStyle(
+          { ...material, ...patch },
+          { refractionProvider: provider, ...preferences }
+        );
+        surface.style.cssText = '';
+        for (const [key, value] of Object.entries(style)) {
+          surface.style.setProperty(key, value);
+        }
+        return style;
+      }
+      const sheet = document.createElement('style');
+      sheet.textContent = materials.opticalMaterialCss();
+      document.head.append(sheet);
+      document.querySelector('#static').style.cssText =
+        '--material-color:#ffffff;--material-opacity:.6;--material-blur:2px;--material-noise:.12;--material-highlight:.6;--material-sheen:.3;--material-sheen-angle:120deg';
+      paint();
+      window.optics = { ...materials, material, provider, paint };
+    </script>
+  </body>
+</html>

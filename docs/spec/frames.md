@@ -224,11 +224,12 @@ surface: material
 ```
 
 `readMaterial` validates opacity, noise and refraction in [0, 1], and blur in
-nonnegative pixels. Default color `inherit` means a transparent surface through
+[0, 48] pixels. Default color `inherit` means a transparent surface through
 which the parent's material is visible. Defaults for opacity/blur/noise/refraction
 are 1/0/0/0. `materialStyle` provides a mixed-alpha background, backdrop blur and
-noise/refraction custom properties for a host shader/noise hook. The framework
-does not ship a refraction shader or site artwork.
+deterministic grain. The opt-in refraction provider supplies a smoothed SVG
+displacement filter. See [optical materials](optical-materials.md) for the complete
+parameter, static CSS, visibility and palette contracts. No site artwork ships.
 
 Apply these styles and the contour clip to a dedicated surface layer below
 content. Place the transparent border SVG above it. Do not apply opacity to the

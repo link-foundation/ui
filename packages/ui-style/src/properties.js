@@ -57,7 +57,7 @@ export const PROPERTIES = Object.freeze({
     css: 'box-shadow',
     type: 'number',
     tokens: ['number'],
-    check: (v) => v.value >= 0 && v.value <= 1,
+    check: (v) => v.value >= 0 && v.value <= 4,
     write: (v, ctx) =>
       `0 0 calc(${values.toCss(v, ctx)} * 24px) ${ctx.variable('color.primary')}`,
   },

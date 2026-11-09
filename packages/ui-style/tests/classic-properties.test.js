@@ -46,3 +46,10 @@ it('surface effects and bounded frame geometry compile without executable CSS', 
     );
   }
 });
+
+it('glow accepts four and rejects values above the optical range', () => {
+  const result = readStyles(rule([['glow', '4']]));
+  assert.deepEqual(result.diagnostics, []);
+  assert.match(compileCss(result.rules), /calc\(4 \* 24px\)/u);
+  assert.ok(readStyles(rule([['glow', '4.1']])).diagnostics.length);
+});

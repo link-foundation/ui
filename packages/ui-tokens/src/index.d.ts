@@ -135,12 +135,18 @@ export function resolveTokens(
 ): ResolvedTokens;
 
 export interface CssOptions {
+  channels?: boolean;
+  pack?: boolean;
+  paletteSelector?: (palette: string) => string;
   selector?: string;
   prefix?: string;
   modeSelector?: (mode: string) => string;
   modeMedia?: Record<string, string>;
 }
-export function toCss(resolved: ResolvedTokens, options?: CssOptions): string;
+export function toCss(
+  resolved: ResolvedTokens | Map<string, ResolvedTokens>,
+  options?: CssOptions
+): string;
 
 export function toDtcg(
   resolved: ResolvedTokens,

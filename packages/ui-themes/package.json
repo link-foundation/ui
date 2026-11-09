@@ -46,6 +46,7 @@
     "access": "public"
   },
   "devDependencies": {
+    "jsdom": "^30.1.3",
     "links-notation": "^0.27.1",
     "prettier": "^3.6.2",
     "@fluentui/tokens": "1.0.0-alpha.24"
