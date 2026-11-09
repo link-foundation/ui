@@ -191,7 +191,7 @@ export const deltaArrow = (delta) => {
 function statTileSvg(spec, options) {
   const tokens = options.tokens ?? null;
   const width = options.width ?? 220;
-  const height = options.height ?? 104;
+  const height = options.height ?? (spec.hint ? 128 : 104);
   const textColor = tokenColor('color.chart.text', tokens);
   const muted = tokenColor('color.chart.muted', tokens);
   const children = [
@@ -207,7 +207,10 @@ function statTileSvg(spec, options) {
         'font-weight': 600,
         style: paint('fill', textColor),
       },
-      withUnit(spec.value, spec.unit)
+      spec.notation === 'compact' &&
+        Math.abs(spec.value) >= (spec.compactThreshold ?? 10000)
+        ? `${new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 0 }).format(spec.value)}${spec.unit ? ` ${spec.unit}` : ''}`
+        : withUnit(spec.value, spec.unit)
     ),
   ];
   if (spec.delta !== null) {
@@ -228,12 +231,23 @@ function statTileSvg(spec, options) {
       )
     );
   }
+  if (spec.hint) {
+    children.push(
+      text(
+        { x: 12, y: height - 8, 'font-size': 12, style: paint('fill', muted) },
+        spec.hint
+      )
+    );
+  }
   return svgRoot(
     {
       width,
       height,
       label: chartLabel(spec),
-      title: spec.label,
+      title:
+        spec.notation === 'compact'
+          ? `${spec.label ?? 'Value'}: ${spec.value}`
+          : spec.label,
       className: 'ui-stat-tile-svg',
     },
     [el('g', { 'aria-hidden': 'true' }, children)]

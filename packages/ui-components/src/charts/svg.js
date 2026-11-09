@@ -48,7 +48,10 @@ export const text = (attrs, content) => el('text', attrs, escapeXml(content));
 export const paint = (name, color) => `${name}:${color}`;
 
 /** The root `<svg>` with its accessible name and description. */
-export function svgRoot({ width, height, label, title, className }, children) {
+export function svgRoot(
+  { width, height, label, title, className, role = 'img' },
+  children
+) {
   return el(
     'svg',
     {
@@ -57,7 +60,7 @@ export function svgRoot({ width, height, label, title, className }, children) {
       width,
       height,
       viewBox: `0 0 ${width} ${height}`,
-      role: 'img',
+      role,
       'aria-label': label,
       'font-family': 'system-ui, sans-serif',
     },

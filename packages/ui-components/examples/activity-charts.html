@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Activity charts</title>
+    <link rel="icon" href="data:," />
+    <script type="importmap">
+      {
+        "imports": {
+          "@floating-ui/dom": "/node_modules/@floating-ui/dom/dist/floating-ui.dom.mjs",
+          "@floating-ui/core": "/node_modules/@floating-ui/core/dist/floating-ui.core.mjs",
+          "@floating-ui/utils": "/node_modules/@floating-ui/utils/dist/floating-ui.utils.mjs",
+          "@floating-ui/utils/dom": "/node_modules/@floating-ui/utils/dist/floating-ui.utils.dom.mjs",
+          "@link-foundation/ui-components/charts": "/packages/ui-components/src/charts/index.js",
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "links-notation": "/node_modules/links-notation/dist/index.js",
+          "d3-array": "/node_modules/d3-array/src/index.js",
+          "d3-color": "/node_modules/d3-color/src/index.js",
+          "d3-format": "/node_modules/d3-format/src/index.js",
+          "d3-interpolate": "/node_modules/d3-interpolate/src/index.js",
+          "d3-path": "/node_modules/d3-path/src/index.js",
+          "d3-scale": "/node_modules/d3-scale/src/index.js",
+          "d3-shape": "/node_modules/d3-shape/src/index.js",
+          "d3-time": "/node_modules/d3-time/src/index.js",
+          "d3-time-format": "/node_modules/d3-time-format/src/index.js",
+          "internmap": "/node_modules/internmap/src/index.js",
+          "echarts": "/node_modules/echarts/dist/echarts.esm.min.mjs"
+        }
+      }
+    </script>
+    <style>
+      body {
+        font: 16px system-ui;
+        margin: 24px;
+        color: var(--color-chart-text);
+        background: var(--color-chart-background);
+      }
+      main {
+        max-width: 920px;
+        margin: auto;
+      }
+      section {
+        border: 1px solid var(--color-chart-grid);
+        border-radius: 8px;
+        margin: 20px 0;
+        padding: 20px;
+      }
+      h1 {
+        font-size: 28px;
+      }
+      h2 {
+        font-size: 18px;
+      }
+      #clipped {
+        clip-path: inset(0);
+        overflow: hidden;
+      }
+      .ui-chart-canvas {
+        max-width: 640px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Activity charts</h1>
+      <p>
+        Keyboard-accessible charts with table alternatives and rich tooltips.
+      </p>
+      <button id="theme" type="button">Toggle theme</button>
+      <div id="gallery"></div>
+    </main>
+    <script type="module" src="./activity-charts.js"></script>
+  </body>
+</html>
