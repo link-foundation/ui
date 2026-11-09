@@ -104,6 +104,13 @@ export { LINO_NETWORK_TAG, defineLinoNetwork } from './lino-network.js';
 
 export { createNetworkPresentation } from './presentation.js';
 export { createSolverJob, installSolverWorker } from './solver-job.js';
+
+export {
+  LINKS_GALLERY_TAG,
+  GALLERY_PAGE_SIZE,
+  defineLinksGallery,
+} from './links-gallery.js';
+
 export {
   createDoubletProvider,
   doubletGeometry,

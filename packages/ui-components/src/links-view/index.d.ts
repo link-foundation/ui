@@ -577,6 +577,8 @@ export interface LinksNetworkElement extends HTMLElement {
   toPng(scale?: number): Promise<Blob>;
 }
 export interface LinksNetworkOptions {
+  /** Disable worker allocation for bounded, synchronous thumbnail layouts. */
+  worker?: boolean;
   tag?: string;
   animator?: AnimatorOptions;
   createWorker?: () => Worker;
@@ -759,6 +761,27 @@ export function installSolverWorker<Result>(
   },
   solve: NetworkSolver<Result>
 ): void;
+export interface LinksGalleryElement extends HTMLElement {
+  size: number;
+  readonly count: bigint;
+  urlFor:
+    | ((input: {
+        code: string;
+        links: [number, number][];
+        index: string;
+        size: number;
+        real: boolean;
+        theme: string | null;
+      }) => string | URL)
+    | null;
+}
+export const LINKS_GALLERY_TAG: 'links-gallery';
+export const GALLERY_PAGE_SIZE: 243;
+export function defineLinksGallery(
+  win?: Window,
+  options?: { tag?: string }
+): CustomElementConstructor;
+
 // --------------------------------------- built-in doublet provider
 export type DoubletPair = readonly [number, number];
 export type DoubletInput = readonly DoubletPair[] | readonly NetworkLinkInput[];

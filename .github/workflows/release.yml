@@ -444,7 +444,13 @@ jobs:
           DEBUG_CHANGESET_FIXTURE: ${{ runner.os == 'Windows' && '1' || '' }}
           CHANGESET_FIXTURE_ROOT_ONLY: ${{ runner.os == 'Windows' && '1' || '' }}
           CHANGESET_FIXTURE_TRACE_STDERR: ${{ runner.os == 'Windows' && '1' || '' }}
-        run: bash scripts/run-with-budget-warning.sh 300 "Deno test suite" deno test -A --parallel --shard "$DENO_SHARD"
+        run: |
+          # Reserve CPU for child builds instead of timing them out while
+          # every Windows runner core is occupied by another test module.
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            export DENO_JOBS=2
+          fi
+          bash scripts/run-with-budget-warning.sh 300 "Deno test suite" deno test -A --parallel --shard "$DENO_SHARD"
 
       - name: Repeat Windows Deno release formatter fixture
         if: ${{ !cancelled() && matrix.runtime == 'deno' && runner.os == 'Windows' }}
