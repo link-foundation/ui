@@ -16,7 +16,10 @@ node --test packages/ui-components/tests/charts/activity.test.js
 node --test packages/ui-components/tests/charts/*.test.js
 npx playwright test --config experiments/issue-232/playwright.config.mjs \
   packages/ui-components/tests/e2e/activity-charts.spec.js --workers 1
-npm test -- --test-concurrency=1
+npm test
+# Memory-bounded equivalent (the flag must precede the file list):
+node --test --test-concurrency=1 --test-timeout=30000 tests/*.test.js \
+  packages/*/tests/*.test.js packages/*/tests/*/*.test.js
 npm run lint
 npm run format:check
 npm run check:duplication
