@@ -211,7 +211,9 @@ describe('readStyles: diagnostics', () => {
   });
 
   it('reports unknown states, invalid conditions and misplaced selectors', () => {
-    expect(codes(one('(state active (opacity 1))'))).toEqual(['unknown-state']);
+    expect(codes(one('(state unknown (opacity 1))'))).toEqual([
+      'unknown-state',
+    ]);
     expect(codes(one('(media (min-height 10px) (opacity 1))'))).toEqual([
       'invalid-condition',
     ]);

@@ -252,3 +252,16 @@ export function buildCss(
 
 /** Whether a URL uses a `javascript:`, `data:` or `vbscript:` scheme. */
 export function isUnsafeUrl(url: string): boolean;
+
+/** Opt-in threshold markers; no ResizeObserver is allocated without limits. */
+export function observeFrameFit(
+  root: Element | Document,
+  options: {
+    levels: Record<string, string[]>;
+    scope?: Element;
+    prefix?: string;
+    boundaryAttribute?: string;
+    ResizeObserver?: typeof ResizeObserver;
+    MutationObserver?: typeof MutationObserver;
+  }
+): { refresh(): void; dispose(): void };

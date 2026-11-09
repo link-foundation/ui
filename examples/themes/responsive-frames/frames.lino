@@ -1,0 +1,20 @@
+frames
+  panel
+    corner top-left cut
+      size 60
+      width 40
+      stroke 2
+      color '#71e3ff'
+    edge top bracket
+      stroke 3
+      gap 24
+    state hover
+      edge bottom accent
+        stroke 4
+  block
+    extends panel
+      scale 0.6
+  control
+    extends panel
+      scale 0.35
+    style dotted

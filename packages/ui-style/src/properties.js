@@ -9,6 +9,7 @@
  */
 
 import { values } from '@link-foundation/ui-core';
+import { validClipPath } from './clip-path.js';
 import { styleDiagnostic } from './diagnostics.js';
 
 /**
@@ -73,15 +74,12 @@ export const PROPERTIES = Object.freeze({
     css: 'clip-path',
     type: 'string',
     tokens: [],
-    check: (v) =>
-      /^(?:polygon\([0-9.% ,]+\)|inset\([0-9.]+px(?: round [0-9.]+px)?\))$/u.test(
-        v.value
-      ),
+    check: (v) => validClipPath(v.value),
     write: (v) => v.value,
   },
   'border-style': {
     css: 'border-style',
-    type: ['enum', 'none', 'solid', 'dashed', 'double'],
+    type: ['enum', 'none', 'solid', 'dashed', 'dotted', 'double'],
     tokens: [],
   },
   stroke: { css: 'stroke', type: 'color', tokens: ['color'] },

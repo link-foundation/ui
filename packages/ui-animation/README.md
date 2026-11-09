@@ -447,3 +447,9 @@ secrets. No rrweb code or dependency ships in this package.
 
 Run the example at `/examples/animation/`: Record, interact with OK, Stop, then
 Replay or move the labelled time scrubber. The `<pre>` shows the sharable LiNo.
+
+## Background layers
+
+Independent decorative canvas, WebGL and CSS entry points are documented in
+[backgrounds](src/backgrounds/README.md), with a runnable all-layer example,
+original nebula preset, host glyph hooks and reduced-motion/CSS fallbacks.
