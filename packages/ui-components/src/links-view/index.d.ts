@@ -735,7 +735,7 @@ export function networkToRaster(
   options?: NetworkRasterOptions
 ): Promise<Blob>;
 
-import type { Configuration } from './configurations.js';
+import type { Configuration } from './configurations.d.ts';
 
 export interface NetworkEditorValues {
   [key: string]: unknown;
@@ -771,7 +771,7 @@ export interface NetworkSolverResult {
 }
 export interface NetworkEditorSettings {
   presentation: NetworkPresentation;
-  configurations?: typeof import('./configurations.js');
+  configurations?: typeof import('./configurations.d.ts');
   solve?: (
     links: Configuration,
     options: NetworkEditorValues,
