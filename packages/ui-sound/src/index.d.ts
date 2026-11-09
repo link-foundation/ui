@@ -45,12 +45,13 @@ export interface SoundTheme {
   voices: Record<string, SoundVoice>;
   events: Record<
     string,
-    { mode: 'random' | 'cycle' | 'layer'; voices: string[]; throttle: number }
+    { mode: SoundMode; voices: string[]; throttle: number; level?: number }
   >;
   bus: {
     shelf: [number, number];
     compressor: [number, number];
     reverb: number;
+    room?: number;
   };
 }
 export function readSoundTheme(text: unknown): {
@@ -60,6 +61,15 @@ export function readSoundTheme(text: unknown): {
 export interface SoundBus {
   input: GainNode;
   master: GainNode;
+  shelf: BiquadFilterNode;
+  convolver: ConvolverNode;
+  wet: GainNode;
+  configure(
+    values: Pick<
+      SoundRuntimeSettings,
+      'volume' | 'tone' | 'frequency' | 'reverb' | 'room'
+    > & { maxVolume?: number }
+  ): void;
   disconnect(): void;
 }
 export function createSoundBus(
@@ -71,9 +81,16 @@ export function playVoice(
   audio: BaseAudioContext,
   voice: SoundVoice,
   output: AudioNode,
-  options?: { at?: number; pan?: number; gain?: number; random?: () => number }
+  options?: {
+    at?: number;
+    pan?: number;
+    gain?: number;
+    detune?: number;
+    random?: () => number;
+  }
 ): number;
 export interface SoundConfig {
+  readonly schema?: SettingsSchema;
   get(key: string): unknown;
   set(key: string, value: unknown): unknown;
   subscribe(listener: (...args: any[]) => void): () => void;
@@ -82,14 +99,39 @@ export interface SoundCue {
   event: string;
   pan: number;
 }
+export type SoundMode = 'random' | 'cycle' | 'layer';
+export interface SoundEventSettings {
+  voices?: string[];
+  mode?: SoundMode;
+  level?: number;
+  throttle?: number;
+}
+export interface SoundRuntimeSettings {
+  enabled?: boolean;
+  volume?: number;
+  tone?: number;
+  frequency?: number;
+  reverb?: number;
+  room?: number;
+  pitchSpread?: number;
+  stereo?: boolean;
+  width?: number;
+  hoverGap?: number;
+  mode?: SoundMode | null;
+  events?: Record<string, SoundEventSettings>;
+  reducedMotionEvents?: string[];
+}
 export interface SoundPlayer {
   play(event: string, options?: { x?: number }): string[];
   cue(name: string, options?: { x?: number }): string[];
+  configure(values: SoundRuntimeSettings): void;
+  preview(voiceName: string, options?: { x?: number }): string[];
   onCue(handler: (cue: SoundCue) => void): () => void;
   setVolume(value: number): void;
   mute(value?: boolean): void;
   readonly enabled: boolean;
   readonly volume: number;
+  readonly hoverGap: number;
   dispose(): Promise<void>;
 }
 export function createSoundPlayer(options: {
@@ -99,6 +141,10 @@ export function createSoundPlayer(options: {
   random?: () => number;
   createContext?: () => AudioContext;
   gestureTarget?: EventTarget & { innerWidth?: number };
+  document?: Document;
+  hasBeenActive?: () => boolean;
+  maxVolume?: number;
+  reducedMotionEvents?: string[];
   reducedMotion?: () => boolean;
   onDiagnostic?: (diagnostic: Diagnostic) => void;
 }): SoundPlayer;
@@ -122,5 +168,29 @@ export const SOUND_COMFORT_KEYS: readonly string[];
 export function soundSettingsSchema(): SettingsSchema;
 export function bindSoundConfig(
   config: Config,
-  options?: { target?: string }
-): SoundConfig;
+  options?: { target?: string; schema?: SettingsSchema }
+): ReturnType<typeof import('@link-foundation/ui-settings').bindConfig> & {
+  readonly schema: SettingsSchema;
+};
+
+export function bindSoundToDocument(
+  player: Pick<SoundPlayer, 'play'> & Partial<Pick<SoundPlayer, 'hoverGap'>>,
+  options?: { root?: Document | Element; cueEvent?: string; now?: () => number }
+): { dispose(): void };
+export interface SoundSettingsOptions {
+  slots?: number;
+  maxVolume?: number;
+}
+export type SoundSettingsEvent = string | { name: string; label?: string };
+/** A nested LiNo schema fragment without a schema header. */
+export function generateSoundSettings(
+  theme: SoundTheme,
+  events: SoundSettingsEvent[],
+  options?: SoundSettingsOptions
+): string;
+export function createSoundSettingsSchema(
+  theme: SoundTheme,
+  events: SoundSettingsEvent[],
+  options?: SoundSettingsOptions
+): SettingsSchema;
+export function soundEventKey(event: string, field: string): string;

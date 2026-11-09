@@ -1,48 +1,27 @@
-import { createSoundBus, playVoice } from './graph.js';
+import { playVoice } from './graph.js';
+import { audioSession } from './audio-session.js';
+import {
+  bound,
+  chooseVoices,
+  configureRuntime,
+  runtimeSettings,
+} from './runtime.js';
+import { runtimeFromConfig } from './settings.js';
 
-const boundedVolume = (value) =>
-  Number.isFinite(value) ? Math.max(0, Math.min(1, value)) : 0;
-
-function chooseVoices(binding, turn, random) {
-  const names = binding.voices;
-  if (binding.mode === 'layer') {
-    return [...names];
-  }
-  const index =
-    binding.mode === 'cycle'
-      ? turn % names.length
-      : Math.min(
-          names.length - 1,
-          Math.max(0, Math.floor(random() * names.length))
-        );
-  return [names[index]];
-}
-
-function reportAudioError(onDiagnostic, error) {
-  onDiagnostic({
-    code: 'audio-unavailable',
-    severity: 'warning',
-    message: String(error?.message ?? error),
-  });
-}
-function resumeAudio(audio, report) {
-  if (audio?.state === 'suspended') {
-    try {
-      Promise.resolve(audio.resume()).catch(report);
-    } catch (error) {
-      report(error);
+function trackGestures(target, state, session, update) {
+  const pointer = (event) => {
+    if (Number.isFinite(event.clientX)) {
+      update((event.clientX / Math.max(1, target.innerWidth ?? 1)) * 2 - 1);
     }
-  }
-}
-
-function pointerPan(x, target) {
-  return Math.max(
-    -1,
-    Math.min(1, (x / Math.max(1, target.innerWidth ?? 1)) * 2 - 1)
-  );
-}
-
-function listenGestures(target, gesture, pointer) {
+  };
+  const gesture = (event) => {
+    update();
+    session.retry();
+    pointer(event);
+    if (state.enabled) {
+      session.ensure();
+    }
+  };
   target?.addEventListener('pointerdown', gesture, true);
   target?.addEventListener('keydown', gesture, true);
   target?.addEventListener('pointermove', pointer, true);
@@ -53,11 +32,45 @@ function listenGestures(target, gesture, pointer) {
   };
 }
 
-/**
- * Silent until enabled and a pointerdown/keydown. `config` is the sound settings
- * binding returned by bindSoundConfig (or a compatible get/set/subscribe store).
- * `x` is a normalized pointer coordinate, 0 left to 1 right.
- */
+function voiceScheduler({
+  state,
+  theme,
+  random,
+  session,
+  position,
+  isActivated,
+}) {
+  return (names, level, options) => {
+    if (!state.enabled || state.volume <= 0 || !isActivated()) {
+      return [];
+    }
+    const context = session.ensure();
+    if (!context) {
+      return [];
+    }
+    const detune =
+      state.pitchSpread === 0 ? 0 : (random() * 2 - 1) * state.pitchSpread;
+    const variation =
+      state.pitchSpread === 0
+        ? 1
+        : 1 + (random() * 2 - 1) * 0.1 * Math.min(1, state.pitchSpread / 15);
+    for (const name of names) {
+      try {
+        playVoice(context.audio, theme.voices[name], context.bus.input, {
+          pan: position(options),
+          random,
+          detune,
+          gain: (level * variation) / Math.sqrt(names.length),
+        });
+      } catch (error) {
+        session.report(error);
+      }
+    }
+    return names;
+  };
+}
+
+/** Lazy opt-in player. Pre-activation plays are silent and never queued. */
 export function createSoundPlayer({
   theme,
   config,
@@ -65,145 +78,138 @@ export function createSoundPlayer({
   random = Math.random,
   createContext = () => new globalThis.AudioContext(),
   gestureTarget = globalThis.window,
+  document = gestureTarget?.document ?? globalThis.document,
+  hasBeenActive = () =>
+    globalThis.navigator?.userActivation?.hasBeenActive === true,
   reducedMotion = () =>
     globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ??
     false,
+  reducedMotionEvents = ['intro', 'scan'],
+  maxVolume = 1,
   onDiagnostic = () => {},
 } = {}) {
-  let enabled = config?.get('sound.enabled') === true;
-  let volume = boundedVolume(config?.get('sound.volume') ?? 0.5);
-  let audio = null;
-  let bus = null;
+  const state = runtimeSettings(theme, bound(maxVolume, 1, 2, 1));
+  state.reducedMotionEvents = [...reducedMotionEvents];
+  configureRuntime(state, runtimeFromConfig(config, theme), theme);
   let disposed = false;
   let activated = false;
   let pan = 0;
   const listeners = new Set();
   const last = new Map();
   const turns = new Map();
-  const report = (error) => reportAudioError(onDiagnostic, error);
-  const applyVolume = () => {
-    if (bus) {
-      bus.master.gain.setValueAtTime(enabled ? volume : 0, audio.currentTime);
+  const previous = new Map();
+  const session = audioSession({
+    theme,
+    state,
+    createContext,
+    random,
+    onDiagnostic,
+    document,
+  });
+  const stopGestures = trackGestures(gestureTarget, state, session, (value) => {
+    if (value === undefined) {
+      activated = true;
+    } else {
+      pan = bound(value, -1, 1);
     }
-  };
-  const resume = () => resumeAudio(audio, report);
-  const gesture = (event) => {
+  });
+  const configure = (values = {}) => {
     if (disposed) {
       return;
     }
-    activated = true;
-    if (Number.isFinite(event.clientX)) {
-      pan = pointerPan(event.clientX, gestureTarget);
-    }
-    if (!enabled) {
-      return;
-    }
-    try {
-      if (!audio) {
-        audio = createContext();
-        bus = createSoundBus(audio, theme.bus, random);
-        applyVolume();
-      }
-      resume();
-    } catch (error) {
-      bus?.disconnect();
-      const failed = audio;
-      audio = bus = null;
-      try {
-        Promise.resolve(failed?.close?.()).catch(report);
-      } catch {
-        /* reported below */
-      }
-      report(error);
-    }
+    configureRuntime(state, values, theme);
+    session.apply();
   };
-  const stopGestures = listenGestures(gestureTarget, gesture, (event) => {
-    if (Number.isFinite(event.clientX)) {
-      pan = pointerPan(event.clientX, gestureTarget);
-    }
+  const stopConfig = config?.subscribe(() =>
+    configure(runtimeFromConfig(config, theme))
+  );
+  const position = (options) =>
+    state.stereo
+      ? (Number.isFinite(options.x) ? bound(options.x * 2 - 1, -1, 1) : pan) *
+        state.width
+      : 0;
+  const schedule = voiceScheduler({
+    state,
+    theme,
+    random,
+    session,
+    position,
+    isActivated: () => activated || hasBeenActive(),
   });
-  const stopConfig = config?.subscribe(() => {
-    enabled = config.get('sound.enabled') === true;
-    volume = boundedVolume(config.get('sound.volume'));
-    applyVolume();
-  });
-  const canPlay = () => activated && audio && enabled && volume > 0;
   const play = (event, options = {}) => {
-    if (disposed) {
-      return [];
-    }
-    const binding = theme.events[event];
-    if (!binding || (['intro', 'scan'].includes(event) && reducedMotion())) {
+    const binding = Object.hasOwn(state.events, event)
+      ? state.events[event]
+      : null;
+    if (
+      disposed ||
+      !binding ||
+      (state.reducedMotionEvents.includes(event) && reducedMotion())
+    ) {
       return [];
     }
     const time = now();
     if (time - (last.get(event) ?? -Infinity) < binding.throttle) {
       return [];
     }
-    last.set(event, time);
-    const position = Number.isFinite(options.x)
-      ? Math.max(-1, Math.min(1, options.x * 2 - 1))
-      : pan;
+    // Unactivated cues may still drive visual feedback, but do not consume throttles.
     for (const listener of [...listeners]) {
-      listener({ event, pan: position });
+      listener({ event, pan: position(options) });
     }
-    if (!canPlay()) {
-      return [];
-    }
-    resume();
     if (!binding.voices.length) {
       return [];
     }
     const turn = turns.get(event) ?? 0;
-    const chosen = chooseVoices(binding, turn, random);
-    turns.set(event, turn + 1);
-    for (const name of chosen) {
-      try {
-        playVoice(audio, theme.voices[name], bus.input, {
-          pan: position,
-          random,
-          gain: 1 / Math.sqrt(chosen.length),
-        });
-      } catch (error) {
-        report(error);
-      }
+    const chosen = chooseVoices(
+      binding,
+      state.mode ?? binding.mode,
+      turn,
+      previous.get(event),
+      random
+    );
+    const played = schedule(chosen, binding.level, options);
+    if (played.length) {
+      last.set(event, time);
+      turns.set(event, turn + 1);
+      previous.set(event, chosen.at(-1));
     }
-    return chosen;
+    return played;
   };
   return {
     play,
-    cue: (name, options) => play(name, options),
+    cue: play,
+    configure,
+    preview(name, options = {}) {
+      return disposed || !Object.hasOwn(theme.voices, name)
+        ? []
+        : schedule([name], 1, options);
+    },
     onCue(handler) {
       listeners.add(handler);
       return () => listeners.delete(handler);
     },
     setVolume(value) {
-      volume = boundedVolume(value);
-      config?.set('sound.volume', volume);
-      applyVolume();
+      configure({ volume: bound(value, 0, state.maxVolume) });
+      config?.set('sound.volume', state.volume);
     },
     mute(value = true) {
-      enabled = !value;
-      config?.set('sound.enabled', enabled);
-      applyVolume();
+      configure({ enabled: !value });
+      config?.set('sound.enabled', state.enabled);
     },
     get enabled() {
-      return enabled;
+      return state.enabled;
     },
     get volume() {
-      return volume;
+      return state.volume;
+    },
+    get hoverGap() {
+      return state.hoverGap;
     },
     async dispose() {
       disposed = true;
       stopGestures();
       stopConfig?.();
       listeners.clear();
-      bus?.disconnect();
-      try {
-        await audio?.close?.();
-      } catch (error) {
-        report(error);
-      }
+      await session.dispose();
     },
   };
 }
