@@ -127,6 +127,8 @@ it('uses pinned transforms verbatim and validates every input reference and opti
     'tension 2.1',
     'end\n  size 16',
     'start\n  angle 4',
+    'end\n  constructor 1',
+    'end\n  __proto__ 1',
     'opacity 0',
     'width 4097',
     'card\n  inset 31',

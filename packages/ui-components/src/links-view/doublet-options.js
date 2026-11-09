@@ -165,17 +165,17 @@ function markerOptions(target, values) {
     if (name === 'shape') {
       target.shape = choice(value, DOUBLET_MARKERS.join(' '), name);
     } else {
-      const range = {
+      const ranges = {
         size: [0.5, 15],
         angle: [5, 85],
         offset: [-20, 20],
         across: [-20, 20],
         rotation: [-180, 180],
-      }[name];
-      if (!range) {
+      };
+      if (!Object.hasOwn(ranges, name)) {
         throw new TypeError(`Unknown marker option: ${name}`);
       }
-      target[name] = numeric(value, range, name);
+      target[name] = numeric(value, ranges[name], name);
     }
     target.explicit.push(name);
   });
