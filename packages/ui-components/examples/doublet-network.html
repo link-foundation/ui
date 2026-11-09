@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Doublet network provider</title>
+    <link rel="icon" href="data:," />
+    <script type="importmap">
+      {
+        "imports": {
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "@link-foundation/ui-tokens": "/packages/ui-tokens/src/index.js",
+          "@dagrejs/dagre": "/node_modules/@dagrejs/dagre/dist/dagre.esm.js",
+          "d3-force": "/node_modules/d3-force/src/index.js",
+          "d3-dispatch": "/node_modules/d3-dispatch/dist/d3-dispatch.mjs",
+          "d3-quadtree": "/node_modules/d3-quadtree/dist/d3-quadtree.mjs",
+          "d3-timer": "/node_modules/d3-timer/dist/d3-timer.mjs",
+          "links-notation": "/node_modules/links-notation/dist/index.js"
+        }
+      }
+    </script>
+    <style>
+      :root {
+        font-family: sans-serif;
+        color: #202b3d;
+        background: #f1f5f9;
+      }
+      body {
+        max-width: 1000px;
+        margin: auto;
+        padding: 24px;
+      }
+      h1 {
+        margin-top: 0;
+      }
+      h2 {
+        font-size: 20px;
+      }
+      .gallery {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+      figure {
+        background: white;
+        margin: 0;
+        padding: 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+      }
+      figcaption {
+        font-size: 14px;
+        padding-bottom: 8px;
+      }
+      svg {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+      #markers {
+        grid-template-columns: repeat(6, 1fr);
+      }
+      @media (max-width: 650px) {
+        .gallery {
+          grid-template-columns: 1fr;
+        }
+        #markers {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Doublet network provider</h1>
+      <p>
+        Own-middle anchors, continuous cubic links and shared preview/export
+        geometry.
+      </p>
+      <h2>Networks</h2>
+      <div id="overview" class="gallery"></div>
+      <h2>Nine independent marker shapes, minimum and maximum sizes</h2>
+      <div id="markers" class="gallery"></div>
+    </main>
+    <script type="module" src="./doublet-gallery.js"></script>
+  </body>
+</html>
