@@ -88,7 +88,11 @@
       "types": "./src/settings/index.d.ts",
       "default": "./src/settings/index.js"
     },
-    "./settings.css": "./src/settings/settings.css"
+    "./settings.css": "./src/settings/settings.css",
+    "./links-view/configurations": {
+      "types": "./src/links-view/configurations.d.ts",
+      "default": "./src/links-view/configurations.js"
+    }
   },
   "types": "./src/index.d.ts",
   "files": [
