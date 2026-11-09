@@ -457,12 +457,7 @@ export interface NetworkLayoutOptions {
   pins?: [NetworkId, LinkPoint][];
 }
 export type NetworkLayoutName =
-  | 'circle'
-  | 'grid'
-  | 'hex'
-  | 'spiral'
-  | 'force'
-  | 'layered';
+  'circle' | 'grid' | 'hex' | 'spiral' | 'force' | 'layered';
 export type NetworkLayout = (
   network: Network,
   options?: NetworkLayoutOptions
@@ -734,3 +729,28 @@ export function networkToRaster(
   svg: string,
   options?: NetworkRasterOptions
 ): Promise<Blob>;
+
+/** Job execution only; this does not provide a collision search algorithm. */
+export type NetworkSolver<Result> = (
+  links: number[][],
+  options: Record<string, unknown>,
+  context: { signal: AbortSignal }
+) => Result | Promise<Result>;
+export function createSolverJob<Result>(
+  solve: NetworkSolver<Result>,
+  configuration?: { workerUrl?: string | URL; Worker?: typeof Worker }
+): (
+  links: number[][],
+  options?: Record<string, unknown>,
+  context?: { signal?: AbortSignal }
+) => Promise<Result>;
+export function installSolverWorker<Result>(
+  scope: {
+    addEventListener(
+      type: 'message',
+      listener: (event: MessageEvent) => void
+    ): void;
+    postMessage(value: unknown): void;
+  },
+  solve: NetworkSolver<Result>
+): void;
