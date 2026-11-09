@@ -26,6 +26,8 @@ import {
   drawSmallChart,
   uniqueId,
 } from './element.js';
+import { tooltipContent, showTopTooltip } from './tooltip.js';
+import { supportsECharts } from './renderer-features.js';
 import { layoutChart } from './layout.js';
 import { summarizeChart } from './summary.js';
 import { layoutToSvg } from './svg-renderer.js';
@@ -187,6 +189,145 @@ async function mountECharts(canvas, spec, layout, options) {
   return instance;
 }
 
+function positionPointTooltip(tooltip, canvas, layout, point, pointer, scale) {
+  const box = canvas.querySelector('svg').getBoundingClientRect();
+  const markBox = canvas
+    .querySelector(
+      `.ui-chart-marks [data-series="${point.series}"][data-row="${point.row}"]`
+    )
+    ?.getBoundingClientRect();
+  const x =
+    pointer?.clientX ??
+    (markBox ? markBox.left + markBox.width / 2 : box.left + point.x * scale);
+  const y = pointer?.clientY ?? markBox?.top ?? box.top + point.y * scale;
+  return showTopTooltip(
+    tooltip,
+    canvas,
+    x,
+    y,
+    x > box.left + (layout.plot.x + layout.plot.width * 0.6) * scale
+  );
+}
+
+function showPointTooltip(
+  { parts, layout, spec, echarts, stop },
+  point,
+  pointer
+) {
+  const { tooltip, canvas } = parts;
+  const scale = svgScale(parts.canvas, layout);
+  stop?.();
+  stop = null;
+  tooltipContent(tooltip, point, spec);
+  tooltip.style.left = `${point.x * scale}px`;
+  tooltip.style.top = `${point.y * scale}px`;
+  tooltip.hidden = echarts;
+  if (!pointer && spec.mark.type === 'calendar') {
+    const target = point.x * scale;
+    if (
+      target < canvas.scrollLeft ||
+      target > canvas.scrollLeft + canvas.clientWidth
+    ) {
+      canvas.scrollLeft = target - canvas.clientWidth / 2;
+    }
+  }
+  if (spec.tooltip?.layer === 'top') {
+    stop = positionPointTooltip(tooltip, canvas, layout, point, pointer, scale);
+  }
+  canvas.setAttribute('aria-describedby', tooltip.id);
+  const svg = canvas.querySelector('svg');
+  if (svg !== null) {
+    placeFocusRing(svg, point);
+  }
+  return stop;
+}
+
+function initializeActivity(element, spec, parts, layout, win) {
+  if (spec.mark.type === 'calendar') {
+    parts.canvas.classList.add('ui-calendar-scroll');
+    parts.canvas.setAttribute('role', 'region');
+    win.queueMicrotask(() => {
+      if (parts.canvas.isConnected) {
+        parts.canvas.scrollLeft = parts.canvas.scrollWidth;
+      }
+    });
+  }
+  for (const diagnostic of layout.diagnostics) {
+    element.dispatchEvent(
+      new win.CustomEvent('chart-diagnostic', {
+        detail: diagnostic,
+        bubbles: true,
+      })
+    );
+  }
+}
+
+function calendarMove(element, layout, active, key) {
+  if (
+    element.spec.mark.type !== 'calendar' ||
+    active === null ||
+    !key.startsWith('Arrow')
+  ) {
+    return false;
+  }
+  const points = navigable(layout)[0].points;
+  const delta = { ArrowRight: 7, ArrowLeft: -7, ArrowDown: 1, ArrowUp: -1 }[
+    key
+  ];
+  const index = points.findIndex(
+    (point) => point.day === points[active.index].day + delta
+  );
+  if (index >= 0) {
+    element.focusPoint(0, index);
+  }
+  return true;
+}
+
+function toggleParts(parts, show) {
+  const { toggle, table } = parts;
+  const shown = show ?? toggle.getAttribute('aria-expanded') !== 'true';
+  toggle.setAttribute('aria-expanded', String(shown));
+  toggle.textContent = toggleText(shown);
+  table.classList.toggle('ui-visually-hidden', !shown);
+}
+
+function pointerPoint(canvas, layout, event) {
+  const svg = canvas.querySelector('svg');
+  const box = svg.getBoundingClientRect();
+  const scale = svgScale(canvas, layout);
+  const x = (event.clientX - box.left) / scale;
+  const y = (event.clientY - box.top) / scale;
+  const row = event.target.closest?.('[data-row]')?.getAttribute('data-row');
+  return row !== undefined && row !== null
+    ? (navigable(layout)
+        .flatMap((series) => series.points)
+        .find((point) => point.row === Number(row)) ??
+        nearestPoint(layout, x, y))
+    : nearestPoint(layout, x, y);
+}
+
+function wireParts(element, document, spec, layout) {
+  const parts = createParts(document, spec, layout);
+  const { canvas, toggle } = parts;
+  toggle.addEventListener('click', () => element.toggleTable());
+  canvas.addEventListener('keydown', (event) => element.onKey(event));
+  canvas.addEventListener('blur', () => element.hideTooltip());
+  canvas.addEventListener('pointermove', (event) => element.onPointer(event));
+  canvas.addEventListener('pointerleave', () => element.hideTooltip());
+  canvas.addEventListener('focusin', (event) => {
+    const row = event.target.getAttribute('data-row');
+    if (spec.mark.type === 'range' && row !== null) {
+      element.focusPoint(0, Number(row));
+    }
+  });
+  canvas.addEventListener('focusout', (event) => {
+    if (!canvas.contains(event.relatedTarget)) {
+      element.hideTooltip();
+    }
+  });
+  return parts;
+}
+
 /**
  * The `<ui-chart>` class of a window.
  * @param {Window} win
@@ -198,6 +339,7 @@ export function createChartClass(win) {
     #layout = null;
     #parts = null;
     #echarts = null;
+    #stopTooltip = null;
 
     /** Resolves when the chart (and ECharts, if used) has rendered. */
     ready = Promise.resolve();
@@ -214,7 +356,14 @@ export function createChartClass(win) {
       return series?.points[this.#active.index] ?? null;
     }
 
+    disconnectedCallback() {
+      this.hideTooltip();
+      this.#echarts?.dispose?.();
+    }
+
     draw(spec) {
+      this.hideTooltip();
+      this.#echarts?.dispose?.();
       this.#active = null;
       this.#echarts = null;
       if (spec.kind !== 'chart') {
@@ -225,34 +374,19 @@ export function createChartClass(win) {
       const width = Number(this.getAttribute('width')) || undefined;
       const height = Number(this.getAttribute('height')) || undefined;
       this.#layout = layoutChart(spec, { width, height });
-      const parts = this.buildParts(document, spec);
+      const parts = wireParts(this, document, spec, this.#layout);
       this.#parts = parts;
+      initializeActivity(this, spec, parts, this.#layout, win);
       this.ready =
-        spec.renderer === 'echarts'
+        spec.renderer === 'echarts' && supportsECharts(spec)
           ? this.useECharts(spec, parts.canvas)
           : Promise.resolve();
       return [parts.figure];
     }
 
-    /** The parts of the chart, wired to the element. */
-    buildParts(document, spec) {
-      const parts = createParts(document, spec, this.#layout);
-      const { canvas, toggle } = parts;
-      toggle.addEventListener('click', () => this.toggleTable());
-      canvas.addEventListener('keydown', (event) => this.onKey(event));
-      canvas.addEventListener('blur', () => this.hideTooltip());
-      canvas.addEventListener('pointermove', (event) => this.onPointer(event));
-      canvas.addEventListener('pointerleave', () => this.hideTooltip());
-      return parts;
-    }
-
     /** Show or hide the data table (it is always in the accessibility tree). */
     toggleTable(show) {
-      const { toggle, table } = this.#parts;
-      const shown = show ?? toggle.getAttribute('aria-expanded') !== 'true';
-      toggle.setAttribute('aria-expanded', String(shown));
-      toggle.textContent = toggleText(shown);
-      table.classList.toggle('ui-visually-hidden', !shown);
+      toggleParts(this.#parts, show);
     }
 
     onKey(event) {
@@ -269,8 +403,16 @@ export function createChartClass(win) {
         return;
       }
       event.preventDefault();
+      if (calendarMove(this, this.#layout, this.#active, event.key)) {
+        return;
+      }
       const next =
-        this.#active === null ? { series: 0, index: 0 } : move(this.#active);
+        this.#active === null
+          ? {
+              series: 0,
+              index: event.key === 'End' ? Number.MAX_SAFE_INTEGER : 0,
+            }
+          : move(this.#active);
       this.focusPoint(next.series, next.index);
     }
 
@@ -304,23 +446,28 @@ export function createChartClass(win) {
       );
     }
 
-    showTooltip(point) {
-      const { tooltip, canvas } = this.#parts;
-      const scale = svgScale(this.#parts.canvas, this.#layout);
-      tooltip.textContent = point.text;
-      tooltip.style.left = `${point.x * scale}px`;
-      tooltip.style.top = `${point.y * scale}px`;
-      tooltip.hidden = this.#echarts !== null;
-      canvas.setAttribute('aria-describedby', tooltip.id);
-      const svg = canvas.querySelector('svg');
-      if (svg !== null) {
-        placeFocusRing(svg, point);
-      }
+    showTooltip(point, pointer = null) {
+      this.#stopTooltip = showPointTooltip(
+        {
+          parts: this.#parts,
+          layout: this.#layout,
+          spec: this.spec,
+          echarts: this.#echarts !== null,
+          stop: this.#stopTooltip,
+        },
+        point,
+        pointer
+      );
     }
 
     hideTooltip() {
       if (this.#parts === null) {
         return;
+      }
+      this.#stopTooltip?.();
+      this.#stopTooltip = null;
+      if (this.#parts.tooltip.hasAttribute('popover')) {
+        this.#parts.tooltip.hidePopover?.();
       }
       this.#parts.tooltip.hidden = true;
       this.#parts.canvas.querySelector('.ui-chart-focus')?.remove();
@@ -332,16 +479,11 @@ export function createChartClass(win) {
       if (this.#layout === null || this.#echarts !== null) {
         return;
       }
-      const svg = this.#parts.canvas.querySelector('svg');
-      const box = svg.getBoundingClientRect();
-      const scale = svgScale(this.#parts.canvas, this.#layout);
-      const x = (event.clientX - box.left) / scale;
-      const y = (event.clientY - box.top) / scale;
-      const point = nearestPoint(this.#layout, x, y);
+      const point = pointerPoint(this.#parts.canvas, this.#layout, event);
       if (point === null) {
         this.hideTooltip();
       } else {
-        this.showTooltip(point);
+        this.showTooltip(point, event);
       }
     }
 

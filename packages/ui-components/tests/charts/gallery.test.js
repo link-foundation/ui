@@ -43,7 +43,19 @@ describe('the chart gallery', () => {
       expect(spec).toEqual(fixtureSpecs.get(spec.id));
       marks.push(spec.mark.type);
     }
-    expect(marks.sort()).toEqual([...MARKS].sort());
+    const activity = chartsFromLinks(
+      parseLino(
+        readFileSync(
+          new URL('../../examples/activity-charts.lino', import.meta.url),
+          'utf8'
+        )
+      )
+    )
+      .filter(
+        (spec) => spec.kind === 'chart' && !marks.includes(spec.mark.type)
+      )
+      .map((spec) => spec.mark.type);
+    expect([...marks, ...activity].sort()).toEqual([...MARKS].sort());
   });
 
   it('shows a gauge, a stat tile and a sparkline with labels', () => {
