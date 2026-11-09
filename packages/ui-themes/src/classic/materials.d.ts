@@ -1,3 +1,4 @@
+/// <reference lib="dom" />
 export interface Material {
   color: string;
   opacity: number;

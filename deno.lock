@@ -3458,6 +3458,7 @@
             "npm:@link-foundation/ui-store@^0.0.0",
             "npm:@link-foundation/ui-themes@^0.0.0",
             "npm:@link-foundation/ui-tokens@^0.0.0",
+            "npm:esbuild@0.27.0",
             "npm:jsdom@^30.1.3",
             "npm:test-anywhere@~0.8.48"
           ]
