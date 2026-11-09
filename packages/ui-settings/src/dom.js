@@ -11,6 +11,7 @@
  * rules inlined in the script. Corrupted storage gives the defaults.
  */
 
+import { hexToChannels } from './color-channels.js';
 import { cssValue, formatValue } from './coerce.js';
 import { BUILT_IN_TYPES } from './types.js';
 import { diff, merge } from './values.js';
@@ -57,6 +58,16 @@ function applyProjection(root, projection) {
   }
 }
 
+function applyChannels(element, field, target, value, channels) {
+  if (channels && target.cssVar && field.type === 'color') {
+    writeCss(
+      element,
+      `${target.cssVar}-rgb`,
+      value === null ? null : hexToChannels(value)
+    );
+  }
+}
+
 /**
  * Set the CSS variables and data attributes of the values (missing or
  * invalid values: the defaults) on a root element.
@@ -64,7 +75,12 @@ function applyProjection(root, projection) {
  * @param {SettingsValues} values
  * @param {HTMLElement} [root] default: `document.documentElement`
  */
-export function applyToRoot(schema, values, root, { project } = {}) {
+export function applyToRoot(
+  schema,
+  values,
+  root,
+  { project, channels = false } = {}
+) {
   const element = root ?? globalThis.document?.documentElement;
   if (!element) {
     throw new TypeError('applyToRoot needs a root element');
@@ -80,6 +96,7 @@ export function applyToRoot(schema, values, root, { project } = {}) {
           value === null ? null : cssValue(field, value)
         );
       }
+      applyChannels(element, field, target, value, channels);
       if (target.dataAttr) {
         writeAttr(
           element,

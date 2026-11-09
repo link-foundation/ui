@@ -4,12 +4,31 @@ export interface Material {
   blur: number;
   noise: number;
   refraction: number;
+  saturation?: number;
+  brightness?: number;
+  contrast?: number;
+  tint?: string;
+  'tint-level'?: number;
+  highlight?: number;
+  depth?: number;
+  'depth-blur'?: number;
+  shadow?: number;
+  'shadow-blur'?: number;
+  'shadow-distance'?: number;
+  'shadow-spread'?: number;
+  sheen?: number;
+  'sheen-angle'?: number;
+  'light-angle'?: number;
+  'border-width'?: number;
+  'border-light'?: number;
 }
 export interface ViewerPreferences {
   motion?: boolean | 'auto' | 'on' | 'off';
   sound?: boolean;
   volume?: number;
-  transparency?: boolean;
+  transparency?: boolean | 'auto' | 'on' | 'off';
+  reducedTransparency?: boolean;
+  refractionProvider?: RefractionProvider;
 }
 export interface EffectState extends ViewerPreferences {
   visible?: boolean;
@@ -22,7 +41,7 @@ export function materialStyle(
 ): Record<string, string>;
 export function applyAppearancePreset<
   T extends { preferences: ViewerPreferences },
->(current: T, preset: Partial<T>): T;
+>(current: T, preset: Partial<T>, keys?: (keyof T)[]): T;
 /** Independent quality multipliers, monotonically decreasing until removal. */
 export interface EffectQuality {
   scale: number;
@@ -84,3 +103,30 @@ export interface EffectGovernor {
 export function createEffectGovernor(
   options?: EffectGovernorOptions
 ): EffectGovernor;
+
+export interface RefractionOptions {
+  scale?: number;
+  detail?: number;
+  octaves?: number;
+  smoothing?: number;
+  seed?: number;
+}
+export interface RefractionProvider {
+  supported: boolean;
+  reference(strength: number, preferences?: ViewerPreferences): string;
+  dispose(): void;
+}
+export function createRefractionProvider(
+  document?: Document,
+  options?: RefractionOptions
+): RefractionProvider;
+export function observeMaterialVisibility(
+  root: Document | Element,
+  selector: string,
+  options?: {
+    margin?: number | string;
+    /** Share with a surface's governor: (_, visible) => governor.set({ visible }). */
+    onVisibility?: (element: Element, visible: boolean) => void;
+  }
+): { dispose(): void };
+export function opticalMaterialCss(selector?: string): string;
