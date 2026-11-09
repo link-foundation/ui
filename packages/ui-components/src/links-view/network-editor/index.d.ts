@@ -1,6 +1,7 @@
 import type {
   NetworkPresentation,
   NetworkPresentationSnapshot,
+  NetworkPresentationProvider,
 } from '../index.js';
 import type { Configuration } from '../configurations.js';
 
@@ -105,3 +106,7 @@ export function syncNetworkUrl(
   presentation: NetworkPresentation,
   settings: NetworkUrlSyncSettings
 ): { flush(): void; dispose(): void };
+
+export function createNetworkEditorProvider(configuration?: {
+  debug?: (message: string, data?: object) => void;
+}): NetworkPresentationProvider;

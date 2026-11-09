@@ -47,3 +47,9 @@ the Chromium test configuration used its explicit executable path. No caches
 were removed. The first full npm run ignored a trailing concurrency flag and
 approached the container memory cap; it was stopped. Final checks use CPU
 affinity to constrain Node's default parallelism.
+
+During final verification, #227 merged into main at c1016ba. Main is merged into
+this branch, and createNetworkEditorProvider now binds all renderer options and
+per-link colours to the actual built-in doublet provider. Its integration test
+checks parsed options, explicit-marker defaults, pinned geometry and SVG colour.
+The example and review screenshot use the actual doublet provider.

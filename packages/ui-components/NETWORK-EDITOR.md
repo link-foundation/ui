@@ -9,11 +9,18 @@ for a prepared `createNetworkPresentation` instance. It returns `snapshot()`,
 ```js
 import {
   createNetworkEditor,
-  networkOptionsFromParams,
-  networkOptionsToLino,
+  createNetworkEditorProvider,
+  createNetworkPresentation,
 } from '@link-foundation/ui-components/links-view';
 
-// Prepare your provider with sequential 1-based doublet item IDs first.
+const presentation = createNetworkPresentation(createNetworkEditorProvider());
+await presentation.update({
+  items: [
+    [1, 1],
+    [2, 2],
+    [1, 2],
+  ],
+});
 const editor = createNetworkEditor(document.getElementById('editor'), {
   presentation,
   locale: 'en',
@@ -61,10 +68,16 @@ vocabulary. An existing provider with another LiNo vocabulary must supply both
 intentionally keeps provider text opaque. Renderer options, solver inputs and
 per-link colours are not silently injected into another provider's grammar.
 
-The example adapts the existing circle renderer's supported dimensions and
-colours. It does **not** claim to implement the continuous doublet geometry or
-collision search in #227/#228. Those remain independent upstream work. All
-editor options remain in the presentation input for a complete provider to use.
+`createNetworkEditorProvider()` adapts the built-in doublet renderer to this
+persisted vocabulary. It translates groups, global gaps, per-link turns/gaps,
+frames and circle order into the renderer's nested LiNo, leaving default marker
+fields implicit so tip compensation is preserved. Per-link colours apply to the
+identified SVG groups, whose paths and markers inherit currentColor. Preview
+and raster exports use that same markup. The example uses this provider.
+
+The collision algorithm in #228 remains independent upstream work. Hosts supply
+a solver callback; the editor does not substitute an algorithm or simulated
+collision counts when none is installed.
 
 ## Editing and styles
 

@@ -128,3 +128,5 @@ export {
   DOUBLET_MARKERS,
   readDoubletOptions,
 } from './doublet.js';
+
+export { createNetworkEditorProvider } from './network-editor/provider.js';
