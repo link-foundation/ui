@@ -109,3 +109,11 @@ export {
   GALLERY_PAGE_SIZE,
   defineLinksGallery,
 } from './links-gallery.js';
+
+export {
+  createDoubletProvider,
+  doubletGeometry,
+  doubletOptionAvailability,
+  DOUBLET_MARKERS,
+  readDoubletOptions,
+} from './doublet.js';
