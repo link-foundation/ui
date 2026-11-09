@@ -118,7 +118,19 @@ const media = (css, queries) =>
 
 /** Scoped tokens for every explicit/system combination. No inherited dark residue. */
 export function compileThemeCss(theme, options = {}) {
-  const root = attr('theme', theme.id);
+  if (Array.isArray(theme)) {
+    return theme
+      .map((entry) =>
+        compileThemeCss(entry, {
+          ...options,
+          palettePack: true,
+          selector:
+            options.paletteSelector?.(entry.id) ?? attr('palette', entry.id),
+        })
+      )
+      .join('\n');
+  }
+  const root = options.selector ?? attr('theme', theme.id);
   const axes = [
     axis('scheme', 'light', 'dark', 'prefers-color-scheme', 'dark'),
     axis('contrast', 'normal', 'more', 'prefers-contrast', 'more'),
@@ -129,7 +141,13 @@ export function compileThemeCss(theme, options = {}) {
   // A boundary with only data-theme still gets the light defaults.
   const base = checkedTokens(theme, [], options);
   cache.set('', base);
-  css.push(toCss(base, { selector: root, prefix: options.prefix }));
+  css.push(
+    toCss(base, {
+      selector: root,
+      channels: options.channels,
+      prefix: options.prefix,
+    })
+  );
   for (const scheme of axes[0]) {
     for (const contrast of axes[1]) {
       for (const motion of axes[2]) {
@@ -147,6 +165,7 @@ export function compileThemeCss(theme, options = {}) {
         }:where(${scheme.selector}${contrast.selector}${motion.selector})`;
         const block = toCss(cache.get(key), {
           selector,
+          channels: options.channels,
           prefix: options.prefix,
         });
         css.push(
@@ -179,7 +198,9 @@ export function compileThemeCss(theme, options = {}) {
     reducedTransparency: options.reducedTransparency,
   });
   if (style) {
-    css.push(`@scope (${root}) to ([data-theme]) {\n${style}\n}`);
+    css.push(
+      `@scope (${root}) to (${options.palettePack ? '[data-theme], [data-palette]' : '[data-theme]'}) {\n${style}\n}`
+    );
   }
   const extras = themeExtrasCss(theme, root, options);
   if (extras) {

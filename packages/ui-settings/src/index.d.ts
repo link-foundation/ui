@@ -238,7 +238,7 @@ export function applyToRoot(
   schema: SettingsSchema,
   values: SettingsValues,
   root?: HTMLElement,
-  options?: { project?: SettingsProjection }
+  options?: { project?: SettingsProjection; channels?: boolean }
 ): void;
 export function paintSnapshot(
   schema: SettingsSchema,
@@ -301,3 +301,5 @@ export function createSettingsCodec(
   };
   write(values: SettingsValues): string;
 };
+
+export function hexToChannels(hex: string): string;

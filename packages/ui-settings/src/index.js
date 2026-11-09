@@ -45,3 +45,5 @@ export {
 } from './dom.js';
 export { assertEverySettingUsed } from './testing.js';
 export { bindConfig } from './config.js';
+
+export { hexToChannels } from './color-channels.js';

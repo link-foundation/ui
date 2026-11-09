@@ -52,6 +52,9 @@ export function ensureContrast(
   min?: number
 ): { color: string; adjusted: boolean; ratio: number };
 export interface ThemeCssOptions {
+  channels?: boolean;
+  selector?: string;
+  paletteSelector?: (palette: string) => string;
   transparency?: 'on' | 'off';
   reducedTransparency?: boolean;
   prefix?: string;
@@ -61,7 +64,7 @@ export interface ThemeCssOptions {
   onDiagnostic?: (diagnostic: ThemeDiagnostic) => void;
 }
 export function compileThemeCss(
-  theme: Theme,
+  theme: Theme | Theme[],
   options?: ThemeCssOptions
 ): string;
 export function resolveTemplate(

@@ -57,6 +57,11 @@ export default defineConfig({
   },
   projects: [
     {
+      name: 'firefox',
+      testMatch: 'packages/ui-themes/e2e/optical-materials.e2e.mjs',
+      use: { ...devices['Desktop Firefox'] },
+    },
+    {
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],

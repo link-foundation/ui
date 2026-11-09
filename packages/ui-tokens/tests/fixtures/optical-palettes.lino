@@ -1,0 +1,72 @@
+original-1: theme
+  token color.surface '#122436'
+  mode light
+    token color.surface '#edebe9'
+  mode dark
+    token color.surface '#020304'
+original-2: theme
+  token color.surface '#24486c'
+  mode light
+    token color.surface '#eae6e2'
+  mode dark
+    token color.surface '#040608'
+original-3: theme
+  token color.surface '#366ca2'
+  mode light
+    token color.surface '#e7e1db'
+  mode dark
+    token color.surface '#06090c'
+original-4: theme
+  token color.surface '#4890d8'
+  mode light
+    token color.surface '#e4dcd4'
+  mode dark
+    token color.surface '#080c10'
+original-5: theme
+  token color.surface '#5ab40e'
+  mode light
+    token color.surface '#e1d7ed'
+  mode dark
+    token color.surface '#0a0f14'
+original-6: theme
+  token color.surface '#6cd844'
+  mode light
+    token color.surface '#ded2e6'
+  mode dark
+    token color.surface '#0c1218'
+original-7: theme
+  token color.surface '#7efc7a'
+  mode light
+    token color.surface '#dbeddf'
+  mode dark
+    token color.surface '#0e151c'
+original-8: theme
+  token color.surface '#9020b0'
+  mode light
+    token color.surface '#d8e8d8'
+  mode dark
+    token color.surface '#101820'
+original-9: theme
+  token color.surface '#a244e6'
+  mode light
+    token color.surface '#d5e3d1'
+  mode dark
+    token color.surface '#121b24'
+original-10: theme
+  token color.surface '#b4681c'
+  mode light
+    token color.surface '#d2deea'
+  mode dark
+    token color.surface '#141e28'
+original-11: theme
+  token color.surface '#c68c52'
+  mode light
+    token color.surface '#efd9e3'
+  mode dark
+    token color.surface '#16212c'
+original-12: theme
+  token color.surface '#d8b088'
+  mode light
+    token color.surface '#ecd4dc'
+  mode dark
+    token color.surface '#182400'
