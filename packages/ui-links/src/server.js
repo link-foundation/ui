@@ -461,9 +461,9 @@ function updateSubscription(subscription, changes, fits) {
     .filter(differs);
 }
 
-function openSession(server, { subject = null, onPush = null } = {}) {
-  const { links, policy, autoCreate, sessions } = server;
-  const state = { subject, subscriptions: new Map(), next: 1 };
+/** The permission-filtered store and names one session reads through. */
+function sessionView(server, state) {
+  const { links, policy } = server;
   const subjectOf = () => state.subject;
   const doublets = policy ? withPermissions(links, policy, subjectOf) : links;
   const tripletsView =
@@ -475,9 +475,50 @@ function openSession(server, { subject = null, onPush = null } = {}) {
   const names =
     server.names.withLinks?.(view) ??
     (policy ? namesOfView(server.names, view) : server.names);
-  const context = { links: view, base: links, names, autoCreate };
   const readable = (link) =>
     !policy || (server.policyWatch ?? policy).canRead(state.subject, link);
+  return { view, names, readable };
+}
+
+/** Diff one subscription against `changes` and push what it still sees. */
+function deliverSubscription(n, subscription, delivery) {
+  const { links, names, fits, changes, refresh, own, onPush } = delivery;
+  const seen = refresh
+    ? refreshSubscription(
+        subscription,
+        new Map(
+          allLinks(links, subscription.query)
+            .filter((link) => fits(subscription, link))
+            .map((link) => [link.id, link])
+        )
+      )
+    : updateSubscription(subscription, changes, fits);
+  if (names.dependencies) {
+    const selected = [...subscription.selected.values()];
+    includeNames(names, subscription, selected, seen);
+  }
+  if (own) {
+    const written = new Set(
+      changes.map(({ before, after }) => (after ?? before).id)
+    );
+    const indirect = seen.filter(
+      ({ before, after }) => !written.has((after ?? before).id)
+    );
+    seen.splice(0, seen.length, ...indirect);
+  }
+  if (seen.length > 0 && onPush) {
+    onPush([
+      named('notify', [String(n)]),
+      ...seen.map((change) => changeToLino(change)),
+    ]);
+  }
+}
+
+function openSession(server, { subject = null, onPush = null } = {}) {
+  const { links, autoCreate, sessions } = server;
+  const state = { subject, subscriptions: new Map(), next: 1 };
+  const { view, names, readable } = sessionView(server, state);
+  const context = { links: view, base: links, names, autoCreate };
   const nameRef = (id) => names.getName(id) ?? String(id);
   /** Tell the other sessions about `changes`; them as LiNo for the reply. */
   const report = (changes, ref = String) => {
@@ -594,36 +635,9 @@ function openSession(server, { subject = null, onPush = null } = {}) {
       if (state.subscriptions.size === 0) {
         return;
       }
+      const delivery = { links, names, fits, changes, refresh, own, onPush };
       for (const [n, subscription] of state.subscriptions) {
-        const seen = refresh
-          ? refreshSubscription(
-              subscription,
-              new Map(
-                allLinks(links, subscription.query)
-                  .filter((link) => fits(subscription, link))
-                  .map((link) => [link.id, link])
-              )
-            )
-          : updateSubscription(subscription, changes, fits);
-        if (names.dependencies) {
-          const selected = [...subscription.selected.values()];
-          includeNames(names, subscription, selected, seen);
-        }
-        if (own) {
-          const written = new Set(
-            changes.map(({ before, after }) => (after ?? before).id)
-          );
-          const indirect = seen.filter(
-            ({ before, after }) => !written.has((after ?? before).id)
-          );
-          seen.splice(0, seen.length, ...indirect);
-        }
-        if (seen.length > 0 && onPush) {
-          onPush([
-            named('notify', [String(n)]),
-            ...seen.map((change) => changeToLino(change)),
-          ]);
-        }
+        deliverSubscription(n, subscription, delivery);
       }
     },
     close() {
