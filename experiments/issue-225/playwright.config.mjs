@@ -5,7 +5,7 @@ export default {
   testDir: '../..',
   snapshotPathTemplate: decodeURIComponent(
     new URL(
-      '../../packages/ui-themes/tests/e2e/__screenshots__/{projectName}/{testFileName}/{arg}{ext}',
+      '../../{testFileDir}/__screenshots__/{projectName}/{testFileName}/{arg}{ext}',
       import.meta.url
     ).pathname
   ),
