@@ -29,6 +29,10 @@ it('clamps, ignores unknown URL fields, migrates gap and custom colours', () => 
   assert.equal(options.endGap, 0.3);
   assert.equal(options.palette, 'custom');
   assert.equal(Object.hasOwn(options, 'unknown'), false);
+  const reset = editOptions(options, { palette: 'default' });
+  assert.equal(reset.palette, 'default');
+  assert.equal(reset.color, normalize({}).color);
+  assert.equal(toParams(reset).has('color'), false);
 });
 it('round trips per-link overrides and pinned frame without precision loss', () => {
   const options = normalize({

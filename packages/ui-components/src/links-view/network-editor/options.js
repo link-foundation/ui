@@ -216,6 +216,16 @@ export function fromOptions(text = '') {
 }
 
 export function editOptions(input, patch, { countChanged = false } = {}) {
+  // Selecting the default palette restores its colours; otherwise inherited
+  // custom colours would immediately normalize the selection back to custom.
+  const palette =
+    patch.palette === 'default'
+      ? Object.fromEntries(
+          networkOptionSchema
+            .filter((field) => field.type === 'color')
+            .map((field) => [field.key, field.default])
+        )
+      : {};
   const geometry = new Set([
     'layout',
     'geometry',
@@ -248,6 +258,7 @@ export function editOptions(input, patch, { countChanged = false } = {}) {
   return normalize({
     ...input,
     ...patch,
+    ...palette,
     ...(clearsFrame ? { frame: null } : {}),
     ...(countChanged ? { frame: null, order: null } : {}),
   });

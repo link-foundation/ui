@@ -56,7 +56,9 @@ issues #227 and #228; passes are bounded to 1..10 for an interactive editor.
 not JSON. `networkOptionsFromParams` ignores unknown/malformed optional fields,
 understands legacy `gap`, and treats explicit colours without a palette as
 custom. A custom colour with the default palette normalizes to custom so the
-URL remains unambiguous. The URL's `code` is separate from the options.
+URL remains unambiguous. Selecting or resetting the default palette restores
+its scalar colours, while retaining per-link overrides and the pinned frame.
+The URL's `code` is separate from the options.
 `restoreUrl()` reads it with the current search parameters; call this explicitly
 on initial mount when the host did not already prepare the presentation from
 the URL. Back/forward events restore automatically.
