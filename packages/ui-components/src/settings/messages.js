@@ -1,6 +1,18 @@
 /** Host catalogs may use ui-i18n or any formatter; parameters stay structured. */
 export const PANEL_MESSAGES = Object.freeze({
   settings: 'Settings',
+  back: 'Back to my look',
+  inherit: ({ label }) => `Inherit ${label}`,
+  inherited: 'inherited',
+  levels: ({ label }) => `${label} levels`,
+  levelOwned: 'Own values',
+  copyLooks: 'Copy all looks',
+  emptyLooks: 'No saved looks yet',
+  defaultLook: ({ count }) => `Look ${count}`,
+  updateLook: 'Update to current',
+  renameLook: 'Rename look',
+  looksError:
+    'Could not save or read looks. Check storage permissions or available space.',
   close: 'Close settings',
   search: 'Search settings',
   preset: 'Preset',
@@ -50,13 +62,13 @@ export function createMessages(catalog = {}) {
   let current = catalog;
   let revision = 0;
   const contents = new Map();
-  const bindings = [];
+  const bindings = new Map();
   const text = (key, params = {}) => {
     const value = current[key] ?? PANEL_MESSAGES[key];
     return typeof value === 'function' ? value(params) : value;
   };
-  const bind = (update) => {
-    bindings.push(update);
+  const bind = (update, owner) => {
+    bindings.set(update, owner);
     update();
   };
   return {
@@ -71,7 +83,7 @@ export function createMessages(catalog = {}) {
           if (item) {
             element.textContent = text(...item);
           }
-        });
+        }, element);
       }
       contents.set(element, [key, params]);
       element.textContent = text(key, params);
@@ -79,12 +91,20 @@ export function createMessages(catalog = {}) {
     message: (key, params) => () => text(key, params),
     bind,
     attr(element, name, key, params) {
-      bind(() => element.setAttribute(name, text(key, params)));
+      bind(() => element.setAttribute(name, text(key, params)), element);
+    },
+    release(root) {
+      for (const [update, owner] of bindings) {
+        if (owner && root.contains(owner)) {
+          bindings.delete(update);
+          contents.delete(owner);
+        }
+      }
     },
     update(next) {
       current = next;
       revision++;
-      for (const update of bindings) {
+      for (const update of bindings.keys()) {
         update();
       }
     },

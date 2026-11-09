@@ -213,6 +213,8 @@ export interface StorageLike {
 }
 
 export interface PersistOptions {
+  sync?: boolean;
+  eventTarget?: Window;
   onDiagnostic?: (diagnostic: Diagnostic) => void;
 }
 
