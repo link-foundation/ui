@@ -457,7 +457,12 @@ export interface NetworkLayoutOptions {
   pins?: [NetworkId, LinkPoint][];
 }
 export type NetworkLayoutName =
-  'circle' | 'grid' | 'hex' | 'spiral' | 'force' | 'layered';
+  | 'circle'
+  | 'grid'
+  | 'hex'
+  | 'spiral'
+  | 'force'
+  | 'layered';
 export type NetworkLayout = (
   network: Network,
   options?: NetworkLayoutOptions
