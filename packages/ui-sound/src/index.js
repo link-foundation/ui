@@ -8,3 +8,10 @@ export {
   SOUND_SETTINGS_LINO,
   SOUND_COMFORT_KEYS,
 } from './comfort.js';
+
+export {
+  generateSoundSettings,
+  createSoundSettingsSchema,
+  soundEventKey,
+} from './settings.js';
+export { bindSoundToDocument } from './document.js';

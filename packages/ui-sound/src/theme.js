@@ -224,7 +224,7 @@ export function readSoundTheme(text) {
     name: '',
     voices: Object.create(null),
     events: Object.create(null),
-    bus: { shelf: [4000, -6], compressor: [-18, 4], reverb: 0.15 },
+    bus: { shelf: [4000, -6], compressor: [-18, 4], reverb: 0.2 },
   };
   try {
     const roots = parseLinks(text, { maxInputSize: 131072, maxDepth: 32 });

@@ -1,4 +1,19 @@
 /** Build bounded Web Audio graphs. Context, time and randomness are injectable. */
+const bound = (n, min, max) => Math.max(min, Math.min(max, n));
+const noiseBuffers = new WeakMap();
+
+function cachedNoise(audio, random) {
+  let entry = noiseBuffers.get(audio);
+  if (!entry || entry.sampleRate !== audio.sampleRate) {
+    entry = {
+      sampleRate: audio.sampleRate,
+      buffer: noiseBuffer(audio, 2, 1, random),
+    };
+    noiseBuffers.set(audio, entry);
+  }
+  return entry.buffer;
+}
+
 const clamp = (n) => Math.max(-1, Math.min(1, n));
 
 function noiseBuffer(audio, seconds, channels, random, decay = false) {
@@ -36,17 +51,39 @@ export function createSoundBus(audio, settings, random = Math.random) {
     .connect(compressor)
     .connect(master)
     .connect(audio.destination);
-  if (settings.reverb > 0) {
-    const convolver = audio.createConvolver();
-    convolver.buffer = noiseBuffer(audio, 1.4, 2, random, true);
-    const wet = audio.createGain();
-    wet.gain.value = settings.reverb;
-    shelf.connect(convolver).connect(wet).connect(compressor);
-    nodes.push(convolver, wet);
-  }
+  const convolver = audio.createConvolver();
+  const wet = audio.createGain();
+  wet.gain.value = settings.reverb ?? 0.2;
+  shelf.connect(convolver).connect(wet).connect(compressor);
+  nodes.push(convolver, wet);
+  let room = bound(settings.room ?? 1.4, 0.3, 4);
+  convolver.buffer = noiseBuffer(audio, room, 2, random, true);
   return {
     input,
     master,
+    shelf,
+    convolver,
+    wet,
+    configure(values = {}) {
+      for (const [key, param, min, max] of [
+        ['volume', master.gain, 0, values.maxVolume ?? 1],
+        ['tone', shelf.gain, -40, 40],
+        ['frequency', shelf.frequency, 1, 24000],
+        ['reverb', wet.gain, 0, 1],
+      ]) {
+        if (Number.isFinite(values[key])) {
+          param.setTargetAtTime(
+            bound(values[key], min, max),
+            audio.currentTime,
+            0.02
+          );
+        }
+      }
+      if (Number.isFinite(values.room) && bound(values.room, 0.3, 4) !== room) {
+        room = bound(values.room, 0.3, 4);
+        convolver.buffer = noiseBuffer(audio, room, 2, random, true);
+      }
+    },
     disconnect: () => nodes.forEach((node) => node.disconnect()),
   };
 }
@@ -62,6 +99,8 @@ function createEnvelope(audio, envelope, start, peak) {
   const { attack, decay, sustain, release } = envelope;
   const stop = start + attack + decay + release;
   const amp = audio.createGain();
+  amp.gain.value = 0;
+  amp.gain.setValueAtTime(0, 0);
   amp.gain.setValueAtTime(0, start);
   amp.gain.linearRampToValueAtTime(peak, start + attack);
   if (envelope.curve === 'exponential' && peak > 0) {
@@ -81,7 +120,13 @@ export function playVoice(
   audio,
   voice,
   output,
-  { at = audio.currentTime, pan = 0, gain = 1, random = Math.random } = {}
+  {
+    at = audio.currentTime,
+    pan = 0,
+    gain = 1,
+    detune = 0,
+    random = Math.random,
+  } = {}
 ) {
   let end = at;
   for (let repeat = 0; repeat < voice.repeat; repeat++) {
@@ -102,16 +147,13 @@ export function playVoice(
       let source;
       if (part.kind === 'noise') {
         source = audio.createBufferSource();
-        source.buffer = noiseBuffer(
-          audio,
-          Math.max(duration, 0.001),
-          1,
-          random
-        );
+        source.buffer = cachedNoise(audio, random);
+        source.loop = true;
+        source.detune.value = detune;
       } else {
         source = audio.createOscillator();
         source.type = part.wave;
-        source.detune.value = part.detune;
+        source.detune.value = part.detune + detune;
         sweep(
           source.frequency,
           part.frequency,
@@ -122,6 +164,7 @@ export function playVoice(
         if (part.fm) {
           const mod = audio.createOscillator();
           const depth = audio.createGain();
+          mod.detune.value = detune;
           mod.frequency.value = part.frequency * part.fm.ratio;
           depth.gain.setValueAtTime(part.frequency * part.fm.index, start);
           if (part.fm.index > 0) {
@@ -158,9 +201,17 @@ export function playVoice(
       }
       tail.connect(output);
       source.onended = () => nodes.forEach((node) => node.disconnect());
-      source.start(start);
+      startSource(source, part.kind, start, random);
       source.stop(stop);
     }
   }
   return end;
+}
+
+function startSource(source, kind, start, random) {
+  if (kind === 'noise') {
+    source.start(start, random() * 2);
+  } else {
+    source.start(start);
+  }
 }
