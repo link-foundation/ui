@@ -100,6 +100,7 @@
     "dist/",
     "stories/",
     "README.md",
+    "CONFIGURATIONS.md",
     "LICENSE",
     "bin/"
   ],

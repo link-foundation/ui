@@ -227,7 +227,10 @@ function connectNetwork(node, state) {
   });
   connectNetworkInteraction(node, state, listen);
   state.zoom = createZoomPan(node, { onChange: () => node.requestDraw() });
-  if (state.options.createWorker || state.win.Worker) {
+  if (
+    state.options.worker !== false &&
+    (state.options.createWorker || state.win.Worker)
+  ) {
     state.runner = createLayoutRunner({
       createWorker:
         state.options.createWorker ??

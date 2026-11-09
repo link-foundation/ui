@@ -1476,3 +1476,8 @@ large decimal indexes, LiNo settings and host ownership.
 The [network editor adapter](NETWORK-EDITOR.md) adds live notations, per-link
 controls, declarative options, looks and sizes, saved styles, sharing and
 held-input URL synchronization around a host-owned network presentation.
+
+### Doublet configurations and gallery
+
+See [the configurations guide](CONFIGURATIONS.md) for exact enumeration,
+notation conversion, editing helpers, renaming classes and `<links-gallery>`.

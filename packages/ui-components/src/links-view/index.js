@@ -121,6 +121,13 @@ export {
   networkShareTargets,
 } from './network-editor/share.js';
 export { networkOverrideSchema } from './network-editor/schema.js';
+
+export {
+  LINKS_GALLERY_TAG,
+  GALLERY_PAGE_SIZE,
+  defineLinksGallery,
+} from './links-gallery.js';
+
 export {
   createDoubletProvider,
   doubletGeometry,

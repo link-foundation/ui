@@ -53,3 +53,7 @@ this branch, and createNetworkEditorProvider now binds all renderer options and
 per-link colours to the actual built-in doublet provider. Its integration test
 checks parsed options, explicit-marker defaults, pinned geometry and SVG colour.
 The example and review screenshot use the actual doublet provider.
+
+During final CI, #229 merged into main at 76cced8. Main is merged again,
+retaining both the gallery and editor exports. Configuration sources match the
+upstream implementation; the editor now uses the merged API directly.

@@ -28,10 +28,9 @@ const editor = createNetworkEditor(document.getElementById('editor'), {
 });
 ```
 
-The adapter includes the actual pure configurations implementation from
-[PR #244](https://github.com/link-foundation/ui/pull/244), pinned at
-`dfaddf20e109365fc7c70dec37d4740ed33d9b81`. Its model, notations, canonical
-renaming and regression tests are reused unchanged. They are also available at
+The adapter uses the pure configurations implementation merged into main in
+[PR #244](https://github.com/link-foundation/ui/pull/244). Its model, notations,
+canonical renaming and regression tests are reused unchanged. They are also available at
 `@link-foundation/ui-components/links-view/configurations`. A host may supply
 another `configurations` object implementing that module's contract.
 No consumer-site source is copied.
