@@ -26,11 +26,11 @@ const samples = frame.curves.map((curve) =>
 const cross = (x, y) => x.x * y.y - x.y * y.x;
 const sub = (x, y) => ({ x: x.x - y.x, y: x.y - y.y });
 const intersections = [];
-for (let a = 0; a < 2; a++)
+for (let a = 0; a < 2; a++) {
   for (let b = 0; b < 2; b++) {
     const first = samples[0][a],
       second = samples[1][b];
-    for (let i = 1; i < first.length; i++)
+    for (let i = 1; i < first.length; i++) {
       for (let j = 1; j < second.length; j++) {
         const p = first[i - 1],
           q = second[j - 1];
@@ -38,17 +38,22 @@ for (let a = 0; a < 2; a++)
           v = sub(second[j], q),
           w = sub(q, p);
         const denominator = cross(u, v);
-        if (Math.abs(denominator) < 1e-12) continue;
+        if (Math.abs(denominator) < 1e-12) {
+          continue;
+        }
         const t = cross(w, v) / denominator,
           s = cross(w, u) / denominator;
-        if (t > 0 && t < 1 && s > 0 && s < 1)
+        if (t > 0 && t < 1 && s > 0 && s < 1) {
           intersections.push({
             halves: [a, b],
             x: p.x + t * u.x,
             y: p.y + t * u.y,
           });
+        }
       }
+    }
   }
+}
 const provider = createDoubletProvider();
 const svg = provider.svg({ frame });
 const directory = resolve(process.argv[2] ?? '/tmp/issue-228-renderer');
