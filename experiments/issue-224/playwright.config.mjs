@@ -8,15 +8,17 @@ export default {
   testMatch: 'tests/ui/backgrounds.e2e.mjs',
   outputDir: '../../test-results',
   webServer: { ...base.webServer, cwd: '../..' },
-  projects: base.projects.map((project) => {
-    const executablePath =
-      project.name === 'chromium' ? process.env.CHROME : process.env.WEBKIT;
-    return {
-      ...project,
-      use: {
-        ...project.use,
-        launchOptions: executablePath ? { executablePath } : {},
-      },
-    };
-  }),
+  projects: base.projects
+    .filter((project) => ['chromium', 'webkit'].includes(project.name))
+    .map((project) => {
+      const executablePath =
+        project.name === 'chromium' ? process.env.CHROME : process.env.WEBKIT;
+      return {
+        ...project,
+        use: {
+          ...project.use,
+          launchOptions: executablePath ? { executablePath } : {},
+        },
+      };
+    }),
 };
