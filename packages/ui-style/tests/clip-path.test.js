@@ -3,6 +3,20 @@ import assert from 'node:assert/strict';
 import { validClipPath } from '../src/clip-path.js';
 import { typeDeclaration } from '../src/properties.js';
 import { STATE_CSS } from '../src/conditions.js';
+import { readStyles, compileCss } from '../src/index.js';
+it('compiles active as the pressed alias on hosts and control parts', () => {
+  for (const part of ['', '    part indicator\n']) {
+    const source = `press: style
+  selector
+    type checkbox
+${part}  state active
+    opacity 0.5`;
+    const active = readStyles(source);
+    const pressed = readStyles(source.replace('state active', 'state pressed'));
+    assert.deepEqual(active.diagnostics, []);
+    assert.equal(compileCss(active.rules), compileCss(pressed.rules));
+  }
+});
 it('accepts bounded computed polygons and dotted borders', () => {
   for (const text of [
     'polygon(0% 0%, 100% 0%, 100% 100%)',
