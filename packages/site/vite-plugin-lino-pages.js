@@ -12,6 +12,11 @@ import { registerSiteKinds } from './src/kinds.js';
 const packageRoot = fileURLToPath(new globalThis.URL('.', import.meta.url));
 const THEME_MODULE = 'virtual:site-themes';
 const EXAMPLES_MODULE = 'virtual:site-examples';
+const trace = (phase, started) => {
+  if (process.env.SITE_BUILD_TRACE === '1') {
+    console.error(`[site-build] ${phase}: ${Date.now() - started}ms`);
+  }
+};
 const json = (value) => JSON.stringify(value).replaceAll('<', '\\u003c');
 
 export function linoPages({ contentDir, layout, languages = ['en', 'ru'] }) {
@@ -20,6 +25,7 @@ export function linoPages({ contentDir, layout, languages = ['en', 'ru'] }) {
   let catalog;
   let resolved;
   async function generate() {
+    const started = Date.now();
     registerSiteKinds();
     const pages = await loadPages({ contentDir, layout, languages });
     themes = new Map(
@@ -77,6 +83,7 @@ export function linoPages({ contentDir, layout, languages = ['en', 'ru'] }) {
       home,
       `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Links UI · Language</title></head><body><main><h1>Links UI</h1><p><a href="./en/">English</a> · <a href="./ru/">Русский</a></p></main><script>location.replace('./'+(navigator.language.toLowerCase().startsWith('ru')?'ru':'en')+'/');</script></body></html>`
     );
+    trace('generate pages', started);
     return [...inputs, home];
   }
   return {
@@ -105,7 +112,9 @@ export function linoPages({ contentDir, layout, languages = ['en', 'ru'] }) {
       order: 'post',
       handler(_options, bundle) {
         appendGallery(bundle, catalog, themes, languages);
+        const started = Date.now();
         emitMatrices(this, bundle, catalog, themes, languages);
+        trace('render matrices', started);
       },
     },
     transformIndexHtml(html) {
