@@ -734,3 +734,5 @@ export function networkToRaster(
   svg: string,
   options?: NetworkRasterOptions
 ): Promise<Blob>;
+
+export * from './network-editor/index.js';

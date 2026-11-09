@@ -103,3 +103,21 @@ export { linoToNetwork, networkToLino } from './lino-to-network.js';
 export { LINO_NETWORK_TAG, defineLinoNetwork } from './lino-network.js';
 
 export { createNetworkPresentation } from './presentation.js';
+
+export { createNetworkEditor } from './network-editor/editor.js';
+export {
+  networkOptionSchema,
+  normalize as normalizeNetworkOptions,
+  toParams as networkOptionsToParams,
+  fromParams as networkOptionsFromParams,
+  toOptions as networkOptionsToLino,
+  fromOptions as networkOptionsFromLino,
+  optionAvailable as networkOptionAvailable,
+} from './network-editor/options.js';
+export { syncNetworkUrl } from './network-editor/url-sync.js';
+export { networkLooks, networkSizePresets } from './network-editor/presets.js';
+export {
+  networkFilename,
+  networkShareTargets,
+} from './network-editor/share.js';
+export { networkOverrideSchema } from './network-editor/schema.js';

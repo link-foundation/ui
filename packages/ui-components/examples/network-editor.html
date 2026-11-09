@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Network editor adapter</title>
+    <link rel="icon" href="data:," />
+    <script type="importmap">
+      {
+        "imports": {
+          "@link-foundation/ui-store": "/packages/ui-store/src/index.js",
+          "@link-foundation/ui-store/memory": "/packages/ui-store/src/memory.js",
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "@link-foundation/ui-core/source": "/packages/ui-core/src/source.js",
+          "@link-foundation/ui-style": "/packages/ui-style/src/index.js",
+          "@link-foundation/ui-tokens": "/packages/ui-tokens/src/index.js",
+          "@link-foundation/ui-tokens/themes": "/packages/ui-tokens/src/themes/index.js",
+          "@link-foundation/ui-dom": "/packages/ui-dom/src/index.js",
+          "@dagrejs/dagre": "/node_modules/@dagrejs/dagre/dist/dagre.esm.js",
+          "d3-force": "/node_modules/d3-force/src/index.js",
+          "d3-dispatch": "/node_modules/d3-dispatch/dist/d3-dispatch.mjs",
+          "d3-quadtree": "/node_modules/d3-quadtree/dist/d3-quadtree.mjs",
+          "d3-timer": "/node_modules/d3-timer/dist/d3-timer.mjs",
+          "links-notation": "/node_modules/links-notation/dist/index.js"
+        }
+      }
+    </script>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        max-width: 1100px;
+        margin: auto;
+        padding: 1rem;
+        color: #18202b;
+        background: #f3f4f6;
+      }
+      #preview {
+        background: white;
+        max-width: 100%;
+        height: 300px;
+        overflow: hidden;
+      }
+      #preview svg {
+        height: 100%;
+        width: 100%;
+      }
+      h1 {
+        font-size: 1.7rem;
+      }
+      @media (prefers-color-scheme: dark) {
+        body {
+          color: #f3f4f6;
+          background: #111827;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Network editor</h1>
+      <p>
+        This adapter example uses the existing circle renderer. The complete
+        doublet renderer and collision solver are tracked in issues #227 and
+        #228. The solver is unavailable until a host supplies it.
+      </p>
+      <div id="preview" role="img" aria-label="Network preview"></div>
+      <div id="editor"></div>
+    </main>
+    <script type="module" src="./network-editor.js"></script>
+  </body>
+</html>
