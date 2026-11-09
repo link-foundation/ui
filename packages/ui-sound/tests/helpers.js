@@ -13,11 +13,15 @@ export function seeded(seed = 42) {
 }
 export function fakeAudio() {
   const nodes = [];
+  const buffers = [];
   const param = () => ({
     value: 0,
     calls: [],
     setValueAtTime(v, t) {
       this.calls.push(['set', v, t]);
+    },
+    setTargetAtTime(v, t, constant) {
+      this.calls.push(['target', v, t, constant]);
     },
     linearRampToValueAtTime(v, t) {
       this.calls.push(['linear', v, t]);
@@ -47,8 +51,9 @@ export function fakeAudio() {
       disconnect() {
         this.disconnected = true;
       },
-      start(t) {
+      start(t, offset) {
         this.started = t;
+        this.offset = offset;
       },
       stop(t) {
         this.stopped = t;
@@ -59,6 +64,7 @@ export function fakeAudio() {
   };
   return {
     nodes,
+    buffers,
     currentTime: 0,
     sampleRate: 8000,
     state: 'running',
@@ -75,7 +81,13 @@ export function fakeAudio() {
         { length: channels },
         () => new Float32Array(length)
       );
-      return { getChannelData: (i) => data[i] };
+      const buffer = { getChannelData: (i) => data[i] };
+      buffers.push(buffer);
+      return buffer;
+    },
+    suspend() {
+      this.state = 'suspended';
+      return Promise.resolve();
     },
     resume() {
       this.state = 'running';

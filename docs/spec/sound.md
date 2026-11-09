@@ -59,31 +59,36 @@ all 26 SOUNDS records' character, sourceLabel (as label), and sourceUrl
 are metadata only: no third-party recordings or audio files are fetched.
 
 An `event NAME` selects up to six voice names with `voices` and a `mode`:
-`random` picks one using the injected random source, `cycle` rotates, and
+`random` picks one using the injected random source, excluding the previously
+played voice for the same event when another voice is available, `cycle` rotates, and
 `layer` plays all with gain divided by the square root of the voice count.
 An empty voice list is silent. `throttle` is milliseconds (0–60000), defaults
 to 120 for scan and zero otherwise. The first cue is eligible at any clock
 value; the next is eligible when the elapsed time is at least the throttle.
 
-The bus defaults to `shelf 4000 -6`, `compressor -18 4`, `reverb 0.15`.
+The bus defaults to `shelf 4000 -6`, `compressor -18 4`, `reverb 0.2`.
 Shelf is Hz and dB (-40–40); compressor is threshold dB (-100–0) and ratio
 (1–20). Input feeds a high shelf, then dry and convolution reverb paths,
 then the compressor and a final master volume. Reverb is a 0–1 send to a
-synthesized 1.4-second stereo impulse. Mute and volume affect wet tails too.
+synthesized stereo impulse (default length 1.4 seconds). The wet route is
+always present, including at send zero. Live volume/shelf/send changes use
+a 20 ms time constant; room changes (0.3–4 seconds) replace the impulse in place. Mute and volume affect wet tails too.
 
 ## Interaction and comfort
 
-A player starts disabled. It creates an AudioContext only in an enabled
-`pointerdown` or `keydown` handler on its gesture target. Cues before that
-are silent and never queued for later playback. If enabling happens after
-the capturing gesture handler, the next gesture initializes audio. Only a
-later gesture retries failed initialization. Suspended contexts resume on
-eligible gestures or subsequent enabled plays. Unsupported/failed audio is
-reported through optional diagnostics without throwing into UI handlers.
+A player starts disabled. An enabled player creates an AudioContext lazily
+on a captured pointerdown/keydown or its first eligible play when the page
+already has sticky user activation. `hasBeenActive` is injectable and defaults
+to `navigator.userActivation.hasBeenActive`. Pre-activation cues stay silent
+and are not queued. Enabling and playing in the same captured gesture works.
+Failed initialization retries on the next gesture and reports optional
+diagnostics. Hidden documents suspend audio immediately; the next eligible
+visible play resumes it. Disposal removes the visibility listener too.
 
 `play(event, {x})` and `cue(name, {x})` use a normalized horizontal
 coordinate (0 left, 1 right). Without x the player uses the last pointermove or pointerdown
-position; keyboard cues keep that position. Part pan is added and clamped.
+position; keyboard cues keep that position. Pointer pan is multiplied by
+width (default 0.6), or zero while stereo is off. Part pan is then added and clamped.
 `onCue` receives `{event, pan}` after throttling, including while muted,
 so visual resonance can work independently. Unknown events, disposed
 players and reduced-motion intro/scan events emit no cue. The injectable
@@ -92,7 +97,8 @@ clock returns milliseconds and random returns a number in [0,1).
 Only `intro` and `scan` are suppressed by prefers-reduced-motion; unrelated
 click and other interaction sounds remain available. Sound never carries
 information unavailable through ordinary accessible UI. The viewer can
-always mute and set a 0–1 volume.
+always mute and set a 0–1 volume (hosts may opt into a maximum up to 2).
+The reduced-motion event list is configurable; its default remains intro/scan.
 
 `SOUND_SETTINGS_LINO` declares `sound.enabled` (false) and `sound.volume`
 (0.5) with ui-settings `(comfort)`. `bindSoundConfig` binds these fields to
@@ -136,3 +142,25 @@ sound-map
 Invalid mapping input throws at binding setup. `dispose()` unsubscribes
 machines and disables the callback. Await player `dispose()` to remove
 gesture/config listeners, disconnect the bus and close its context.
+
+## Runtime settings and document binding
+
+The [ui-sound API guide](../../packages/ui-sound/README.md#live-controls-and-preview)
+specifies runtime bounds, humanization, event replacement, preview and the
+settings fragment. Runtime events accept zero to four ordered voice names,
+mode, level (0–2, default 1) and throttle without reparsing a theme. Existing
+theme files continue to accept up to six voices. A global mode overrides all
+event modes. Layering applies 1/√n headroom before the event level.
+
+Humanization defaults to ±15 cents and up to ±10% level, with level spread
+scaled by min(1, cents/15). Zero spread yields exact added detune 0 and level 1.
+Noise buffers are reused per context/sample rate with independent start offsets.
+Every amplitude envelope has an explicit zero anchor before its scheduled
+start, including fractional-sample repeat times.
+
+The settings generator emits nested LiNo using ui-core `formatLinks`; every
+field is comfort metadata. Sequential slots use `visible-when` clauses,
+voice labels use `option-labels`, and previews use the existing panel hook.
+The [document binding contract](../../packages/ui-sound/README.md#plain-document-interaction-binding)
+defines control classification, disabled behavior, pointer entry and scan,
+input throttles, details toggle deduplication and the window cue channel.
