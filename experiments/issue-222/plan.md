@@ -44,11 +44,11 @@ There are no required sub-issues or upstream blockers.
 Additional prose requirements are covered by runtime modes/throttle and
 sub-15-cent variation tests; settings config integration (consumer events,
 boost, live tone, global mode and silent slots); preview/mute tests;
-configurable motion suppression; and real OfflineAudioContext verification
+configurable motion suppression; muted visual-cue throttling; and real OfflineAudioContext verification
 of fractional-sample repeated envelopes. Browser tests exercise the standard
 settings panel, named voice labels, progressive slots, preview controls,
 conditional room/width and an axe WCAG audit.
 
-Focused verification: 35 sound tests pass and two real-browser tests pass.
+Focused verification: 36 sound tests pass and two real-browser tests pass.
 The checked-in screenshot shows the demo's progressive voice slots and preview.
 The changeset prepares ui-sound minor and ui-components patch releases.
