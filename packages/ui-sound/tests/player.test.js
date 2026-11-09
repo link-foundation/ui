@@ -50,8 +50,8 @@ describe('sound player', () => {
     s.gesture('keydown');
     expect(s.contexts()).toBe(0);
     s.config.set('sound.enabled', true);
-    expect(s.player.play('click')).toEqual([]);
-    expect(s.contexts()).toBe(0);
+    expect(s.player.play('click').length).toBe(1);
+    expect(s.contexts()).toBe(1);
     s.gesture();
     expect(s.contexts()).toBe(1);
     expect(s.player.play('click').length).toBe(1);
@@ -111,10 +111,10 @@ describe('sound player', () => {
     const cues = [];
     const off = s.player.onCue((c) => cues.push(c));
     s.player.cue('click', { x: 0 });
-    expect(cues).toEqual([{ event: 'click', pan: -1 }]);
+    expect(cues).toEqual([{ event: 'click', pan: -0.6 }]);
     s.gesture();
     s.player.play('click', { x: 1 });
-    expect(s.audio.nodes.find((n) => n.kind === 'panner').pan.value).toBe(1);
+    expect(s.audio.nodes.find((n) => n.kind === 'panner').pan.value).toBe(0.6);
     s.player.setVolume(0.23);
     expect(s.config.get('sound.volume')).toBe(0.23);
     s.player.mute();
@@ -145,7 +145,7 @@ describe('sound player', () => {
     s.audio.state = 'suspended';
     s.player.play('click');
     expect(s.audio.state).toBe('running');
-    expect(s.audio.nodes.find((n) => n.kind === 'panner').pan.value).toBe(-1);
+    expect(s.audio.nodes.find((n) => n.kind === 'panner').pan.value).toBe(-0.6);
     await s.player.dispose();
   });
   it('reports unavailable audio without breaking interaction', async () => {

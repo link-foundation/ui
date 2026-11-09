@@ -50,11 +50,12 @@ export function mountField(
   const clauses = Object.entries(props)
     .filter(([key]) => !['options', 'unit'].includes(key))
     .map(([key, v]) => [key, ...(Array.isArray(v) ? v : [String(v)])]);
+  const optionLabels = choiceLabels(field);
   const children =
     element === 'select'
       ? (field.options ?? []).map((v, i) => ({
           id: `${id}-option-${i}`,
-          values: ['option', v, ['value', v]],
+          values: ['option', optionLabels.get(v) ?? v, ['value', v]],
         }))
       : [];
   const source = formatLinks([
@@ -187,4 +188,12 @@ function mountCollection(container, field, value, onChange, element, messages) {
       container.replaceChildren();
     },
   };
+}
+
+function choiceLabels(field) {
+  const labels = field.props['option-labels'];
+  const pairs = Array.isArray(labels?.[0]) ? labels : [labels];
+  return new Map(
+    pairs.filter((pair) => Array.isArray(pair) && pair.length === 2)
+  );
 }
