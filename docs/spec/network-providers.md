@@ -65,3 +65,7 @@ Consumer parity remains a separate acceptance check: single continuous curves,
 self-references, nine marker shapes, neutral/anchored turns and gaps, painted
 clearance solving, history traversal and caption/export formats must all be
 verified against the consumer before deleting its backend.
+
+The built-in [`createDoubletProvider`](doublet-provider.md) supplies the
+continuous two-cubic doublet renderer, nine parametric markers, placements,
+backgrounds, cards and captions without a consumer geometry backend.
