@@ -42,9 +42,12 @@ jobs:
         with:
           persist-credentials: false
 
-      # The container user (root) does not own the runner's workspace.
-      - name: Trust the checkout
-        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      # The container user (root) does not own the runner's workspace or home.
+      # Firefox refuses to launch when its home belongs to another user.
+      - name: Prepare the checkout and browser home
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          chown "$(id -u):$(id -g)" "$HOME"
 
       - name: Check Playwright version pins
         run: node scripts/check-playwright-version.mjs
