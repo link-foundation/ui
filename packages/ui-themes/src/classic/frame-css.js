@@ -152,8 +152,11 @@ function nestedCss(ctx, levels) {
   if (!levels.panel || !ctx.frames.has('block')) {
     return { css: '', fit: '' };
   }
-  const nested = `:scope :is(${levels.panel.join(', ')}) :is(${levels.panel.join(', ')})`;
-  const chunk = levelCss(ctx, 'block', [nested]);
+  const panel = `:is(${levels.panel.join(', ')})`;
+  const chunk = levelCss(ctx, 'block', [
+    `:scope ${panel} ${panel}`,
+    `:scope${panel} ${panel}`,
+  ]);
   const boundary = ctx.boundaryAttribute ? `[${ctx.boundaryAttribute}]` : null;
   const wrap = (rules) =>
     !boundary

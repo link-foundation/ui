@@ -317,15 +317,16 @@ test('nested blocks restart at boundaries and all levels support live frame, own
   await page.setContent(
     documentHtml(
       css,
-      host('outer', host('nested')) +
-        host(
-          'wrapper',
-          `<section data-boundary>${host('preview', host('preview-nested'))}</section>`
-        ) +
-        levels
-          .slice(1)
-          .map((level) => `<article data-frame="${level}">${layer}</article>`)
-          .join('')
+      `${host(
+        'outer',
+        host('nested')
+      )}<article data-boundary data-frame="panel" id="boundary-host">${layer}${host('boundary-child')}</article>${host(
+        'wrapper',
+        `<section data-boundary>${host('preview', host('preview-nested'))}</section>`
+      )}${levels
+        .slice(1)
+        .map((level) => `<article data-frame="${level}">${layer}</article>`)
+        .join('')}`
     )
   );
   const extent = (selector) =>
@@ -340,6 +341,8 @@ test('nested blocks restart at boundaries and all levels support live frame, own
   expect(await extent('#nested')).toBe(12);
   expect(await extent('#preview')).toBe(40);
   expect(await extent('#preview-nested')).toBe(12);
+  expect(await extent('#boundary-host')).toBe(40);
+  expect(await extent('#boundary-child')).toBe(12);
   for (const level of levels.slice(1)) {
     const selector = `[data-frame="${level}"]`;
     expect(await extent(selector)).toBe(12);
