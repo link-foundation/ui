@@ -6,6 +6,7 @@
  */
 
 import { values as coreValues } from '@link-foundation/ui-core';
+import { rgba } from './native.js';
 import { cssVariable } from '../names.js';
 import { COMPOSITE_FIELDS, FONT_WEIGHTS } from '../values.js';
 
@@ -96,11 +97,21 @@ const kebab = (key) => key.replace(/[A-Z]/gu, (c) => `-${c.toLowerCase()}`);
  * The declarations of one token: `[name, value, description?]`.
  * @param {ResolvedToken} token
  */
-function declarations(token, prefix) {
+function declarations(token, prefix, channels) {
   const ref = (path) => `var(${cssVariable(path, prefix)})`;
   const name = cssVariable(token.path, prefix);
   if (token.type !== 'typography') {
-    return [[name, valueCss(token.raw, ref)]];
+    const output = [[name, valueCss(token.raw, ref)]];
+    if (channels && token.type === 'color') {
+      const c = rgba(token.value);
+      output.push([
+        `${name}-rgb`,
+        token.raw.type === 'token-ref'
+          ? `var(${cssVariable(token.raw.path, prefix)}-rgb)`
+          : [c.r, c.g, c.b].map((n) => Number((n * 255).toFixed(6))).join(' '),
+      ]);
+    }
+    return output;
   }
   return COMPOSITE_FIELDS.typography.map(([field, key]) => [
     `${name}-${field}`,
@@ -112,13 +123,13 @@ function declarations(token, prefix) {
 
 const comment = (text) => `/* ${text.replace(/\*\//gu, '* /')} */`;
 
-function block(selector, tokens, prefix, pad) {
+function block(selector, tokens, prefix, pad, channels) {
   const lines = [`${pad}${selector} {`];
   for (const token of tokens.values()) {
     if (token.description !== undefined) {
       lines.push(`${pad}  ${comment(token.description)}`);
     }
-    for (const [name, value] of declarations(token, prefix)) {
+    for (const [name, value] of declarations(token, prefix, channels)) {
       lines.push(`${pad}  ${name}: ${value};`);
     }
   }
@@ -150,17 +161,34 @@ export function toCss(
     prefix = '',
     modeSelector = (mode) => `[data-mode="${mode}"]`,
     modeMedia = {},
+    channels = false,
+    pack = false,
+    paletteSelector = (id) => `[data-palette=${JSON.stringify(id)}]`,
   } = {}
 ) {
-  const rules = [block(selector, resolved, prefix, '')];
+  if (pack) {
+    return [...resolved]
+      .map(([id, tokens]) => {
+        const scope = paletteSelector(id);
+        return toCss(tokens, {
+          selector: scope,
+          prefix,
+          channels,
+          modeMedia,
+          modeSelector: (mode) => `${scope}:is(${modeSelector(mode)})`,
+        });
+      })
+      .join('\n');
+  }
+  const rules = [block(selector, resolved, prefix, '', channels)];
   for (const [mode, tokens] of resolved.modes ?? []) {
     if (tokens.size === 0) {
       continue;
     }
     rules.push(
       Object.hasOwn(modeMedia, mode)
-        ? `@media ${modeMedia[mode]} {\n${block(selector, tokens, prefix, '  ')}\n}`
-        : block(modeSelector(mode), tokens, prefix, '')
+        ? `@media ${modeMedia[mode]} {\n${block(selector, tokens, prefix, '  ', channels)}\n}`
+        : block(modeSelector(mode), tokens, prefix, '', channels)
     );
   }
   return `${rules.join('\n\n')}\n`;
