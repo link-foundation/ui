@@ -771,7 +771,7 @@ export interface NetworkSolverResult {
 }
 export interface NetworkEditorSettings {
   presentation: NetworkPresentation;
-  configurations?: typeof import('../configurations.js');
+  configurations?: typeof import('./configurations.js');
   solve?: (
     links: Configuration,
     options: NetworkEditorValues,
