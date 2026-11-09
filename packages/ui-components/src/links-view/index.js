@@ -121,3 +121,10 @@ export {
   networkShareTargets,
 } from './network-editor/share.js';
 export { networkOverrideSchema } from './network-editor/schema.js';
+export {
+  createDoubletProvider,
+  doubletGeometry,
+  doubletOptionAvailability,
+  DOUBLET_MARKERS,
+  readDoubletOptions,
+} from './doublet.js';
