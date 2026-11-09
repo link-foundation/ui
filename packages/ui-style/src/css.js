@@ -44,6 +44,7 @@ const disabledControl = `:is([disabled], [aria-disabled='true'], :has([data-part
 const HOST_STATES = {
   hover: `:hover:not(${disabledControl})`,
   pressed: `:active:not(${disabledControl})`,
+  active: `:active:not(${disabledControl})`,
   disabled: disabledControl,
   checked: `:has([data-part='input']:is(:checked, [aria-checked='true']))`,
 };
