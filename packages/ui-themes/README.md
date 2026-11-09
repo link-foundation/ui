@@ -58,3 +58,65 @@ independent corners, edges, state overrides and explicit level inheritance.
 shared opt-in animation/sound governor. See the
 [frame and material contract](../../docs/spec/frames.md) and the
 [original optical example](../../examples/themes/optical-frames/README.md).
+
+### Adaptive effect governor
+
+`createEffectGovernor` from `@link-foundation/ui-themes/classic/materials`
+shares a frame scheduler across host artwork effects. Existing
+`draw(time, state)` callbacks remain supported; `time` is the animation-frame
+clock in milliseconds. The third argument is elapsed seconds since that effect's
+last draw (initially zero, capped at 0.25); the fourth is `{scale, fps}`.
+Return `true` to continue animating; any other return removes an animated effect.
+
+```js
+const governor = createEffectGovernor({
+  watchVisibility: true,
+  watchReducedMotion: true,
+});
+const remove = governor.add(
+  'background',
+  (time, state, elapsedSeconds, quality) => {
+    paintBackground(elapsedSeconds, quality.scale);
+    return true;
+  },
+  { fps: 30, onQualityChange: ({ scale }) => resizeBackingStore(scale) }
+);
+governor.set({ motion: 'auto' });
+// After a resize or option change, repaint once even if motion is off:
+governor.invalidate('background');
+// Read a detached snapshot at any time while the effect is registered:
+console.log(governor.getQuality('background'));
+remove();
+governor.dispose();
+```
+
+Each effect watches all animation frames, including frames skipped by its cap.
+Gaps above 45 ms are slow; gaps at or below zero or above 1000 ms are ignored.
+Windows close after 30 valid gaps or 1000 accumulated milliseconds. The first
+window is warm-up. A strict slow majority lowers quality once per window:
+resolution multiplies by `scaleFactor` (default 0.7, rounded to three decimals)
+until `minScale` (0.4), then frame-rate share multiplies by `fpsFactor` (0.5)
+until `minFps` (0.25). Quality never increases. These four per-effect options
+accept positive numbers up to one; factors must be below one. `resolution: false`
+keeps scale at one and lowers only frame rate.
+
+An optional `fps` target of 5..60 throttles draws to
+`1000 / (fps * quality.fps)` milliseconds; omitting it preserves drawing on every
+animation frame at full quality, with a 60 fps base when quality lowers the
+frame-rate share. `onQualityChange` receives a detached snapshot once per step,
+before drawing, allowing a backing store to resize only when necessary.
+
+Motion defaults to off. `auto` follows reduced motion, `on` overrides reduced
+motion explicitly, and `off` never animates. Legacy booleans still work: `true`
+follows reduced motion and `false` pauses. Hidden pages always pause. Pause and
+resume reset timestamps and start a new warm-up window, retaining quality.
+`invalidate` coalesces requests into one next-frame draw with elapsed zero,
+bypasses the cap, and preserves a paused effect regardless of its return value.
+It never enables motion. Unknown IDs are ignored. Removing/replacing an effect
+starts a new quality session; an old removal callback cannot remove a replacement.
+
+Automatic visibility and reduced-motion subscriptions are opt-in. Tests or hosts
+can inject `document` and `matchMedia` alongside `requestFrame` and `cancelFrame`.
+Without browser sources, the governor still works with manual `set` inputs.
+`dispose` cancels pending frames and removes both listeners. Sound remains
+controlled independently by `sound`, `volume`, and visibility.
