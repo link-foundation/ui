@@ -371,9 +371,18 @@ test('threshold fitting scales corners, restores a rectangle, and layers leave c
   await page.setContent(
     documentHtml(
       css,
-      `<article data-frame="panel">${layer}<span class="content">Content remains opaque</span></article>`
+      `<article data-frame="panel">${layer}<span class="content">Content remains opaque</span><span class="bar"></span></article>`
     )
   );
+  await page.addStyleTag({
+    content:
+      '.bar{position:absolute;inset:0 auto auto 0;width:100%;height:4px;background:red}',
+  });
+  expect(
+    await page
+      .locator('.bar')
+      .evaluate((el) => window.getComputedStyle(el).position)
+  ).toBe('absolute');
   // Import the public helper through the repository's static module server.
   await page.addScriptTag({
     type: 'module',

@@ -71,7 +71,7 @@ function baseCss(prefix) {
     rule('[data-frame-material]', [
       ['background', 'var(--frame-material, transparent)'],
     ]) +
-    rule('[data-frame-paint] ~ :not([data-frame-paint])', [
+    rule(':where([data-frame-paint] ~ :not([data-frame-paint]))', [
       ['position', 'relative'],
       ['z-index', '1'],
     ]) +
