@@ -39,6 +39,17 @@ describe('Windows Deno file shards', () => {
     assert.match(testJob, /fail-fast: false/);
   });
 
+  it('limits competing Windows modules without changing other runners', () => {
+    const denoStep = testJob
+      .split('      - name: Run tests (Deno)')[1]
+      .split('      - name: Repeat Windows Deno')[0];
+    assert.match(
+      denoStep,
+      /if \[ "\$RUNNER_OS" = "Windows" \]; then\s+export DENO_JOBS=2\s+fi/
+    );
+    assert.match(denoStep, /deno test -A --parallel --shard "\$DENO_SHARD"/);
+  });
+
   const denoAvailable =
     spawnSync('deno', ['--version'], { encoding: 'utf8' }).status === 0;
   itUnless(
