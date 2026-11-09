@@ -123,6 +123,7 @@ it('uses pinned transforms verbatim and validates every input reference and opti
     'frame 1e-9 0 0',
     'frame 2 Infinity 0',
     'frame 2 1000001 0',
+    "frame '2 10 -5\n3 4 5'",
     'tension 2.1',
     'end\n  size 16',
     'start\n  angle 4',

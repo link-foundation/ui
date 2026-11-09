@@ -249,6 +249,9 @@ function linkOptions(values, config, count) {
 }
 function readFrame(values) {
   const raw = values.length === 1 ? parseNested(scalar(values)) : [];
+  if (raw.length > 1) {
+    throw new TypeError('Frame needs exactly three numbers');
+  }
   const parts = raw.length
     ? raw[0].id === null
       ? raw[0].values
