@@ -83,7 +83,7 @@ export function edgeValues(ctx, level, frame, side, patch) {
     declarations.push(set('gap', `${edge.gap}px`));
   }
   declarations.push(...edgePaint(ctx, level, side, edge, patch, raw));
-  if (!colorCss(edge.color).includes('currentColor')) {
+  if (!patch && !colorCss(edge.color).includes('currentColor')) {
     ctx.register(ctx.prop(level, `${side}-image`), '<image> | none', 'none');
   }
   ctx.register(ctx.prop(level, `${side}-mask`), '<image> | none', 'none');

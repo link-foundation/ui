@@ -179,7 +179,8 @@ focus, disabled. Hover excludes disabled and ARIA-disabled hosts. Focus uses
 `:focus-visible`. Selection defaults to `[aria-selected='true']`,
 `[aria-pressed='true']`, `[aria-current='page']`; override with
 `options.selected: ['.chosen', '[data-selected]']`. Each state's declarations
-inherit from parent to child. ui-style accepts `active` as well as its existing
+inherit from parent to child. Compound states preserve partial overrides: a
+pressed color change retains a double edge selected by hover. ui-style accepts `active` as well as its existing
 `pressed` alias.
 
 ### Optional threshold fitting

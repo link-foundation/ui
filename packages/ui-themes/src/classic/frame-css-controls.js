@@ -6,6 +6,7 @@ export function createCssContext(frames, options) {
     ...options,
     registrations: new Map(),
     controls: new Map(),
+    unresolvedColors: new Set(),
     enumCss: '',
     enumerations: [],
     prop(level, key) {
@@ -34,8 +35,12 @@ export function createCssContext(frames, options) {
       const result = ctx.set(level, key, value, '<color>', 'black');
       // currentColor depends on the drawing element. Keep its input unresolved;
       // the non-inheriting geometry alias provides the typed final color.
+      const name = ctx.prop(level, key);
       if (value.includes('currentColor')) {
-        ctx.registrations.delete(ctx.prop(level, key));
+        ctx.unresolvedColors.add(name);
+      }
+      if (ctx.unresolvedColors.has(name)) {
+        ctx.registrations.delete(name);
       }
       return result;
     },

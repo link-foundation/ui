@@ -1,22 +1,9 @@
-import {
-  FRAME_EDGES,
-  FRAME_STATES,
-  FRAME_LEVELS,
-  resolveFrame,
-} from './frame-schema.js';
+import { FRAME_EDGES, FRAME_LEVELS, resolveFrame } from './frame-schema.js';
 import { geometryCss, POINTS, IDS, rule } from './frame-css-geometry.js';
 import { createCssContext } from './frame-css-controls.js';
 import { frameValues } from './frame-css-values.js';
+import { stateCss } from './frame-css-states.js';
 
-const disabled = ":is(:disabled, [disabled], [aria-disabled='true'])";
-const states = {
-  hover: `:hover:not(${disabled})`,
-  active: ':active',
-  selected:
-    ":is([aria-selected='true'], [aria-pressed='true'], [aria-current='page'])",
-  focus: ':focus-visible',
-  disabled,
-};
 const validSelector = (s) =>
   typeof s === 'string' && s.length > 0 && !/[{};]/u.test(s);
 function validateOptions({
@@ -153,27 +140,7 @@ function levelCss(ctx, level, selectors) {
     [`--${ctx.prefix}-stacking`, ctx.variable(level, 'layer')],
   ]);
   css += rule(paint(), geometryAliases(ctx, level));
-  for (const state of FRAME_STATES) {
-    const suffix =
-      state === 'selected' && ctx.selected
-        ? `:is(${ctx.selected.join(', ')})`
-        : states[state];
-    const chain = [];
-    let entry = ctx.frames.get(level);
-    while (entry) {
-      if (entry.states[state]) {
-        chain.unshift(entry.states[state]);
-      }
-      entry = ctx.frames.get(entry.extends);
-    }
-    const resolved = resolveFrame(ctx.frames, level, [state]);
-    for (const patch of chain) {
-      css += rule(
-        hosts.map((s) => `${s}:where(${suffix})`).join(', '),
-        frameValues(ctx, level, resolved, patch)
-      );
-    }
-  }
+  css += stateCss(ctx, level, hosts);
   return {
     css,
     fit: rule(paint(`[data-${ctx.prefix}-fit='outside']`), [

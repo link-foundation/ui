@@ -108,3 +108,25 @@ it('rejects unsafe colors and invalid selector/configuration inputs', () => {
     /color/u
   );
 });
+
+it('composes partial geometry states without resolving currentColor inputs on the scope', () => {
+  const css = framesCss(
+    readFrames(`frames
+  panel
+    state hover
+      edge top line
+        style double
+    state active
+      edge top line
+        color '#ff7755'
+`)
+  );
+  assert.match(
+    css.levels.panel,
+    /:where\(:hover:not\([^\n]+:where\(:active\)/u
+  );
+  assert.doesNotMatch(
+    css.properties,
+    /@property --frame-panel-top-(?:color|image) \{/u
+  );
+});

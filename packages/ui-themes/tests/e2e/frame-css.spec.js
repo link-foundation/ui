@@ -165,15 +165,23 @@ test('states have fixed precedence, disabled excludes hover, and selection is co
     documentHtml(
       framesCss(
         readFrames(
-          source.replace(
-            'state hover\n      opacity 0.8',
-            `state hover
+          source
+            .replace(
+              'state hover\n      opacity 0.8',
+              `state hover
       opacity 0.8
       edge top bracket
         style double
       corner bottom-left cut
         stroke 3`
-          )
+            )
+            .replace(
+              'state active\n      opacity 0.6',
+              `state active
+      opacity 0.6
+      edge top bracket
+        color '#ff7755'`
+            )
         ),
         { selected: ['[data-selected]'] }
       ),
