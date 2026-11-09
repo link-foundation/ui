@@ -61,7 +61,7 @@ export function createCadence() {
   };
 }
 
-function shiftCanvas(canvas, ctx, dy, ratio) {
+function shiftCanvas(canvas, ctx, dy) {
   if (!dy) {
     return;
   }
@@ -69,7 +69,7 @@ function shiftCanvas(canvas, ctx, dy, ratio) {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.globalCompositeOperation = 'copy';
   ctx.globalAlpha = 1;
-  ctx.drawImage(canvas, 0, Math.round(dy * ratio));
+  ctx.drawImage(canvas, 0, dy);
   ctx.restore();
 }
 
@@ -191,8 +191,10 @@ function create(canvas) {
     },
     draw(dt, { still, frame }) {
       ctx.setTransform(area.ratio, 0, 0, area.ratio, 0, 0);
-      shiftCanvas(canvas, ctx, o.drift - priorDrift, area.ratio);
-      priorDrift = o.drift;
+      // Round the absolute offset so subpixel deltas accumulate across frames.
+      const drift = Math.round(o.drift * area.ratio);
+      shiftCanvas(canvas, ctx, drift - priorDrift);
+      priorDrift = drift;
       if (!o.visible) {
         return;
       }

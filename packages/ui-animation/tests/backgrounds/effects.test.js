@@ -214,6 +214,26 @@ test('grid wrap shifts exactly one cell', () => {
   beamLayer.dispose();
 });
 
+test('rain accumulates subpixel drift and shifts exactly one cell on wrap', () => {
+  const e = environment();
+  const layer = rain(e.canvas, { animate: false, visible: false });
+  e.calls.length = 0;
+  for (let i = 1; i <= 256; i++) {
+    layer.update({ drift: i / 4 });
+  }
+  const shifts = () =>
+    e.calls.filter(([name]) => name === 'drawImage').map((c) => c[3]);
+  assert.equal(
+    shifts().reduce((sum, dy) => sum + dy, 0),
+    128
+  );
+  layer.update({ drift: 0 });
+  assert.equal(shifts().at(-1), -128);
+  assert.equal(e.calls.filter(([name]) => name === 'fillRect').length, 0);
+  assert.equal(e.calls.filter(([name]) => name === 'clearRect').length, 0);
+  layer.dispose();
+});
+
 test('missing 2D or Path2D returns a safe inert handle', () => {
   for (const mount of [stars, beams, rain]) {
     const e = environment();

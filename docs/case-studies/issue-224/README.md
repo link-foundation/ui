@@ -26,7 +26,7 @@ Work plan and verification inventory:
 
 Verification commands:
 
-- `node --test packages/ui-animation/tests/backgrounds/*.test.js`: 28 tests.
+- `node --test packages/ui-animation/tests/backgrounds/*.test.js`: 29 tests.
 - `npx playwright test -c experiments/issue-224/playwright.config.mjs --workers=1`
   with local executable overrides: six Chromium/WebKit checks, including a real
   mounted rain layer driven through 1,000 simulation steps.
