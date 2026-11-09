@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Background layers — Links UI</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "@link-foundation/ui-animation/backgrounds/": "/packages/ui-animation/src/backgrounds/",
+          "@link-foundation/ui-themes/classic/materials": "/packages/ui-themes/src/classic/materials.js",
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "links-notation": "/node_modules/links-notation/dist/index.js"
+        }
+      }
+    </script>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: system-ui, sans-serif;
+        color: #edf2ff;
+        background: #0a1226;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        isolation: isolate;
+      }
+      .background {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      main {
+        position: relative;
+        z-index: 10;
+        max-width: 44rem;
+        margin: auto;
+        padding: 18vh 2rem 3rem;
+      }
+      article {
+        padding: 2.5rem;
+        border: 1px solid #809dce80;
+        border-radius: 1rem;
+        background: #0a1226e8;
+        box-shadow: 0 2rem 5rem #0006;
+      }
+      h1 {
+        font-size: clamp(2rem, 5vw, 3.8rem);
+        line-height: 1.05;
+        margin: 0.6rem 0 1.4rem;
+      }
+      p {
+        line-height: 1.7;
+        color: #c7d6f4;
+      }
+      .eyebrow {
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: #8ce8e0;
+        font-size: 0.8rem;
+      }
+      button {
+        background: #d8e3ff;
+        color: #122344;
+        border: 0;
+        border-radius: 0.4rem;
+        padding: 0.8rem 1.2rem;
+        font: inherit;
+        cursor: pointer;
+      }
+      button:focus-visible {
+        outline: 3px solid #8ce8e0;
+        outline-offset: 4px;
+      }
+      footer {
+        margin-top: 2rem;
+        font-size: 0.85rem;
+        color: #aebedb;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="nebula" class="background"></canvas>
+    <canvas id="stars" class="background"></canvas>
+    <div id="grid" class="background"></div>
+    <canvas id="beams" class="background"></canvas>
+    <canvas id="rain" class="background"></canvas>
+    <main>
+      <article>
+        <span class="eyebrow">Links UI / original effects</span>
+        <h1>Five layers.<br />One quiet sky.</h1>
+        <p>
+          Sprites, an original nebula shader, travelling beams, glyph rain and a
+          drifting grid share the same lifecycle. Every layer is optional.
+        </p>
+        <p>
+          Your reduced-motion preference keeps the scene still. If WebGL is
+          unavailable, the deep blue CSS background remains visible.
+        </p>
+        <button id="pause" type="button" aria-pressed="false">
+          Pause animation
+        </button>
+        <footer>Appearance is loaded from a Links Notation document.</footer>
+      </article>
+    </main>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
