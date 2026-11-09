@@ -104,3 +104,10 @@ export { LINO_NETWORK_TAG, defineLinoNetwork } from './lino-network.js';
 
 export { createNetworkPresentation } from './presentation.js';
 export { createSolverJob, installSolverWorker } from './solver-job.js';
+export {
+  createDoubletProvider,
+  doubletGeometry,
+  doubletOptionAvailability,
+  DOUBLET_MARKERS,
+  readDoubletOptions,
+} from './doublet.js';

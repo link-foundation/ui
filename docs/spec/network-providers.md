@@ -93,3 +93,6 @@ interactive, CPU-intensive solves.
 The default `solveCollisions` algorithm, its module worker entry and the default
 provider wiring remain blocked on #227's doublet geometry. This execution layer
 does not claim the renderer-dependent acceptance criteria of #228.
+The built-in [`createDoubletProvider`](doublet-provider.md) supplies the
+continuous two-cubic doublet renderer, nine parametric markers, placements,
+backgrounds, cards and captions without a consumer geometry backend.
