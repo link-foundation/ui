@@ -8,6 +8,7 @@
  * browser window, or a jsdom window in tests), so nothing touches globals.
  */
 
+import { drawTagCloud } from './tag-cloud.js';
 import { chartFromLinks, chartToLino, parseChart } from './chart-model.js';
 import { atomNode, formatNode, parseLino, prop } from './lino.js';
 import { renderSmallChartSvg } from './small-svg.js';
@@ -49,6 +50,7 @@ export function createTable(document, spec, id) {
   const table = document.createElement('table');
   table.id = id;
   table.className = 'ui-chart-table';
+  table.setAttribute('role', 'table');
   const captionEl = document.createElement('caption');
   captionEl.textContent = caption;
   const head = document.createElement('thead');
@@ -148,7 +150,14 @@ export function createChartElementClass(win) {
     readSpec() {
       if (this.#spec !== null) {
         // Normalise (and check) a spec object by writing and reading it.
-        return parseChart(chartToLino(this.#spec));
+        const normalized = parseChart(chartToLino(this.#spec));
+        if (this.#spec.tooltip?.content) {
+          normalized.tooltip = {
+            ...normalized.tooltip,
+            content: this.#spec.tooltip.content,
+          };
+        }
+        return normalized;
       }
       const text = this.lino ?? this.attributeLino();
       if (text === null) {
@@ -273,7 +282,17 @@ export function drawSmallChart(
 ) {
   const box = document.createElement(tag);
   box.className = className;
-  box.innerHTML = renderSmallChartSvg(spec);
+  if (spec.kind === 'tag-cloud') {
+    box.append(drawTagCloud(document, spec));
+  } else {
+    box.innerHTML = renderSmallChartSvg(spec);
+  }
+  if (spec.footnote) {
+    const link = document.createElement('a');
+    link.textContent = spec.footnote.label;
+    link.href = spec.footnote.href;
+    box.append(link);
+  }
   const table = createTable(document, spec, uniqueId(document));
   table.classList.add('ui-visually-hidden');
   box.append(table);

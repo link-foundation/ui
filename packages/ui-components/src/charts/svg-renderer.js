@@ -9,9 +9,11 @@
  * literal colours instead, for an SVG used outside a page.
  */
 
+import { patternShapes } from './activity-layout.js';
+import { tagCloudSvg } from './tag-cloud.js';
 import { layoutChart } from './layout.js';
 import { renderSmallChartSvg } from './small-svg.js';
-import { el, paint, svgRoot, text } from './svg.js';
+import { el, escapeXml, paint, svgRoot, text } from './svg.js';
 import { tokenColor } from './tokens.js';
 
 const MARK_ATTRS = {
@@ -30,12 +32,20 @@ function shapeSvg(shape, series) {
       attrs[name] = value;
     }
   }
-  return el(shape.tag, {
-    ...attrs,
-    style: styles.join(';') || null,
-    'data-series': series,
-    'data-row': shape.row,
-  });
+  return el(
+    shape.tag,
+    {
+      ...attrs,
+      style: styles.join(';') || null,
+      'data-series': series,
+      'data-row': shape.row,
+      'data-pattern': shape.pattern,
+    },
+    [
+      shape.title ? el('title', {}, escapeXml(shape.title)) : '',
+      shape.content ? escapeXml(shape.content) : '',
+    ]
+  );
 }
 
 function axisSvg(axis, plot, colors) {
@@ -111,6 +121,10 @@ function legendSvg(legend, colors) {
         rx: 2,
         style: paint('fill', entry.color),
       }),
+      ...patternShapes(
+        { x: 0, y: -9, width: 14, height: 14 },
+        entry.pattern
+      ).map((shape) => shapeSvg(shape, null)),
       text(
         { x: 20, y: 3, 'font-size': 12, style: paint('fill', colors.text) },
         entry.label
@@ -167,7 +181,14 @@ export function layoutToSvg(layout, options = {}) {
       { class: 'ui-chart-plot', transform: `translate(${plot.x},${plot.y})` },
       [
         ...layout.axes.map((axis) => axisSvg(axis, plot, colors)),
-        el('g', { class: 'ui-chart-marks', 'aria-hidden': 'true' }, marks),
+        el(
+          'g',
+          {
+            class: 'ui-chart-marks',
+            'aria-hidden': layout.accessibleMarks ? null : 'true',
+          },
+          marks
+        ),
       ]
     )
   );
@@ -178,6 +199,7 @@ export function layoutToSvg(layout, options = {}) {
       label: layout.label,
       title: layout.title,
       className: 'ui-chart-svg',
+      role: layout.accessibleMarks ? 'group' : 'img',
     },
     children
   );
@@ -194,6 +216,9 @@ export function layoutToSvg(layout, options = {}) {
  * @returns {string}
  */
 export function renderChartSvg(spec, options = {}) {
+  if (spec.kind === 'tag-cloud') {
+    return tagCloudSvg(spec);
+  }
   if (spec.kind !== undefined && spec.kind !== 'chart') {
     return renderSmallChartSvg(spec, options);
   }

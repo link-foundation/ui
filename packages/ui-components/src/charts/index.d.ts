@@ -3,7 +3,15 @@
 import type { Link } from 'links-notation';
 
 /** The marks of a chart. */
-export type Mark = 'line' | 'area' | 'bar' | 'point' | 'arc';
+export type Mark =
+  | 'line'
+  | 'area'
+  | 'bar'
+  | 'point'
+  | 'arc'
+  | 'calendar'
+  | 'range'
+  | 'composition';
 /** The type of a field (as in Vega-Lite). */
 export type FieldType = 'quantitative' | 'temporal' | 'ordinal' | 'nominal';
 /** How a chart is drawn. */
@@ -12,6 +20,7 @@ export type Renderer = 'svg' | 'echarts';
 /** A field of the data on a channel. */
 export interface FieldDef {
   /** The data field. */
+  scale?: { type: 'log'; base?: number };
   field: string;
   type: FieldType;
   /** The axis or legend title (default: the field). */
@@ -30,6 +39,7 @@ export interface MarkDef {
 
 export interface Encoding {
   x?: FieldDef;
+  x2?: FieldDef;
   y?: FieldDef;
   theta?: FieldDef;
   color?: FieldDef;
@@ -40,6 +50,22 @@ export interface Encoding {
 /** A `(NAME: chart (data ...) (mark ...) (encoding ...))` spec. */
 export interface ChartSpec {
   kind: 'chart';
+  cornerRadius?: number;
+  labels?: 'peaks' | 'last';
+  emphasis?: string;
+  topN?: number;
+  weekStart?: number;
+  thresholds?: number[];
+  /** Snapshot end for ongoing rows; default: next year after latest data date. */
+  ongoingEnd?: string;
+  tooltip?: {
+    layer?: 'top' | 'inline';
+    content?: (datum: Record<string, string | number>) => {
+      title?: string;
+      value?: string | number;
+      rows?: [string, string | number][];
+    };
+  };
   id: string | null;
   title: string | null;
   description: string | null;
@@ -67,6 +93,10 @@ export interface GaugeSpec {
 
 export interface StatTileSpec {
   kind: 'stat-tile';
+  notation?: 'compact';
+  compactThreshold?: number;
+  hint?: string;
+  footnote?: { label: string; href: string };
   id: string | null;
   label: string | null;
   description: string | null;
@@ -88,7 +118,21 @@ export interface SparklineSpec {
 }
 
 export type SmallChartSpec = GaugeSpec | StatTileSpec | SparklineSpec;
-export type AnyChartSpec = ChartSpec | SmallChartSpec;
+export interface TagCloudSpec {
+  kind: 'tag-cloud';
+  id: string | null;
+  label: string | null;
+  description: string | null;
+  minSize: number;
+  maxSize: number;
+  items: {
+    name: string;
+    count?: number | null;
+    color?: string | null;
+    emphasis?: boolean;
+  }[];
+}
+export type AnyChartSpec = ChartSpec | SmallChartSpec | TagCloudSpec;
 
 /**
  * Where a bad link is: the indexes from the top-level link down to it, and
@@ -151,9 +195,11 @@ export interface ChartPoint {
   index: number;
   /** The index of the data row. */
   row: number;
-  /** The centre, in SVG pixels. */
+  /** Navigation anchor, in SVG pixels. */
   x: number;
   y: number;
+  datum: Record<string, string | number>;
+  day?: number;
   /** The tooltip and announcement. */
   text: string;
 }
@@ -171,11 +217,26 @@ export interface ChartLayout {
   width: number;
   height: number;
   title: string | null;
+  weeks?: number;
+  accessibleMarks: boolean;
+  diagnostics: {
+    code: string;
+    channel: string;
+    row: number;
+    value: string | number;
+    message: string;
+  }[];
   /** The accessible name. */
   label: string;
   plot: { x: number; y: number; width: number; height: number };
   axes: object[];
-  legend: { label: string; color: string; x: number; y: number }[];
+  legend: {
+    label: string;
+    color: string;
+    x: number;
+    y: number;
+    pattern?: 'solid' | 'hatched' | 'dotted';
+  }[];
   series: ChartSeries[];
 }
 

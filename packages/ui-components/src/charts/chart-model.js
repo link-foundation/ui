@@ -20,6 +20,14 @@
  * `small-model.js`; `chartFromLinks` accepts every kind.
  */
 
+import {
+  ACTIVITY_PROPERTIES,
+  activityNodes,
+  readActivity,
+  readScale,
+} from './activity-model.js';
+import { validateActivity } from './activity-validation.js';
+import { readTagCloud, tagCloudNode } from './tag-cloud.js';
 import { ChartSpecError, at, fail } from './errors.js';
 import {
   formatNested,
@@ -42,7 +50,16 @@ import { isCanonicalNumber, parseTemporal, toNumber } from './values.js';
 export { ChartSpecError };
 
 /** The marks of the chart dialect (Vega-Lite mark types). */
-export const MARKS = Object.freeze(['line', 'area', 'bar', 'point', 'arc']);
+export const MARKS = Object.freeze([
+  'line',
+  'area',
+  'bar',
+  'point',
+  'arc',
+  'calendar',
+  'range',
+  'composition',
+]);
 
 /** The field types (Vega-Lite measurement types). */
 export const FIELD_TYPES = Object.freeze([
@@ -57,6 +74,7 @@ export const CHANNELS = Object.freeze([
   'x',
   'y',
   'theta',
+  'x2',
   'color',
   'size',
   'tooltip',
@@ -66,12 +84,25 @@ export const CHANNELS = Object.freeze([
 export const RENDERERS = Object.freeze(['svg', 'echarts']);
 
 /** Every kind `chartFromLinks` reads. */
-export const CHART_KINDS = Object.freeze(['chart', ...SMALL_KINDS]);
+export const CHART_KINDS = Object.freeze([
+  'chart',
+  'tag-cloud',
+  ...SMALL_KINDS,
+]);
 
 const INTERPOLATIONS = ['linear', 'monotone', 'step'];
 
 /** The channels each mark needs and allows. */
 const MARK_CHANNELS = {
+  calendar: { required: ['x', 'y'], allowed: ['x', 'y', 'tooltip'] },
+  range: {
+    required: ['x', 'x2', 'y'],
+    allowed: ['x', 'x2', 'y', 'color', 'tooltip'],
+  },
+  composition: {
+    required: ['theta', 'color'],
+    allowed: ['theta', 'color', 'tooltip'],
+  },
   line: { required: ['x', 'y'], allowed: ['x', 'y', 'color', 'tooltip'] },
   area: { required: ['x', 'y'], allowed: ['x', 'y', 'color', 'tooltip'] },
   bar: { required: ['x', 'y'], allowed: ['x', 'y', 'color', 'tooltip'] },
@@ -91,7 +122,7 @@ const MARK_CHANNELS = {
  * @property {string|null} title  the axis or legend title (default: field)
  *
  * @typedef {object} MarkDef
- * @property {'line'|'area'|'bar'|'point'|'arc'} type
+ * @property {'line'|'area'|'bar'|'point'|'arc'|'calendar'|'range'|'composition'} type
  * @property {'linear'|'monotone'|'step'} interpolate  line and area curve
  * @property {boolean} point  draw a point on every value of a line or area
  * @property {number} innerRadius  the hole of an arc (a donut), in pixels
@@ -100,6 +131,7 @@ const MARK_CHANNELS = {
  * @property {FieldDef} [x]
  * @property {FieldDef} [y]
  * @property {FieldDef} [theta]
+ * @property {FieldDef} [x2]
  * @property {FieldDef} [color]
  * @property {FieldDef} [size]
  * @property {FieldDef[]} [tooltip]
@@ -215,7 +247,12 @@ function readData(entry) {
 
 /** A field definition `((field f) (type t) (title 'T'))` after its head. */
 function readFieldDef(node, path, from, name) {
-  const props = properties(node, path, from, ['field', 'type', 'title']);
+  const props = properties(node, path, from, [
+    'field',
+    'type',
+    'title',
+    'scale',
+  ]);
   const field = optionalText(props, 'field');
   if (field === null) {
     fail('missing-field', `(${name}) needs (field NAME)`, node, path);
@@ -231,7 +268,14 @@ function readFieldDef(node, path, from, name) {
     );
   }
   return {
-    def: { field, type, title: optionalText(props, 'title') },
+    def: {
+      field,
+      type,
+      title: optionalText(props, 'title'),
+      ...(props.has('scale')
+        ? { scale: readScale(props.get('scale')[0]) }
+        : {}),
+    },
     where: { node, path, field: props.get('field')[0] },
   };
 }
@@ -273,12 +317,15 @@ const allNumbers = (rows, field) =>
  * missing field is an error, and a field without `(type)` is
  * `quantitative` when every value is a number, `nominal` otherwise.
  */
-function typeFields(channels, rows) {
+function typeFields(channels, rows, mark) {
   const types = new Map();
   for (const item of Object.values(channels).flat()) {
     const { def, where } = item;
     const missing = rows.find(({ row }) => !Object.hasOwn(row, def.field));
-    if (missing !== undefined) {
+    if (
+      missing !== undefined &&
+      !(mark.type === 'range' && item === channels.x2)
+    ) {
       fail(
         'missing-field',
         `field "${def.field}" is missing from a data row`,
@@ -287,6 +334,14 @@ function typeFields(channels, rows) {
       );
     }
     def.type ??= allNumbers(rows, def.field) ? 'quantitative' : 'nominal';
+    if (def.scale && def.type !== 'quantitative') {
+      fail(
+        'invalid-value',
+        'log scales require quantitative fields',
+        where.node,
+        where.path
+      );
+    }
     const known = types.get(def.field);
     // A field has one type: the strongest one asked for wins.
     if (known === undefined || def.type === 'quantitative') {
@@ -315,11 +370,14 @@ function typedValue(text, type, cell) {
 }
 
 /** The typed rows: numbers for quantitative fields, text otherwise. */
-function typeRows(rows, types) {
+function typeRows(rows, types, ongoingField) {
   return rows.map(({ row, where }) => {
     const typed = {};
     for (const [name, text] of Object.entries(row)) {
-      typed[name] = typedValue(text, types.get(name), where[name]);
+      typed[name] =
+        name === ongoingField && text === 'ongoing'
+          ? text
+          : typedValue(text, types.get(name), where[name]);
     }
     return typed;
   });
@@ -380,6 +438,7 @@ function sizeOf(props, name) {
 }
 
 const CHART_PROPERTIES = [
+  ...ACTIVITY_PROPERTIES,
   'title',
   'description',
   'data',
@@ -406,7 +465,7 @@ function readChart(node, path) {
   const encodingEntry = props.get('encoding')?.[0];
   const channels = encodingEntry ? readEncoding(encodingEntry) : {};
   checkChannels(mark, channels, markEntry, encodingEntry);
-  const types = typeFields(channels, rows);
+  const types = typeFields(channels, rows, mark);
   const renderer = optionalText(props, 'renderer') ?? 'svg';
   if (!RENDERERS.includes(renderer)) {
     const entry = props.get('renderer')[0];
@@ -417,18 +476,29 @@ function readChart(node, path) {
       entry.path
     );
   }
-  return {
-    kind: 'chart',
-    id: node.id,
-    title: optionalText(props, 'title'),
-    description: optionalText(props, 'description'),
-    renderer,
-    width: sizeOf(props, 'width'),
-    height: sizeOf(props, 'height'),
-    mark,
-    data: { values: typeRows(rows, types) },
-    encoding: encodingOf(channels),
-  };
+  return validateActivity(
+    {
+      kind: 'chart',
+      ...readActivity(props),
+      id: node.id,
+      title: optionalText(props, 'title'),
+      description: optionalText(props, 'description'),
+      renderer,
+      width: sizeOf(props, 'width'),
+      height: sizeOf(props, 'height'),
+      mark,
+      data: {
+        values: typeRows(
+          rows,
+          types,
+          mark.type === 'range' ? channels.x2.def.field : undefined
+        ),
+      },
+      encoding: encodingOf(channels),
+    },
+    node,
+    path
+  );
 }
 
 /** The kind of a top-level node (`chart`, `gauge`, ...), or `null`. */
@@ -459,7 +529,11 @@ export function chartsFromLinks(links) {
       return [];
     }
     return [
-      kind === 'chart' ? readChart(node, [i]) : readSmallChart(node, [i], kind),
+      kind === 'chart'
+        ? readChart(node, [i])
+        : kind === 'tag-cloud'
+          ? readTagCloud(node, [i])
+          : readSmallChart(node, [i], kind),
     ];
   });
 }
@@ -494,6 +568,15 @@ function fieldNodes(def) {
   return [
     prop('field', def.field),
     prop('type', def.type),
+    ...(def.scale
+      ? [
+          prop(
+            'scale',
+            prop('type', def.scale.type),
+            prop('base', String(def.scale.base ?? 10))
+          ),
+        ]
+      : []),
     ...(def.title === null || def.title === undefined
       ? []
       : [prop('title', def.title)]),
@@ -536,7 +619,7 @@ function encodingNode(encoding) {
 
 /** The node of a chart spec. */
 function chartNode(spec) {
-  const values = [{ id: 'chart', values: [] }];
+  const values = [{ id: 'chart', values: [] }, ...activityNodes(spec)];
   for (const name of ['title', 'description']) {
     if (spec[name] !== null && spec[name] !== undefined) {
       values.push(prop(name, spec[name]));
@@ -577,6 +660,8 @@ export function chartToLino(spec) {
   const node =
     spec.kind === undefined || spec.kind === 'chart'
       ? chartNode(spec)
-      : smallChartNode(spec);
+      : spec.kind === 'tag-cloud'
+        ? tagCloudNode(spec)
+        : smallChartNode(spec);
   return formatNested(node);
 }

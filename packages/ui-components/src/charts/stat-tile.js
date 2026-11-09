@@ -20,7 +20,17 @@ export const defineStatTileElement = (win = globalThis.window) =>
     createSmallChartClass(w, {
       kind: 'stat-tile',
       className: 'ui-stat-tile',
-      names: ['label', 'value', 'unit', 'delta', 'trend', 'description'],
+      names: [
+        'label',
+        'value',
+        'unit',
+        'delta',
+        'trend',
+        'description',
+        'notation',
+        'compact-threshold',
+        'hint',
+      ],
       lists: ['trend'],
       tag: 'div',
     })

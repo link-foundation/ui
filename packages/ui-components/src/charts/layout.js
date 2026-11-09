@@ -5,6 +5,8 @@
  * focus ring and the tooltip.
  */
 
+import { ACTIVITY_LAYOUTS } from './activity-layout.js';
+import { decorateSeries, roundedBar, emphasizeArcs } from './mark-options.js';
 import {
   arc as d3Arc,
   area as d3Area,
@@ -219,7 +221,7 @@ function plotArea(spec, width, height, legendRows, yLabelWidth) {
 }
 
 /** The shapes and points of a bar series. */
-function barShapes(group, scales, color, fields) {
+function barShapes(group, scales, color, fields, spec) {
   const { xScale, yScale, horizontal, keyDef, valueDef } = scales;
   const keyScale = horizontal ? yScale : xScale;
   const valueScale = horizontal ? xScale : yScale;
@@ -247,15 +249,22 @@ function barShapes(group, scales, color, fields) {
           width: half * 2,
           height: Math.abs(b - a),
         };
-    shapes.push({
-      tag: 'rect',
-      attrs: { ...attrs, fill: color },
-      row: item.index,
-    });
+    shapes.push(
+      spec.cornerRadius
+        ? roundedBar(
+            attrs,
+            spec.cornerRadius,
+            horizontal,
+            b < a,
+            color,
+            item.index
+          )
+        : { tag: 'rect', attrs: { ...attrs, fill: color }, row: item.index }
+    );
     points.push({
       row: item.index,
-      x: horizontal ? Math.max(a, b) : center,
-      y: horizontal ? center : Math.min(a, b),
+      x: horizontal ? (a + b) / 2 : center,
+      y: horizontal ? center - half : Math.min(a, b),
       text: rowText(fields, item.row),
     });
   }
@@ -384,8 +393,9 @@ function cartesianLayout(spec, width, height, tokens) {
     const color = group.key === null ? colors.colorAt(0) : colors.colorAt(i);
     const { shapes, points } =
       spec.mark.type === 'bar'
-        ? barShapes(group, scales, color, fields)
+        ? barShapes(group, scales, color, fields, spec)
         : seriesShapes(spec, group, scales, color, fields);
+    decorateSeries(spec, shapes, points);
     return { key: group.key, color, shapes, points };
   });
   return {
@@ -447,6 +457,7 @@ function arcLayout(spec, width, height, tokens) {
       text: rowText(fields, slice.data),
     };
   });
+  emphasizeArcs(spec, shapes, points);
   const seen = new Set();
   const legend = [];
   labels.forEach((label, i) => {
@@ -481,13 +492,16 @@ export function layoutChart(spec, options = {}) {
   const width = options.width ?? spec.width ?? DEFAULT_WIDTH;
   const height = options.height ?? spec.height ?? DEFAULT_HEIGHT;
   const tokens = options.tokens ?? null;
-  const body =
-    spec.mark.type === 'arc'
+  const body = ACTIVITY_LAYOUTS[spec.mark.type]
+    ? ACTIVITY_LAYOUTS[spec.mark.type](spec, width, height, tokens)
+    : spec.mark.type === 'arc'
       ? arcLayout(spec, width, height, tokens)
       : cartesianLayout(spec, width, height, tokens);
   const series = body.series.map((item, s) => ({
     ...item,
     points: item.points.map((p, index) => ({
+      ...p,
+      datum: p.datum ?? spec.data.values[p.row],
       series: s,
       index,
       row: p.row,
@@ -497,8 +511,27 @@ export function layoutChart(spec, options = {}) {
     })),
   }));
   return {
-    width,
-    height,
+    width: body.width ?? width,
+    height: body.height ?? height,
+    weeks: body.weeks,
+    accessibleMarks: ['calendar', 'range'].includes(spec.mark.type),
+    diagnostics: Object.entries(spec.encoding).flatMap(([channel, def]) =>
+      def.scale?.type === 'log'
+        ? spec.data.values.flatMap((row, index) =>
+            Number(row[def.field]) <= 0
+              ? [
+                  {
+                    code: 'log-clamped',
+                    channel,
+                    row: index,
+                    value: row[def.field],
+                    message: `${def.field}: nonpositive value ${row[def.field]} clamped to the positive log domain`,
+                  },
+                ]
+              : []
+          )
+        : []
+    ),
     title: spec.title,
     label: chartLabel(spec),
     plot: body.plot,
