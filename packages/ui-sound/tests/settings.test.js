@@ -103,6 +103,7 @@ describe('sound settings generator', () => {
       theme,
       config,
       maxVolume: 2,
+      random: () => 0,
       hasBeenActive: () => true,
       createContext: () => audio,
     });
