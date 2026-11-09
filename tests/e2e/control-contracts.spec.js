@@ -100,7 +100,14 @@ test('rich panel conditions, whole-section columns and transparent previews', as
   await page.getByRole('tab', { name: 'Shape', exact: true }).click();
   await page.getByRole('switch', { name: 'Show frame', exact: true }).click();
   await expect(page.locator('[data-key=radius]')).toBeHidden();
+  await expect(
+    page.getByRole('tab', { name: 'Shape', exact: true })
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole('tab', { name: 'Fit', exact: true })
+  ).toHaveAttribute('aria-selected', 'true');
   await page.getByRole('switch', { name: 'Show frame', exact: true }).click();
+  await page.getByRole('tab', { name: 'Shape', exact: true }).click();
   await expect(page.locator('.frame-preview')).toBeVisible();
   await expectAccessible(page);
   await page.setViewportSize({ width: 390, height: 800 });
