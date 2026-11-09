@@ -1,6 +1,34 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mountDoc, typeInto, commit } from '../support/controls.js';
+import { renderToHTML } from '@link-foundation/ui-dom';
+import { CONTROL_KIND_SPECS } from '../../src/controls/index.js';
+
+test('color palettes render statically without browser-only selector APIs', () => {
+  for (const mode of ['inline', 'popover']) {
+    const diagnostics = [];
+    const html = renderToHTML(
+      `color: color-field
+  label Accent
+  mode ${mode}
+  value '#123456'
+  palette
+    Navy '#123456'
+  palettes
+    name Ocean
+    colors
+      (name Blue) (hex '#234567')`,
+      {
+        kinds: CONTROL_KIND_SPECS,
+        onDiagnostic: (diagnostic) => diagnostics.push(diagnostic),
+      }
+    );
+    assert.deepEqual(diagnostics, []);
+    assert.match(html, /aria-pressed="true"/);
+    assert.match(html, /Navy/);
+    assert.match(html, /Ocean/);
+  }
+});
 
 test('steppers reflect bounds, preserve pointer focus and multiply Shift clicks', () => {
   const t = mountDoc(

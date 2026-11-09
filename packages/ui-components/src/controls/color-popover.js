@@ -13,6 +13,7 @@ export function colorPopover(control, el) {
     'aria-haspopup': 'dialog',
     'aria-expanded': 'false',
   });
+  parts.swatch = trigger;
   const dialog = partOf(doc, 'div', 'chooser', {
     role: 'dialog',
     popover: 'manual',
@@ -20,8 +21,10 @@ export function colorPopover(control, el) {
     id: `${parts.input.id}-chooser`,
   });
   trigger.setAttribute('aria-controls', dialog.id);
-  node.append(trigger, dialog);
-  dialog.append(parts.rgb, parts.palette);
+  node.appendChild(trigger);
+  node.appendChild(dialog);
+  dialog.appendChild(parts.rgb);
+  dialog.appendChild(parts.palette);
   parts.indicator.hidden = true;
   let opened = false;
   let stopPosition;
@@ -71,14 +74,14 @@ export function colorPopover(control, el) {
       close(true);
     }
   };
-  doc.addEventListener('pointerdown', outside);
-  doc.addEventListener('focusin', outside);
+  doc.addEventListener?.('pointerdown', outside);
+  doc.addEventListener?.('focusin', outside);
   dialog.addEventListener('keydown', escape);
   const stop = control.stop;
   control.stop = () => {
     close();
-    doc.removeEventListener('pointerdown', outside);
-    doc.removeEventListener('focusin', outside);
+    doc.removeEventListener?.('pointerdown', outside);
+    doc.removeEventListener?.('focusin', outside);
     stop();
   };
   control.popover = {
@@ -89,7 +92,7 @@ export function colorPopover(control, el) {
       const parent = active ? dialog : node;
       for (const part of [parts.rgb, parts.palette]) {
         if (part.parentNode !== parent) {
-          parent.append(part);
+          parent.appendChild(part);
         }
       }
       if (!active) {

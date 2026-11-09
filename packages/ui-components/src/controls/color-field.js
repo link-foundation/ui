@@ -72,8 +72,8 @@ function render(control) {
   if (control.parts.swatch) {
     paintSwatch(control.parts.swatch, picked);
   }
-  for (const chip of control.parts.palette.querySelectorAll('[data-color]')) {
-    chip.setAttribute('aria-pressed', String(chip.dataset.color === picked));
+  for (const { button, color } of control.parts.paletteButtons) {
+    button.setAttribute('aria-pressed', String(color === picked));
   }
   commitValue(control);
 }
@@ -81,13 +81,14 @@ function render(control) {
 function updatePalette(control, el, doc) {
   const palette = control.parts.palette;
   setText(palette, '');
+  control.parts.paletteButtons = [];
   const groups = paletteGroups(el.props.get('palettes'));
   for (const group of groups) {
     const fieldset = partOf(doc, 'fieldset', null);
     const legend = partOf(doc, 'legend', null);
     setText(legend, group.name);
-    fieldset.append(legend);
-    palette.append(fieldset);
+    fieldset.appendChild(legend);
+    palette.appendChild(fieldset);
     for (const item of group.colors ?? []) {
       const color = formatHex(item.hex);
       if (!color) {
@@ -97,7 +98,8 @@ function updatePalette(control, el, doc) {
         type: 'button',
         'aria-label': `${item.name} ${color}`,
       });
-      chip.dataset.color = color;
+      chip.setAttribute('data-color', color);
+      control.parts.paletteButtons.push({ button: chip, color });
       setText(chip, item.name);
       paintSwatch(chip, color);
       chip.addEventListener('click', () => {
@@ -108,7 +110,7 @@ function updatePalette(control, el, doc) {
           control.assign({ value: color, invalid: false });
         }
       });
-      fieldset.append(chip);
+      fieldset.appendChild(chip);
     }
   }
   for (const pair of el.props.get('palette') ?? []) {
@@ -123,7 +125,8 @@ function updatePalette(control, el, doc) {
     }
     const button = partOf(doc, 'button', null, { type: 'button' });
     setText(button, name);
-    button.dataset.color = color;
+    button.setAttribute('data-color', color);
+    control.parts.paletteButtons.push({ button, color });
     button.setAttribute('aria-label', `${name} ${color}`);
     button.addEventListener('click', () => {
       if (
@@ -164,7 +167,12 @@ export const COLOR_FIELD_KIND = Object.freeze({
           'aria-label': 'Palette',
         });
         node.appendChild(palette);
-        return { indicator, palette, ...createRgb(doc, node, getControl) };
+        return {
+          indicator,
+          palette,
+          paletteButtons: [],
+          ...createRgb(doc, node, getControl),
+        };
       },
       actions,
       render,
@@ -175,7 +183,6 @@ export const COLOR_FIELD_KIND = Object.freeze({
     const { input, control } = updateTextControl(node, el, ctx, has);
     control.strictHex = textOf(el, 'mode') === 'popover';
     colorPopover(control, el);
-    control.parts.swatch ??= node.querySelector('[data-part=swatch]');
     control.popover?.update(el);
     const { indicator } = control.parts;
     const disabled = flagOf(el, 'disabled') || flagOf(el, 'readonly');
@@ -192,7 +199,7 @@ export const COLOR_FIELD_KIND = Object.freeze({
       'hidden',
       control.parts.palette.children.length === 0
     );
-    for (const button of control.parts.palette.querySelectorAll('button')) {
+    for (const { button } of control.parts.paletteButtons) {
       button.toggleAttribute('disabled', disabled);
     }
     updateRgb(control, el);
