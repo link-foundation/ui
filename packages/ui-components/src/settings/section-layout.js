@@ -25,8 +25,11 @@ export function estimateSection(section, schema) {
 
 function references(raw, schema) {
   return (Array.isArray(raw) ? raw.flat(Infinity) : [raw])
-    .map((key) => schema.fields.get(key)?.section)
-    .filter(Boolean);
+    .map((key) => {
+      const field = schema.fields.get(key);
+      return field ? (field.section ?? '') : undefined;
+    })
+    .filter((id) => id !== undefined);
 }
 
 /** Assign once: editing, searching and switching levels cannot reparent a section. */
@@ -62,15 +65,16 @@ export function sectionColumns(context, body, sections) {
     const dependency = dependencies.find(
       (id) => id !== section.id && ids.has(id)
     );
-    if (dependency && !placements.has(dependency)) {
+    if (dependency !== undefined && !placements.has(dependency)) {
       const pending = waiting.get(dependency) ?? [];
       pending.push({ section, group });
       waiting.set(dependency, pending);
       return body;
     }
-    const target = dependency
-      ? placements.get(dependency)
-      : columns.reduce((a, b) => (a.height <= b.height ? a : b));
+    const target =
+      dependency !== undefined
+        ? placements.get(dependency)
+        : columns.reduce((a, b) => (a.height <= b.height ? a : b));
     placements.set(section.id, target);
     target.height += estimateSection(section, schema);
     const anchor = anchors.get(dependency);

@@ -258,3 +258,30 @@ test('a dependent section declared first still follows its later controller', ()
   assert.equal(groups[1].hidden, false);
   v.close();
 });
+
+test('a conditional section follows a controller in the implicit General section', () => {
+  const definition = readSchema(`s: schema
+  version 1
+child: section
+  label Child
+  visible-when enabled
+enabled:
+  type toggle
+  default false
+child-size:
+  type number
+  default 3
+  section child`).schema;
+  const v = setup({ columns: { count: 2, balance: 'estimate' } }, definition);
+  const groups = [
+    ...v.panel.element.querySelectorAll('.settings-column details'),
+  ];
+  const child = groups.find(
+    (group) => group.querySelector('summary').textContent === 'Child'
+  );
+  const general = groups.find((group) => group !== child);
+  assert.equal(general.nextElementSibling, child);
+  v.panel.update({ enabled: true });
+  assert.equal(child.hidden, false);
+  v.close();
+});
