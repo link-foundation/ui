@@ -103,6 +103,13 @@ export { linoToNetwork, networkToLino } from './lino-to-network.js';
 export { LINO_NETWORK_TAG, defineLinoNetwork } from './lino-network.js';
 
 export { createNetworkPresentation } from './presentation.js';
+
+export {
+  LINKS_GALLERY_TAG,
+  GALLERY_PAGE_SIZE,
+  defineLinksGallery,
+} from './links-gallery.js';
+
 export {
   createDoubletProvider,
   doubletGeometry,
