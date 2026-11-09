@@ -151,7 +151,7 @@ export function createSoundPlayer({
     if (time - (last.get(event) ?? -Infinity) < binding.throttle) {
       return [];
     }
-    // Unactivated cues may still drive visual feedback, but do not consume throttles.
+    last.set(event, time);
     for (const listener of [...listeners]) {
       listener({ event, pan: position(options) });
     }
@@ -168,7 +168,6 @@ export function createSoundPlayer({
     );
     const played = schedule(chosen, binding.level, options);
     if (played.length) {
-      last.set(event, time);
       turns.set(event, turn + 1);
       previous.set(event, chosen.at(-1));
     }

@@ -231,3 +231,20 @@ describe('playback contracts', () => {
     await s.dispose();
   });
 });
+
+it('preserves event throttling for muted visual cues without queuing audio', async () => {
+  let time = 0;
+  const s = setup({ config: settings(), now: () => time });
+  s.player.configure({ events: { click: { throttle: 100 } } });
+  const cues = [];
+  s.player.onCue((cue) => cues.push(cue.event));
+  expect(s.player.play('click')).toEqual([]);
+  expect(s.player.play('click')).toEqual([]);
+  expect(cues).toEqual(['click']);
+  expect(s.contexts()).toBe(0);
+  time = 100;
+  s.player.play('click');
+  expect(cues).toEqual(['click', 'click']);
+  expect(s.contexts()).toBe(0);
+  await s.dispose();
+});
