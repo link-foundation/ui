@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="data:," />
+    <title>Sound settings</title>
+    <link
+      rel="stylesheet"
+      href="../../ui-components/src/settings/settings.css"
+    />
+    <style>
+      body {
+        margin: 2rem auto;
+        max-width: 65rem;
+        padding: 0 1rem;
+        font: 16px system-ui;
+        color: #19212b;
+        background: #fff;
+      }
+      button,
+      select,
+      input {
+        font: inherit;
+      }
+      button {
+        padding: 0.4rem 0.7rem;
+      }
+      .settings-row {
+        border-bottom: 1px solid #d4d9df;
+        padding: 0.6rem 0;
+      }
+      .settings-changed {
+        color: #354b60;
+      }
+      output {
+        color: #354b60;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Sound preferences</h1>
+    <p>
+      Enable sound to try the controls. Your sound preferences survive changes
+      to presets.
+    </p>
+    <button id="try">Try an interaction</button>
+    <p id="status" aria-live="polite">Sound starts off.</p>
+    <main id="settings"></main>
+    <!-- Build: npx esbuild packages/ui-sound/examples/main.js --bundle --format=esm --outfile=packages/ui-sound/examples/dist/main.js -->
+    <script type="module" src="./dist/main.js"></script>
+  </body>
+</html>
