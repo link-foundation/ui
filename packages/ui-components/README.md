@@ -1472,3 +1472,8 @@ backends to a single transactional snapshot. Assign it to
 `linksNetwork.presentation` to share the preview and export scene. See the
 [provider contract](../../docs/spec/network-providers.md) for cancellation,
 large decimal indexes, LiNo settings and host ownership.
+
+### Doublet configurations and gallery
+
+See [the configurations guide](CONFIGURATIONS.md) for exact enumeration,
+notation conversion, editing helpers, renaming classes and `<links-gallery>`.
