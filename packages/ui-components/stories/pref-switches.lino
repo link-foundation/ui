@@ -1,0 +1,4 @@
+pref-switches-stories: stories
+  component pref-switches
+  story default
+    pref-switches

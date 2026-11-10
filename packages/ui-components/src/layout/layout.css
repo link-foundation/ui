@@ -559,3 +559,202 @@
     border: 1px solid CanvasText;
   }
 }
+
+/* Native link navigation: a mask on the viewport, never on individual links. */
+:where(ui-nav-strip, ui-section-nav) {
+  display: block;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  flex: 1 1 auto;
+}
+
+:where(ui-nav-strip, ui-section-nav) > nav {
+  --ui-nav-fade-left: 0px;
+  --ui-nav-fade-right: 0px;
+
+  overflow-x: auto;
+  scrollbar-width: none;
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 var(--ui-nav-fade-left),
+    #000 calc(100% - var(--ui-nav-fade-right)),
+    transparent
+  );
+}
+
+:where(ui-nav-strip, ui-section-nav) > nav::-webkit-scrollbar {
+  display: none;
+}
+
+:where(ui-nav-strip, ui-section-nav) > nav[data-more~='start'] {
+  --ui-nav-fade-left: var(--ui-nav-fade, 2rem);
+}
+
+:where(ui-nav-strip, ui-section-nav) > nav[data-more~='end'] {
+  --ui-nav-fade-right: var(--ui-nav-fade, 2rem);
+}
+
+:where(ui-nav-strip, ui-section-nav) > nav:dir(rtl) {
+  --ui-nav-fade-left: 0px;
+  --ui-nav-fade-right: 0px;
+}
+
+:where(ui-nav-strip, ui-section-nav) > nav:dir(rtl)[data-more~='start'] {
+  --ui-nav-fade-right: var(--ui-nav-fade, 2rem);
+}
+
+:where(ui-nav-strip, ui-section-nav) > nav:dir(rtl)[data-more~='end'] {
+  --ui-nav-fade-left: var(--ui-nav-fade, 2rem);
+}
+
+:where(ui-nav-strip, ui-section-nav) ul {
+  display: flex;
+  inline-size: max-content;
+  min-inline-size: 100%;
+  box-sizing: border-box;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: var(--ui-nav-gap, 0.5rem);
+}
+
+:where(ui-nav-strip, ui-section-nav) li {
+  flex: none;
+}
+
+:where(ui-nav-strip, ui-section-nav) a {
+  display: block;
+  padding: 0.75rem;
+  white-space: nowrap;
+  color: inherit;
+  text-decoration: none;
+}
+
+:where(ui-nav-strip, ui-section-nav) a[aria-current] {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.5rem;
+}
+
+:where(ui-nav-strip, ui-section-nav, ui-link-card, ui-pref-switches)
+  :focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -3px;
+}
+
+:where(ui-app-bar):has(ui-nav-strip, ui-section-nav) > [data-part='root'],
+:where(ui-app-bar):has(ui-nav-strip, ui-section-nav)
+  > [data-part='root']
+  > [data-part='content'] {
+  flex-wrap: wrap;
+  min-inline-size: 0;
+}
+
+:where(ui-app-bar)
+  > [data-part='root']
+  > [data-part='content']:has([data-wrapped]) {
+  flex: 1 1 100%;
+}
+
+:where(ui-nav-strip, ui-section-nav)[data-wrapped] {
+  order: 100;
+  flex: 0 0 100%;
+  inline-size: 100%;
+}
+
+:where(ui-titled-section) {
+  display: block;
+}
+
+:where(ui-titled-section) [data-part='kicker'] {
+  color: var(--color-on-surface-variant, CanvasText);
+  font-size: 0.875rem;
+}
+
+:where(ui-link-cards) {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(min(100%, var(--min, 240px)), 1fr)
+  );
+  gap: var(--ui-link-cards-gap, 1rem);
+}
+
+:where(ui-link-card) {
+  display: block;
+}
+
+:where(ui-link-card) > a {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  block-size: 100%;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 1px solid var(--color-outline-variant, GrayText);
+  border-radius: var(--shape-corner-medium, 12px);
+  color: var(--color-on-surface, CanvasText);
+  background: var(--color-surface, Canvas);
+  text-decoration: none;
+}
+
+:where(ui-link-card) [data-part='title'] {
+  font-weight: 700;
+}
+
+:where(ui-pref-switches) {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+:where(ui-pref-switches) button {
+  min-block-size: 2.75rem;
+  padding: 0.5rem;
+  color: inherit;
+  background: transparent;
+  border: 1px solid currentColor;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font: inherit;
+}
+
+:where(ui-pref-switches) [aria-pressed='true'] {
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+:where(ui-pref-switches) [hidden] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :where(ui-link-card) > a {
+    transition: transform var(--motion-duration-short, 150ms);
+  }
+
+  :where(ui-link-card) > a:is(:hover, :focus-visible) {
+    transform: translateY(-3px);
+  }
+}
+
+[data-motion='off'] :where(ui-link-card) > a {
+  transition: none;
+  transform: none;
+}
+
+@media (forced-colors: active) {
+  :where(ui-nav-strip, ui-section-nav) > nav {
+    mask-image: none;
+  }
+}
+
+[data-motion='on'] :where(ui-link-card) > a {
+  transition: transform var(--motion-duration-short, 150ms);
+}
+
+[data-motion='on'] :where(ui-link-card) > a:is(:hover, :focus-visible) {
+  transform: translateY(-3px);
+}

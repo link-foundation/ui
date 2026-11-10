@@ -237,3 +237,31 @@ export function shellMode(
 ): ShellMode;
 /** The mode of a rendered app shell. */
 export function appShellMode(node: Element): ShellMode | null;
+
+/** Quick preference fields, all registered as comfort by bindConfig. */
+export const PREF_SWITCHES_SCHEMA: string;
+export interface PreferenceTarget {
+  values(): Record<string, unknown>;
+  update(values: Record<string, unknown>): unknown;
+  subscribe?(listener: (values: Record<string, unknown>) => void): () => void;
+}
+export interface PrefSwitchOptions {
+  document?: Document;
+  target?: PreferenceTarget;
+  localizer?: { locale(): string; setLocale(locale: string): void };
+  languages?: { locale: string; label: string }[];
+  scope?: HTMLElement;
+  label?: string;
+  languageLabel?: string;
+  message?: (
+    key: string,
+    params: Record<string, unknown>
+  ) => string | undefined;
+  onChange?: (values: Record<string, unknown>) => void;
+}
+/** Also supplied as render options.layout.preferences for the LiNo kind. */
+export function createPrefSwitches(options?: PrefSwitchOptions): {
+  element: HTMLElement;
+  refresh(): void;
+  destroy(): void;
+};

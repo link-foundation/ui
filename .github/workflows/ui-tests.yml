@@ -66,7 +66,9 @@ jobs:
 
       # The icon gallery loads the generated sets from the gitignored dist/.
       - name: Build icon sets
-        run: npm run build:icons
+        run: |
+          npm run build:icons
+          node scripts/build-icons.mjs --names packages/ui-components/examples/inline-icons.lino --out packages/ui-components/dist/icons/inline
 
       - name: Build foreign dev mode and unpacked extension
         run: npm run build --workspace @link-foundation/ui-devmode-extension

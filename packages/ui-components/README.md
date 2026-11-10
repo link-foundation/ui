@@ -727,6 +727,9 @@ The gallery `examples/layout.html` (served with
 `node scripts/serve-static.mjs`) shows every kind; its Playwright spec is
 `tests/e2e/layout.spec.js`.
 
+Page links, section navigation, titled sections, whole-link card grids and
+quick preference controls are described in [Page navigation and quick preferences](src/layout/README.md).
+
 ### Layout kinds
 
 | Kind        | Example                                                                                        | What it does                                                                                                                                                                                  |
@@ -1493,3 +1496,6 @@ The opt-in [`embed` module](src/embed/README.md) provides `<ui-embed>`, the
 `embedVocabulary()` extension, shared deferred SDK loading, timeout/error
 fallback, archived children and an optional archive toggle. X, Telegram and VK
 adapters are separate imports under `@link-foundation/ui-components/embed/providers/`.
+
+See [brand marks, presentation variants and static subsets](ICONS.md) for
+Simple Icons and localized inline messages.

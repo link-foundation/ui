@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="data:," />
+    <title>Page navigation and preferences</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "@material/material-color-utilities": "/node_modules/@material/material-color-utilities/index.js",
+          "@floating-ui/dom": "/node_modules/@floating-ui/dom/dist/floating-ui.dom.browser.mjs",
+          "@floating-ui/core": "/node_modules/@floating-ui/core/dist/floating-ui.core.browser.mjs",
+          "@link-foundation/ui-config": "/packages/ui-config/src/index.js",
+          "@link-foundation/ui-settings": "/packages/ui-settings/src/index.js",
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "@link-foundation/ui-store": "/packages/ui-store/src/index.js",
+          "@link-foundation/ui-store/memory": "/packages/ui-store/src/memory.js",
+          "@link-foundation/ui-style": "/packages/ui-style/src/index.js",
+          "@link-foundation/ui-tokens": "/packages/ui-tokens/src/index.js",
+          "@link-foundation/ui-tokens/themes": "/packages/ui-tokens/src/themes/index.js",
+          "@link-foundation/ui-themes": "/packages/ui-themes/src/index.js",
+          "@link-foundation/ui-dom": "/packages/ui-dom/src/index.js",
+          "links-notation": "/node_modules/links-notation/dist/index.js"
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="../../src/layout/layout.css" />
+    <style>
+      body {
+        margin: 0;
+        font:
+          16px/1.5 Arial,
+          sans-serif;
+        background: Canvas;
+        color: CanvasText;
+      }
+      main {
+        padding: 1rem;
+      }
+      ui-app-bar {
+        border-bottom: 1px solid GrayText;
+      }
+      ui-titled-section {
+        margin-block: 2rem;
+      }
+      ui-link-cards {
+        margin-block: 1rem;
+      }
+      ui-pref-switches {
+        margin-block: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Page navigation</h1>
+    <div id="app"></div>
+    <script type="module" src="./page-layout.js"></script>
+  </body>
+</html>

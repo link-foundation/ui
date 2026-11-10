@@ -54,3 +54,7 @@ export {
   SHELL_MODES,
   shellMode,
 } from './app-shell.js';
+
+import './page-links.js';
+import './nav-strip.js';
+export { createPrefSwitches, PREF_SWITCHES_SCHEMA } from './pref-switches.js';

@@ -108,6 +108,10 @@
     "./embed/providers/vk": {
       "types": "./src/embed/providers/vk.d.ts",
       "default": "./src/embed/providers/vk.js"
+    },
+    "./icons/adapters/simple-icons": {
+      "types": "./src/icons/adapters/simple-icons.d.ts",
+      "default": "./src/icons/adapters/simple-icons.js"
     }
   },
   "types": "./src/index.d.ts",
@@ -117,6 +121,7 @@
     "stories/",
     "README.md",
     "CONFIGURATIONS.md",
+    "ICONS.md",
     "LICENSE",
     "bin/"
   ],
@@ -195,7 +200,8 @@
     "echarts": "^6.1.0",
     "lucide": ">=1.0.0",
     "mermaid": "^11.0.0 || ^12.0.0",
-    "monaco-editor": "^0.58.0-dev-20261103"
+    "monaco-editor": "^0.58.0-dev-20261103",
+    "simple-icons": ">=16.0.0"
   },
   "peerDependenciesMeta": {
     "@material-symbols/svg-400": {
@@ -215,6 +221,9 @@
     },
     "monaco-editor": {
       "optional": true
+    },
+    "simple-icons": {
+      "optional": true
     }
   },
   "devDependencies": {
@@ -227,6 +236,7 @@
     "lucide": "^1.66.0",
     "mermaid": "11.17.2",
     "monaco-editor": "0.58.0-dev-20261103",
+    "simple-icons": "^16.37.0",
     "test-anywhere": "^0.8.48"
   },
   "publishConfig": {

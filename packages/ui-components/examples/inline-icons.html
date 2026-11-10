@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Brand and inline icons</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "@link-foundation/ui-dom": "/packages/ui-dom/src/index.js",
+          "@link-foundation/ui-store": "/packages/ui-store/src/index.js",
+          "@link-foundation/ui-store/memory": "/packages/ui-store/src/memory.js",
+          "@link-foundation/ui-style": "/packages/ui-style/src/index.js",
+          "@link-foundation/ui-tokens": "/packages/ui-tokens/src/index.js",
+          "@link-foundation/ui-tokens/themes": "/packages/ui-tokens/src/themes/index.js",
+          "links-notation": "/node_modules/links-notation/dist/index.js",
+          "lino-i18n/browser": "/node_modules/lino-i18n/src/browser.js"
+        }
+      }
+    </script>
+    <style>
+      :root {
+        color-scheme: light;
+        color: #202124;
+        background: #fff;
+      }
+      :root[data-theme='dark'] {
+        color-scheme: dark;
+        color: #eee;
+        background: #181818;
+      }
+      body {
+        font:
+          20px/1.6 system-ui,
+          sans-serif;
+        padding: 32px;
+        margin: auto;
+        max-width: 720px;
+      }
+      h1 {
+        font-size: 28px;
+      }
+      label {
+        display: inline-block;
+        margin-right: 24px;
+      }
+      select {
+        font: inherit;
+      }
+      .marks {
+        display: flex;
+        gap: 24px;
+        margin: 32px 0;
+      }
+      .marks ui-icon {
+        --ui-icon-size: 36px;
+      }
+      #sentence {
+        font-size: 28px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Brand and inline icons</h1>
+      <label
+        >Theme
+        <select id="theme">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select></label
+      >
+      <label
+        >Language
+        <select id="locale">
+          <option value="en">English</option>
+          <option value="ru">Русский</option>
+        </select></label
+      >
+      <div class="marks">
+        <ui-icon set="brand" name="github" label="true"></ui-icon>
+        <ui-icon set="brand" name="github"></ui-icon>
+        <ui-icon set="lucide" name="star" label="Star" fill="current"></ui-icon>
+        <ui-icon
+          set="lucide"
+          name="dot"
+          label="Dot"
+          fill="current"
+          stroke-width="3"
+        ></ui-icon>
+        <ui-icon
+          set="lucide"
+          name="heart"
+          label="Heart"
+          fill="current"
+        ></ui-icon>
+        <ui-icon
+          set="lucide"
+          name="flame"
+          label="Flame"
+          fill="current"
+          size="1em"
+        ></ui-icon>
+      </div>
+      <p id="sentence"></p>
+      <p>Icons follow the text color. The second brand mark is decorative.</p>
+      <p>
+        Brand marks: Simple Icons, CC0-1.0. Trademarks belong to their owners.
+        UI icons: Lucide, ISC / MIT.
+      </p>
+    </main>
+    <script type="module" src="./inline-icons.js"></script>
+  </body>
+</html>

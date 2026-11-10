@@ -22,6 +22,7 @@ import {
   resolveIcon,
 } from './icon-registry.js';
 import { iconToSvg } from './svg.js';
+import { applyPresentation } from './presentation.js';
 
 export const ICON_TAG = 'ui-icon';
 
@@ -31,6 +32,9 @@ export const ICON_ATTRIBUTES = Object.freeze([
   'set',
   'label',
   'mirror',
+  'fill',
+  'stroke-width',
+  'size',
 ]);
 
 export const ICON_CSS = `${ICON_TAG} {
@@ -72,6 +76,9 @@ export const ICON_KIND_TEXT = `icon: kind
   property label string
   property mirror
     enum true false
+  property fill string
+  property stroke-width string
+  property size string
   property note string multi
   children none`;
 
@@ -173,6 +180,7 @@ function createIconClass(win) {
     #unlisten = undefined;
     #ready = Promise.resolve(undefined);
     #icon = undefined;
+    #sizeBefore = undefined;
 
     /** The icon data shown now (after `ready`). */
     get icon() {
@@ -219,7 +227,13 @@ function createIconClass(win) {
 
     /** Decorative without a label, an image named by the label with one. */
     #applyLabel() {
-      const label = this.getAttribute('label')?.trim();
+      const value = this.getAttribute('label')?.trim();
+      const label =
+        value === 'true'
+          ? (this.#icon?.title ?? this.#icon?.name)
+          : value === 'false'
+            ? ''
+            : value;
       if (label) {
         this.setAttribute('role', 'img');
         this.setAttribute('aria-label', label);
@@ -242,7 +256,26 @@ function createIconClass(win) {
           return this.#icon;
         }
         this.#icon = icon;
-        this.replaceChildren(svgElement(this.ownerDocument, icon));
+        const svg = svgElement(this.ownerDocument, icon);
+        const size = applyPresentation(this, svg);
+        if (this.#sizeBefore !== undefined) {
+          const { value, priority } = this.#sizeBefore;
+          if (value) {
+            this.style.setProperty('--ui-icon-size', value, priority);
+          } else {
+            this.style.removeProperty('--ui-icon-size');
+          }
+          this.#sizeBefore = undefined;
+        }
+        if (size !== undefined) {
+          this.#sizeBefore = {
+            value: this.style.getPropertyValue('--ui-icon-size'),
+            priority: this.style.getPropertyPriority('--ui-icon-size'),
+          };
+          this.style.setProperty('--ui-icon-size', size);
+        }
+        this.replaceChildren(svg);
+        this.#applyLabel();
         this.setAttribute('data-icon-set', icon.set);
         this.toggleAttribute('data-placeholder', icon.placeholder === true);
         this.toggleAttribute('data-mirror', mirrors(this, icon));
@@ -292,6 +325,9 @@ export function iconAttributes(el) {
     set: atom(el, 'set'),
     label: atom(el, 'label'),
     mirror: atom(el, 'mirror'),
+    fill: atom(el, 'fill'),
+    'stroke-width': atom(el, 'stroke-width'),
+    size: atom(el, 'size'),
   };
 }
 
