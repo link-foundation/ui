@@ -1,18 +1,35 @@
 import { defaults, toLino, applyToRoot } from '@link-foundation/ui-settings';
 import { buildPanelModel } from './panel-model.js';
+import { refreshSection } from './section-tabs.js';
 import { refreshRows } from './panel-rows.js';
 
 export function refreshPanel(
-  { schema, options, messages },
-  { rows, sections, search, count, presets, peek, changes },
-  { values, peeking, tabs, level },
+  context,
+  { rows, sections, chromes, search, count, presets, cards, peek, changes },
+  { values, peeking, tabs, level, sectionLevels },
   updateControls
 ) {
+  const { schema, options, messages } = context;
   const shown = peeking ? defaults(schema) : values;
+  for (const chrome of chromes) {
+    refreshSection(
+      chrome,
+      {
+        values,
+        shown,
+        level,
+        sectionLevels,
+        selectedTabs: tabs,
+        query: search.value.trim(),
+      },
+      context
+    );
+  }
   const model = buildPanelModel(schema, values, {
     query: search.value,
     tabs,
     level,
+    sectionLevels,
   });
   refreshRows(schema, {
     rows,
@@ -26,13 +43,8 @@ export function refreshPanel(
   count.textContent =
     options.formatCount?.(model) ??
     messages.text('count', { count: model.changedCount });
-  for (const [id, group] of sections) {
-    const tab = tabs[id] ?? schema.sections.find((s) => s.id === id)?.tabs?.[0];
-    for (const button of group.querySelectorAll('[data-tab]')) {
-      button.setAttribute('aria-pressed', String(button.dataset.tab === tab));
-    }
-  }
   presets.value = model.activePreset ?? '';
+  cards?.update(values);
   peek.setAttribute('aria-pressed', String(peeking));
   changes.value = options.codec?.write(values) ?? toLino(schema, values);
   if (options.previewRoot) {

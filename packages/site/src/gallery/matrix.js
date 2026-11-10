@@ -11,14 +11,17 @@ export function buildMatrix(
   { themes, schemes = ['light', 'dark'], states = ['default', 'disabled'] }
 ) {
   const vocabulary = defaultVocabulary();
+  const template = parse(example.text);
   return themes.flatMap((theme) =>
     schemes.flatMap((scheme) =>
       states.map((state) => {
-        const document = parse(example.text);
+        const document = globalThis.structuredClone(template);
+        document.byId = new Map();
         const key = `${example.id}-${theme}-${scheme}-${state}`;
         walk(document, (node) => {
           if (node.id) {
             node.id = `${key}-${node.id}`;
+            document.byId.set(node.id, node);
           }
           if (
             state === 'disabled' &&
@@ -38,7 +41,7 @@ export function buildMatrix(
           { name: 'theme', values: [theme] },
           { name: 'scheme', values: [scheme] }
         );
-        return { key, theme, scheme, state, links: format(document) };
+        return { key, theme, scheme, state, links: format(document), document };
       })
     )
   );

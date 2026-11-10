@@ -29,6 +29,9 @@ export function controlFor(field) {
   }
   for (const key of [
     'fallback',
+    'inherit',
+    'mode',
+    'palettes',
     'snapping',
     'rgb',
     'palette',
@@ -38,6 +41,22 @@ export function controlFor(field) {
     if (field.props?.[key] !== undefined) {
       props[key] = field.props?.[key];
     }
+  }
+  if (Array.isArray(props.palettes)) {
+    props.palettes = props.palettes.map((group) =>
+      group?.name
+        ? [
+            ['name', group.name],
+            [
+              'colors',
+              ...group.colors.map((color) => [
+                ['name', color.name],
+                ['hex', color.hex],
+              ]),
+            ],
+          ]
+        : group
+    );
   }
   return { element, props };
 }

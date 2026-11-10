@@ -30,11 +30,14 @@ import { fieldType, toNumber } from './types.js';
  *   key: string, type: string, default: unknown, label?: string,
  *   description?: string, section?: string, min?: number, max?: number,
  *   step?: number, unit?: string, options?: string[], comfort: boolean,
+ *   random?: { min?: number, max?: number } | 'not-heavier-than-default',
  *   apply: ApplyTarget[], props: Record<string, unknown>,
  * }} SettingField
- * @typedef {{ id: string, label?: string, description?: string }} SettingsSection
  * @typedef {{ id: string, label?: string, description?: string,
- *   values: Record<string, unknown> }} SettingsPreset
+ *   tabs?: string[], levels?: string[], presets?: string[], preview?: string,
+ *   extraHeight?: number, 'visible-when'?: unknown }} SettingsSection
+ * @typedef {{ id: string, label?: string, description?: string,
+ *   values: Record<string, unknown>, partial?: boolean }} SettingsPreset
  * @typedef {{ from: number, to: number,
  *   renames: Array<{ from: string, to: string }>,
  *   oldDefaults: Array<{ key: string, raw: unknown }> }} SettingsMigration
@@ -110,6 +113,13 @@ function readClause(field, { name, args }, diagnostics) {
     field[name] = text(args);
   } else if (name === 'options' && args.length > 0 && args.every(isAtom)) {
     field.options = [...args];
+  } else if (name === 'random') {
+    field.random =
+      args[0] === 'not-heavier-than-default'
+        ? args[0]
+        : Object.fromEntries(
+            clausesOf(args).map((c) => [c.name, toNumber(c.args[0])])
+          );
   } else if (name === 'apply') {
     field.apply.push(...readApply(args, { key: field.key }, diagnostics));
   } else if (name !== '' && !UNSAFE_KEYS.includes(name)) {
@@ -262,8 +272,17 @@ function readSection(id, values) {
   for (const { name, args } of clausesOf(values)) {
     if (['label', 'description', 'level'].includes(name) && text(args)) {
       section[name] = text(args);
-    } else if (name === 'tabs' && args.every(isAtom)) {
-      section.tabs = [...args];
+    } else if (
+      ['tabs', 'levels', 'presets'].includes(name) &&
+      args.every(isAtom)
+    ) {
+      section[name] = [...args];
+    } else if (name === 'extraHeight' || name === 'extra-height') {
+      section.extraHeight = toNumber(args[0]);
+    } else if (name === 'visible-when') {
+      section[name] = rawOf(args);
+    } else if (name === 'preview') {
+      section.preview = rawOf(args);
     }
   }
   return section;
@@ -274,6 +293,10 @@ function readPreset(id, values, fields, diagnostics) {
   for (const { name, args } of clausesOf(values)) {
     if ((name === 'label' || name === 'description') && text(args)) {
       preset[name] = text(args);
+      continue;
+    }
+    if (name === 'partial') {
+      preset.partial = args[0] !== 'false';
       continue;
     }
     const [key, ...rest] = args;

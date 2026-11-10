@@ -78,7 +78,7 @@ test('live number drafts, native text keys and keyboard palette editing', async 
   await expect(
     page.getByRole('textbox', { name: 'Accent', exact: true })
   ).toHaveValue('#1256ab');
-  await page.getByRole('button', { name: 'Sand', exact: true }).focus();
+  await page.getByRole('button', { name: 'Sand #eecbaa', exact: true }).focus();
   await page.keyboard.press('Enter');
   await expect(
     page.getByRole('textbox', { name: 'Accent', exact: true })
@@ -94,13 +94,20 @@ test('rich panel conditions, whole-section columns and transparent previews', as
   const first = await sections.nth(0).boundingBox();
   const second = await sections.nth(1).boundingBox();
   expect(second.x).toBeGreaterThan(first.x + first.width);
-  await page.getByRole('button', { name: 'Fit', exact: true }).click();
+  await page.getByRole('tab', { name: 'Fit', exact: true }).click();
   await expect(page.locator('[data-key=radius]')).toBeHidden();
   await expect(page.locator('[data-key=width]')).toBeVisible();
-  await page.getByRole('button', { name: 'Shape', exact: true }).click();
+  await page.getByRole('tab', { name: 'Shape', exact: true }).click();
   await page.getByRole('switch', { name: 'Show frame', exact: true }).click();
   await expect(page.locator('[data-key=radius]')).toBeHidden();
+  await expect(
+    page.getByRole('tab', { name: 'Shape', exact: true })
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole('tab', { name: 'Fit', exact: true })
+  ).toHaveAttribute('aria-selected', 'true');
   await page.getByRole('switch', { name: 'Show frame', exact: true }).click();
+  await page.getByRole('tab', { name: 'Shape', exact: true }).click();
   await expect(page.locator('.frame-preview')).toBeVisible();
   await expectAccessible(page);
   await page.setViewportSize({ width: 390, height: 800 });
@@ -219,7 +226,9 @@ test('panel language changes retain values and localize field-specific steppers 
   await expect(
     page.getByRole('textbox', { name: 'Accent', exact: true })
   ).toHaveValue('#6800a4');
-  await page.getByRole('button', { name: 'Ocean', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Ocean #1256ab', exact: true })
+    .click();
   await expect(red).toHaveValue('18');
   await expectAccessible(page);
   await page.evaluate(() => globalThis.panel.setMessages({}));

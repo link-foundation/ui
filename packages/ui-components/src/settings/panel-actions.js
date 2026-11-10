@@ -8,18 +8,21 @@ import {
   toShareHash,
 } from '@link-foundation/ui-settings';
 
-export function createToolbar({
-  node,
-  button,
-  schema,
-  options,
-  messages,
-  win,
-  commit,
-  getValues,
-  isPeeking,
-  setPeek,
-}) {
+import { presetCards } from './preset-cards.js';
+
+export function createToolbar(context) {
+  const {
+    node,
+    button,
+    schema,
+    options,
+    messages,
+    win,
+    commit,
+    getValues,
+    isPeeking,
+    setPeek,
+  } = context;
   const toolbar = node('div');
   toolbar.className = 'settings-toolbar';
   const presets = node('select', undefined, toolbar);
@@ -30,6 +33,9 @@ export function createToolbar({
     const option = node('option', preset.label ?? preset.id, presets);
     option.value = preset.id;
   }
+  const cards =
+    options.presets?.display === 'cards' ? presetCards(context, toolbar) : null;
+  presets.hidden = Boolean(cards);
   presets.addEventListener('change', () => {
     if (presets.value) {
       commit(applyPreset(schema, getValues(), presets.value));
@@ -69,27 +75,39 @@ export function createToolbar({
       setPeek(false);
     }
   }
-  peek.addEventListener('pointerdown', (event) => {
-    peek.setPointerCapture?.(event.pointerId);
-    startPeek();
-  });
-  peek.addEventListener('keydown', (event) => {
-    if ([' ', 'Enter'].includes(event.key)) {
-      event.preventDefault();
+  const back = button(messages.message('back'), endPeek, toolbar);
+  back.className = 'settings-peek-back';
+  back.hidden = true;
+  if (options.peek === 'toggle') {
+    peek.addEventListener('click', () => setPeek(!isPeeking()));
+  } else {
+    peek.addEventListener('pointerdown', (event) => {
+      peek.setPointerCapture?.(event.pointerId);
       startPeek();
-    }
-  });
-  peek.addEventListener('keyup', endPeek);
-  peek.addEventListener('blur', endPeek);
-  peek.addEventListener('lostpointercapture', endPeek);
-  win.addEventListener('pointerup', endPeek);
-  win.addEventListener('pointercancel', endPeek);
-  win.addEventListener('blur', endPeek);
+    });
+    peek.addEventListener('keydown', (event) => {
+      if ([' ', 'Enter'].includes(event.key)) {
+        event.preventDefault();
+        startPeek();
+      }
+    });
+    peek.addEventListener('keyup', endPeek);
+    peek.addEventListener('blur', endPeek);
+    peek.addEventListener('lostpointercapture', endPeek);
+    win.addEventListener('pointerup', endPeek);
+    win.addEventListener('pointercancel', endPeek);
+    win.addEventListener('blur', endPeek);
+  }
   return {
     presets,
+    cards,
     peek,
+    updatePeek(value) {
+      back.hidden = options.peek !== 'toggle' || !value;
+    },
     endPeek,
     destroy() {
+      cards?.destroy();
       win.removeEventListener('pointerup', endPeek);
       win.removeEventListener('pointercancel', endPeek);
       win.removeEventListener('blur', endPeek);
@@ -107,6 +125,7 @@ export function createSharing({
   commit,
   getValues,
   isDestroyed,
+  importLooks,
 }) {
   node('h3', messages.message('changes'));
   const changes = node('textarea');
@@ -115,7 +134,8 @@ export function createSharing({
   messages.attr(changes, 'aria-label', 'changes');
   const status = node('p');
   status.setAttribute('role', 'status');
-  const fallback = node('input');
+  const fallback = node('textarea');
+  fallback.rows = 6;
   fallback.readOnly = true;
   fallback.hidden = true;
   messages.attr(fallback, 'aria-label', 'copyText');
@@ -143,6 +163,10 @@ export function createSharing({
   const exportText = () =>
     options.codec?.write(getValues()) ?? toLino(schema, getValues());
   const importText = (text) => {
+    const collection = importLooks(text);
+    if (collection !== null) {
+      return collection;
+    }
     const parsed = options.codec
       ? options.codec.read(text, { base: getValues() })
       : text.trimStart().startsWith('{')
@@ -206,5 +230,5 @@ export function createSharing({
       messages.content(status, 'shareError');
     }
   });
-  return { changes, status, importText, exportText };
+  return { changes, status, importText, exportText, copy };
 }

@@ -30,14 +30,39 @@ export function randomize(schema, values, options) {
     if (field.comfort || locked.has(field.key)) {
       continue;
     }
-    const drawn = fieldType(field.type)?.random(field, random);
+    const bounds = randomBounds(field);
+    const drawn = fieldType(field.type)?.random(bounds ?? field, random);
     if (drawn === undefined) {
       continue;
     }
     const result = coerce(field, drawn);
-    if (result.ok) {
+    if (
+      result.ok &&
+      (!bounds || (result.value >= bounds.min && result.value <= bounds.max))
+    ) {
       out[field.key] = result.value;
     }
   }
   return out;
+}
+
+/** Preserve the original step origin; never coerce an out-of-bounds draw into a heavier value. */
+function randomBounds(field) {
+  const option = field.random ?? field.props?.random;
+  if (!option || !['number', 'range'].includes(field.type)) {
+    return null;
+  }
+  let min = Math.max(field.min ?? 0, option.min ?? -Infinity);
+  let max = Math.min(
+    field.max ?? 100,
+    option === 'not-heavier-than-default'
+      ? field.default
+      : (option.max ?? Infinity)
+  );
+  if (field.step > 0 && field.normalization?.numbers !== 'clamp') {
+    const base = field.min ?? 0;
+    min = base + Math.ceil((min - base) / field.step) * field.step;
+    max = base + Math.floor((max - base) / field.step) * field.step;
+  }
+  return { ...field, min, max };
 }

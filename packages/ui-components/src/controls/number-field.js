@@ -63,12 +63,24 @@ const actions = (input, getControl) => ({
   'read-draft': (args, meta) => {
     getControl().draft = input.value;
     const read = readNumber(input.value, rangeOf(meta.context));
-    meta.assign(read.invalid ? { invalid: true } : read);
+    meta.assign(
+      read.invalid
+        ? { invalid: true }
+        : read.value === null && meta.context.inherit
+          ? { invalid: false }
+          : read
+    );
   },
   'read-value': (args, meta) => {
     getControl().draft = undefined;
     const read = readNumber(input.value, rangeOf(meta.context));
-    meta.assign(read.invalid ? { invalid: true } : read);
+    meta.assign(
+      read.invalid
+        ? { invalid: true }
+        : read.value === null && meta.context.inherit
+          ? { invalid: false }
+          : read
+    );
   },
   'restore-value': (args, meta) => {
     getControl().draft = undefined;
@@ -98,6 +110,17 @@ function render(control) {
       input.value = text;
     }
   }
+  renderSteppers(context, control.parts);
+  const inherited = context.inherit && context.value === null;
+  if (inherited) {
+    input.setAttribute('aria-valuetext', context.inheritedLabel || 'inherited');
+  } else {
+    input.removeAttribute('aria-valuetext');
+  }
+  control.parts.reset.hidden = !context.inherit;
+  control.parts.reset.disabled = Boolean(
+    inherited || context.disabled || context.readonly
+  );
   commitValue(control);
 }
 
@@ -111,7 +134,7 @@ export const NUMBER_FIELD_KIND = Object.freeze({
       kind: 'number-field',
       attrs: { type: 'text', inputmode: 'decimal', autocomplete: 'off' },
       ignoreInFields: false,
-      children: (doc, node) => {
+      children: (doc, node, getControl) => {
         const parts = {};
         for (const [name, label] of [
           ['decrement', 'Decrease'],
@@ -122,10 +145,39 @@ export const NUMBER_FIELD_KIND = Object.freeze({
             'aria-label': label,
           });
           setText(button, name === 'increment' ? '+' : '−');
+          button.addEventListener('pointerdown', (event) =>
+            event.preventDefault()
+          );
+          button.addEventListener(
+            'click',
+            (event) => {
+              event.stopImmediatePropagation();
+              if (!button.disabled) {
+                const direction =
+                  name === 'increment' ? 'arrow-up' : 'arrow-down';
+                getControl().service.send(
+                  `${event.shiftKey ? 'shift-' : ''}${direction}`
+                );
+              }
+            },
+            true
+          );
           node.appendChild(button);
           parts[name] = button;
         }
-        return parts;
+        const reset = partOf(doc, 'button', 'reset', {
+          type: 'button',
+          hidden: '',
+        });
+        setText(reset, 'Inherit');
+        reset.addEventListener('click', () => {
+          if (!reset.disabled) {
+            getControl().draft = undefined;
+            getControl().assign({ value: null, invalid: false });
+          }
+        });
+        node.appendChild(reset);
+        return { ...parts, reset };
       },
       actions,
       render,
@@ -156,6 +208,9 @@ export const NUMBER_FIELD_KIND = Object.freeze({
         flagOf(el, 'disabled') || flagOf(el, 'readonly')
       );
     }
+    range.inherit = flagOf(el, 'inherit');
+    range.inheritedLabel = textOf(el, 'inherited-label');
+    setText(control.parts.reset, textOf(el, 'inherit-label') || 'Inherit');
     control.assign(range);
     if (has('value')) {
       const value = numberOf(el, 'value', Number.NaN);
@@ -169,3 +224,16 @@ export const NUMBER_FIELD_KIND = Object.freeze({
   },
   destroy: stopControl,
 });
+
+function renderSteppers(context, parts) {
+  const effective = context.value ?? context.fallback;
+  for (const name of ['increment', 'decrement']) {
+    const bounded =
+      name === 'increment'
+        ? effective >= context.max && context.max !== null
+        : effective <= context.min && context.min !== null;
+    const disabled = context.disabled || context.readonly || bounded;
+    parts[name].disabled = Boolean(disabled);
+    parts[name].tabIndex = -1;
+  }
+}
