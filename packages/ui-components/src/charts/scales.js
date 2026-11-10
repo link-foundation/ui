@@ -7,6 +7,7 @@
 import {
   scaleBand,
   scaleLinear,
+  scaleLog,
   scalePoint,
   scaleSqrt,
   scaleUtc,
@@ -55,6 +56,45 @@ export function discreteDomain(def, rows) {
     return keys;
   }
   return keys.sort((a, b) => continuousValue(def, a) - continuousValue(def, b));
+}
+
+function logPositionScale(def, rows, range, extent) {
+  const base = def.scale.base ?? 10;
+  const positive = rows
+    .map((row) => Number(row[def.field]))
+    .concat(extent)
+    .filter((value) => value > 0);
+  const low = positive.length ? Math.min(...positive) : 1;
+  const high = positive.length ? Math.max(...positive) : base;
+  const scale = scaleLog()
+    .base(base)
+    .domain([low, high === low ? low * base : high])
+    .range(range)
+    .nice();
+  const minimum = scale.domain()[0];
+  const position = (value) => scale(Math.max(minimum, Number(value)));
+  return {
+    kind: 'continuous',
+    position,
+    continuous: position,
+    bandwidth: 0,
+    ticks: () => {
+      const [a, b] = scale.domain();
+      const ticks = [];
+      const first = Math.ceil(Math.log(a) / Math.log(base) - 1e-10);
+      const last = Math.floor(Math.log(b) / Math.log(base) + 1e-10);
+      const stride = Math.max(1, Math.ceil((last - first) / 32));
+      for (let power = first; power <= last; power += stride) {
+        const value = base ** power;
+        ticks.push({
+          value,
+          position: scale(value),
+          label: formatNumber(value),
+        });
+      }
+      return ticks;
+    },
+  };
 }
 
 /** A domain that is not a single point. */
@@ -115,6 +155,9 @@ export function positionScale(def, rows, range, options = {}) {
           ),
         })),
     };
+  }
+  if (def.scale?.type === 'log') {
+    return logPositionScale(def, rows, range, extent);
   }
   const values = [
     ...rows.map((row) => continuousValue(def, row[def.field])),

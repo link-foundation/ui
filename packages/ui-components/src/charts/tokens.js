@@ -143,15 +143,23 @@ export const CHART_CSS = `:root { ${declarations('light')} }
   position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
 }
+.ui-chart-table.ui-visually-hidden { display: block; }
 .ui-chart-tooltip {
   position: absolute; pointer-events: none; z-index: 1; max-width: 16rem;
   background: var(--color-chart-text); color: var(--color-chart-background);
   border-radius: 4px; padding: 0.25rem 0.5rem; font-size: 0.8125rem; line-height: 1.3;
   transform: translate(-50%, calc(-100% - 10px)); white-space: nowrap;
 }
+.ui-chart-tooltip-top { inset: auto; margin: 0; border: 0; transform: none; }
+.ui-chart-tooltip dl { display: grid; grid-template-columns: auto auto; gap: 0.25rem 1rem; margin: 0.5rem 0 0; }
+.ui-chart-tooltip dd { margin: 0; }
+.ui-calendar-scroll { overflow-x: auto; }
+.ui-calendar-scroll svg { max-width: none; }
+.ui-tag-cloud { display: flex; flex-wrap: wrap; align-items: baseline; gap: 1rem; list-style: none; padding: 0; }
 .ui-chart-tooltip[hidden] { display: none; }
 .ui-chart-focus { fill: none; stroke: var(--color-chart-focus); stroke-width: 2; }
 .ui-stat-tile { padding: 0.75rem 1rem; border: 1px solid var(--color-chart-grid); border-radius: 8px; min-width: 10rem; }
+.ui-stat-tile a { color: var(--color-chart-text); text-decoration: underline; }
 .ui-stat-tile-label { font-size: 0.875rem; color: var(--color-chart-muted); margin: 0; }
 .ui-stat-tile-value { font-size: 1.75rem; font-weight: 600; margin: 0.125rem 0; }
 .ui-stat-tile-delta { font-size: 0.875rem; margin: 0; }

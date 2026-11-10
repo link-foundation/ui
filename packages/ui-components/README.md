@@ -313,7 +313,9 @@ In a page:
 <ui-sparkline label="Visits" values="3 5 2 8 6 9" mark="area"></ui-sparkline>
 ```
 
-The gallery `examples/charts.html` shows every mark. To open it, run
+The gallery `examples/charts.html` shows the original marks. The
+[activity chart guide](src/charts/README.md) documents calendar, range,
+composition, tag clouds, log scales and rich top-layer tooltips. To open it, run
 `node scripts/serve-static.mjs` from the repository root and go to
 http://127.0.0.1:4173/packages/ui-components/examples/charts.html.
 

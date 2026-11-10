@@ -60,7 +60,17 @@ const COMMON = ['label', 'description'];
 
 const PROPERTIES = {
   gauge: [...COMMON, 'value', 'min', 'max', 'unit'],
-  'stat-tile': [...COMMON, 'value', 'unit', 'delta', 'trend'],
+  'stat-tile': [
+    ...COMMON,
+    'value',
+    'unit',
+    'delta',
+    'trend',
+    'notation',
+    'compact-threshold',
+    'hint',
+    'footnote',
+  ],
   sparkline: [...COMMON, 'values', 'mark'],
 };
 
@@ -91,7 +101,45 @@ function readGauge(props, node, path) {
 function readStatTile(props, node, path) {
   required(props, 'value', node, path, 'stat-tile');
   const trend = props.get('trend')?.[0];
+  const extras = {};
+  for (const name of ['notation', 'hint']) {
+    if (props.has(name)) {
+      extras[name] = optionalText(props, name);
+    }
+  }
+  if (extras.notation && extras.notation !== 'compact') {
+    fail('invalid-value', 'notation must be compact', node, path);
+  }
+  if (props.has('compact-threshold')) {
+    extras.compactThreshold = optionalNumber(props, 'compact-threshold');
+    if (extras.compactThreshold < 0) {
+      fail(
+        'invalid-value',
+        'compact-threshold must be nonnegative',
+        node,
+        path
+      );
+    }
+  }
+  if (props.has('footnote')) {
+    const entry = props.get('footnote')[0];
+    const fields = properties(entry.node, entry.path, 1, ['label', 'href']);
+    const href = optionalText(fields, 'href');
+    if (!href || !/^(https?:|mailto:|\/|#)/u.test(href)) {
+      fail(
+        'invalid-value',
+        'footnote requires an http, mailto or relative href',
+        entry.node,
+        entry.path
+      );
+    }
+    extras.footnote = {
+      label: optionalText(fields, 'label') ?? 'Source',
+      href,
+    };
+  }
   return {
+    ...extras,
     value: optionalNumber(props, 'value'),
     unit: optionalText(props, 'unit'),
     delta: optionalNumber(props, 'delta'),
@@ -157,7 +205,14 @@ const isDefault = (name, value) =>
 export function smallChartNode(spec) {
   const values = [{ id: spec.kind, values: [] }];
   for (const name of PROPERTIES[spec.kind]) {
-    const value = spec[name];
+    const value =
+      spec[name === 'compact-threshold' ? 'compactThreshold' : name];
+    if (name === 'footnote' && value) {
+      values.push(
+        prop('footnote', prop('label', value.label), prop('href', value.href))
+      );
+      continue;
+    }
     if (!isDefault(name, value)) {
       values.push(
         prop(name, ...(Array.isArray(value) ? value : [value]).map(String))
