@@ -452,6 +452,14 @@ jobs:
           fi
           bash scripts/run-with-budget-warning.sh 300 "Deno test suite" deno test -A --parallel --shard "$DENO_SHARD"
 
+      # Diagnostic only (issue #253): the first repetition after the suite
+      # was the slow one. Record what else keeps the runner busy then.
+      - name: Snapshot Windows runner load after the Deno suite
+        if: ${{ !cancelled() && matrix.runtime == 'deno' && runner.os == 'Windows' }}
+        shell: pwsh
+        timeout-minutes: 2
+        run: ./experiments/issue-253/runner-snapshot.ps1 -Label 'after Deno suite'
+
       - name: Repeat Windows Deno release formatter fixture
         if: ${{ !cancelled() && matrix.runtime == 'deno' && runner.os == 'Windows' }}
         shell: bash
