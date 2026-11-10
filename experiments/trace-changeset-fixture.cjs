@@ -31,9 +31,10 @@ if (process.env.DEBUG_CHANGESET_FIXTURE) {
       require('node:perf_hooks').performance.now()
     ),
   });
-  // Issue #253: tell CPU-bound work in this process, other busy processes and
-  // waiting (disk, scanning) apart. Machine CPU comes from os.cpus() idle time.
+  // Tell CPU-bound work in this process, other busy processes and waiting
+  // (disk, scanning) apart. Machine CPU comes from os.cpus() idle time.
   const os = require('node:os');
+  const { setInterval } = require('node:timers');
   const machineIdle = () => {
     let idle = 0;
     let total = 0;
