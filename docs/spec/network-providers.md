@@ -92,10 +92,11 @@ interactive, CPU-intensive solves.
 
 The default `solveCollisions` algorithm, its module worker entry and the default
 provider wiring are not implemented by this execution layer. The renderer from
-#227 is now available, but its canonical turns produce crossings in the input
-that #228 describes as clean; [#249](https://github.com/link-foundation/ui/issues/249)
-tracks that fixture mismatch. This execution layer does not claim the
-renderer-dependent acceptance criteria of #228.
+#227 is now available. [#249](https://github.com/link-foundation/ui/issues/249)
+reconciled the input that #228 describes as clean as a shared fixture, which
+that renderer paints without collisions (see [doublet provider](doublet-provider.md)).
+This execution layer does not claim the renderer-dependent acceptance criteria
+of #228.
 The built-in [`createDoubletProvider`](doublet-provider.md) supplies the
 continuous two-cubic doublet renderer, nine parametric markers, placements,
 backgrounds, cards and captions without a consumer geometry backend.
