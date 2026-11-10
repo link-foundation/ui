@@ -1492,10 +1492,9 @@ notation conversion, editing helpers, renaming classes and `<links-gallery>`.
 
 ## Deferred social embeds
 
-The opt-in [`embed` module](src/embed/README.md) provides `<ui-embed>`, the
-`embedVocabulary()` extension, shared deferred SDK loading, timeout/error
-fallback, archived children and an optional archive toggle. X, Telegram and VK
-adapters are separate imports under `@link-foundation/ui-components/embed/providers/`.
+The opt-in [`embed` module](src/embed/README.md) provides `<ui-embed>` and
+`embedVocabulary()`, deferred SDK loading, archive fallback and a toggle.
+Import X, Telegram and VK adapters from `@link-foundation/ui-components/embed/providers/`.
 
 See [brand marks, presentation variants and static subsets](ICONS.md) for
 Simple Icons and localized inline messages.
