@@ -1489,3 +1489,6 @@ for balanced columns, preset cards, saved looks, colour popovers and cross-tab s
 
 See [the configurations guide](CONFIGURATIONS.md) for exact enumeration,
 notation conversion, editing helpers, renaming classes and `<links-gallery>`.
+
+See [brand marks, presentation variants and static subsets](ICONS.md) for
+Simple Icons and localized inline messages.

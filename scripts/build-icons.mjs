@@ -3,13 +3,14 @@
 //
 //   node scripts/build-icons.mjs                 # every set
 //   node scripts/build-icons.mjs --sets own      # some sets (comma-separated)
+//   node scripts/build-icons.mjs --names icons.lino # exact app-selected subset
 //   node scripts/build-icons.mjs --check         # validate, write nothing,
 //                                                # fail when own-icons.js is stale
 //   node scripts/build-icons.mjs --root DIR --out DIR
 //
 // File sets are the directories under assets/icons/ (assets/icons/own/ is
 // ours, CC0-1.0); their asset records come from assets/assets.lino. Adapter
-// sets (lucide, tabler, material-symbols) come from the npm packages and
+// sets (lucide, tabler, material-symbols, brand) come from the npm packages and
 // the records the adapters make. The build stops, writing nothing, when an
 // icon has no record, a licence is not on the allow list, or a record
 // names a source on the avoid list (Remix Icon, SF Symbols).
@@ -33,6 +34,8 @@ import {
 import { dirname, join, posix, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { optimize } from 'svgo';
+import { readIconSubset } from './lib/icon-subsets.mjs';
+import { SIMPLE_ICONS } from '../packages/ui-components/src/icons/adapters/simple-icons.js';
 import {
   DEFAULT_POLICY,
   formatAssetRecord,
@@ -94,6 +97,7 @@ export const ICON_POLICY = Object.freeze({
 
 /** The adapter sets the build knows, by set name. */
 export const ADAPTERS = Object.freeze({
+  brand: SIMPLE_ICONS,
   lucide: LUCIDE,
   tabler: TABLER,
   'material-symbols': MATERIAL_SYMBOLS,
@@ -340,7 +344,7 @@ function findPackageDir(name, from = SCRIPTS) {
 }
 
 /** Read and check an adapter set (every logical icon name). */
-async function readAdapterSet(adapter) {
+async function readAdapterSet(adapter, selected) {
   const errors = [];
   const icons = new Map();
   const packageDir = findPackageDir(adapter.packageName);
@@ -353,7 +357,13 @@ async function readAdapterSet(adapter) {
       ],
     };
   }
-  for (const [name, library] of Object.entries(adapter.names)) {
+  const names = selected
+    ? [...selected].map((name) => [
+        name,
+        Object.hasOwn(adapter.names, name) ? adapter.names[name] : name,
+      ])
+    : Object.entries(adapter.names);
+  for (const [name, library] of names) {
     const record = adapter.record(library);
     if (record === undefined) {
       errors.push(
@@ -434,8 +444,10 @@ function compileSet(set, read) {
   for (const [name, { svg, record }] of [...read.icons.entries()].sort(
     ([a], [b]) => a.localeCompare(b)
   )) {
+    const { title: iconTitle } = splitSvg(svg);
     const { viewBox, body } = splitSvg(optimizeSvg(svg), { defaults });
     icons[name] = {
+      ...(iconTitle ? { title: iconTitle } : {}),
       viewBox,
       body,
       mirrorInRtl: MIRROR_IN_RTL.has(name),
@@ -463,6 +475,7 @@ export function parseArgs(argv) {
   return {
     root: resolve(value('--root') ?? '.'),
     out: value('--out'),
+    names: value('--names'),
     sets: value('--sets')
       ?.split(',')
       .map((set) => set.trim())
@@ -476,10 +489,10 @@ export function parseArgs(argv) {
  * @param {string} root
  * @param {string[]|undefined} sets
  */
-async function readSets(root, sets) {
+async function readSets(root, sets, selected) {
   const fileSetNames = fileSets(root);
   const known = [...fileSetNames, ...Object.keys(ADAPTERS)];
-  const wanted = sets ?? known;
+  const wanted = sets ?? (selected ? [...selected.keys()] : known);
   const errors = [
     ...avoidedDependencies(root),
     ...wanted
@@ -494,7 +507,20 @@ async function readSets(root, sets) {
   for (const set of wanted.filter((name) => known.includes(name))) {
     const read = fileSetNames.includes(set)
       ? readFileSet(root, set, allRecords)
-      : await readAdapterSet(ADAPTERS[set]);
+      : await readAdapterSet(ADAPTERS[set], selected?.get(set));
+    if (selected) {
+      const names = selected.get(set) ?? new Set();
+      for (const name of names) {
+        if (!read.icons.has(name)) {
+          read.errors.push(`unknown icon "${set}:${name}"`);
+        }
+      }
+      read.icons = new Map([...read.icons].filter(([name]) => names.has(name)));
+      const ids = new Set(
+        [...read.icons.values()].map(({ record }) => record?.id)
+      );
+      read.records = read.records.filter((record) => ids.has(record.id));
+    }
     errors.push(...read.errors.map((error) => `${set}: ${error}`));
     reads.set(set, read);
   }
@@ -538,7 +564,7 @@ const relativePath = (root, path) => relative(root, path).split('\\').join('/');
 
 /**
  * Build the icon sets.
- * @param {{root?: string, out?: string, sets?: string[], check?: boolean}} [options]
+ * @param {{root?: string, out?: string, sets?: string[], names?: string, check?: boolean}} [options]
  *   `check` validates and compares own-icons.js, writing nothing
  * @returns {Promise<{errors: string[], written: string[], stale: string[],
  *   built: Record<string, object>}>}
@@ -547,10 +573,17 @@ export async function buildIcons({
   root = '.',
   out,
   sets,
+  names,
   check = false,
 } = {}) {
   root = resolve(root);
-  const { errors, reads } = await readSets(root, sets);
+  let selected;
+  try {
+    selected = names ? readIconSubset(resolve(root, names), sets) : undefined;
+  } catch (error) {
+    return { errors: [error.message], written: [], stale: [], built: {} };
+  }
+  const { errors, reads } = await readSets(root, sets, selected);
   if (errors.length > 0) {
     return { errors, written: [], stale: [], built: {} };
   }
@@ -561,7 +594,7 @@ export async function buildIcons({
 
   const stale = [];
   const ownModule = join(root, OWN_MODULE);
-  if (built[DEFAULT_ICON_SET] && existsSync(dirname(ownModule))) {
+  if (!selected && built[DEFAULT_ICON_SET] && existsSync(dirname(ownModule))) {
     const text = moduleText(built[DEFAULT_ICON_SET]);
     if (syncGeneratedFile(ownModule, text, { write: !check }).stale) {
       stale.push(relativePath(root, ownModule));

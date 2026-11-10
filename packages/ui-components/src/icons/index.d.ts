@@ -14,6 +14,8 @@ export interface AssetRecord {
 }
 
 export interface IconData {
+  /** Library title, used by label=true. */
+  title?: string;
   viewBox: string;
   /** SVG markup drawn in currentColor. */
   body: string;
@@ -43,7 +45,13 @@ export interface StaticIconModule {
   set: string;
   icons: Record<
     string,
-    { viewBox: string; body: string; mirrorInRtl?: boolean; record: string }
+    {
+      viewBox: string;
+      body: string;
+      title?: string;
+      mirrorInRtl?: boolean;
+      record: string;
+    }
   >;
   records: AssetRecord[];
 }
@@ -69,7 +77,7 @@ export const MIRROR_IN_RTL: ReadonlySet<string>;
 export function splitSvg(
   text: string,
   options?: { defaults?: Record<string, string> }
-): { viewBox: string; body: string };
+): { viewBox: string; body: string; title?: string };
 export function iconToSvg(
   icon: { viewBox: string; body: string },
   attributes?: Record<string, string>
@@ -77,7 +85,15 @@ export function iconToSvg(
 export function iconNodeToSvg(node: unknown, root?: unknown): string;
 
 export const ICON_TAG: 'ui-icon';
-export const ICON_ATTRIBUTES: readonly ['name', 'set', 'label', 'mirror'];
+export const ICON_ATTRIBUTES: readonly [
+  'name',
+  'set',
+  'label',
+  'mirror',
+  'fill',
+  'stroke-width',
+  'size',
+];
 export const ICON_CSS: string;
 export const ICON_KIND_TEXT: string;
 /** The ui-dialect/0 vocabulary plus the `icon` kind. */
@@ -93,6 +109,9 @@ export function iconAttributes(el: {
   set: string | undefined;
   label: string | undefined;
   mirror: string | undefined;
+  fill: string | undefined;
+  'stroke-width': string | undefined;
+  size: string | undefined;
 };
 
 /** The `ui-icon` element. */
