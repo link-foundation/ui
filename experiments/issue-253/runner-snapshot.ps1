@@ -9,6 +9,7 @@ $machine = @(
   '\Memory\Available MBytes',
   '\Memory\Pages Input/sec',
   '\Memory\Page Reads/sec',
+  '\Memory\Pages Output/sec',
   '\Memory\Modified Page List Bytes',
   '\Memory\Standby Cache Normal Priority Bytes',
   '\LogicalDisk(C:)\% Disk Time',
@@ -19,7 +20,8 @@ $machine = @(
   '\LogicalDisk(D:)\% Disk Time',
   '\LogicalDisk(D:)\Avg. Disk sec/Read'
 )
-$counters = $machine + '\Process(*)\% Processor Time'
+$perProcess = @('\Process(*)\% Processor Time', '\Process(*)\IO Read Bytes/sec', '\Process(*)\IO Write Bytes/sec')
+$counters = $machine + $perProcess
 $data = Get-Counter -Counter $counters -SampleInterval 1 -MaxSamples $Samples -ErrorAction SilentlyContinue
 if ($data) {
   Write-Output '-- Machine counters per second'
@@ -28,19 +30,24 @@ if ($data) {
       ForEach-Object { '{0}={1:N3}' -f (($_.Path -split '\\')[-2..-1] -join '\'), $_.CookedValue }
     Write-Output ('{0:HH:mm:ss.fff} {1}' -f $set.Timestamp.ToUniversalTime(), ($values -join '; '))
   }
-  Write-Output '-- Busiest processes (average % of one core over the sample)'
-  $data | ForEach-Object { $_.CounterSamples } |
-    Where-Object { $_.Path -like '*\process(*' -and $_.InstanceName -notin @('_total', 'idle') } |
-    Group-Object InstanceName |
-    ForEach-Object {
-      [pscustomobject]@{
-        Process = $_.Name
-        CpuPercent = [math]::Round(($_.Group | Measure-Object CookedValue -Average).Average, 1)
-      }
-    } |
-    Sort-Object CpuPercent -Descending |
-    Select-Object -First 8 |
-    Format-Table -AutoSize | Out-String -Width 160
+  # Per-process CPU and I/O for every sample, so a burst can be attributed.
+  Write-Output '-- Busiest processes per second (CPU % of one core, I/O KB/s)'
+  foreach ($set in $data) {
+    $rows = $set.CounterSamples |
+      Where-Object { $_.Path -like '*\process(*' -and $_.InstanceName -notin @('_total', 'idle') } |
+      Group-Object InstanceName |
+      ForEach-Object {
+        $cpu = ($_.Group | Where-Object { $_.Path -like '*% processor time' }).CookedValue
+        $read = ($_.Group | Where-Object { $_.Path -like '*io read bytes/sec' }).CookedValue
+        $write = ($_.Group | Where-Object { $_.Path -like '*io write bytes/sec' }).CookedValue
+        [pscustomobject]@{ Name = $_.Name; Cpu = [math]::Round($cpu); ReadKB = [math]::Round($read / 1KB); WriteKB = [math]::Round($write / 1KB) }
+      } |
+      Where-Object { $_.Cpu -ge 5 -or $_.ReadKB -ge 64 -or $_.WriteKB -ge 64 } |
+      Sort-Object { $_.ReadKB + $_.WriteKB + $_.Cpu } -Descending |
+      Select-Object -First 6 |
+      ForEach-Object { '{0} cpu={1} readKB={2} writeKB={3}' -f $_.Name, $_.Cpu, $_.ReadKB, $_.WriteKB }
+    Write-Output ('{0:HH:mm:ss.fff} {1}' -f $set.Timestamp.ToUniversalTime(), ($rows -join '; '))
+  }
 }
 Write-Output '-- Largest working sets (MB)'
 Get-Process | Sort-Object WorkingSet64 -Descending | Select-Object -First 8 |
