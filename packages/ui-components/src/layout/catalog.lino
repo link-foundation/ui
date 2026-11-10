@@ -10,3 +10,18 @@ card-catalog: component-entry
 app-bar-catalog: component-entry
   kind app-bar
   story 'packages/ui-components/stories/app-bar.lino'
+nav-strip-catalog: component-entry
+  kind nav-strip
+  story 'packages/ui-components/stories/nav-strip.lino'
+section-nav-catalog: component-entry
+  kind section-nav
+  story 'packages/ui-components/stories/section-nav.lino'
+titled-section-catalog: component-entry
+  kind titled-section
+  story 'packages/ui-components/stories/titled-section.lino'
+link-cards-catalog: component-entry
+  kind link-cards
+  story 'packages/ui-components/stories/link-cards.lino'
+pref-switches-catalog: component-entry
+  kind pref-switches
+  story 'packages/ui-components/stories/pref-switches.lino'

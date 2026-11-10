@@ -1,0 +1,11 @@
+nav-strip-stories: stories
+  component nav-strip
+  story default
+    nav-strip
+      label Pages
+      active home
+      wrap-below 600px
+      home: nav-link Home
+        href /
+      docs: nav-link Documentation
+        href /docs
