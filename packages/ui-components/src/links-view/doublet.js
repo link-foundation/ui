@@ -1,4 +1,4 @@
-import { add, scale, pathBounds, segmentLength } from './geometry.js';
+import { add, sub, scale, pathBounds, segmentLength } from './geometry.js';
 import { doubletPairs, readDoubletOptions } from './doublet-options.js';
 import { doubletPlaces } from './doublet-layout.js';
 import { doubletCurves, trimCubic } from './doublet-curves.js';
@@ -56,6 +56,30 @@ function fit(curves, o, pairs) {
     captionRoom: caption,
   };
 }
+/**
+ * A start/end gap at another link's middle moves that end and its handle back
+ * along the end tangent, so the end keeps its direction instead of curling
+ * toward the middle. Free and self-loop ends are still trimmed by arc length.
+ */
+function backedEnds(path, gaps, references = [false, false]) {
+  const moved = path.map((s, side) => {
+    if (!references[side] || !gaps[side]) {
+      return s;
+    }
+    const [end, handle] = side === 0 ? ['p0', 'c1'] : ['p3', 'c2'];
+    const tangent = sub(s[handle], s[end]);
+    const length = Math.hypot(tangent.x, tangent.y);
+    if (length < 1e-12) {
+      return s;
+    }
+    const shift = scale(tangent, gaps[side] / length);
+    return { ...s, [end]: add(s[end], shift), [handle]: add(s[handle], shift) };
+  });
+  return {
+    path: moved,
+    gaps: gaps.map((g, i) => (i < 2 && moved[i] !== path[i] ? 0 : g)),
+  };
+}
 function fittedCurve(curve, transform, o) {
   const [k, x, y] = transform,
     point = (p) => add(scale(p, k), { x, y });
@@ -65,14 +89,15 @@ function fittedCurve(curve, transform, o) {
   const gaps = (o.links[curve.id]?.gaps ?? [null, null, null, null]).map(
     (v, i) => (v ?? o.gaps[i]) * (i < 2 ? k : 1)
   );
-  const markers = placeDoubletMarkers({ path }, gaps, o);
+  const cut = backedEnds(path, gaps, curve.references);
+  const markers = placeDoubletMarkers({ path: cut.path }, cut.gaps, o);
   const cap = o.linecap === 'butt' ? 0 : o.strokeWidth / 2;
   const trim = ['start', 'end'].map((end) =>
     compensatedMarker(o[end], end, o) ? markerTipExtension(o[end], o) + cap : 0
   );
   const visible = [
-    trimCubic(path[0], gaps[0] + trim[0], gaps[2]),
-    trimCubic(path[1], gaps[3], gaps[1] + trim[1]),
+    trimCubic(cut.path[0], cut.gaps[0] + trim[0], gaps[2]),
+    trimCubic(cut.path[1], gaps[3], cut.gaps[1] + trim[1]),
   ];
   return {
     ...curve,
