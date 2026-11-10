@@ -43,8 +43,8 @@ first npm run on the VM. The later repetitions always passed.
   writes its debug log this way).
 
 `runner-snapshot.ps1` prints per-second machine and per-process CPU, paging
-and C:/D: disk counters. The workflow runs it after the Deno suite and during
-the first repetition.
+and C:/D: disk counters. While the investigation ran, the workflow ran it
+after the Deno suite and during the first repetition.
 
 ## Findings (runs 42798633136, 42802768016, 42805630880)
 
@@ -100,6 +100,25 @@ command and the real Prettier `--check` still run.
 Regression check: after `changeset version`, the fixture asserts that its
 temp directory is empty. Without `NODE_DISABLE_COMPILE_CACHE` the check
 fails locally with `Expected ["node-compile-cache"] to equal []`.
+
+## Verification on CI
+
+Run [42807960525](https://github.com/link-foundation/ui/actions/runs/42807960525)
+passed every job. Below, run 42805630880 is the last run without the fix and
+42807960525 is the first with it.
+
+| first repetition, shards 1/2 | Changesets `version` | npm's last output → `cmd.exe` exit |
+| ---------------------------- | -------------------: | ---------------------------------: |
+| 42805630880 (before)         |        5.0 s / 4.6 s |                    1.49 s / 1.27 s |
+| 42807960525 (after)          |        2.8 s / 2.9 s |                      12 ms / 10 ms |
+
+In the run with the fix, the per-process snapshot for repetition 1 shows only
+node reading (up to 1.8 MB/s) and no exit-time write burst. Every
+repetition stays under 3 s against the unchanged 25 s guard. The workflow's
+diagnostic snapshot steps were removed after this run.
+To repeat the sampling, run
+`pwsh -File experiments/issue-253/runner-snapshot.ps1 -Label <label> -Samples <n>`
+next to the repetition.
 
 ## Remaining limit
 
