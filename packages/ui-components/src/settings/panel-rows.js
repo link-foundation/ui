@@ -1,5 +1,8 @@
 import { reset, isDefault } from '@link-foundation/ui-settings';
 import { buildPanelModel } from './panel-model.js';
+import { sectionColumns } from './section-layout.js';
+import { presetCards } from './preset-cards.js';
+import { sectionChrome } from './section-tabs.js';
 import { mountField } from './field-control.js';
 
 export function panelNodes(doc, element, messages) {
@@ -9,7 +12,7 @@ export function panelNodes(doc, element, messages) {
       if (typeof text === 'function') {
         messages.bind(() => {
           result.textContent = text();
-        });
+        }, result);
       } else {
         result.textContent = text;
       }
@@ -59,41 +62,20 @@ export function createPanelHeader({
   return { node, button, heading, search, count };
 }
 
-function createTabs({ section, node, button, group, setTab, messages }) {
-  if (section.tabs?.length) {
-    const tabs = node('div', undefined, group);
-    tabs.setAttribute('role', 'group');
-    messages.attr(tabs, 'aria-label', 'tabs', {
-      label: section.label ?? section.id,
-    });
-    for (const tab of section.tabs) {
-      const choose = button(tab, () => setTab(section.id, tab), tabs);
-      choose.dataset.tab = tab;
-    }
-  }
-}
-
-export function createRows({
-  node,
-  button,
-  schema,
-  id,
-  commit,
-  getValues,
-  isPeeking,
-  options,
-  setTab,
-  messages,
-}) {
+export function createRows(context) {
+  const { node, button, schema, commit, getValues, messages } = context;
   const rows = new Map();
   const sections = new Map();
   const body = node('div');
   body.className = 'settings-sections';
-  body.style.setProperty('--settings-columns', String(options.columns ?? 1));
-  for (const section of buildPanelModel(schema, getValues(), {
+  const definitions = buildPanelModel(schema, getValues(), {
     includeAll: true,
-  }).sections) {
+  }).sections;
+  const place = sectionColumns(context, body, definitions);
+  const chromes = [];
+  for (const section of definitions) {
     const group = node('details', undefined, body);
+    place(section, group);
     group.open = true;
     node('summary', section.label ?? section.id, group);
     // Reset includes filtered-out fields too.
@@ -104,71 +86,87 @@ export function createRows({
       group
     );
     sections.set(section.id, group);
-    createTabs({ section, node, button, group, setTab, messages });
+    if (section.description) {
+      node('p', section.description, group);
+    }
+    const chrome = sectionChrome(context, section, group);
+    if (section.presets?.length) {
+      chrome.presets = presetCards(context, chrome.content, section.presets);
+    }
+    chromes.push(chrome);
     const groups = new Map();
     for (const field of section.fields) {
-      let parent = group;
-      if (field.props.group) {
-        if (!groups.has(field.props.group)) {
-          const fieldset = node('fieldset', undefined, group);
-          fieldset.className = 'settings-group';
-          node('legend', String(field.props.group), fieldset);
-          groups.set(field.props.group, fieldset);
-        }
-        parent = groups.get(field.props.group);
-      }
-      const row = node('div', undefined, parent);
-      row.className = 'settings-row';
-      row.dataset.key = field.key;
-      const title = node('div', undefined, row);
-      node('strong', field.label ?? field.key, title);
-      if (field.description) {
-        node('p', field.description, title);
-      }
-      const container = node('div', undefined, row);
-      container.className = 'settings-control';
-      const mount = options.mountControl ?? mountField;
-      const control = mount(
-        container,
-        field,
-        getValues()[field.key],
-        (value) => {
-          if (!isPeeking()) {
-            commit({ [field.key]: value });
-          }
-        },
-        `${id}-${rows.size}`,
-        { messages }
-      );
-      const output = node('output', undefined, row);
-      messages.attr(output, 'aria-label', 'value', {
-        label: field.label ?? field.key,
-      });
-      const marker = node('span', messages.message('changed'), title);
-      marker.className = 'settings-changed';
-      const resetButton = button(
-        messages.message('reset', { label: field.label ?? field.key }),
-        () => commit({ [field.key]: field.default }),
-        row
-      );
-      const preview =
-        field.props.preview &&
-        options.mountPreview?.({
-          container: node('div', undefined, row),
-          field,
-          values: getValues(),
-        });
-      rows.set(field.key, {
-        row,
-        control,
-        output,
-        marker,
-        resetButton,
-        preview,
-      });
+      mountRow(context, { field, chrome, groups, rows });
     }
   }
-  return { rows, sections };
+  return { rows, sections, chromes };
+}
+
+function mountRow(context, { field, chrome, groups, rows }) {
+  const { node, button, id, commit, getValues, isPeeking, options, messages } =
+    context;
+  let parent =
+    chrome.tabs?.entries.find((e) => e.value === field.props.tab)?.panel ??
+    chrome.content;
+  if (field.props.group) {
+    const groupKey = `${parent.id}/${field.props.group}`;
+    if (!groups.has(groupKey)) {
+      const fieldset = node('fieldset', undefined, parent);
+      fieldset.className = 'settings-group';
+      node('legend', String(field.props.group), fieldset);
+      groups.set(groupKey, fieldset);
+    }
+    parent = groups.get(groupKey);
+  }
+  const row = node('div', undefined, parent);
+  row.className = 'settings-row';
+  row.dataset.key = field.key;
+  const title = node('div', undefined, row);
+  node('strong', field.label ?? field.key, title);
+  if (field.description) {
+    node('p', field.description, title);
+  }
+  const container = node('div', undefined, row);
+  container.className = 'settings-control';
+  const mount = options.mountControl ?? mountField;
+  const control = mount(
+    container,
+    field,
+    getValues()[field.key],
+    (value) => {
+      if (!isPeeking()) {
+        commit({ [field.key]: value });
+      }
+    },
+    `${id}-${rows.size}`,
+    { messages }
+  );
+  const output = node('output', undefined, row);
+  messages.attr(output, 'aria-label', 'value', {
+    label: field.label ?? field.key,
+  });
+  const marker = node('span', messages.message('changed'), title);
+  marker.className = 'settings-changed';
+  const resetButton = button(
+    messages.message('reset', { label: field.label ?? field.key }),
+    () => commit({ [field.key]: field.default }),
+    row
+  );
+  const preview =
+    field.props.preview &&
+    options.mountPreview?.({
+      container: node('div', undefined, row),
+      field,
+      values: getValues(),
+    });
+  rows.set(field.key, {
+    row,
+    control,
+    output,
+    marker,
+    resetButton,
+    preview,
+  });
 }
 
 export function refreshRows(

@@ -304,3 +304,6 @@ See [control and settings integration contracts](../../docs/case-studies/issue-2
 for external labels, popup sizing, live editors, rich panel extensions, normalization
 and compatibility codec hooks. The [rich panel example](../ui-components/examples/rich-settings.html)
 demonstrates conditional fields, section tabs, previews and whole-section columns.
+
+See the [settings gallery guide](../../docs/case-studies/issue-231/README.md)
+for balanced columns, preset cards, saved looks, colour popovers and cross-tab sync.

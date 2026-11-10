@@ -32,7 +32,7 @@ export function mountField(
   const editorLabels = () => {
     const names =
       element === 'number-field'
-        ? ['increment', 'decrement']
+        ? ['increment', 'decrement', 'inherit', 'inherited']
         : element === 'color-field'
           ? ['palette', 'rgb', 'red', 'green', 'blue']
           : [];
@@ -101,7 +101,9 @@ export function mountField(
         number.setAttribute('aria-label', numberLabel());
       }
       if (next === null) {
-        mounted.store.removeProp(id, property);
+        if (mounted.store.get(id).properties.some((p) => p.name === property)) {
+          mounted.store.removeProp(id, property);
+        }
       } else {
         mounted.store.setProp(id, property, formatValue(field, next));
       }

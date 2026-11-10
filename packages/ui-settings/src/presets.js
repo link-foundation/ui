@@ -42,7 +42,9 @@ export function applyPreset(schema, values, id) {
     throw new RangeError(`Unknown preset "${id}"`);
   }
   return applySharedLook(schema, values, {
-    ...defaults(schema),
+    ...(preset.partial
+      ? merge(schema, values, undefined).values
+      : defaults(schema)),
     ...preset.values,
   });
 }
@@ -57,7 +59,12 @@ export function applyPreset(schema, values, id) {
 export function activePreset(schema, values) {
   for (const preset of schema.presets.values()) {
     const expected = { ...defaults(schema), ...preset.values };
-    if (equalValues(schema, values, expected, { skip: (f) => f.comfort })) {
+    if (
+      equalValues(schema, values, expected, {
+        skip: (f) =>
+          f.comfort || (preset.partial && !Object.hasOwn(preset.values, f.key)),
+      })
+    ) {
       return preset.id;
     }
   }

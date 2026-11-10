@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="data:," />
+    <title>Settings gallery</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "@floating-ui/dom": "/node_modules/@floating-ui/dom/dist/floating-ui.dom.mjs",
+          "@floating-ui/core": "/node_modules/@floating-ui/core/dist/floating-ui.core.mjs",
+          "@floating-ui/utils": "/node_modules/@floating-ui/utils/dist/floating-ui.utils.mjs",
+          "@floating-ui/utils/dom": "/node_modules/@floating-ui/utils/dist/floating-ui.utils.dom.mjs",
+          "@link-foundation/ui-settings": "/packages/ui-settings/src/index.js",
+          "@link-foundation/ui-config": "/packages/ui-config/src/index.js",
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "@link-foundation/ui-store": "/packages/ui-store/src/index.js",
+          "@link-foundation/ui-store/memory": "/packages/ui-store/src/memory.js",
+          "@link-foundation/ui-dom": "/packages/ui-dom/src/index.js",
+          "@link-foundation/ui-style": "/packages/ui-style/src/index.js",
+          "@link-foundation/ui-tokens": "/packages/ui-tokens/src/index.js",
+          "@link-foundation/ui-tokens/themes": "/packages/ui-tokens/src/themes/index.js",
+          "links-notation": "/node_modules/links-notation/dist/index.js"
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="../src/controls/styles.css" />
+    <link rel="stylesheet" href="../src/settings/settings.css" />
+    <style>
+      body {
+        margin: 0;
+        padding: 1rem;
+        background: #f4f0fa;
+        color: #1d1b20;
+        font:
+          16px/1.5 system-ui,
+          sans-serif;
+      }
+      main {
+        max-width: 100rem;
+        margin: auto;
+      }
+      #preview {
+        padding: 2rem;
+        margin-block: 1rem;
+        background: #fff;
+        border: 3px solid var(--accent);
+        border-radius: 1rem;
+      }
+      #preview .sample {
+        display: inline-block;
+        padding: 1rem;
+        background: var(--accent);
+        color: white;
+        font-size: calc(1rem * var(--scale));
+      }
+      settings-panel {
+        max-inline-size: 100%;
+      }
+      .settings-column .settings-row {
+        grid-template-columns: minmax(0, 1fr) auto;
+      }
+      .settings-column .settings-control {
+        grid-column: 1 / -1;
+      }
+      .settings-miniature .sample {
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Settings gallery</h1>
+      <p>
+        Changes apply immediately. Export them as Links Notation or a share
+        link.
+      </p>
+      <button id="open" type="button">Focus settings</button>
+      <section id="preview" aria-label="Live preview">
+        <p class="sample">Live interface preview</p>
+      </section>
+      <div id="panel"></div>
+    </main>
+    <script type="module" src="./settings-gallery.js"></script>
+  </body>
+</html>

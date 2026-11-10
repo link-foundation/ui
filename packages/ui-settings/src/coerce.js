@@ -8,7 +8,7 @@ import { fieldType } from './types.js';
 
 function isInherited(field, raw, policy) {
   return (
-    field?.props?.nullable === 'true' &&
+    (field?.props?.nullable === 'true' || field?.props?.inherit === 'true') &&
     (raw === null || (policy.primitives !== 'strict' && raw === 'null'))
   );
 }
