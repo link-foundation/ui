@@ -466,9 +466,19 @@ jobs:
         env:
           DEBUG_CHANGESET_FIXTURE: '1'
         run: |
+          # Diagnostic only (issue #253): sample paging and disks while the
+          # first, slow repetition runs; the sampler stops by itself.
+          pwsh -NoProfile -File experiments/issue-253/runner-snapshot.ps1 -Label 'during repetition 1' -Samples 12 > "$RUNNER_TEMP/rep1-snapshot.log" 2>&1 &
+          sampler=$!
           for attempt in 1 2 3; do
             echo "Release formatter repetition ${attempt}/3"
-            bash scripts/run-with-budget-warning.sh 60 "Windows Deno release formatter" deno test -A tests/changeset-config.test.js
+            status=0
+            bash scripts/run-with-budget-warning.sh 60 "Windows Deno release formatter" deno test -A tests/changeset-config.test.js || status=$?
+            if [ "$attempt" = 1 ]; then
+              wait "$sampler" || true
+              cat "$RUNNER_TEMP/rep1-snapshot.log"
+            fi
+            [ "$status" = 0 ] || exit "$status"
           done
 
       - name: Repeat Windows Deno formatter with competing fixture processes

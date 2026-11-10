@@ -1,25 +1,36 @@
-# Issue #253: what keeps a Windows runner busy right after the Deno suite?
-# One bounded sample (about 3 s): machine CPU and disk, the busiest
-# processes, and real-time scanning state. Read-only; it changes nothing.
-param([string]$Label = 'snapshot')
+# What keeps a Windows runner slow right after the Deno suite? Bounded samples
+# (one per second) of machine CPU, memory paging, the C: and D: disks, the
+# busiest processes and real-time scanning state. Read-only; it changes nothing.
+param([string]$Label = 'snapshot', [int]$Samples = 3)
 $ErrorActionPreference = 'Continue'
 Write-Output "== Runner snapshot: $Label at $((Get-Date).ToUniversalTime().ToString('o'))"
-$counters = @(
+$machine = @(
   '\Processor(_Total)\% Processor Time',
-  '\PhysicalDisk(_Total)\% Disk Time',
-  '\PhysicalDisk(_Total)\Avg. Disk Queue Length',
-  '\Process(*)\% Processor Time'
+  '\Memory\Available MBytes',
+  '\Memory\Pages Input/sec',
+  '\Memory\Page Reads/sec',
+  '\Memory\Modified Page List Bytes',
+  '\Memory\Standby Cache Normal Priority Bytes',
+  '\LogicalDisk(C:)\% Disk Time',
+  '\LogicalDisk(C:)\Avg. Disk Queue Length',
+  '\LogicalDisk(C:)\Disk Read Bytes/sec',
+  '\LogicalDisk(C:)\Disk Write Bytes/sec',
+  '\LogicalDisk(C:)\Avg. Disk sec/Read',
+  '\LogicalDisk(D:)\% Disk Time',
+  '\LogicalDisk(D:)\Avg. Disk sec/Read'
 )
-$samples = Get-Counter -Counter $counters -SampleInterval 1 -MaxSamples 3 -ErrorAction SilentlyContinue
-if ($samples) {
-  $all = $samples | ForEach-Object { $_.CounterSamples }
-  $all | Where-Object { $_.Path -notlike '*\process(*' } |
-    Group-Object Path |
-    ForEach-Object {
-      '{0}: {1:N1}' -f $_.Name, ($_.Group | Measure-Object CookedValue -Average).Average
-    }
+$counters = $machine + '\Process(*)\% Processor Time'
+$data = Get-Counter -Counter $counters -SampleInterval 1 -MaxSamples $Samples -ErrorAction SilentlyContinue
+if ($data) {
+  Write-Output '-- Machine counters per second'
+  foreach ($set in $data) {
+    $values = $set.CounterSamples | Where-Object { $_.Path -notlike '*\process(*' } |
+      ForEach-Object { '{0}={1:N3}' -f (($_.Path -split '\\')[-2..-1] -join '\'), $_.CookedValue }
+    Write-Output ('{0:HH:mm:ss.fff} {1}' -f $set.Timestamp.ToUniversalTime(), ($values -join '; '))
+  }
   Write-Output '-- Busiest processes (average % of one core over the sample)'
-  $all | Where-Object { $_.Path -like '*\process(*' -and $_.InstanceName -notin @('_total', 'idle') } |
+  $data | ForEach-Object { $_.CounterSamples } |
+    Where-Object { $_.Path -like '*\process(*' -and $_.InstanceName -notin @('_total', 'idle') } |
     Group-Object InstanceName |
     ForEach-Object {
       [pscustomobject]@{
@@ -28,9 +39,13 @@ if ($samples) {
       }
     } |
     Sort-Object CpuPercent -Descending |
-    Select-Object -First 12 |
+    Select-Object -First 8 |
     Format-Table -AutoSize | Out-String -Width 160
 }
+Write-Output '-- Largest working sets (MB)'
+Get-Process | Sort-Object WorkingSet64 -Descending | Select-Object -First 8 |
+  Select-Object Name, Id, @{ Name = 'WorkingSetMB'; Expression = { [math]::Round($_.WorkingSet64 / 1MB) } } |
+  Format-Table -AutoSize | Out-String -Width 160
 Write-Output '-- Node, Deno, npm and shell processes still running'
 Get-Process -Name node, deno, cmd, conhost, bun -ErrorAction SilentlyContinue |
   Select-Object Name, Id, CPU, StartTime |

@@ -49,6 +49,8 @@ if (process.env.DEBUG_CHANGESET_FIXTURE) {
     cpu: process.cpuUsage(),
     machine: machineIdle(),
     modules: Object.keys(require.cache).length,
+    // On Windows libuv reports all page faults and read operations here.
+    usage: process.resourceUsage(),
   });
   const usageSince = (before) => {
     const after = sample();
@@ -69,6 +71,8 @@ if (process.env.DEBUG_CHANGESET_FIXTURE) {
           )
         : undefined,
       modulesLoaded: after.modules - before.modules,
+      pageFaults: after.usage.majorPageFault - before.usage.majorPageFault,
+      fsReads: after.usage.fsRead - before.usage.fsRead,
     };
   };
   // A blocked event loop delays every timer; report each gap of 1 s or more.
