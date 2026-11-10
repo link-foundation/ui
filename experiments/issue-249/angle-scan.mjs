@@ -10,7 +10,22 @@ const step = Number(process.argv[2] ?? 15);
 for (let source = 0; source <= 90; source += step) {
   for (let target = 0; target <= 90; target += step) {
     const text = `angles fixed\nsourceAngle ${source}\ntargetAngle ${target}\nlink 1\n  turns -90 90\n`;
-    const r = paintedReport(doubletGeometry([[2, 2], [1, 1]], text), { attachment: 0, steps: 64 });
-    console.log(source, target, r.crossings.length, r.ownCrossings.length, r.gap.toFixed(3));
+    const r = paintedReport(
+      doubletGeometry(
+        [
+          [2, 2],
+          [1, 1],
+        ],
+        text
+      ),
+      { steps: 64 }
+    );
+    console.log(
+      source,
+      target,
+      r.crossings.length,
+      r.ownCrossings.length,
+      r.gap.toFixed(3)
+    );
   }
 }

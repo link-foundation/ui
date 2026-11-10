@@ -5,6 +5,7 @@
  * including marker outlines, miter tips and filled dots.
  * Usage: node experiments/issue-249/painted-check.mjs [options-file]
  */
+import { URL } from 'node:url';
 import { readFile } from 'node:fs/promises';
 import { doubletGeometry } from '../../packages/ui-components/src/links-view/doublet.js';
 import { paintedReport } from '../../packages/ui-components/tests/links-view/doublet-painted.js';

@@ -2,6 +2,7 @@
  * Writes the default-renderer SVG of `22 11` with the issue 249 fixture and an
  * HTML preview. Usage: node experiments/issue-249/render.mjs [out-dir] [label]
  */
+import { URL } from 'node:url';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import {
@@ -29,7 +30,10 @@ const frame = doubletGeometry(
 const report = paintedReport(frame);
 const svg = createDoubletProvider().svg({ frame });
 const escape = (text) =>
-  text.replace(/[&<>]/gu, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]);
+  text.replace(
+    /[&<>]/gu,
+    (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]
+  );
 await mkdir(directory, { recursive: true });
 await writeFile(resolve(directory, 'clean-input.svg'), svg);
 await writeFile(

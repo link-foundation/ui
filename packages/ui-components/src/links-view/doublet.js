@@ -58,8 +58,8 @@ function fit(curves, o, pairs) {
 }
 /**
  * A start/end gap at another link's middle moves that end and its handle back
- * along the end tangent, so the end keeps its direction instead of curling
- * toward the middle. Free and self-loop ends are still trimmed by arc length.
+ * along the end tangent, so the end keeps its direction near the middle.
+ * Free and self-loop ends are trimmed by arc length.
  */
 function backedEnds(path, gaps, references = [false, false]) {
   const moved = path.map((s, side) => {
