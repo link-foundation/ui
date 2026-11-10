@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { listThemes, loadTheme } from '@link-foundation/ui-themes';
+import { cssVariable } from '@link-foundation/ui-tokens';
 
 const home = '/packages/site/dist/';
 const ready = (page) =>
@@ -8,6 +10,64 @@ async function choose(page, label, value) {
   await page.getByRole('combobox', { name: label, exact: true }).click();
   await page.getByRole('option', { name: value, exact: true }).click();
 }
+
+for (const [label, selector] of [
+  ['Theme', '#app > ui-document'],
+  ['Preview theme', '#live-preview ui-document'],
+]) {
+  test(`every theme switches with precompiled CSS: ${label}`, async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    const errors = [];
+    page.on('pageerror', (error) => errors.push(error.message));
+    await page.goto(`${home}en/playground/`);
+    await ready(page);
+    const target = page.locator(selector);
+    for (const id of listThemes()) {
+      // Some themes are standalone chat styles with no color.primary token.
+      const theme = await loadTheme(id);
+      const variable = cssVariable(theme.tokens.keys().next().value);
+      await page.getByRole('combobox', { name: label, exact: true }).click();
+      await page.locator(`[role="option"][data-value="${id}"]:visible`).click();
+      await expect(target).toHaveAttribute('data-theme', id);
+      // Check a token this theme actually defines in the shared stylesheet.
+      await expect
+        .poll(() =>
+          target.evaluate(
+            (node, name) =>
+              globalThis.getComputedStyle(node).getPropertyValue(name),
+            variable
+          )
+        )
+        .not.toBe('');
+    }
+    expect(errors).toEqual([]);
+  });
+}
+
+test('every localized site page hydrates with the client theme registry', async ({
+  page,
+}) => {
+  const errors = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  for (const language of ['en', 'ru']) {
+    for (const route of [
+      '',
+      'getting-started/',
+      'dialect/',
+      'components/',
+      'playground/',
+      'themes/',
+      'about/',
+    ]) {
+      await page.goto(`${home}${language}/${route}`);
+      await ready(page);
+      await expect(page.locator('main h1')).toBeVisible();
+    }
+  }
+  expect(errors).toEqual([]);
+});
 
 for (const language of ['en', 'ru']) {
   for (const scheme of ['light', 'dark']) {
