@@ -51,7 +51,8 @@ The Deno step of `.github/workflows/release.yml` sets `SITE_BUILD_TRACE: '1'`.
 ## Evidence from CI
 
 `experiments/issue-246/windows-shard-durations.sh` reads the Windows Deno
-shard 1/3 job of every attempt of the last 100 `Checks and release` runs.
+shard 1/3 job of every attempt of the `Checks and release` runs from 42709325900,
+the reported failure, to 42807960525.
 
 | Code                             | Jobs | Failed at 60 s | Passing durations |
 | -------------------------------- | ---: | -------------: | ----------------- |
@@ -100,7 +101,7 @@ once as shipped and once with only the `base` theme inlined:
 | `main-*.js`    |      32 MB |      696 KB |
 
 Changing what the site ships is outside this issue, so the theme registry is
-tracked in a separate issue.
+tracked in [issue #259](https://github.com/link-foundation/ui/issues/259).
 
 ## Bounded reproduction
 
