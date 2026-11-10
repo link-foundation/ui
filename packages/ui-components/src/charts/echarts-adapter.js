@@ -12,6 +12,7 @@
  * keyboard points of `<ui-chart>` map to `(seriesIndex, dataIndex)`.
  */
 
+import { supportsECharts } from './renderer-features.js';
 import { layoutChart } from './layout.js';
 import {
   continuousValue,
@@ -153,6 +154,11 @@ function modeColors(theme) {
 export function toEChartsOption(spec, options = {}) {
   if (spec.kind !== 'chart') {
     throw new TypeError(`ECharts renders (chart ...) links, not ${spec.kind}`);
+  }
+  if (!supportsECharts(spec)) {
+    throw new TypeError(
+      'Activity features require the SVG renderer; use renderChartSvg or ui-chart'
+    );
   }
   const colors = modeColors(options.theme ?? 'light');
   const layout = layoutChart(spec, options);

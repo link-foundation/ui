@@ -1,0 +1,147 @@
+calendar: chart
+  title 'Contribution calendar'
+  mark calendar
+  week-start 1
+  tooltip
+    layer top
+  data
+    row
+      date 2025-01-01
+      count 0
+    row
+      date 2025-12-31
+      count 12
+  encoding
+    x
+      field date
+      type temporal
+    y
+      field count
+      type quantitative
+range: chart
+  title 'Project timeline'
+  mark range
+  ongoing-end 2026-11-01
+  tooltip
+    layer top
+  data
+    row
+      name Framework
+      start 2020-01-01
+      end 2023-06-01
+      category Work
+    row
+      name Research
+      start 2021-01-01
+      category Study
+    row
+      name Community
+      start 2024-01-01
+      end ongoing
+      category Volunteer
+  encoding
+    x
+      field start
+      type temporal
+    x2
+      field end
+      type temporal
+    y
+      field name
+      type nominal
+    color
+      field category
+      type nominal
+composition: chart
+  title 'Language shares'
+  mark composition
+  top-n 5
+  data
+    row
+      name JavaScript
+      count 55
+    row
+      name Rust
+      count 20
+    row
+      name Python
+      count 10
+    row
+      name Go
+      count 5
+    row
+      name C
+      count 4
+    row
+      name Swift
+      count 3
+    row
+      name Kotlin
+      count 3
+  encoding
+    theta
+      field count
+      type quantitative
+    color
+      field name
+      type nominal
+cloud: tag-cloud
+  label Languages
+  min-size 14
+  max-size 36
+  items
+    item JavaScript
+      count 1000
+      color '#1f6fb2'
+      emphasis true
+    item Rust
+      count 100
+    item Python
+      count 10
+    item Exploring
+stat: stat-tile
+  label Contributions
+  value 123456
+  notation compact
+  hint 'Across all projects'
+  footnote
+    label 'Source data'
+    href 'https://example.com/data'
+log: chart
+  title 'Activity by decade'
+  mark bar
+  corner-radius 6
+  labels last
+  emphasis favourite
+  tooltip
+    layer top
+  data
+    row
+      day A
+      count 1
+    row
+      day B
+      count 10
+      favourite true
+    row
+      day C
+      count 100
+    row
+      day D
+      count 1000
+    row
+      day E
+      count 10000
+    row
+      day F
+      count 100000
+  encoding
+    x
+      field day
+      type nominal
+    y
+      field count
+      type quantitative
+      scale
+        type log
+        base 10

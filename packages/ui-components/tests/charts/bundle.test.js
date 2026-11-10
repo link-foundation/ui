@@ -78,6 +78,7 @@ describe('the bundle of the chart entries', () => {
     // ui-core reads the nested form of a chart (#133); it imports only
     // links-notation.
     expect([...packages].sort()).toEqual([
+      '@floating-ui/dom',
       '@link-foundation/ui-core',
       'd3-scale',
       'd3-shape',
