@@ -6,6 +6,7 @@ import {
   mkdirSync,
   mkdtempSync,
   readFileSync,
+  readdirSync,
   rmSync,
   symlinkSync,
   unlinkSync,
@@ -20,6 +21,18 @@ import {
   runBounded,
 } from './helpers/bounded-run.js';
 import { itUnless, sandboxed } from './helpers/skip.js';
+
+/**
+ * The first npm run on a Windows runner reads npm from a cold, busy system
+ * disk. On top of that, npm 10 turns on Node's compile cache and writes
+ * about 550 cache files while npx exits, plus a debug log file. These writes
+ * delayed the nested `npx prettier` by seconds and are not part of the
+ * release check, so the fixture turns them off.
+ */
+const COLD_START_WRITES_OFF = {
+  NODE_DISABLE_COMPILE_CACHE: '1',
+  npm_config_logs_max: '0',
+};
 
 const config = JSON.parse(readFileSync('.changeset/config.json', 'utf8'));
 
@@ -165,6 +178,9 @@ describe('Changesets release formatter', () => {
           spawnSync('deno', ['--version'], { env }).error?.code,
           'ENOENT'
         );
+        // Keep every temporary file of the nested npx run inside the fixture.
+        const fixtureTmp = join(cwd, 'tmp');
+        mkdirSync(fixtureTmp);
         const budgetMs = HANG_GUARD_MS;
         let commandIndex = 0;
         const run = async (file, args) => {
@@ -191,6 +207,10 @@ describe('Changesets release formatter', () => {
                   npm_config_offline: 'true',
                   npm_config_yes: 'false',
                   npm_config_loglevel: 'verbose',
+                  TMPDIR: fixtureTmp,
+                  TEMP: fixtureTmp,
+                  TMP: fixtureTmp,
+                  ...COLD_START_WRITES_OFF,
                 },
                 timeout: budgetMs,
                 trace: (event) => events.push(event),
@@ -226,6 +246,9 @@ describe('Changesets release formatter', () => {
         expect(
           readFileSync(join(packageDir, 'CHANGELOG.md'), 'utf8')
         ).toContain('Check release versioning.');
+        // npm enables Node's compile cache in os.tmpdir(); a cold run writes
+        // hundreds of files there while the formatter's npx process exits.
+        expect(readdirSync(fixtureTmp)).toEqual([]);
         await run('node_modules/prettier/bin/prettier.cjs', [
           '--check',
           'packages/ui-core/package.json',
