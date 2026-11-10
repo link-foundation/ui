@@ -1482,3 +1482,10 @@ for balanced columns, preset cards, saved looks, colour popovers and cross-tab s
 
 See [the configurations guide](CONFIGURATIONS.md) for exact enumeration,
 notation conversion, editing helpers, renaming classes and `<links-gallery>`.
+
+## Deferred social embeds
+
+The opt-in [`embed` module](src/embed/README.md) provides `<ui-embed>`, the
+`embedVocabulary()` extension, shared deferred SDK loading, timeout/error
+fallback, archived children and an optional archive toggle. X, Telegram and VK
+adapters are separate imports under `@link-foundation/ui-components/embed/providers/`.

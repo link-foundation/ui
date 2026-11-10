@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en" data-scheme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Deferred post embed</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "@link-foundation/ui-components/embed": "/packages/ui-components/src/embed/index.js",
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "@link-foundation/ui-store": "/packages/ui-store/src/index.js",
+          "@link-foundation/ui-store/memory": "/packages/ui-store/src/memory.js",
+          "@link-foundation/ui-style": "/packages/ui-style/src/index.js",
+          "@link-foundation/ui-tokens": "/packages/ui-tokens/src/index.js",
+          "@link-foundation/ui-tokens/themes": "/packages/ui-tokens/src/themes/index.js",
+          "@link-foundation/ui-dom": "/packages/ui-dom/src/index.js",
+          "links-notation": "/node_modules/links-notation/dist/index.js"
+        }
+      }
+    </script>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: system-ui, sans-serif;
+        background: #fafafa;
+        color: #202124;
+      }
+      :root[data-scheme='dark'] {
+        color-scheme: dark;
+        background: #202124;
+        color: #fafafa;
+      }
+      body {
+        max-width: 680px;
+        margin: 40px auto;
+        padding: 20px;
+      }
+      ui-embed {
+        display: block;
+        margin-block: 24px;
+        padding: 20px;
+        border: 1px solid #888;
+        border-radius: 12px;
+      }
+      ui-embed iframe {
+        width: 100%;
+        border: 0;
+      }
+      button,
+      summary {
+        cursor: pointer;
+        padding: 10px;
+        font: inherit;
+      }
+      button {
+        margin-block-start: 12px;
+      }
+      [hidden] {
+        display: none !important;
+      }
+      :focus-visible {
+        outline: 3px solid #5b8def;
+        outline-offset: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Deferred post embed</h1>
+      <p>
+        Official X widgets load near the viewport. The archive remains available
+        if a post cannot load.
+      </p>
+      <button id="theme" type="button">Switch theme</button>
+      <section id="posts" aria-label="Posts"></section>
+    </main>
+    <script type="module" src="./embed.js"></script>
+  </body>
+</html>
