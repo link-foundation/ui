@@ -14,6 +14,7 @@ export interface PanelModelOptions {
   query?: string;
   tabs?: Record<string, string>;
   level?: string;
+  sectionLevels?: Record<string, string>;
   includeAll?: boolean;
 }
 export interface PanelModel {
@@ -27,6 +28,17 @@ export interface FieldControl {
   destroy(): void;
 }
 export type SettingsMessageKey =
+  | 'back'
+  | 'inherit'
+  | 'inherited'
+  | 'levels'
+  | 'levelOwned'
+  | 'copyLooks'
+  | 'emptyLooks'
+  | 'defaultLook'
+  | 'updateLook'
+  | 'renameLook'
+  | 'looksError'
   | 'settings'
   | 'close'
   | 'search'
@@ -92,7 +104,18 @@ export interface SettingsPanelOptions extends PanelModelOptions {
   previewRoot?: HTMLElement;
   project?: SettingsProjection;
   onPreview?: (values: SettingsValues, root: HTMLElement) => void;
-  columns?: number;
+  columns?: number | { count: number; balance: 'estimate' };
+  presets?: { display: 'cards' };
+  peek?: 'hold' | 'toggle';
+  looksStorage?: Pick<Storage, 'getItem' | 'setItem'> | null;
+  looksStorageKey?: string;
+  onChangedCount?: (count: number) => void;
+  mountMiniature?: (context: {
+    container: HTMLElement;
+    values: SettingsValues;
+    preset?: import('@link-foundation/ui-settings').SettingsPreset;
+    look?: string;
+  }) => { update?(values: SettingsValues): void; destroy?(): void };
   random?: () => number;
   randomLocked?: Iterable<string>;
   confirmReset?: () => boolean;
@@ -114,10 +137,16 @@ export interface SettingsPanelOptions extends PanelModelOptions {
   ) => FieldControl;
   mountPreview?: (context: {
     container: HTMLElement;
-    field: SettingField;
+    field?: SettingField;
+    section?: SettingsSection;
+    level?: string;
     values: SettingsValues;
   }) => {
-    update(values: SettingsValues, field: SettingField): void;
+    update(
+      values: SettingsValues,
+      definition: SettingField | SettingsSection,
+      level?: string
+    ): void;
     destroy?(): void;
   };
   codec?: {
@@ -151,9 +180,14 @@ export function createSettingsPanel(
   values(): SettingsValues;
   update(changes: SettingsValues): void;
   setTab(section: string, tab: string): void;
+  setSectionLevel(section: string, level: string): void;
+  changedCount(): number;
   setLevel(level?: string): void;
   setMessages(messages: SettingsMessages): void;
-  saveLook(name: string): void;
+  saveLook(name?: string): boolean;
+  renameLook(name: string, nextName: string): boolean;
+  deleteLook(name: string): boolean;
+  exportLooks(): string;
   applyLook(name: string): void;
   applyShared(
     hash: string

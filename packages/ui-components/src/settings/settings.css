@@ -124,3 +124,55 @@ settings-panel .settings-sections fieldset {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+settings-panel .settings-column {
+  min-inline-size: 0;
+}
+settings-panel .settings-toolbar > .settings-presets {
+  flex: 1 0 100%;
+}
+settings-panel .settings-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  gap: 1rem;
+  margin-block: 1rem;
+}
+settings-panel .settings-cards > div {
+  border: 1px solid var(--color-outline, #79747e);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+}
+settings-panel .settings-miniature {
+  min-block-size: 4rem;
+  padding: 0.75rem;
+  border: 2px solid var(--accent, #6750a4);
+  border-radius: 0.5rem;
+  background: var(--color-surface, #fffbfe);
+  color: var(--color-on-surface, #1d1b20);
+  font-size: calc(1rem * var(--scale, 1));
+}
+settings-panel .settings-sticky-preview {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--color-surface, #fffbfe);
+}
+settings-panel .settings-peek-back {
+  position: fixed;
+  inset-block-end: 1rem;
+  inset-inline-end: 1rem;
+  z-index: 20;
+}
+settings-panel [role='tablist'] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+settings-panel [role='tab'][aria-selected='true'],
+settings-panel [data-preset][aria-pressed='true'] {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+settings-panel [data-owned]::after {
+  content: ' •';
+}

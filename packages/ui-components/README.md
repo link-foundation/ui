@@ -1479,6 +1479,9 @@ The [network editor adapter](NETWORK-EDITOR.md) adds live notations, per-link
 controls, declarative options, looks and sizes, saved styles, sharing and
 held-input URL synchronization around a host-owned network presentation.
 
+See the [settings gallery guide](../../docs/case-studies/issue-231/README.md)
+for balanced columns, preset cards, saved looks, colour popovers and cross-tab sync.
+
 ### Doublet configurations and gallery
 
 See [the configurations guide](CONFIGURATIONS.md) for exact enumeration,

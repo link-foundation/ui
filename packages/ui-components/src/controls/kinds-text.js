@@ -121,6 +121,9 @@ number-field: kind
   children none
   machine number-field-machine
   role spinbutton
+  property inherit boolean
+  property inherit-label string
+  property inherited-label string
   property fallback number
   property snapping
     enum nearest directional
@@ -144,6 +147,8 @@ color-field: kind
   children none
   machine color-field-machine
   role textbox
+  property mode string
+  property palettes any
   property palette any
   property readonly boolean
   property rgb boolean
