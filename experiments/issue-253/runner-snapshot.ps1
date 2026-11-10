@@ -33,13 +33,14 @@ if ($data) {
   # Per-process CPU and I/O for every sample, so a burst can be attributed.
   Write-Output '-- Busiest processes per second (CPU % of one core, I/O KB/s)'
   foreach ($set in $data) {
+    # Same-named processes (node#1, node#2) are summed per name.
     $rows = $set.CounterSamples |
       Where-Object { $_.Path -like '*\process(*' -and $_.InstanceName -notin @('_total', 'idle') } |
       Group-Object InstanceName |
       ForEach-Object {
-        $cpu = ($_.Group | Where-Object { $_.Path -like '*% processor time' }).CookedValue
-        $read = ($_.Group | Where-Object { $_.Path -like '*io read bytes/sec' }).CookedValue
-        $write = ($_.Group | Where-Object { $_.Path -like '*io write bytes/sec' }).CookedValue
+        $cpu = ($_.Group | Where-Object { $_.Path -like '*% processor time' } | Measure-Object CookedValue -Sum).Sum
+        $read = ($_.Group | Where-Object { $_.Path -like '*io read bytes/sec' } | Measure-Object CookedValue -Sum).Sum
+        $write = ($_.Group | Where-Object { $_.Path -like '*io write bytes/sec' } | Measure-Object CookedValue -Sum).Sum
         [pscustomobject]@{ Name = $_.Name; Cpu = [math]::Round($cpu); ReadKB = [math]::Round($read / 1KB); WriteKB = [math]::Round($write / 1KB) }
       } |
       Where-Object { $_.Cpu -ge 5 -or $_.ReadKB -ge 64 -or $_.WriteKB -ge 64 } |
