@@ -6,6 +6,13 @@
 import { LinksError } from './links.js';
 import { group, named, parseLino } from './lino.js';
 
+/**
+ * Writes an outbox sends between yields to the event loop. A long flush then
+ * neither freezes a page nor hides a test timeout behind microtasks.
+ */
+export const YIELD_EVERY = 32;
+const macrotask = () => new Promise((resolve) => setTimeout(resolve, 0));
+
 /** A number of a reply, or a `bad-reply` error. */
 export function numberOf(text) {
   if (typeof text !== 'string' || !/^[0-9]+$/.test(text)) {
@@ -121,8 +128,13 @@ export function createOutbox({
     // `flush` stores the promise before the loop can end.
     await null;
     try {
+      let sent = 0;
       while (queue.length > 0 && connected() && (await sendFirst())) {
-        // Every write is sent by the condition.
+        // Every write is sent by the condition. An in-process transport
+        // answers in microtasks only: let timers and I/O run now and then.
+        if (++sent % YIELD_EVERY === 0) {
+          await macrotask();
+        }
       }
     } finally {
       // Cleared in the step that saw the queue empty: a write queued later

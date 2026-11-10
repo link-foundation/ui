@@ -5,10 +5,22 @@ import {
   createMemoryLinks,
   createSyncedLinks,
   createLinksNames,
+  decorate,
 } from '@link-foundation/ui-links';
 import * as api from '@link-foundation/ui-store';
 
 const TEXT = 'app: column\n  a: text A\n  b: text B';
+/** A memory cache counting the links its `each` hands out. */
+function countingCache(counter) {
+  const inner = createMemoryLinks();
+  return decorate(inner, {
+    each: (handler, query) =>
+      inner.each((link) => {
+        counter.reads++;
+        return handler(link);
+      }, query),
+  });
+}
 async function fixture() {
   const links = createMemoryLinks();
   const where = api.writeDocumentLinks(
@@ -32,8 +44,12 @@ async function fixture() {
         !(refusing && initialIds.has(link.id) && link.from_id === 0),
     },
   });
+  const counter = { reads: 0 };
   const clients = [0, 1].map(() =>
-    createSyncedLinks({ transport: connectInProcess(server) })
+    createSyncedLinks({
+      transport: connectInProcess(server),
+      cache: countingCache(counter),
+    })
   );
   await Promise.all(clients.map((c) => c.subscribe([])));
   const stores = clients.map(() => api.createStore());
@@ -52,6 +68,7 @@ async function fixture() {
     stores,
     bindings,
     flush,
+    counter,
     refuse: () => {
       refusing = true;
     },
@@ -115,6 +132,11 @@ describe('bindStoreLinks', () => {
     await check(() => a.undo());
     await check(() => a.redo());
     await check(() => a.insert(null, 0, { id: 'new', kind: 'text' }));
+    // Work budget (#238): links the two client caches hand out for this
+    // whole sequence. About 0.75M now; 5.8M when every synced write settled
+    // and checkpointed the whole cache, which outlasted test timeouts on
+    // constrained runners. Counted reads, unlike time, are runner-independent.
+    expect(f.counter.reads).toBeLessThan(1_500_000);
   });
 
   it('rolls the store back when the server refuses an existing handle update', async () => {

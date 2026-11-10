@@ -368,7 +368,7 @@ export function createSyncedLinks({
   transport = null,
   cache = createMemoryLinks(),
   state = emptyClientState(),
-  saveState = () => {},
+  saveState = null,
   durable = async () => {},
 } = {}) {
   const { listeners, call, emit } = createListeners();
@@ -377,8 +377,10 @@ export function createSyncedLinks({
   const subscriptions = new Map(state.subscriptions);
   const remoteSubscriptions = { ids: new Map(), transport: null };
   let nextSubscription = state.nextSubscription;
+  // Without a saveState there is no reader: skip formatting the checkpoint,
+  // whose remap table grows with every created link.
   const checkpoint = () =>
-    saveState(
+    saveState?.(
       writeClientState({
         nextTemp,
         connected: state.connected,
