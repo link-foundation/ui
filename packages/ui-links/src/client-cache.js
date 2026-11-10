@@ -17,6 +17,86 @@ function remove(links, id) {
   }
 }
 
+/** A view of `links` that records the first value of each address it writes. */
+function recording(links, saved) {
+  const keep = (id) => {
+    if (!saved.has(id)) {
+      saved.set(id, getLink(links, id));
+    }
+  };
+  return decorate(links, {
+    createAt(id) {
+      keep(id);
+      return links.createAt(id);
+    },
+    update(id, source, target) {
+      keep(id);
+      return links.update(id, source, target);
+    },
+    delete(id) {
+      keep(id);
+      return links.delete(id);
+    },
+  });
+}
+
+/**
+ * Keep the cache equal to `base` with the open writes replayed on top.
+ * Only addresses that may differ are compared: changed in `base` (`touch`),
+ * written optimistically (the changes of queued writes) or by the previous
+ * replay. A write so costs its own size, not the size of the cache. The
+ * replay runs on `base` itself and is reverted afterwards.
+ */
+function createSettler({ base, cache, emit, queue }) {
+  const dirty = new Set();
+  let replayed = [];
+  // A restored cache is compared in full once.
+  let restored = true;
+  const sync = (id, origin) => {
+    const before = getLink(cache, id);
+    const after = getLink(base, id);
+    if (after === null) {
+      if (before !== null) {
+        cache.delete(id);
+        emit(before, null, origin);
+      }
+    } else if (!sameLink(before, after)) {
+      put(cache, after);
+      emit(before, after, origin);
+    }
+  };
+  const settle = (replay, origin, full = restored) => {
+    restored = false;
+    for (const entry of queue) {
+      for (const { before, after } of entry.changes) {
+        dirty.add((after ?? before).id);
+      }
+    }
+    replayed.forEach((id) => dirty.add(id));
+    const saved = new Map();
+    const scratch = recording(base, saved);
+    queue.filter((entry) => !entry.done).forEach((e) => replay(scratch, e));
+    const ids = full
+      ? new Set([...allLinks(cache), ...allLinks(base)].map((l) => l.id))
+      : new Set([...dirty, ...saved.keys()]);
+    const order = [...ids].sort((x, y) => x - y);
+    // Deletions first, as a cache never holds a link a deletion would orphan.
+    const gone = order.filter((id) => getLink(base, id) === null);
+    const kept = order.filter((id) => getLink(base, id) !== null);
+    [...gone, ...kept].forEach((id) => sync(id, origin));
+    for (const [id, link] of [...saved].reverse()) {
+      if (link === null) {
+        remove(base, id);
+      } else {
+        put(base, link);
+      }
+    }
+    dirty.clear();
+    replayed = [...saved.keys()];
+  };
+  return { settle, touch: (id) => dirty.add(id) };
+}
+
 /**
  * Inverse records retain the confirmed state without duplicating it in the
  * persistence format. Rebase them whenever the server supplies new information,
@@ -41,16 +121,8 @@ export function createCacheWriter(cache, emit, state, checkpoint) {
     }
   }
 
-  /**
-   * Addresses where the cache may differ from `base` plus the replayed open
-   * writes: changed in `base`, written by optimistic writes (their changes)
-   * or by this writer, or touched by the previous replay. Settling compares
-   * only these, so a write costs its own size, not the size of the cache.
-   */
-  const dirty = new Set();
-  let replayed = [];
-  // A restored cache is compared in full once.
-  let restored = true;
+  const settler = createSettler({ base, cache, emit, queue });
+  const { touch } = settler;
   const apply = (links, changes) => {
     for (const { before, after } of changes) {
       if (after === null) {
@@ -59,11 +131,10 @@ export function createCacheWriter(cache, emit, state, checkpoint) {
         put(links, after);
       }
       if (links === base) {
-        dirty.add((after ?? before).id);
+        touch((after ?? before).id);
       }
     }
   };
-  const open = (entry) => !entry.done;
   const lost = (entry) =>
     [entry.id, entry.source, entry.target].find((id) => refused.has(id));
   const replay = (links, entry) => {
@@ -86,77 +157,7 @@ export function createCacheWriter(cache, emit, state, checkpoint) {
       entry.changes = [{ before, after }];
     }
   };
-  /** Record the first value of each address a replay writes in `base`. */
-  const recording = (saved) => {
-    const keep = (id) => {
-      if (!saved.has(id)) {
-        saved.set(id, getLink(base, id));
-      }
-    };
-    return decorate(base, {
-      createAt(id) {
-        keep(id);
-        return base.createAt(id);
-      },
-      update(id, source, target) {
-        keep(id);
-        return base.update(id, source, target);
-      },
-      delete(id) {
-        keep(id);
-        return base.delete(id);
-      },
-    });
-  };
-  const sync = (id, origin) => {
-    const before = getLink(cache, id);
-    const after = getLink(base, id);
-    if (after === null) {
-      if (before !== null) {
-        cache.delete(id);
-        emit(before, null, origin);
-      }
-    } else if (!sameLink(before, after)) {
-      put(cache, after);
-      emit(before, after, origin);
-    }
-  };
-  /**
-   * Make the cache `base` with the open writes replayed on top. The replay
-   * runs on `base` itself and is reverted afterwards.
-   */
-  const settle = (origin, full = restored) => {
-    restored = false;
-    for (const entry of queue) {
-      for (const { before, after } of entry.changes) {
-        dirty.add((after ?? before).id);
-      }
-    }
-    replayed.forEach((id) => dirty.add(id));
-    const saved = new Map();
-    const scratch = recording(saved);
-    queue.filter(open).forEach((entry) => replay(scratch, entry));
-    const ids = full
-      ? new Set([...allLinks(cache), ...allLinks(base)].map((l) => l.id))
-      : new Set([...dirty, ...saved.keys()]);
-    const order = [...ids].sort((x, y) => x - y);
-    // Deletions first, as a cache never holds a link a deletion would orphan.
-    order
-      .filter((id) => getLink(base, id) === null)
-      .forEach((id) => sync(id, origin));
-    order
-      .filter((id) => getLink(base, id) !== null)
-      .forEach((id) => sync(id, origin));
-    for (const [id, link] of [...saved].reverse()) {
-      if (link === null) {
-        remove(base, id);
-      } else {
-        put(base, link);
-      }
-    }
-    dirty.clear();
-    replayed = [...saved.keys()];
-  };
+  const settle = (origin, full) => settler.settle(replay, origin, full);
   const learn = (changes) => {
     apply(base, changes);
     settle('remote');
@@ -204,7 +205,8 @@ export function createCacheWriter(cache, emit, state, checkpoint) {
     remap(temp, after) {
       real.set(temp, after.id);
       put(base, after);
-      dirty.add(after.id).add(temp);
+      touch(after.id);
+      touch(temp);
       const before = getLink(cache, temp);
       if (before !== null) {
         const moved = resolved(before);
@@ -215,7 +217,7 @@ export function createCacheWriter(cache, emit, state, checkpoint) {
             (link.from_id === temp || link.to_id === temp)
           ) {
             put(cache, resolved(link));
-            dirty.add(link.id);
+            touch(link.id);
           }
         }
         cache.delete(temp);
