@@ -109,6 +109,7 @@ export function defaultMounts(root) {
     ['examples', 'deepcase'],
     ['assets', 'classic-themes'],
     ['node_modules', 'links-notation', 'dist'],
+    ['node_modules', 'lino-i18n', 'src'],
     ['node_modules', '@material', 'material-color-utilities'],
     ...BROWSER_MODULES.map((name) => ['node_modules', name]),
     ...EDITOR_BROWSER_MODULES.map((name) => [

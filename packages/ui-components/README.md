@@ -1479,3 +1479,6 @@ large decimal indexes, LiNo settings and host ownership.
 
 See [the configurations guide](CONFIGURATIONS.md) for exact enumeration,
 notation conversion, editing helpers, renaming classes and `<links-gallery>`.
+
+See [brand marks, presentation variants and static subsets](ICONS.md) for
+Simple Icons and localized inline messages.

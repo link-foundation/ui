@@ -25,6 +25,7 @@ import OWN_ICONS from './own-icons.js';
  * @property {'yes'|'no'} [modified]
  *
  * @typedef {object} IconData
+ * @property {string} [title]  library accessible name
  * @property {string} viewBox
  * @property {string} body  SVG markup drawn in currentColor
  * @property {boolean} mirrorInRtl  flip horizontally in right-to-left text
@@ -144,13 +145,22 @@ async function tryResolve(set, name) {
 
 /**
  * Resolve an icon: the named set, then the own set, then the placeholder.
+ * Brand marks skip the own set so a missing brand never becomes a UI glyph.
  * @param {IconRef} ref
  * @returns {Promise<IconData & {set: string, name: string,
  *   placeholder?: boolean}>}  `set` is the set that supplied the icon
  */
 export async function resolveIcon(ref) {
   const { set, name } = parseIconRef(ref);
-  const order = set === DEFAULT_ICON_SET ? [set] : [set, DEFAULT_ICON_SET];
+  const order =
+    set === DEFAULT_ICON_SET || set === 'brand'
+      ? [set]
+      : [set, DEFAULT_ICON_SET];
+  if (set === 'brand' && !sets.has(set)) {
+    console.warn(
+      `brand:${name} could not be loaded: brand set is not registered`
+    );
+  }
   for (const candidate of order) {
     const icon = await tryResolve(candidate, name);
     if (icon !== undefined) {
@@ -188,6 +198,7 @@ export function createStaticSource(module) {
         icon === undefined
           ? undefined
           : {
+              ...(icon.title ? { title: icon.title } : {}),
               viewBox: icon.viewBox,
               body: icon.body,
               mirrorInRtl: icon.mirrorInRtl ?? MIRROR_IN_RTL.has(name),

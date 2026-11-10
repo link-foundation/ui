@@ -203,3 +203,28 @@ symlink, `npx lino-i18n` prints nothing and exits 0
 ## License
 
 [Unlicense](LICENSE)
+
+## Inline icon message parts
+
+`messageParts(value, localizer, slots)` returns text strings and localized
+icon descriptors for `{token}` placeholders, without a DOM dependency:
+
+```js
+import { iconPart, message, messageParts } from '@link-foundation/ui-i18n';
+const parts = messageParts(message('sentence'), localizer, {
+  love: iconPart('lucide:heart', message('love')),
+});
+// With sentence = "I {love} links":
+// ['I ', {type: 'icon', set: 'lucide', name: 'heart',
+//         label: 'love', role: 'img'}, ' links']
+```
+
+Render strings as text nodes, and descriptors as `ui-icon` elements with
+`set`, `name`, `label` and `role` attributes. Never insert strings as HTML.
+The label is required: screen readers read the localized word in place of
+the drawing. Unknown tokens remain literal text. Recompute parts on locale
+changes with `localizer.subscribe(render)`. This helper is also exported by
+the browser entry. It does not add icon parameters to the scalar `text()` API.
+
+[Runnable DOM example](../ui-components/examples/inline-icons.js) and
+[page](../ui-components/examples/inline-icons.html).

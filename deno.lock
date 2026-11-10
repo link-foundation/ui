@@ -57,6 +57,7 @@
     "npm:react-dom@^19.3.1": "19.3.1_react@19.3.1",
     "npm:react-test-renderer@^19.3.1": "19.3.1_react@19.3.1",
     "npm:react@^19.3.1": "19.3.1",
+    "npm:simple-icons@^16.37.0": "16.37.0",
     "npm:svgo@^4.1.0": "4.1.0",
     "npm:test-anywhere@~0.8.48": "0.8.50",
     "npm:vite@^6.4.5": "6.4.5",
@@ -3135,6 +3136,9 @@
     "signal-exit@4.1.0": {
       "integrity": "sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw=="
     },
+    "simple-icons@16.37.0": {
+      "integrity": "sha512-8mCJIhpMYOL9g13GW59EiL3sVXJnTEKGCTZFaekl9UQ3Qo0SwVjnLaJ82QiaH8BKBdouEDzrHMXIWh8cBIy48A=="
+    },
     "sisteransi@1.0.5": {
       "integrity": "sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg=="
     },
@@ -3496,6 +3500,7 @@
             "npm:lucide@^1.66.0",
             "npm:mermaid@11.17.2",
             "npm:monaco-editor@0.58.0-dev-20261103",
+            "npm:simple-icons@^16.37.0",
             "npm:test-anywhere@~0.8.48"
           ]
         }

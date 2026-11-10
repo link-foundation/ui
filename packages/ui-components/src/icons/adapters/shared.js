@@ -33,6 +33,7 @@ import { splitSvg } from '../svg.js';
  *   loader, for example to fetch from your own copy of the package
  * @property {Record<string, string>} [names]  extra or replaced logical
  *   names
+ * @property {(diagnostic: {code: string, set: string, name: string, message: string}) => void} [onDiagnostic]
  */
 
 /** Library icon names are plain words: nothing can climb out of the package. */
@@ -111,7 +112,20 @@ export function createAdapterSource(adapter, options = {}) {
         Promise.resolve()
           .then(() => load(name))
           .then((text) => splitSvg(text, { defaults: adapter.defaults }))
-          .catch(() => undefined)
+          .catch((error) => {
+            const diagnostic = {
+              code: 'missing-icon',
+              set: adapter.set,
+              name,
+              message: `${adapter.set}:${name} could not be loaded: ${error.message}`,
+            };
+            if (options.onDiagnostic) {
+              options.onDiagnostic(diagnostic);
+            } else {
+              console.warn(diagnostic.message);
+            }
+            return undefined;
+          })
       );
     }
     return cache.get(name);

@@ -64,6 +64,7 @@ export function readAttributes(tag) {
  * @property {string} viewBox
  * @property {string} body  the drawing, wrapped in a `<g>` with the root
  *   presentation attributes when it has any
+ * @property {string} [title] the source's accessible title, when present
  */
 
 /**
@@ -93,7 +94,13 @@ export function splitSvg(text, { defaults = {} } = {}) {
     style.length === 0
       ? inner
       : `<g ${style.map(([n, v]) => `${n}="${escapeAttribute(v)}"`).join(' ')}>${inner}</g>`;
-  return { viewBox, body };
+  const title = /<title(?:\s[^>]*)?>([^<]*)<\/title>/.exec(inner)?.[1];
+  const decoded = title?.replace(
+    /&(amp|lt|gt|quot|apos);/g,
+    (_, entity) =>
+      ({ amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" })[entity]
+  );
+  return { viewBox, body, ...(decoded ? { title: decoded } : {}) };
 }
 
 /**

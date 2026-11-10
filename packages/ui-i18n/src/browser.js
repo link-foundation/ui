@@ -26,3 +26,5 @@ export {
   requiresI18n,
 } from './lint.js';
 export { propAtom, propValues } from './props.js';
+
+export { iconPart, messageParts } from './parts.js';

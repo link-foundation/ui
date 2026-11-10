@@ -1,4 +1,6 @@
 export {
+  iconPart,
+  messageParts,
   MESSAGE_HEAD,
   isMessage,
   isMessageLink,
@@ -26,6 +28,7 @@ export {
   propValues,
 } from './index.js';
 export type {
+  IconPart,
   Catalogs,
   MessageParam,
   Message,

@@ -160,3 +160,17 @@ export function checkHardcodedText(
 
 export function propValues(node: UiNode, name: string): RawValue[] | undefined;
 export function propAtom(node: UiNode, name: string): string | undefined;
+
+/** An icon slot whose localized label is read in place of its drawing. */
+export interface IconPart {
+  type: 'icon';
+  set: string;
+  name: string;
+  label: string | Message;
+}
+export function iconPart(ref: string, label: string | Message): IconPart;
+export function messageParts(
+  value: unknown,
+  localizer: Pick<Localizer, 'text'>,
+  slots?: Record<string, IconPart>
+): (string | (IconPart & { label: string; role: 'img' }))[];

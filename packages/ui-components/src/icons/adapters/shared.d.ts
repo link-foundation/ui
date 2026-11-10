@@ -18,6 +18,12 @@ export interface AdapterOptions {
   load?: (name: string) => Promise<string>;
   /** Extra or replaced logical names. */
   names?: Record<string, string>;
+  onDiagnostic?: (diagnostic: {
+    code: string;
+    set: string;
+    name: string;
+    message: string;
+  }) => void;
 }
 
 export type AdapterSource = Readonly<
