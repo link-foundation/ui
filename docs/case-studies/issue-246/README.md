@@ -72,6 +72,30 @@ FAILED | 1101 passed (17 steps) | 1 failed (1m1s)
 
 Runs 42715406472 and 42716746558 failed in both attempts the same way.
 
+## Trace from CI
+
+[Run 42813646087](https://github.com/link-foundation/ui/actions/runs/42813646087),
+job `Test runtimes (windows-2025, deno, 1/3)`, passed in 20 s:
+
+```text
+[site-build] child spawn (at 1ms)
+[site-build] vite config (at 4111ms)
+[site-build] generate pages: 1297ms (at 5409ms)
+[site-build] bundle modules: 2641ms (at 8582ms)
+[site-build] render chunks: 5489ms (at 14071ms)
+[site-build] append gallery: 20ms (at 14091ms)
+[site-build] render matrices: 3292ms (at 17383ms)
+[site-build] write files: 275ms (at 17658ms)
+[site-build] build closed (at 17658ms)
+[site-build] child exit (at 18078ms)
+[site-build] child close (at 18080ms)
+[site-build] verify output: 2151ms (at 20231ms)
+```
+
+Starting the Vite process takes 4.1 s on Windows, against 0.6 s locally on
+Linux. Render chunks, which minifies the inlined theme registry, remains the
+longest phase.
+
 ## Root cause
 
 The build does a fixed amount of CPU work that was close to the 60 s limit on
