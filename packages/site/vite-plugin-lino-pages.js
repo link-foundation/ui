@@ -8,15 +8,11 @@ import { loadPages } from './pages.js';
 import { loadCatalog } from './src/gallery/catalog.js';
 import { renderGallery, renderMatrix } from './src/gallery/render.js';
 import { registerSiteKinds } from './src/kinds.js';
+import { createBuildTrace } from './build-trace.js';
 
 const packageRoot = fileURLToPath(new globalThis.URL('.', import.meta.url));
 const THEME_MODULE = 'virtual:site-themes';
 const EXAMPLES_MODULE = 'virtual:site-examples';
-const trace = (phase, started) => {
-  if (process.env.SITE_BUILD_TRACE === '1') {
-    console.error(`[site-build] ${phase}: ${Date.now() - started}ms`);
-  }
-};
 const json = (value) => JSON.stringify(value).replaceAll('<', '\\u003c');
 
 export function linoPages({ contentDir, layout, languages = ['en', 'ru'] }) {
@@ -24,8 +20,9 @@ export function linoPages({ contentDir, layout, languages = ['en', 'ru'] }) {
   let themes;
   let catalog;
   let resolved;
+  const trace = createBuildTrace();
   async function generate() {
-    const started = Date.now();
+    trace.start('generate pages');
     registerSiteKinds();
     const pages = await loadPages({ contentDir, layout, languages });
     themes = new Map(
@@ -83,7 +80,7 @@ export function linoPages({ contentDir, layout, languages = ['en', 'ru'] }) {
       home,
       `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Links UI · Language</title></head><body><main><h1>Links UI</h1><p><a href="./en/">English</a> · <a href="./ru/">Русский</a></p></main><script>location.replace('./'+(navigator.language.toLowerCase().startsWith('ru')?'ru':'en')+'/');</script></body></html>`
     );
-    trace('generate pages', started);
+    trace.end('generate pages');
     return [...inputs, home];
   }
   return {
@@ -99,6 +96,8 @@ export function linoPages({ contentDir, layout, languages = ['en', 'ru'] }) {
       }
     },
     async config() {
+      // Time before this hook is Node start-up, Vite import and config load.
+      trace.mark('vite config');
       const input = await generate();
       return {
         root: generated,
@@ -108,13 +107,11 @@ export function linoPages({ contentDir, layout, languages = ['en', 'ru'] }) {
         build: { rollupOptions: { input } },
       };
     },
+    ...traceHooks(trace),
     generateBundle: {
       order: 'post',
       handler(_options, bundle) {
-        appendGallery(bundle, catalog, themes, languages);
-        const started = Date.now();
-        emitMatrices(this, bundle, catalog, themes, languages);
-        trace('render matrices', started);
+        emitGallery(this, bundle, { catalog, themes, languages, trace });
       },
     },
     transformIndexHtml(html) {
@@ -168,6 +165,34 @@ export function linoPages({ contentDir, layout, languages = ['en', 'ru'] }) {
       });
     },
   };
+}
+
+/** Rollup phase boundaries for `SITE_BUILD_TRACE=1`; no output otherwise. */
+function traceHooks(trace) {
+  return {
+    buildStart() {
+      trace.start('bundle modules');
+    },
+    buildEnd() {
+      trace.end('bundle modules');
+      trace.start('render chunks');
+    },
+    closeBundle() {
+      trace.end('write files');
+      trace.mark('build closed');
+    },
+  };
+}
+
+function emitGallery(plugin, bundle, { catalog, themes, languages, trace }) {
+  trace.end('render chunks');
+  trace.start('append gallery');
+  appendGallery(bundle, catalog, themes, languages);
+  trace.end('append gallery');
+  trace.start('render matrices');
+  emitMatrices(plugin, bundle, catalog, themes, languages);
+  trace.end('render matrices');
+  trace.start('write files');
 }
 
 function appendGallery(bundle, catalog, themes, languages) {
