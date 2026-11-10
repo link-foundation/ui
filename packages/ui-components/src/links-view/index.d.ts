@@ -845,6 +845,30 @@ export function createNetworkEditorProvider(configuration?: {
   debug?: (message: string, data?: object) => void;
 }): NetworkPresentationProvider;
 
+/** Job execution only; this does not provide a collision search algorithm. */
+export type NetworkSolver<Result> = (
+  links: number[][],
+  options: Record<string, unknown>,
+  context: { signal: AbortSignal }
+) => Result | Promise<Result>;
+export function createSolverJob<Result>(
+  solve: NetworkSolver<Result>,
+  configuration?: { workerUrl?: string | URL; Worker?: typeof Worker }
+): (
+  links: number[][],
+  options?: Record<string, unknown>,
+  context?: { signal?: AbortSignal }
+) => Promise<Result>;
+export function installSolverWorker<Result>(
+  scope: {
+    addEventListener(
+      type: 'message',
+      listener: (event: MessageEvent) => void
+    ): void;
+    postMessage(value: unknown): void;
+  },
+  solve: NetworkSolver<Result>
+): void;
 export interface LinksGalleryElement extends HTMLElement {
   size: number;
   readonly count: bigint;

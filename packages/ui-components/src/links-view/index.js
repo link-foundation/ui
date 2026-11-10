@@ -103,6 +103,7 @@ export { linoToNetwork, networkToLino } from './lino-to-network.js';
 export { LINO_NETWORK_TAG, defineLinoNetwork } from './lino-network.js';
 
 export { createNetworkPresentation } from './presentation.js';
+export { createSolverJob, installSolverWorker } from './solver-job.js';
 
 export { createNetworkEditor } from './network-editor/editor.js';
 export {

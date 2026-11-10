@@ -66,6 +66,36 @@ self-references, nine marker shapes, neutral/anchored turns and gaps, painted
 clearance solving, history traversal and caption/export formats must all be
 verified against the consumer before deleting its backend.
 
+## Cancellable solver jobs
+
+`createSolverJob(solve, { workerUrl, Worker })` wraps an existing solver with
+signature `solve(links, options, { signal })`. The returned function has the
+same arguments and always returns a promise. Each call gets detached links and
+options, so a solver cannot mutate the caller's settings. Options must be
+structured-cloneable; callbacks belong outside the options passed to the job.
+The wrapper does not implement collision scoring or search.
+
+When `workerUrl` is supplied and `Worker` is available, each call starts a new
+module worker. The host's worker entry imports its actual solver and calls
+`installSolverWorker(globalThis, solve)`. Completion, solver errors, worker
+errors, message decoding errors and cancellation all terminate that job's
+worker and remove its listeners. Separate calls are independent; use the
+presentation request's signal for latest-job-wins cancellation.
+
+Aborting rejects with an `AbortError`, including when the signal was already
+aborted. Without `Worker` support (or without a worker URL), the solver runs on
+the calling thread. An asynchronous fallback rejects immediately on abort and
+discards late results. Synchronous fallback CPU work can only observe
+cancellation cooperatively through its signal; it cannot free the calling
+thread to deliver an abort event while running. Supply the worker entry for
+interactive, CPU-intensive solves.
+
+The default `solveCollisions` algorithm, its module worker entry and the default
+provider wiring are not implemented by this execution layer. The renderer from
+#227 is now available, but its canonical turns produce crossings in the input
+that #228 describes as clean; [#249](https://github.com/link-foundation/ui/issues/249)
+tracks that fixture mismatch. This execution layer does not claim the
+renderer-dependent acceptance criteria of #228.
 The built-in [`createDoubletProvider`](doublet-provider.md) supplies the
 continuous two-cubic doublet renderer, nine parametric markers, placements,
 backgrounds, cards and captions without a consumer geometry backend.
