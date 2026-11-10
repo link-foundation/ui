@@ -97,7 +97,7 @@ height 640
 | `free`, `loop`               | 1 (0..10); free length 0.42 (lone 0.9), loop handle radius 0.8 (lone 1.25) times the multiplier                               |
 | `bulge`, `loopBend`          | 0 degrees (−180..180); loop width multiplier is `exp((bulge + loopBend)/180)`                                                 |
 | `angles`                     | `fixed` or `mirror`                                                                                                           |
-| `sourceAngle`, `targetAngle` | 30 degrees (−180..180); aligned chords stay straight with no turns                                                            |
+| `sourceAngle`, `targetAngle` | 30 degrees (−180..180), turned toward the mirror side; aligned chords stay straight with no turns                             |
 | `tension`                    | 0.4 (0..2), times chord length                                                                                                |
 | `gaps`                       | Start/end 0.08 layout units (0..1), before/after middle 0 box units (0..30)                                                   |
 | `link <id>`                  | Nested `turns` (two integer degrees, −180..180) and/or `gaps` (four values); `~` or `null` inherits a global gap              |
@@ -149,10 +149,23 @@ ambiguity. All text/attributes are XML escaped.
 `places` and `layoutCurves` are in layout units. `positions` and `curves` are
 in fitted box units, transformed by `[scale, x, y]`. Every raw curve contains
 exactly two cubics sharing its own middle and tangent direction. References
-anchor at other links' middles, not arc-length halfway points. The visible
-curve is trimmed by arc length and may have a separate subpath around a middle
-cut; a consumed half is null. Symmetric self-loop halves are point reflections
-with reversed parameter direction.
+anchor at other links' middles, not arc-length halfway points. A middle's
+direction is the bisector of its incoming and outgoing chords. When they cancel
+(both references to one place, as in `22 11`), it is the chord from the higher
+to the lower link ID turned by +90 degrees, so both links share it. A fixed
+angle turns each reference end toward the side the mirror end lies on; a lens
+(two references to one link) mirrors at ±45 degrees, so fixed 45 equals mirror.
+A start or end gap at another link's middle moves that visible end and its
+handle back along the end tangent. Free and self-loop end gaps and middle cuts
+are trimmed by arc length. The visible curve may have a separate subpath around
+a middle cut; a consumed half is null. Symmetric self-loop halves are point
+reflections with reversed parameter direction.
+
+The shared clean input for the collision solver of #228 is `22 11` with the
+[fixture](../../packages/ui-components/tests/links-view/fixtures/doublet-22-11-clean.lino)
+`link 1` `turns -90 90` (link 2 unturned, fixed 30-degree ends, default gaps).
+It paints no crossing and keeps a painted gap of at least 1 box unit; without
+turns `22 11` crosses twice ([#249](https://github.com/link-foundation/ui/issues/249)).
 
 Circle chord neighbours, grid/hex neighbours and dice pips have unit spacing
 before transforms; cards use two columns at ±0.7. Dice groups of six pips tile
