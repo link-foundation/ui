@@ -11,6 +11,28 @@ const text = `post: embed
   toggle true
   archive: text 'Archived post'`;
 
+function standalone() {
+  const { window, document } = createDom();
+  const renders = [];
+  const remove = registerEmbedProvider('test', {
+    script: null,
+    validate: () => true,
+    url: () => 'https://example.com',
+    render: (node, context) => {
+      renders.push(context);
+      context.ready();
+    },
+  });
+  defineEmbedElement(window);
+  const host = document.createElement('ui-embed');
+  host.setAttribute('provider', 'test');
+  host.setAttribute('id', '42');
+  host.setAttribute('toggle', 'true');
+  host.innerHTML = '<p slot="fallback">Archive</p>';
+  document.body.append(host);
+  return { window, document, host, renders, remove };
+}
+
 describe('embed element and LiNo kind', () => {
   it('projects archived children and keeps the renderer store identity separate from the post id', async () => {
     const { window, container } = createDom();
@@ -38,19 +60,7 @@ describe('embed element and LiNo kind', () => {
   });
 
   it('standalone elements dispose on disconnect and can reconnect', async () => {
-    const { window, document } = createDom();
-    const remove = registerEmbedProvider('test', {
-      script: null,
-      validate: () => true,
-      url: () => 'https://example.com',
-      render: (node, context) => context.ready(),
-    });
-    defineEmbedElement(window);
-    const host = document.createElement('ui-embed');
-    host.setAttribute('provider', 'test');
-    host.setAttribute('id', '42');
-    host.innerHTML = '<p slot="fallback">Archive</p>';
-    document.body.append(host);
+    const { window, document, host, remove } = standalone();
     await microtasks();
     expect(host.dataset.state).toBe('ready');
     host.remove();
@@ -58,6 +68,39 @@ describe('embed element and LiNo kind', () => {
     document.body.append(host);
     await microtasks();
     expect(host.dataset.state).toBe('ready');
+    host.remove();
+    remove();
+    window.close();
+  });
+
+  it('preserves the archive choice when theme and locale attributes change', async () => {
+    const { window, host, renders, remove } = standalone();
+    await microtasks();
+    host.querySelector('button').click();
+    expect(host.dataset.state).toBe('off');
+    host.setAttribute('theme', 'dark');
+    host.setAttribute('locale', 'ru');
+    await microtasks();
+    expect(host.dataset.state).toBe('off');
+    expect(renders.length).toBe(1);
+    host.querySelector('button').click();
+    await microtasks();
+    expect(renders[1].theme).toBe('dark');
+    expect(renders[1].locale).toBe('ru');
+    host.remove();
+    remove();
+    window.close();
+  });
+
+  it('keeps reconnect attribute updates isolated from an old queued update', async () => {
+    const { window, document, host, renders, remove } = standalone();
+    await microtasks();
+    host.setAttribute('locale', 'en');
+    host.remove();
+    document.body.append(host);
+    host.setAttribute('locale', 'ru');
+    await microtasks();
+    expect(renders.at(-1).locale).toBe('ru');
     host.remove();
     remove();
     window.close();

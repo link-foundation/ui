@@ -17,9 +17,9 @@ const attributes = [
 ];
 const camel = (name) =>
   name.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
-function optionsOf(node) {
+function optionsOf(node, names = attributes) {
   return Object.fromEntries(
-    attributes.map((name) => {
+    names.map((name) => {
       const value = node.getAttribute(name);
       return [
         camel(name),
@@ -44,22 +44,32 @@ export function defineEmbedElement(win = globalThis.window) {
     static observedAttributes = attributes;
     connectedCallback() {
       this.embed?.destroy();
+      this.pendingUpdate = undefined;
       this.embed = createEmbed(this, optionsOf(this));
     }
     disconnectedCallback() {
       this.embed?.destroy();
       this.embed = undefined;
+      this.pendingUpdate = undefined;
     }
-    attributeChangedCallback() {
-      if (!this.embed || this.pendingUpdate) {
+    attributeChangedCallback(name) {
+      if (!this.embed) {
+        return;
+      }
+      if (this.pendingUpdate?.controller === this.embed) {
+        this.pendingUpdate.names.add(name);
         return;
       }
       const controller = this.embed;
-      this.pendingUpdate = true;
+      const pending = { controller, names: new Set([name]) };
+      this.pendingUpdate = pending;
       win.queueMicrotask(() => {
-        this.pendingUpdate = false;
+        if (this.pendingUpdate !== pending) {
+          return;
+        }
+        this.pendingUpdate = undefined;
         if (this.embed === controller) {
-          controller.update(optionsOf(this));
+          controller.update(optionsOf(this, [...pending.names]));
         }
       });
     }

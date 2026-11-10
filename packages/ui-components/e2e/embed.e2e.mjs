@@ -80,6 +80,11 @@ test('timeout, archive toggle, keyboard and accessible screenshots', async ({
   await expect(
     page.getByRole('heading', { name: 'Archived post' })
   ).toBeVisible();
+  await page.locator('ui-embed').evaluate((host) => {
+    host.setAttribute('theme', 'dark');
+  });
+  await expect(page.locator('ui-embed')).toHaveAttribute('data-state', 'off');
+  await expect(page.locator('ui-embed iframe')).toHaveCount(0);
   await expectAccessible(page);
   if (testInfo.project.name === 'chromium') {
     await page.screenshot({ path: 'docs/screenshots/embed-archive.png' });

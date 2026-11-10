@@ -76,7 +76,8 @@ and widget rendering. A failed generation emits one bubbling, composed
 Archived children appear inside a native `<details>` under the live widget.
 Off/failed widgets show them directly. The optional button switches between
 live and archive modes; choosing live starts a fresh generation and clears the
-failure. UI strings default to English or Russian based on the locale.
+failure. Theme/locale attribute updates preserve the user's archive choice.
+UI strings default to English or Russian based on the locale.
 
 The resolved scheme follows the nearest `data-scheme` and the system's
 `prefers-color-scheme`; locale follows the nearest `lang` or `data-locale`.
