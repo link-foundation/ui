@@ -176,6 +176,8 @@ export interface LinksNames extends NamesStore {
   withLinks(links: LinksStorage): LinksNames;
   dependencies(ids: Iterable<number>): Link[];
   bindings(ids: Iterable<number>): Link[];
+  /** `bindings` and `dependencies` from one decoding pass. */
+  namesOf(ids: Iterable<number>): { bindings: Link[]; dependencies: Link[] };
 }
 /** Names encoded as doublets in the same storage, without a sidecar. */
 export function createLinksNames(links: LinksStorage): LinksNames;

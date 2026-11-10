@@ -392,13 +392,13 @@ function createOperations(server, state, { names, reader, view, write }) {
 
 /** Diff a subscription's name marks while retaining shared text nodes. */
 function includeNames(names, subscription, selected, seen) {
-  const current = new Map(
-    names
-      .dependencies(
-        selected.flatMap((link) => [link.id, link.from_id, link.to_id])
-      )
-      .map((link) => [link.id, link])
-  );
+  const ids = selected.flatMap((link) => [link.id, link.from_id, link.to_id]);
+  // One decoding pass over the names when the names view offers it.
+  const { bindings, dependencies } = names.namesOf?.(ids) ?? {
+    bindings: names.bindings(ids),
+    dependencies: names.dependencies(ids),
+  };
+  const current = new Map(dependencies.map((link) => [link.id, link]));
   const delta = new Map(
     seen.map((change) => [(change.after ?? change.before).id, change])
   );
@@ -417,11 +417,7 @@ function includeNames(names, subscription, selected, seen) {
       delta.set(id, { before, after });
     }
   }
-  subscription.bindings = new Set(
-    names
-      .bindings(selected.flatMap((link) => [link.id, link.from_id, link.to_id]))
-      .map((link) => link.id)
-  );
+  subscription.bindings = new Set(bindings.map((link) => link.id));
   subscription.names = current;
   seen.splice(0, seen.length, ...delta.values());
 }

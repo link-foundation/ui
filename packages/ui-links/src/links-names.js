@@ -162,22 +162,21 @@ function namesView(links, base) {
     /** Rebind reads/writes to a permission or transaction view. */
     withLinks: (view) => namesView(view, base),
     /** The name marks, excluding shared immutable text nodes. */
-    bindings(ids) {
-      const wanted = new Set(ids);
-      return records()
-        .filter((record) => wanted.has(record.id))
-        .map((record) => record.mark);
-    },
+    bindings: (ids) => names.namesOf(ids).bindings,
     /** The readable encoding of names of the requested data addresses. */
-    dependencies(ids) {
+    dependencies: (ids) => names.namesOf(ids).dependencies,
+    /** Both of the above from one decoding pass over the names. */
+    namesOf(ids) {
       const wanted = new Set(ids);
+      const bindings = [];
       const found = new Map();
       for (const record of records()) {
         if (wanted.has(record.id)) {
+          bindings.push(record.mark);
           record.dependencies.forEach((link) => found.set(link.id, link));
         }
       }
-      return [...found.values()];
+      return { bindings, dependencies: [...found.values()] };
     },
   };
   return names;
