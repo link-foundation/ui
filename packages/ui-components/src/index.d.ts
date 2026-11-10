@@ -11,3 +11,4 @@ export * from '@link-foundation/ui-components/data';
 export * from '@link-foundation/ui-components/editor';
 export * from '@link-foundation/ui-components/chat';
 export * from '@link-foundation/ui-components/settings';
+export * from '@link-foundation/ui-components/embed';

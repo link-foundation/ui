@@ -204,3 +204,14 @@ renderable core element kind. Review snapshots name otherwise anonymous
 objects with adapter IDs without changing the application document. A future
 collaborative backend may add authors or timestamps through a new format
 version; version 1 uses ordered deterministic events and explicit LiNo exchange.
+
+## Provider embed kind
+
+Issue #235 declares the opt-in `embed` kind in ui-components' `EMBED_KIND_TEXT`.
+`embedVocabulary(base)` adds it without changing the core dialect. It has
+`provider`, post `id`, `hash`, `locale` and `root-margin` strings; `timeout` and
+`script-timeout` numbers; `theme` (`light`, `dark`, `system`); and `enabled`,
+`toggle` and `debug` boolean enums. Children are archived fallback content.
+Should a later dialect include this kind in its base vocabulary? Until then,
+parse it with `embedVocabulary()` and keep provider registration in trusted
+application code. HTML conversion continues to reject scripts and iframes.

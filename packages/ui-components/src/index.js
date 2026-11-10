@@ -37,3 +37,4 @@ export * from './data/index.js';
 export * from './editor/index.js';
 export * from './chat/index.js';
 export * from './settings/index.js';
+export * from './embed/index.js';

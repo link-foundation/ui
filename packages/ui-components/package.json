@@ -93,6 +93,22 @@
       "types": "./src/links-view/configurations.d.ts",
       "default": "./src/links-view/configurations.js"
     },
+    "./embed": {
+      "types": "./src/embed/index.d.ts",
+      "default": "./src/embed/index.js"
+    },
+    "./embed/providers/x": {
+      "types": "./src/embed/providers/x.d.ts",
+      "default": "./src/embed/providers/x.js"
+    },
+    "./embed/providers/telegram": {
+      "types": "./src/embed/providers/telegram.d.ts",
+      "default": "./src/embed/providers/telegram.js"
+    },
+    "./embed/providers/vk": {
+      "types": "./src/embed/providers/vk.d.ts",
+      "default": "./src/embed/providers/vk.js"
+    },
     "./icons/adapters/simple-icons": {
       "types": "./src/icons/adapters/simple-icons.d.ts",
       "default": "./src/icons/adapters/simple-icons.js"
