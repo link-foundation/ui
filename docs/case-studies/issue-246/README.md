@@ -119,7 +119,7 @@ for the matrix code before 5cc0d7c and for the current code.
 ## Cancellation
 
 Node and Deno abort `t.signal` when a test times out. Bun does not
-(`experiments/issue-246/signal-probe.test.mjs`), so before this change a Bun
+(`experiments/issue-246/signal-probe.mjs`), so before this change a Bun
 timeout left the Vite child running until it finished on its own.
 
 The test now owns a 50 s deadline below the 60 s test timeout. The deadline

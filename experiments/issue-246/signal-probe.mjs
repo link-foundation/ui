@@ -1,7 +1,7 @@
 // Does the runtime's node:test abort t.signal on timeout, and is the child reaped?
-// Run: node --test experiments/issue-246/signal-probe.test.mjs
-//      deno test -A experiments/issue-246/signal-probe.test.mjs
-//      bun test experiments/issue-246/signal-probe.test.mjs
+// Run: node --test experiments/issue-246/signal-probe.mjs
+//      deno test -A experiments/issue-246/signal-probe.mjs
+//      bun test ./experiments/issue-246/signal-probe.mjs (Bun skips experiments/**; copy it elsewhere first)
 import { test } from 'node:test';
 import { spawn } from 'node:child_process';
 
