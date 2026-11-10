@@ -9,6 +9,7 @@ import { loadCatalog } from './src/gallery/catalog.js';
 import { renderGallery, renderMatrix } from './src/gallery/render.js';
 import { registerSiteKinds } from './src/kinds.js';
 import { createBuildTrace } from './build-trace.js';
+import { clientThemes } from './client-themes.js';
 
 const packageRoot = fileURLToPath(new globalThis.URL('.', import.meta.url));
 const THEME_MODULE = 'virtual:site-themes';
@@ -136,7 +137,7 @@ export function linoPages({ contentDir, layout, languages = ['en', 'ru'] }) {
         return `export default ${JSON.stringify(catalog)};`;
       }
       if (id === `\0${THEME_MODULE}`) {
-        const data = JSON.stringify(themes, (_key, value) =>
+        const data = JSON.stringify(clientThemes(themes), (_key, value) =>
           value instanceof Map ? { siteMap: [...value] } : value
         );
         return `export default JSON.parse(${JSON.stringify(data)}, (_key, value) => value?.siteMap ? new Map(value.siteMap) : value);`;

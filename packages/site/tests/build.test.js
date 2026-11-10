@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -29,6 +29,22 @@ const PHASES = [
   'write files',
   'build closed',
 ];
+
+async function assertSharedOutput(output) {
+  const main = (await readdir(path.join(output, 'assets'))).find((name) =>
+    /^main-.*\.js$/.test(name)
+  );
+  assert.ok(main, 'shared main bundle exists');
+  const client = await readFile(path.join(output, 'assets', main));
+  assert.ok(client.length < 500_000, `main bundle: ${client.length} bytes`);
+  const home = new JSDOM(
+    await readFile(path.join(output, 'index.html'), 'utf8')
+  ).window.document;
+  assert.deepEqual(
+    [...home.querySelectorAll('a')].map((a) => a.getAttribute('href')),
+    ['./en/', './ru/']
+  );
+}
 
 test(
   'Vite emits all pre-rendered entries and deployable assets for /ui/',
@@ -114,6 +130,7 @@ test(
         assert.ok(!stderr.includes(TRACE_PREFIX), stderr);
       }
       trace.start('verify output');
+      await assertSharedOutput(output);
       assert.equal(process.env.NODE_ENV, environment);
       assert.equal(getKind('button'), button);
       for (const language of ['en', 'ru']) {
@@ -159,13 +176,6 @@ test(
           }
         }
       }
-      const home = new JSDOM(
-        await readFile(path.join(output, 'index.html'), 'utf8')
-      ).window.document;
-      assert.deepEqual(
-        [...home.querySelectorAll('a')].map((a) => a.getAttribute('href')),
-        ['./en/', './ru/']
-      );
       trace.end('verify output');
     } finally {
       clearTimeout(deadline);
