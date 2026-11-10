@@ -1,4 +1,4 @@
-import { merge, diff } from '@link-foundation/ui-settings';
+import { merge, diff, countCustomized } from '@link-foundation/ui-settings';
 import { createSavedLooks } from './saved-looks.js';
 import { refreshPanel } from './panel-refresh.js';
 import { createRows, createPanelHeader } from './panel-rows.js';
@@ -29,6 +29,7 @@ export function createSettingsPanel(schema, options = {}) {
   let values = initialValues(schema, options);
   const tabs = { ...options.tabs };
   let level = options.level;
+  const sectionLevels = { ...options.sectionLevels };
   let peeking = false;
   let opener;
   let destroyed = false;
@@ -41,7 +42,7 @@ export function createSettingsPanel(schema, options = {}) {
     onSearch: () => refresh(false),
   });
   const close = () => {
-    endPeek();
+    toolbar.endPeek();
     element.hidden = true;
     opener?.focus();
   };
@@ -56,48 +57,48 @@ export function createSettingsPanel(schema, options = {}) {
     getValues: () => values,
     isPeeking: () => peeking,
   };
-  const {
-    presets,
-    peek,
-    endPeek,
-    destroy: stopToolbar,
-  } = createToolbar({
+  const toolbar = createToolbar({
     ...context,
     setPeek(value) {
       peeking = value;
       refresh();
     },
   });
-  const { rows, sections } = createRows({ ...context, setTab, id });
-  const { changes, status, importText, exportText } = createSharing({
+  const { rows, sections, chromes } = createRows({
+    ...context,
+    setTab,
+    setSectionLevel,
+    id,
+  });
+  const { changes, status, importText, exportText, copy } = createSharing({
     ...context,
     isDestroyed: () => destroyed,
+    importLooks: (text) => saved.importLooks(text),
   });
-  const saved = createSavedLooks(context);
+  const saved = createSavedLooks({ ...context, status, copy });
   function setTab(section, tab) {
     tabs[section] = tab;
+    refresh();
+  }
+  function setSectionLevel(section, next) {
+    sectionLevels[section] = next;
     refresh();
   }
   function refresh(updateControls = true) {
     refreshPanel(
       context,
-      { rows, sections, search, count, presets, peek, changes },
-      { values, peeking, tabs, level },
+      { rows, sections, chromes, search, count, ...toolbar, changes },
+      { values, peeking, tabs, level, sectionLevels },
       updateControls
     );
+    toolbar.updatePeek(peeking);
+    options.onChangedCount?.(countCustomized(schema, values));
   }
   function commit(changes) {
     if (destroyed || peeking) {
       return false;
     }
-    let result = merge(schema, values, changes);
-    if (!result.rejected.length && options.normalizeChanges) {
-      result = merge(
-        schema,
-        values,
-        options.normalizeChanges(result.values, changes)
-      );
-    }
+    const result = normalizeCommit(schema, values, changes, options);
     if (result.rejected.length) {
       messages.content(status, 'rejected', { keys: result.rejected });
       return false;
@@ -138,6 +139,8 @@ export function createSettingsPanel(schema, options = {}) {
     exportText,
     ...saved,
     setTab,
+    setSectionLevel,
+    changedCount: () => countCustomized(schema, values),
     setMessages(catalog) {
       messages.update(catalog);
       refresh();
@@ -153,16 +156,37 @@ export function createSettingsPanel(schema, options = {}) {
     },
     close,
     destroy() {
-      endPeek();
+      toolbar.endPeek();
       destroyed = true;
       unsubscribe?.();
-      stopToolbar();
+      toolbar.destroy();
+      saved.destroyLooks();
+      destroyControls(rows, chromes);
       doc.removeEventListener('keydown', escape);
-      for (const entry of rows.values()) {
-        entry.control.destroy();
-        entry.preview?.destroy?.();
-      }
       element.remove();
     },
   };
+}
+
+function normalizeCommit(schema, values, changes, options) {
+  let result = merge(schema, values, changes);
+  if (!result.rejected.length && options.normalizeChanges) {
+    result = merge(
+      schema,
+      values,
+      options.normalizeChanges(result.values, changes)
+    );
+  }
+  return result;
+}
+
+function destroyControls(rows, chromes) {
+  for (const chrome of chromes) {
+    chrome.preview?.destroy?.();
+    chrome.presets?.destroy();
+  }
+  for (const entry of rows.values()) {
+    entry.control.destroy();
+    entry.preview?.destroy?.();
+  }
 }

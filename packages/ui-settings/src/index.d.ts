@@ -26,6 +26,7 @@ export interface NormalizationPolicy {
 }
 
 export interface SettingField {
+  random?: { min?: number; max?: number } | 'not-heavier-than-default';
   normalization?: NormalizationPolicy;
   key: string;
   type: string;
@@ -46,6 +47,11 @@ export interface SettingField {
 }
 
 export interface SettingsSection {
+  'visible-when'?: unknown;
+  presets?: string[];
+  levels?: string[];
+  preview?: unknown;
+  extraHeight?: number;
   tabs?: string[];
   level?: string;
   id: string;
@@ -54,6 +60,7 @@ export interface SettingsSection {
 }
 
 export interface SettingsPreset {
+  partial?: boolean;
   id: string;
   label?: string;
   description?: string;
@@ -303,3 +310,12 @@ export function createSettingsCodec(
 };
 
 export function hexToChannels(hex: string): string;
+
+export function looksToLino(
+  schema: SettingsSchema,
+  looks: Record<string, SettingsValues>
+): string;
+export function looksFromLino(
+  schema: SettingsSchema,
+  text: string
+): { ok: boolean; looks: Record<string, SettingsValues> } | null;

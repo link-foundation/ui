@@ -25,7 +25,9 @@ test('six HIG galleries have accessible contrast, real targets and screenshot ev
     for (const mode of ['light', 'dark', 'high-contrast']) {
       const panel = page.locator(`#${variant}-${mode}`);
       const sizes = await panel
-        .locator('button, input:not([type="hidden"]), [role="slider"]')
+        .locator(
+          'button:visible, input:not([type="hidden"]):visible, [role="slider"]:visible'
+        )
         .evaluateAll((nodes) =>
           nodes.map((node) => {
             const box = node.getBoundingClientRect();

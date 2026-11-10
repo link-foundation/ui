@@ -1478,6 +1478,9 @@ backends to a single transactional snapshot. Assign it to
 [provider contract](../../docs/spec/network-providers.md) for cancellation,
 large decimal indexes, LiNo settings and host ownership.
 
+See the [settings gallery guide](../../docs/case-studies/issue-231/README.md)
+for balanced columns, preset cards, saved looks, colour popovers and cross-tab sync.
+
 ### Doublet configurations and gallery
 
 See [the configurations guide](CONFIGURATIONS.md) for exact enumeration,

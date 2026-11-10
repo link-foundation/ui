@@ -21,7 +21,7 @@ export const STORAGE_KEYS = Object.freeze({
  * @param {'user'|'session'} layer
  * @param {Pick<Storage, 'getItem'|'setItem'|'removeItem'>|undefined} storage
  * @param {string} [key]
- * @param {{ onDiagnostic?: (d: import('@link-foundation/ui-core').Diagnostic) => void }} [options]
+ * @param {{ sync?: boolean, eventTarget?: Window, onDiagnostic?: (d: import('@link-foundation/ui-core').Diagnostic) => void }} [options]
  * @returns {{ diagnostics: import('@link-foundation/ui-core').Diagnostic[], stop: () => void }}
  */
 export function persistLayer(config, layer, storage, key, options = {}) {
@@ -69,9 +69,10 @@ export function persistLayer(config, layer, storage, key, options = {}) {
     }
     result.diagnostics.forEach(report);
   }
+  let receiving = false;
   const against = LAYERS[layerIndex(layer) - 1];
   const save = (events) => {
-    if (!events.some((e) => e.layer === layer)) {
+    if (receiving || !events.some((e) => e.layer === layer)) {
       return;
     }
     try {
@@ -88,7 +89,38 @@ export function persistLayer(config, layer, storage, key, options = {}) {
     }
   };
   const stop = config.subscribe(save);
-  return { diagnostics, stop: () => void stop() };
+  const events = options.eventTarget ?? globalThis.window;
+  const receive = (event) => {
+    if (
+      (event.key !== storageKey && event.key !== null) ||
+      (event.storageArea && event.storageArea !== storage)
+    ) {
+      return;
+    }
+    receiving = true;
+    try {
+      if (event.newValue === null) {
+        config.clear(layer);
+      } else {
+        const result = config.loadLayer(layer, event.newValue);
+        result.diagnostics.forEach(report);
+      }
+    } finally {
+      receiving = false;
+    }
+  };
+  if (options.sync) {
+    events?.addEventListener('storage', receive);
+  }
+  return {
+    diagnostics,
+    stop() {
+      stop();
+      if (options.sync) {
+        events?.removeEventListener('storage', receive);
+      }
+    },
+  };
 }
 
 /** Keep the `user` layer in `localStorage` (or the given storage). */

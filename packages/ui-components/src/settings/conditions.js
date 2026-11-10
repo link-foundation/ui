@@ -25,17 +25,20 @@ export function matchesCondition(condition, values) {
     : Boolean(values[head]);
 }
 
-export function fieldVisible(
-  field,
-  values,
-  { tabs = {}, level } = {},
-  section
-) {
+export function fieldVisible(field, values, options = {}, section) {
   const props = field.props;
-  const tab = tabs[section?.id] ?? section?.tabs?.[0];
+  const { tab, level } = activeScope(options, section);
   return (
+    matchesCondition(section?.['visible-when'], values) &&
     matchesCondition(props['visible-when'], values) &&
     (!props.tab || !tab || props.tab === tab) &&
     (!props.level || !level || props.level === level)
   );
+}
+
+function activeScope({ tabs = {}, level, sectionLevels = {} }, section) {
+  return {
+    tab: tabs[section?.id] ?? section?.tabs?.[0],
+    level: sectionLevels[section?.id] ?? level ?? section?.levels?.[0],
+  };
 }

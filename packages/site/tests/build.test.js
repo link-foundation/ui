@@ -20,14 +20,15 @@ const vite = path.join(
 test(
   'Vite emits all pre-rendered entries and deployable assets for /ui/',
   { timeout: 60_000 },
-  async () => {
+  async (t) => {
     const output = await mkdtemp(path.join(tmpdir(), 'ui-site-build-'));
     const environment = process.env.NODE_ENV;
     const button = getKind('button');
     try {
       // Vite changes NODE_ENV and the site registers kinds. Keep both out of
       // Bun/Deno's shared test process so other renderer tests retain defaults.
-      await promisify(execFile)(
+      const started = Date.now();
+      const build = promisify(execFile)(
         'node',
         [
           vite,
@@ -41,8 +42,34 @@ test(
           '--logLevel',
           'silent',
         ],
-        { cwd: site, env: { ...process.env, NODE_ENV: 'production' } }
+        {
+          cwd: site,
+          env: { ...process.env, NODE_ENV: 'production' },
+          signal: t.signal,
+        }
       );
+      const trace = (event) => {
+        if (process.env.SITE_BUILD_TRACE === '1') {
+          console.error(
+            `[site-build] child ${event}: ${Date.now() - started}ms`
+          );
+        }
+      };
+      build.child.on('exit', () => trace('exit'));
+      build.child.on('close', () => trace('close'));
+      const closed = new Promise((resolve) =>
+        build.child.once('close', resolve)
+      );
+      try {
+        const { stderr } = await build;
+        if (process.env.SITE_BUILD_TRACE === '1') {
+          console.error(stderr);
+        }
+      } finally {
+        // execFile rejects on abort before the child has actually exited.
+        // Reap it before removing the output directory, including on timeout.
+        await closed;
+      }
       assert.equal(process.env.NODE_ENV, environment);
       assert.equal(getKind('button'), button);
       for (const language of ['en', 'ru']) {
