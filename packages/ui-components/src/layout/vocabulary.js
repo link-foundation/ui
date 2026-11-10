@@ -142,6 +142,52 @@ app-bar: kind
     enum surface primary
   property style element-ref
   children any
+nav-strip: kind
+  property label string
+  property active string
+  property wrap-below dimension
+  children any
+
+section-nav: kind
+  property label string
+  property active string
+  property wrap-below dimension
+  property back-to-top string
+  property back-label string
+  children any
+
+nav-link: kind
+  positional label
+  property label string
+  property href string
+  property external boolean
+  children none
+
+link-cards: kind
+  property min dimension
+  children any
+
+link-card: kind
+  positional title
+  property title string
+  property label string
+  property summary string
+  property glyph string
+  property icon string
+  property href string
+  property external boolean
+  children none
+
+titled-section: kind
+  positional title
+  property title string
+  property kicker string
+  property level number
+  children any
+
+pref-switches: kind
+  children none
+
 `;
 
 /** The common properties of the dialect (`note`), declared on every kind. */

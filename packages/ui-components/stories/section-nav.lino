@@ -1,0 +1,9 @@
+section-nav-stories: stories
+  component section-nav
+  story default
+    section-nav
+      label Sections
+      back-to-top '#introduction'
+      back-label 'Back to top'
+      intro-link: nav-link Introduction
+        href '#introduction'

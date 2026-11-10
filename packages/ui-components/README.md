@@ -727,6 +727,9 @@ The gallery `examples/layout.html` (served with
 `node scripts/serve-static.mjs`) shows every kind; its Playwright spec is
 `tests/e2e/layout.spec.js`.
 
+Page links, section navigation, titled sections, whole-link card grids and
+quick preference controls are described in [Page navigation and quick preferences](src/layout/README.md).
+
 ### Layout kinds
 
 | Kind        | Example                                                                                        | What it does                                                                                                                                                                                  |

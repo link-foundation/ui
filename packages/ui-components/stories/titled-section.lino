@@ -1,0 +1,7 @@
+titled-section-stories: stories
+  component titled-section
+  story default
+    titled-section Introduction
+      kicker Welcome
+      level 2
+      body: text 'A section of a page.'

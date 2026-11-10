@@ -1,0 +1,9 @@
+link-cards-stories: stories
+  component link-cards
+  story default
+    link-cards
+      min 240px
+      docs-card: link-card Documentation
+        href /docs
+        glyph '↗'
+        summary 'Learn the framework.'
