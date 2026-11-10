@@ -16,7 +16,15 @@ function direction(pair, id, positions, o) {
   const incoming = s && s !== id ? unit(sub(m, positions.get(s))) : null;
   const outgoing = t && t !== id ? unit(sub(positions.get(t), m)) : null;
   if (incoming && outgoing) {
-    return unit(add(incoming, outgoing), rotate(incoming, 90));
+    // Cancelled chords (both references on one side, as in `2 2` and `1 1`)
+    // turn a quarter from the chord that runs from the higher ID to the lower
+    // one, so links that reference each other share a single middle direction.
+    const [high, low] = s > id ? [s, id] : [id, s];
+    const across = rotate(
+      unit(sub(positions.get(low), positions.get(high))),
+      90
+    );
+    return unit(add(incoming, outgoing), across);
   }
   if (incoming || outgoing) {
     return rotate(incoming ?? outgoing, o.bulge);
@@ -26,13 +34,25 @@ function direction(pair, id, positions, o) {
 function endDirection(chord, tangent, o, side, same, turn) {
   const a = (Math.atan2(chord.y, chord.x) * 180) / Math.PI;
   const mid = (Math.atan2(tangent.y, tangent.x) * 180) / Math.PI;
+  // The mirror end (a lens for two references to one link), in degrees from
+  // the chord. Fixed angles turn the chord to the same side as this mirror.
+  const offset = a - mid;
+  const mirror = same
+    ? Math.sin((offset * Math.PI) / 180) < 0
+      ? -45
+      : 45
+    : offset;
   if (o.angles === 'mirror') {
-    return rotate(chord, (same ? (side === 0 ? -45 : 45) : a - mid) + turn);
+    return rotate(chord, mirror + turn);
   }
-  const aligned = Math.abs(chord.x * tangent.y - chord.y * tangent.x) < 1e-10;
+  const across = chord.x * tangent.y - chord.y * tangent.x;
+  if (Math.abs(across) < 1e-10) {
+    return rotate(chord, turn);
+  }
+  const toward = Math.sin((mirror * Math.PI) / 180) < 0 ? -1 : 1;
   return rotate(
     chord,
-    (aligned ? 0 : side === 0 ? o.sourceAngle : -o.targetAngle) + turn
+    toward * (side === 0 ? o.sourceAngle : o.targetAngle) + turn
   );
 }
 function half({ m, dir, ref, id, side, pair, positions, o, turn, n }) {
@@ -92,7 +112,10 @@ export function doubletCurves(pairs, positions, o) {
         n: pairs.length,
       })
     );
-    return { id, middle: m, direction: dir, path };
+    // Ends at another link's middle; their start/end gaps back off along the
+    // end tangent when fitted.
+    const references = pair.map((ref) => ref !== 0 && ref !== id);
+    return { id, middle: m, direction: dir, path, references };
   });
   bendOverlaps(curves, pairs, o);
   return curves;
