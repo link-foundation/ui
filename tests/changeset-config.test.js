@@ -94,6 +94,69 @@ function writeWorkspaceFixture(cwd) {
   return { packageDir, pkg };
 }
 
+function prepareReleaseFixture() {
+  const cwd = mkdtempSync(join(tmpdir(), 'changeset-version-'));
+  const dependencies = join(cwd, 'node_modules');
+  const links = [
+    join(dependencies, '@changesets/cli'),
+    join(dependencies, 'prettier'),
+  ];
+  for (const file of [
+    'package.json',
+    // Changesets detects npm workspaces through the npm lock file.
+    'package-lock.json',
+    'deno.json',
+    'deno.lock',
+    '.prettierrc',
+  ]) {
+    copyFileSync(file, join(cwd, file));
+  }
+  mkdirSync(join(cwd, '.changeset'));
+  copyFileSync('.changeset/config.json', join(cwd, '.changeset/config.json'));
+  // Match the Linux release runner even when the checkout uses Windows CRLF.
+  const manifest = readFileSync(join(cwd, 'package.json'), 'utf8').replaceAll(
+    '\r\n',
+    '\n'
+  );
+  writeFileSync(join(cwd, 'package.json'), manifest);
+  const rootVersion = JSON.parse(manifest).version;
+  const { packageDir, pkg } = writeWorkspaceFixture(cwd);
+  // Deno's automatic installation does not promise npm-style bin links.
+  // Give npm a minimal local tree with the actual installed CLI/formatter.
+  mkdirSync(join(dependencies, '@changesets'), { recursive: true });
+  for (const link of links) {
+    const relative = link.slice(dependencies.length + 1);
+    symlinkSync(resolve('node_modules', relative), link, 'junction');
+  }
+  createPrettierBins(dependencies);
+  const env = { ...process.env };
+  const pathKey = Object.keys(env).find((key) => key.toUpperCase() === 'PATH');
+  assert.ok(pathKey, 'The release fixture needs Node and npm on PATH');
+  env[pathKey] = env[pathKey]
+    .split(delimiter)
+    .filter(
+      (dir) =>
+        !['deno', 'deno.exe', 'deno.cmd'].some((name) =>
+          existsSync(join(dir, name))
+        )
+    )
+    .join(delimiter);
+  assert.equal(spawnSync('deno', ['--version'], { env }).error?.code, 'ENOENT');
+  // Keep every temporary file of the nested npx run inside the fixture.
+  const fixtureTmp = join(cwd, 'tmp');
+  mkdirSync(fixtureTmp);
+  return {
+    cwd,
+    links,
+    env,
+    manifest,
+    rootVersion,
+    packageDir,
+    pkg,
+    fixtureTmp,
+  };
+}
+
 describe('Changesets release formatter', () => {
   it('uses the same formatter as the project formatting check', () => {
     expect(config.format).toBe('prettier');
@@ -121,66 +184,18 @@ describe('Changesets release formatter', () => {
   itUnless(sandboxed)(
     'versions and formats the real package with Deno absent from PATH',
     async () => {
-      const cwd = mkdtempSync(join(tmpdir(), 'changeset-version-'));
-      const dependencies = join(cwd, 'node_modules');
-      const links = [
-        join(dependencies, '@changesets/cli'),
-        join(dependencies, 'prettier'),
-      ];
+      const {
+        cwd,
+        links,
+        env,
+        manifest,
+        rootVersion,
+        packageDir,
+        pkg,
+        fixtureTmp,
+      } = prepareReleaseFixture();
       let failure;
       try {
-        for (const file of [
-          'package.json',
-          // Changesets detects npm workspaces through the npm lock file.
-          'package-lock.json',
-          'deno.json',
-          'deno.lock',
-          '.prettierrc',
-        ]) {
-          copyFileSync(file, join(cwd, file));
-        }
-        mkdirSync(join(cwd, '.changeset'));
-        copyFileSync(
-          '.changeset/config.json',
-          join(cwd, '.changeset/config.json')
-        );
-        // Match the Linux release runner even when the checkout uses Windows CRLF.
-        const manifest = readFileSync(
-          join(cwd, 'package.json'),
-          'utf8'
-        ).replaceAll('\r\n', '\n');
-        writeFileSync(join(cwd, 'package.json'), manifest);
-        const rootVersion = JSON.parse(manifest).version;
-        const { packageDir, pkg } = writeWorkspaceFixture(cwd);
-        // Deno's automatic installation does not promise npm-style bin links.
-        // Give npm a minimal local tree with the actual installed CLI/formatter.
-        mkdirSync(join(dependencies, '@changesets'), { recursive: true });
-        for (const link of links) {
-          const relative = link.slice(dependencies.length + 1);
-          symlinkSync(resolve('node_modules', relative), link, 'junction');
-        }
-        createPrettierBins(dependencies);
-        const env = { ...process.env };
-        const pathKey = Object.keys(env).find(
-          (key) => key.toUpperCase() === 'PATH'
-        );
-        assert.ok(pathKey, 'The release fixture needs Node and npm on PATH');
-        env[pathKey] = env[pathKey]
-          .split(delimiter)
-          .filter(
-            (dir) =>
-              !['deno', 'deno.exe', 'deno.cmd'].some((name) =>
-                existsSync(join(dir, name))
-              )
-          )
-          .join(delimiter);
-        assert.equal(
-          spawnSync('deno', ['--version'], { env }).error?.code,
-          'ENOENT'
-        );
-        // Keep every temporary file of the nested npx run inside the fixture.
-        const fixtureTmp = join(cwd, 'tmp');
-        mkdirSync(fixtureTmp);
         const budgetMs = HANG_GUARD_MS;
         let commandIndex = 0;
         const run = async (file, args) => {
