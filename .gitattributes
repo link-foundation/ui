@@ -1,6 +1,8 @@
 # Shell scripts and Git hooks require LF on every platform.
 *.sh text eol=lf
 .husky/** text eol=lf
+kotlin/gradlew text eol=lf
+kotlin/gradlew.bat text eol=crlf
 
 # LiNo documents are parser inputs: docs/spec/parser-vectors.json records their
 # exact bytes (inputs, lines and columns), and the spec samples must equal the
