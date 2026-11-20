@@ -144,7 +144,7 @@ height data. Frame title/size observation reads only the embedding DOM.
 
 Provider references: [X factory](https://developer.x.com/en/docs/x-for-websites/embedded-tweets/javascript-factory-function),
 [Telegram post widget](https://core.telegram.org/widgets/post),
-[VK post widget](https://dev.vk.com/ru/widgets/post).
+[VK post widget (archived)](https://web.archive.org/web/20260415094236/https://dev.vk.com/ru/widgets/post).
 
 ## Verification
 
