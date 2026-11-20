@@ -1,5 +1,11 @@
 # @link-foundation/ui-react-native
 
+## 0.1.1
+
+### Patch Changes
+
+- a31aaa2: Smoke-test the pure `/map` entry after publishing. The package root imports the optional `react-native` peer, so it cannot be imported in a plain Node consumer workspace.
+
 ## 0.1.0
 
 ### Minor Changes
