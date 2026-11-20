@@ -55,6 +55,31 @@ function runCheckChangesets(root) {
 
 describe('check-changesets CLI', () => {
   itUnless(sandboxed)(
+    'reports no pending changesets when only released checkout metadata remains',
+    () => {
+      const root = createFixture();
+
+      try {
+        for (const file of ['README.md', 'config.json']) {
+          writeFileSync(
+            path.join(root, '.changeset', file),
+            readFileSync(path.join('.changeset', file), 'utf8')
+          );
+        }
+
+        const { outputFile, result } = runCheckChangesets(root);
+
+        expect(result.status).toBe(0);
+        expect(readFileSync(outputFile, 'utf8')).toBe(
+          'has_changesets=false\nchangeset_count=0\n'
+        );
+      } finally {
+        rmSync(root, { force: true, recursive: true });
+      }
+    }
+  );
+
+  itUnless(sandboxed)(
     'ignores stray Markdown files without valid changeset frontmatter',
     () => {
       const root = createFixture();

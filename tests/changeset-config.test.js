@@ -281,17 +281,30 @@ describe('Changesets release formatter', () => {
 });
 
 describe('credential-free PR release versioning', () => {
-  it('checks the fresh merge in the independent lint job and discards changes', () => {
+  it('only runs offline versioning when the fresh merge has pending changesets', () => {
     const workflow = readFileSync('.github/workflows/release.yml', 'utf8');
     const lint = workflow.split('\n  lint:')[1].split('\n  test:')[0];
+    const detect = lint.indexOf('Check for pending changesets (PR only)');
+    const version = lint.indexOf('Dry-run release versioning (PR only)');
+    const eslint = lint.indexOf('Run ESLint');
     expect(lint).toContain('needs: [detect-changes]');
-    expect(lint).toContain('Dry-run release versioning');
-    expect(lint).toContain('npm run changeset:version');
-    expect(lint).toContain(
-      "trap 'git restore --source=HEAD --staged --worktree -- .' EXIT"
+    expect(detect).toBeGreaterThan(lint.indexOf('Simulate fresh merge'));
+    expect(version).toBeGreaterThan(detect);
+    expect(eslint).toBeGreaterThan(version);
+    expect(lint.indexOf('Check formatting')).toBeGreaterThan(eslint);
+    const detection = lint.slice(detect, version);
+    expect(detection).toContain('id: pending_changesets');
+    expect(detection).toContain("if: github.event_name == 'pull_request'");
+    expect(detection).toContain('run: node scripts/check-changesets.mjs');
+    const dryRun = lint.slice(version, eslint);
+    expect(dryRun).toContain(
+      "if: github.event_name == 'pull_request' && steps.pending_changesets.outputs.has_changesets == 'true'"
     );
-    expect(lint.indexOf('Dry-run release versioning')).toBeGreaterThan(
-      lint.indexOf('Simulate fresh merge')
+    expect(dryRun).toContain("npm_config_offline: 'true'");
+    expect(dryRun).toContain("npm_config_ignore_scripts: 'true'");
+    expect(dryRun).toContain('npm run changeset:version');
+    expect(dryRun).toContain(
+      "trap 'git restore --source=HEAD --staged --worktree -- .' EXIT"
     );
   });
 });
