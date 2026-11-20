@@ -7,7 +7,8 @@ import XCTest
 
 final class ActionTests: XCTestCase {
     func testPressingOkSendsTheNavigateAction() throws {
-        let text = try readText(repositoryRoot.appendingPathComponent("docs/case-studies/issue-1/samples/document.lino"))
+        let text = try readText(
+            repositoryRoot.appendingPathComponent("docs/case-studies/issue-1/samples/document.lino"))
         let ok = RenderTree(lino: text).node(id: "ok")!
         var received: [UiAction] = []
         ok.fire("press") { received.append($0) }
@@ -29,7 +30,8 @@ final class ActionTests: XCTestCase {
     }
 
     func testStringsAreNeverExecuted() {
-        let tree = RenderTree(lino: "(bad: button Bad (on press 'alert(1)'))\n(run: button Run (on press (eval 'alert(1)')))")
+        let tree = RenderTree(
+            lino: "(bad: button Bad (on press 'alert(1)'))\n(run: button Run (on press (eval 'alert(1)')))")
         XCTAssertEqual(tree.node(id: "bad")!.handlers, [])
         XCTAssertEqual(tree.node(id: "run")!.handlers, [])
         XCTAssertEqual(Set(tree.diagnostics.map(\.code)), ["invalid-handler", "unknown-action"])
@@ -38,16 +40,21 @@ final class ActionTests: XCTestCase {
     func testSeveralActionsRunInOrder() throws {
         let fixture = fixturesDirectory.appendingPathComponent("behaviour/several-actions.lino")
         let save = RenderTree(lino: try readText(fixture)).node(id: "save")!
-        XCTAssertEqual(save.fire("press").map(\.action), [
-            ["set", "status", "value", "Saving"], ["emit", "save"], ["toggle", "menu", "open"], ["focus", "status"],
-        ])
+        XCTAssertEqual(
+            save.fire("press").map(\.action),
+            [
+                ["set", "status", "value", "Saving"], ["emit", "save"], ["toggle", "menu", "open"],
+                ["focus", "status"],
+            ])
     }
 
     func testSafeNavigationIsKept() throws {
         let fixture = fixturesDirectory.appendingPathComponent("behaviour/navigate.lino")
         let docs = RenderTree(lino: try readText(fixture)).node(id: "docs-link")!
-        XCTAssertEqual(docs.fire("press"), [
-            UiAction(source: "docs-link", event: "press", action: ["navigate", "https://example.com/docs"])
-        ])
+        XCTAssertEqual(
+            docs.fire("press"),
+            [
+                UiAction(source: "docs-link", event: "press", action: ["navigate", "https://example.com/docs"])
+            ])
     }
 }

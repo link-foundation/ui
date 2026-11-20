@@ -56,11 +56,12 @@ private func isTypedReference(_ value: UiValue) -> Bool {
 private func isFunctionalColor(_ items: [UiValue]) -> Bool {
     guard let space = items.first?.atom, ["oklch", "rgb"].contains(space) else { return false }
     let channels = items.dropFirst()
-    return [3, 4].contains(channels.count) && channels.allSatisfy { channel in
-        guard var text = channel.atom else { return false }
-        if text.hasSuffix("%") { text.removeLast() }
-        return isUiNumber(text)
-    }
+    return [3, 4].contains(channels.count)
+        && channels.allSatisfy { channel in
+            guard var text = channel.atom else { return false }
+            if text.hasSuffix("%") { text.removeLast() }
+            return isUiNumber(text)
+        }
 }
 
 /// Whether a value fits a vocabulary type (values.md).
@@ -93,7 +94,9 @@ func checkValues(_ document: UiDocument, _ vocabulary: UiVocabulary) -> [UiDiagn
     func visit(_ element: UiNode) {
         let spec = element.kind.flatMap { vocabulary.kinds[$0] }
         for property in element.properties {
-            let at: [String: UiDiagnosticValue] = ["element": UiDiagnosticValue(element.id), "property": .string(property.name)]
+            let at: [String: UiDiagnosticValue] = [
+                "element": UiDiagnosticValue(element.id), "property": .string(property.name),
+            ]
             guard let type = spec?.properties[property.name]?.type else { continue }
             if type == .atom("action") {
                 diagnostics += handlerDiagnostics(property.values, vocabulary).map {
@@ -107,7 +110,9 @@ func checkValues(_ document: UiDocument, _ vocabulary: UiVocabulary) -> [UiDiagn
             }
         }
         if let spec, spec.children == .atom("none"), !element.children.isEmpty {
-            diagnostics.append(UiDiagnostic(code: "unexpected-child", severity: .warning, at: ["element": UiDiagnosticValue(element.id)]))
+            diagnostics.append(
+                UiDiagnostic(
+                    code: "unexpected-child", severity: .warning, at: ["element": UiDiagnosticValue(element.id)]))
         }
         element.children.forEach(visit)
     }

@@ -1,142 +1,51 @@
 name: Swift
 
-# The Swift Links Notation parser (native/swift/LinksNotation, issue #29) and
-# the SwiftUI renderer (packages/ui-swift, issue #30, the root Package.swift):
-# `swift test` on Linux, in the official Swift image, and on macOS. The tests
-# read docs/spec (parser vectors, fixtures, vocabulary), so the spec triggers
-# them too. On Linux the root package is the parser and UiSwiftCore; on macOS
-# it also builds UiSwiftUI and the UiDemo app, whose light and dark
-# screenshots are uploaded as the `ui-swift-screenshots` artifact.
+# Keep the workflow visible when Swift can be skipped. The reusable lane
+# classifies changed paths before installing a toolchain or compiling.
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'native/swift/**'
-      - 'packages/ui-swift/**'
-      - 'examples/swift/**'
-      - 'Package.swift'
-      - 'docs/spec/**'
-      - 'docs/case-studies/issue-1/samples/**'
-      - '.github/workflows/swift.yml'
-      - '.github/actions/artifact-transport/**'
   pull_request:
-    types: [opened, synchronize, reopened]
-    paths:
-      - 'native/swift/**'
-      - 'packages/ui-swift/**'
-      - 'examples/swift/**'
-      - 'Package.swift'
-      - 'docs/spec/**'
-      - 'docs/case-studies/issue-1/samples/**'
-      - '.github/workflows/swift.yml'
-      - '.github/actions/artifact-transport/**'
+  merge_group:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '19 4 * * 1'
   workflow_dispatch:
 
-# Least-privilege default; these jobs only need to read the checked-out tree.
 permissions:
   contents: read
 
-# Provide Git config to actions/checkout itself; checkout runs git init before
-# any workflow step can configure Git.
-env:
-  GIT_CONFIG_COUNT: '1'
-  GIT_CONFIG_KEY_0: init.defaultBranch
-  GIT_CONFIG_VALUE_0: main
-
 jobs:
-  swift-linux:
-    name: swift test (Linux)
-    runs-on: ubuntu-24.04
-    container:
-      # The official image (hub.docker.com/_/swift), pinned to a digest.
-      image: swift@sha256:bca121f6eb59fd80340d1296887b2698ed8f3eb9eca7d80c181f8af769dc7ee0 # 6.4-noble
-    # Typical run: ~2min (image pull, debug build, tests). 15min stops a hung
-    # build from blocking the run.
-    timeout-minutes: 15
-    concurrency:
-      group: check-${{ github.workflow }}-${{ github.ref }}-swift-linux
-      cancel-in-progress: true
-    permissions:
-      contents: read
-    # Container jobs run `run:` blocks with sh, which has no [[ ]].
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
+  root:
+    uses: ./.github/workflows/swift-ci.yml
+    with:
+      mode: embedded
+      pipeline-directory: swift/ci
+      package-directory: '.'
+      source-paths: |
+        Package.swift
+        Package.resolved
+        native/swift/LinksNotation
+        packages/ui-swift
+        examples/swift
+        docs/spec
+        docs/case-studies/issue-1/samples
 
-      # The container user (root) does not own the runner's workspace.
-      - name: Trust the checkout
-        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
-
-      - name: Show the toolchain
-        run: swift --version
-
-      - name: swift test
-        working-directory: native/swift/LinksNotation
-        run: swift test
-
-  swift-macos:
-    name: swift test (macOS)
-    runs-on: macos-15
-    # Typical run: ~3min (debug build, tests). 20min stops a hung build from
-    # blocking the run.
-    timeout-minutes: 20
-    concurrency:
-      group: check-${{ github.workflow }}-${{ github.ref }}-swift-macos
-      cancel-in-progress: true
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-
-      - name: Show the toolchain
-        run: swift --version
-
-      - name: swift test
-        working-directory: native/swift/LinksNotation
-        run: swift test
-
-  ui-swift-linux:
-    name: ui-swift core (Linux)
-    runs-on: ubuntu-24.04
-    container:
-      image: swift@sha256:bca121f6eb59fd80340d1296887b2698ed8f3eb9eca7d80c181f8af769dc7ee0 # 6.4-noble
-    # Typical run: ~3min (image pull, debug build of the parser and
-    # UiSwiftCore, tests). 15min stops a hung build from blocking the run.
-    timeout-minutes: 15
-    concurrency:
-      group: check-${{ github.workflow }}-${{ github.ref }}-ui-swift-linux
-      cancel-in-progress: true
-    permissions:
-      contents: read
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-
-      - name: Trust the checkout
-        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
-
-      - name: swift build
-        run: swift build
-
-      - name: swift test
-        run: swift test
+  parser:
+    uses: ./.github/workflows/swift-ci.yml
+    with:
+      mode: embedded
+      pipeline-directory: swift/ci
+      package-directory: native/swift/LinksNotation
+      source-paths: |
+        native/swift/LinksNotation
+        docs/spec
 
   ui-swift-macos:
-    name: ui-swift (macOS)
+    name: UiDemo render and screenshots (macOS)
+    needs: root
+    if: github.event_name != 'schedule' && needs.root.outputs.swift == 'true'
     runs-on: macos-15
-    # Typical run: ~6min (debug build of UiSwiftUI and UiDemo, tests, two
-    # screenshots). 30min stops a hung build or app from blocking the run.
+    # Bound the demo build and capture of both appearances.
     timeout-minutes: 30
     concurrency:
       group: check-${{ github.workflow }}-${{ github.ref }}-ui-swift-macos
@@ -146,19 +55,22 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          fetch-depth: 0
           persist-credentials: false
 
-      - name: Show the toolchain
-        run: swift --version
+      - name: Materialize the validated tree
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CI_BASE: ${{ needs.root.outputs.base }}
+        run: bash swift/ci/checkout-base.sh
 
-      - name: swift build
-        run: swift build
-
-      - name: swift test
-        run: swift test
+      - uses: tryswift/setup-swift@ce5fe39afee72fd792fabab6db8ec3005962daf7 # v1.2.0
+        with:
+          swift-version: '6.4.1'
+          use-preinstalled: 'true'
 
       - name: Render tree of the issue-1 sample
-        run: swift run UiDemo --dump
+        run: swift run -j 2 UiDemo --dump
 
       # The app quits by itself once the window is captured; the alarm (perl
       # ships with macOS, GNU timeout does not) stops it if it never draws.
@@ -168,6 +80,7 @@ jobs:
           for appearance in light dark; do
             perl -e 'alarm 120; exec @ARGV' .build/debug/UiDemo --appearance "$appearance" \
               --screenshot "ui-swift-screenshots/uidemo-$appearance.png"
+            test -s "ui-swift-screenshots/uidemo-$appearance.png"
           done
           file ui-swift-screenshots/*.png
 
@@ -199,9 +112,8 @@ jobs:
     if: >-
       !cancelled()
     needs:
-      - swift-linux
-      - swift-macos
-      - ui-swift-linux
+      - root
+      - parser
       - ui-swift-macos
     steps:
       - uses: actions/checkout@v7

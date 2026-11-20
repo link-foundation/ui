@@ -1,2 +1,10 @@
 #!/usr/bin/env sh
+set -e
+
+set -- Package.swift ':(glob)native/swift/LinksNotation/**/*.swift' \
+  ':(glob)packages/ui-swift/**/*.swift' ':(glob)examples/swift/**/*.swift'
+if ! git diff --cached --quiet -- "$@"; then
+  python3 swift/ci/check_swift.py --staged "$@"
+fi
+
 npx lint-staged --config package.json

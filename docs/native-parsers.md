@@ -127,14 +127,10 @@ cd native/swift/LinksNotation && swift test
   syntax errors, each with the exact line, column and message, plus depth
   errors and invalid literals.
 
-The [Swift workflow](../.github/workflows/swift.yml) runs `swift test` on
-Linux, in the official `swift` image pinned by digest, and on macOS. It runs
-whenever `native/swift/**` or `docs/spec/**` changes. The same workflow
-builds and tests the root `Package.swift` (the renderer of #30) on Linux and
-macOS. The issue asked for
-`ubuntu-latest` and `macos-latest`, but the repository's CI policy
-(`scripts/check-ci-workflows.mjs`) requires pinned runner images, so the
-workflow uses `ubuntu-24.04` and `macos-15`.
+The [Swift workflow](../.github/workflows/swift.yml) qualifies the standalone
+parser and the root renderer package on Ubuntu 24.04 and macOS 15. The
+[embedded Swift CI guide](../swift/ci/README.md) describes the inputs and
+formatting checks.
 
 ## Kotlin
 

@@ -18,7 +18,9 @@ public struct UiHandler: Equatable, Sendable {
 }
 
 /// The handlers of an element, with the diagnostics of the dropped ones.
-public func uiHandlers(of node: UiNode, vocabulary: UiVocabulary = .standard) -> (handlers: [UiHandler], diagnostics: [UiDiagnostic]) {
+public func uiHandlers(of node: UiNode, vocabulary: UiVocabulary = .standard) -> (
+    handlers: [UiHandler], diagnostics: [UiDiagnostic]
+) {
     var handlers: [UiHandler] = []
     var diagnostics: [UiDiagnostic] = []
     let at: [String: UiDiagnosticValue] = ["element": UiDiagnosticValue(node.id), "property": "on"]

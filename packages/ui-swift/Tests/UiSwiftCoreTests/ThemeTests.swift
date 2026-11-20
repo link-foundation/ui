@@ -39,11 +39,13 @@ final class ThemeTests: XCTestCase {
     func testMissingTokenIsADiagnosticNotACrash() {
         let tree = RenderTree(lino: "(body: stack (gap (token space.huge)))")
         XCTAssertNil(tree.roots[0].prop("spacing"))
-        XCTAssertEqual(tree.diagnostics, [
-            UiDiagnostic(
-                code: "unresolved-token", severity: .warning,
-                at: ["element": "body", "property": "gap", "token": "space.huge"])
-        ])
+        XCTAssertEqual(
+            tree.diagnostics,
+            [
+                UiDiagnostic(
+                    code: "unresolved-token", severity: .warning,
+                    at: ["element": "body", "property": "gap", "token": "space.huge"])
+            ])
     }
 
     func testFallbackTakesTheFirstThatResolves() {
@@ -55,10 +57,11 @@ final class ThemeTests: XCTestCase {
     }
 
     func testRuntimeThemeOverridesAndExtends() throws {
-        let theme = try UiTheme(lino: """
-            (compact: theme (extends material3) (token space.medium 8px) (token space.small (token space.medium)))
-            (material3: theme (token color.primary '#000000'))
-            """)
+        let theme = try UiTheme(
+            lino: """
+                (compact: theme (extends material3) (token space.medium 8px) (token space.small (token space.medium)))
+                (material3: theme (token color.primary '#000000'))
+                """)
         XCTAssertEqual(theme.active, "compact")
         XCTAssertEqual(theme.lookup("space.medium"), .atom("8px"))
         XCTAssertEqual(theme.lookup("color.primary"), .atom("#000000"), "the extended set comes before the base")
@@ -68,12 +71,15 @@ final class ThemeTests: XCTestCase {
     }
 
     func testCycleIsADiagnosticNotACrash() throws {
-        let theme = try UiTheme(document: UiDocument(elements: [
-            UiNode(id: "loop", kind: "theme", properties: [
-                UiProp(name: "token", values: [.atom("a"), .list([.atom("token"), .atom("b")])]),
-                UiProp(name: "token", values: [.atom("b"), .list([.atom("token"), .atom("a")])]),
-            ])
-        ]))
+        let theme = try UiTheme(
+            document: UiDocument(elements: [
+                UiNode(
+                    id: "loop", kind: "theme",
+                    properties: [
+                        UiProp(name: "token", values: [.atom("a"), .list([.atom("token"), .atom("b")])]),
+                        UiProp(name: "token", values: [.atom("b"), .list([.atom("token"), .atom("a")])]),
+                    ])
+            ]))
         let resolution = theme.resolve(.list([.atom("token"), .atom("a")]), element: "x", property: "gap")
         XCTAssertNil(resolution.value)
         XCTAssertEqual(resolution.diagnostics.map(\.code), ["reference-cycle"])

@@ -66,10 +66,10 @@ indirect enum JSON: Equatable, CustomStringConvertible {
         case let text as String: self = .string(text)
         case let number as NSNumber:
             #if canImport(Darwin)
-                if CFGetTypeID(number) == CFBooleanGetTypeID() {
-                    self = .bool(number.boolValue)
-                    return
-                }
+            if CFGetTypeID(number) == CFBooleanGetTypeID() {
+                self = .bool(number.boolValue)
+                return
+            }
             #endif
             self = .number(number.doubleValue)
         case let array as [Any]: self = .array(array.map(JSON.init(any:)))
@@ -124,9 +124,10 @@ extension JSON {
             "id": node.id.map(JSON.string) ?? .null,
             "kind": node.kind.map(JSON.string) ?? .null,
             "positional": .array(node.positional.map(JSON.string)),
-            "properties": .array(node.properties.map {
-                .object(["name": .string($0.name), "values": .array($0.values.map(JSON.init))])
-            }),
+            "properties": .array(
+                node.properties.map {
+                    .object(["name": .string($0.name), "values": .array($0.values.map(JSON.init))])
+                }),
             "children": .array(node.children.map(JSON.init)),
             "unknown": .array(node.unknown.map(JSON.init)),
         ])
@@ -136,13 +137,14 @@ extension JSON {
         self = .object([
             "code": .string(diagnostic.code),
             "severity": .string(diagnostic.severity.rawValue),
-            "at": .object(diagnostic.at.mapValues {
-                switch $0 {
-                case .string(let text): return .string(text)
-                case .number(let number): return .number(Double(number))
-                case .null: return .null
-                }
-            }),
+            "at": .object(
+                diagnostic.at.mapValues {
+                    switch $0 {
+                    case .string(let text): return .string(text)
+                    case .number(let number): return .number(Double(number))
+                    case .null: return .null
+                    }
+                }),
         ])
     }
 

@@ -29,7 +29,8 @@ func fail(_ message: String) -> Never {
 let repositoryRoot = URL(fileURLWithPath: #filePath)
     .deletingLastPathComponent().deletingLastPathComponent()
     .deletingLastPathComponent().deletingLastPathComponent()
-let documentURL = option("--document").map(URL.init(fileURLWithPath:))
+let documentURL =
+    option("--document").map(URL.init(fileURLWithPath:))
     ?? repositoryRoot.appendingPathComponent("docs/case-studies/issue-1/samples/document.lino")
 
 let model: UiDocumentModel
@@ -44,7 +45,9 @@ do {
 if arguments.contains("--dump") {
     let tree = RenderTree(document: model.document, theme: theme)
     print(tree.dumpLino(), terminator: "")
-    tree.diagnostics.forEach { print("diagnostic:", $0) }
+    for diagnostic in tree.diagnostics {
+        print("diagnostic:", diagnostic)
+    }
     exit(0)
 }
 
@@ -85,7 +88,7 @@ window.contentView = NSHostingView(rootView: DemoView(model: model, theme: theme
 window.isReleasedWhenClosed = false
 window.center()
 window.makeKeyAndOrderFront(nil)
-app.activate(ignoringOtherApps: true)
+app.activate()
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }

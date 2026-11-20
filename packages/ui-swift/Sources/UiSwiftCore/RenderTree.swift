@@ -139,8 +139,9 @@ public func renderHead(
         return resolution.value?.atom
     }
     func cannotDraw(_ name: String) {
-        diagnostics.append(UiDiagnostic(
-            code: "unsupported-value", severity: .warning, at: ["element": element, "property": .string(name)]))
+        diagnostics.append(
+            UiDiagnostic(
+                code: "unsupported-value", severity: .warning, at: ["element": element, "property": .string(name)]))
     }
     func points(_ name: String, as renamed: String? = nil) -> RenderProp? {
         guard let text = resolved(name) else { return nil }
@@ -192,8 +193,9 @@ public func renderHead(
             if valueMatches(.atom("url"), .atom(source)) && !isUnsafeNavigationTarget(source) {
                 props.append(RenderProp("url", .atom(source)))
             } else {
-                diagnostics.append(UiDiagnostic(
-                    code: "unsafe-url", severity: .error, at: ["element": element, "property": "source"]))
+                diagnostics.append(
+                    UiDiagnostic(
+                        code: "unsafe-url", severity: .error, at: ["element": element, "property": "source"]))
             }
         }
         props += [points("width"), points("height")].compactMap { $0 }
@@ -201,9 +203,10 @@ public func renderHead(
         if let alt { props.append(RenderProp("alt", .atom(alt))) }
         head = RenderNode(id: node.id, kind: node.kind, primitive: .asyncImage, props: props, accessibilityLabel: alt)
     default:
-        diagnostics.append(UiDiagnostic(
-            code: "unsupported-kind", severity: .warning,
-            at: ["element": element, "kind": UiDiagnosticValue(node.kind)]))
+        diagnostics.append(
+            UiDiagnostic(
+                code: "unsupported-kind", severity: .warning,
+                at: ["element": element, "kind": UiDiagnosticValue(node.kind)]))
         head = RenderNode(id: node.id, kind: node.kind, primitive: .emptyView)
     }
     return (head, diagnostics)
