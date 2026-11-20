@@ -297,6 +297,7 @@ jobs:
         with:
           node-version: '24.x'
 
+      # The shared status script below classifies cancelled jobs.
       - name: Check that Gradle jobs match the plan
         if: needs.plan.result == 'success'
         env:
@@ -307,7 +308,8 @@ jobs:
             .plan.outputs.kotlin as $kotlin
             | ($kotlin == "true" or $kotlin == "false")
               and (del(.plan) | all(.[];
-                if $kotlin == "true" then .result == "success"
+                if .result == "cancelled" then true
+                elif $kotlin == "true" then .result == "success"
                 else .result == "skipped" end))
           ' <<< "$NEEDS_JSON"
 
