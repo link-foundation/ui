@@ -10,12 +10,13 @@ npm ci
 npx playwright test tests/e2e/published-consumer.spec.js --project chromium --workers 1
 ```
 
-The shared UI workflow also runs this test in WebKit. The test stages the real
-Changesets release in a temporary directory, verifies every public package has a
-version of at least 0.1.0 and compatible sibling ranges, and packs every package
-with its normal lifecycle hooks. It checks all concrete exports, declaration and
-CLI targets, README and LICENSE files, generated icon sets and their attribution
-and license files, and the bundled network worker with its dependency licenses.
+The shared UI workflow also runs this test in WebKit. The test stages the
+workspaces in a temporary directory, applies pending changesets, verifies every
+public package has a version of at least 0.1.0 and compatible sibling ranges, and
+packs every package with its normal lifecycle hooks. It checks all concrete
+exports, declaration and CLI targets, README and LICENSE files, generated icon
+sets and their attribution and license files, and the bundled network worker
+with its dependency licenses.
 
 It installs those archives with `npm install --omit=dev --legacy-peer-deps` in a
 standalone application. React, React DOM, Vue and Vite use versions from the
@@ -39,10 +40,29 @@ Stop the preview with Ctrl-C. To rebuild an existing generated consumer, pass it
 printed temporary root as the first argument. The automated test cleans up its
 own temporary directory.
 
-## Initial publication
+## Verify published packages
 
-The private root is tooling; install the individual packages from npm after the
-first release, for example:
+Issue [#221](https://github.com/link-foundation/ui/issues/221) tracks the first
+publication and verification of a consumer installed from npm. Run the same
+build and browser checks against the published workspace versions:
+
+```bash
+UI_RELEASE_REGISTRY=1 npx playwright test tests/e2e/published-consumer.spec.js --project chromium --workers 1
+```
+
+Use a checkout whose public workspace versions have been published. This mode
+installs exact versions of all public runtime workspaces from the public npm
+registry into a fresh temporary application. It checks the consumer lockfile
+for registry tarball URLs and integrity hashes for every dependency, including
+transitive dependencies. It builds with the consumer's installed Vite and
+uses the same browser assertions as the local archive test.
+
+Run `UI_RELEASE_REGISTRY=1 node experiments/published-consumer/build.mjs` to
+preview the registry consumer and inspect its generated `app/package-lock.json`.
+
+## Install in your project
+
+The private root is tooling. Install the runtime packages you need from npm.
 
 ```bash
 npm install @link-foundation/ui-react @link-foundation/ui-settings @link-foundation/ui-components react react-dom
@@ -55,15 +75,6 @@ Consumer installation of the resulting archives runs no framework build scripts
 and requires no monorepo checkout. Swift/Kotlin projects and private site and
 extension workspaces are not npm runtime releases.
 
-**Publication is still blocked:** at investigation time all 19 runtime packages
-return npm 404, the repository has no Actions secrets, and main's release
-preflight refuses publication. A maintainer must add a granular `NPM_TOKEN`
-secret authorized to create the packages and authorize the first release. Then
-configure each package's trusted publisher for `link-foundation/ui`, workflow
-`release.yml`, and remove the bootstrap secret. Existing PR preflight reports
-credential failures as advisory; main correctly fails with the required action.
-
-Local tarball checks verify release contents and installation; they do not prove
-npm publication. Keep that issue criterion open until all versioned packages are
-visible in npm and a consumer installed from the registry archives passes the
-same browser checks. The reporting site's code is neither copied nor relicensed.
+The [follow-up release on main](https://github.com/link-foundation/ui/actions/runs/44676305074)
+verified trusted publishing for all 19 runtime workspaces and published
+`@link-foundation/ui-react-native@0.1.1` with npm provenance.
