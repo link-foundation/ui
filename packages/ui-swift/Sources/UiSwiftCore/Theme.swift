@@ -124,9 +124,10 @@ public struct UiTheme: Equatable, Sendable {
                 return nil
             case "param":
                 // Component parameters are bound by components, which v0 does not render.
-                diagnostics.append(UiDiagnostic(
-                    code: "unresolved-param", severity: .warning,
-                    at: ["element": UiDiagnosticValue(element), "property": .string(property)]))
+                diagnostics.append(
+                    UiDiagnostic(
+                        code: "unresolved-param", severity: .warning,
+                        at: ["element": UiDiagnosticValue(element), "property": .string(property)]))
                 return nil
             default:
                 return value

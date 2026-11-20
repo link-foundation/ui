@@ -63,16 +63,24 @@ final class FixtureTests: XCTestCase {
             func visit(_ element: JSON, parent: String) {
                 let id = element["id"]?.string ?? "-"
                 expected.append("\(parent) > \(id)")
-                element["children"]?.array?.forEach { visit($0, parent: id) }
+                for child in element["children"]?.array ?? [] {
+                    visit(child, parent: id)
+                }
             }
-            tree["elements"]?.array?.forEach { visit($0, parent: "-") }
+            for element in tree["elements"]?.array ?? [] {
+                visit(element, parent: "-")
+            }
             var actual: [String] = []
             func walk(_ node: RenderNode, parent: String) {
                 let id = node.accessibilityIdentifier ?? "-"
                 actual.append("\(parent) > \(id)")
-                node.children.forEach { walk($0, parent: id) }
+                for child in node.children {
+                    walk(child, parent: id)
+                }
             }
-            RenderTree(document: document).roots.forEach { walk($0, parent: "-") }
+            for root in RenderTree(document: document).roots {
+                walk(root, parent: "-")
+            }
             XCTAssertEqual(actual, expected, fixture.label)
         }
     }
@@ -82,7 +90,8 @@ final class FixtureTests: XCTestCase {
         for (fixture, _) in try renderableFixtures() {
             guard let text = try? readText(fixture.snapshotURL) else { continue }
             XCTAssertNoThrow(try Parser().parse(text), fixture.label)
-            XCTAssertEqual(project(text).diagnostics.filter { $0.severity == .error && $0.code.hasPrefix("syntax") }, [])
+            XCTAssertEqual(
+                project(text).diagnostics.filter { $0.severity == .error && $0.code.hasPrefix("syntax") }, [])
         }
     }
 }

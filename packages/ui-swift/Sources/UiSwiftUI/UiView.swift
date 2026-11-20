@@ -25,7 +25,8 @@ public struct UiView: View {
     ///   - onAction: called with each action of a handler, in order (`(on press (navigate home))`
     ///     on `ok` gives `UiAction(source: "ok", event: "press", action: ["navigate", "home"])`).
     ///     The renderer never runs anything itself.
-    public init(document: UiDocumentModel, theme: UiTheme = .default, onAction: @escaping (UiAction) -> Void = { _ in }) {
+    public init(document: UiDocumentModel, theme: UiTheme = .default, onAction: @escaping (UiAction) -> Void = { _ in })
+    {
         self.document = document
         self.theme = theme
         self.onAction = onAction

@@ -33,7 +33,8 @@ let packageDirectory = URL(fileURLWithPath: #filePath)
     .deletingLastPathComponent()
 
 /// The root of the repository the package is vendored in.
-let repositoryRoot = packageDirectory
+let repositoryRoot =
+    packageDirectory
     .deletingLastPathComponent()  // swift
     .deletingLastPathComponent()  // native
     .deletingLastPathComponent()

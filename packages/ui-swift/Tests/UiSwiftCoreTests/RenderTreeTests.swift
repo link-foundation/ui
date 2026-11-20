@@ -11,7 +11,8 @@ final class RenderTreeTests: XCTestCase {
     }
 
     func testSampleDocumentDumpsAsTheIssueShows() throws {
-        let text = try readText(repositoryRoot.appendingPathComponent("docs/case-studies/issue-1/samples/document.lino"))
+        let text = try readText(
+            repositoryRoot.appendingPathComponent("docs/case-studies/issue-1/samples/document.lino"))
         let tree = render(text)
         XCTAssertEqual(
             tree.dumpLino(),
@@ -33,12 +34,16 @@ final class RenderTreeTests: XCTestCase {
 
     func testStackDirectionChoosesVStackOrHStack() {
         let tree = render(
-            "(v: stack (gap 8px) (padding 1rem) (align start))\n(h: stack (direction horizontal) (gap 4px) (align end))")
+            "(v: stack (gap 8px) (padding 1rem) (align start))\n(h: stack (direction horizontal) (gap 4px) (align end))"
+        )
         let vertical = tree.node(id: "v")!
         XCTAssertEqual(vertical.primitive, .vStack)
-        XCTAssertEqual(vertical.props, [
-            RenderProp("spacing", .atom("8")), RenderProp("padding", .atom("16")), RenderProp("alignment", .atom("leading")),
-        ])
+        XCTAssertEqual(
+            vertical.props,
+            [
+                RenderProp("spacing", .atom("8")), RenderProp("padding", .atom("16")),
+                RenderProp("alignment", .atom("leading")),
+            ])
         let horizontal = tree.node(id: "h")!
         XCTAssertEqual(horizontal.primitive, .hStack)
         XCTAssertEqual(horizontal.props, [RenderProp("spacing", .atom("4")), RenderProp("alignment", .atom("bottom"))])
@@ -58,11 +63,13 @@ final class RenderTreeTests: XCTestCase {
         XCTAssertEqual(tree.node(id: "a")!.primitive, .button)
         XCTAssertEqual(tree.node(id: "a")!.props, [RenderProp("label", .atom("OK"))])
         XCTAssertEqual(tree.node(id: "a")!.accessibilityLabel, "OK")
-        XCTAssertEqual(tree.node(id: "b")!.props, [RenderProp("label", .atom("Save")), RenderProp("disabled", .atom("true"))])
+        XCTAssertEqual(
+            tree.node(id: "b")!.props, [RenderProp("label", .atom("Save")), RenderProp("disabled", .atom("true"))])
     }
 
     func testImageIsAnAsyncImageLabelledByAlt() {
-        let tree = render("(logo: image 'https://example.com/logo.png' (alt 'Company logo') (width 64px) (height 2rem))")
+        let tree = render(
+            "(logo: image 'https://example.com/logo.png' (alt 'Company logo') (width 64px) (height 2rem))")
         let image = tree.node(id: "logo")!
         XCTAssertEqual(image.primitive, .asyncImage)
         XCTAssertEqual(image.accessibilityLabel, "Company logo")
@@ -70,7 +77,8 @@ final class RenderTreeTests: XCTestCase {
         XCTAssertEqual(image.prop("width")?.number, 64)
         XCTAssertEqual(image.prop("height")?.number, 32)
         XCTAssertEqual(
-            image.dumpLino(), "logo: AsyncImage (url 'https://example.com/logo.png') (width 64) (height 32) (alt 'Company logo')")
+            image.dumpLino(),
+            "logo: AsyncImage (url 'https://example.com/logo.png') (width 64) (height 32) (alt 'Company logo')")
     }
 
     func testImageWithAnUnsafeSourceHasNoURL() {
@@ -86,8 +94,10 @@ final class RenderTreeTests: XCTestCase {
         XCTAssertEqual(chart.children, [], "the children of an unsupported kind are not rendered")
         XCTAssertNil(tree.node(id: "inner"))
         XCTAssertEqual(tree.node(id: "after")?.primitive, .text)
-        XCTAssertTrue(tree.diagnostics.contains(
-            UiDiagnostic(code: "unsupported-kind", severity: .warning, at: ["element": "chart-1", "kind": "chart"])))
+        XCTAssertTrue(
+            tree.diagnostics.contains(
+                UiDiagnostic(code: "unsupported-kind", severity: .warning, at: ["element": "chart-1", "kind": "chart"]))
+        )
         XCTAssertEqual(chart.dumpLino(), "chart-1: EmptyView")
     }
 
@@ -98,7 +108,8 @@ final class RenderTreeTests: XCTestCase {
     }
 
     func testEveryNodeIsIdentifiedByItsLinkId() throws {
-        let text = try readText(repositoryRoot.appendingPathComponent("docs/case-studies/issue-1/samples/document.lino"))
+        let text = try readText(
+            repositoryRoot.appendingPathComponent("docs/case-studies/issue-1/samples/document.lino"))
         let tree = render(text)
         XCTAssertEqual(tree.allNodes.map(\.accessibilityIdentifier), ["app", "body", "greeting", "ok"])
         for node in tree.allNodes {

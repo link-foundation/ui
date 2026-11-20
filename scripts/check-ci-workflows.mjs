@@ -6,7 +6,10 @@ import { pathToFileURL } from 'node:url';
 
 // Verified against the action tag's support/versions table, without network in CI:
 // https://github.com/zizmorcore/zizmor-action/blob/v0.6.4/support/versions
-const supportedZizmor = { 'v0.6.4': '1.30.1' };
+const supportedZizmor = {
+  'v0.6.4': '1.30.1',
+  '45d7276c9ca790aabd705e31ca99c6185c3e76dd': '1.32.0', // Swift template uses the v0.8.1 action's exact-version installer.
+};
 
 export function checkWorkflowPolicy(text) {
   const errors = [];

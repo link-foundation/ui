@@ -1,0 +1,338 @@
+name: Swift CI
+
+on:
+  workflow_call:
+    outputs:
+      base:
+        description: Base snapshot used by the shared checks
+        value: ${{ jobs.detect.outputs.base }}
+      swift:
+        description: Whether Swift inputs changed
+        value: ${{ jobs.detect.outputs.swift }}
+    inputs:
+      full-validation:
+        description: Check the full tree before publishing pending changesets
+        type: boolean
+        default: false
+      mode:
+        description: standalone or embedded
+        type: string
+        default: embedded
+      package-directory:
+        description: Repository-relative directory containing Package.swift
+        type: string
+        default: '.'
+      source-paths:
+        description: Newline-separated repository-relative Swift inputs and fixtures
+        type: string
+        default: ''
+      pipeline-directory:
+        description: Repository-relative directory holding the template scripts
+        type: string
+        default: swift/ci
+      swift-version:
+        description: Exact toolchain version
+        type: string
+        default: '6.4.1'
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+  group: swift-ci-${{ github.workflow }}-${{ github.ref }}-${{ inputs.package-directory || '.' }}
+  cancel-in-progress: true
+
+env:
+  PIPELINE: ${{ inputs.pipeline-directory || 'swift/ci' }}
+  SWIFT_PACKAGE: ${{ inputs.package-directory || '.' }}
+  SWIFT_SOURCES: ${{ inputs.source-paths || '' }}
+  SWIFT_MODE: ${{ inputs.mode || 'standalone' }}
+
+jobs:
+  detect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      base: ${{ steps.snapshot.outputs.base }}
+      code: ${{ steps.scope.outputs.code }}
+      swift: ${{ steps.scope.outputs.swift }}
+      docs: ${{ steps.scope.outputs.docs }}
+      workflows: ${{ steps.scope.outputs.workflows }}
+      container: ${{ steps.scope.outputs.container }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Identify the tree to validate
+        id: snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_REF: ${{ github.base_ref }}
+          MERGE_BASE: ${{ github.event.merge_group.base_sha }}
+          FULL_VALIDATION: ${{ inputs.full-validation }}
+          BEFORE_SHA: ${{ github.event.before }}
+        run: bash "$PIPELINE/snapshot.sh"
+      - name: Determine check scopes
+        id: scope
+        env:
+          CI_BASE: ${{ steps.snapshot.outputs.base }}
+        run: python3 "$PIPELINE/scope.py" "$CI_BASE" "$SWIFT_PACKAGE" "$PIPELINE" "$SWIFT_SOURCES" "$SWIFT_MODE"
+
+  quality:
+    needs: detect
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      CI_BASE: ${{ needs.detect.outputs.base }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Materialize the validated tree
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash "$PIPELINE/checkout-base.sh"
+      - name: Scan introduced commits for secrets
+        run: bash "$PIPELINE/scan-secrets.sh"
+      - name: Validate changesets and generated files
+        if: env.SWIFT_MODE == 'standalone' && (github.event_name == 'pull_request' || github.event_name == 'merge_group')
+        env:
+          CODE_CHANGED: ${{ needs.detect.outputs.code }}
+        run: python3 "$PIPELINE/check-changesets.py" "$CI_BASE" "$CODE_CHANGED"
+      - uses: tryswift/setup-swift@ce5fe39afee72fd792fabab6db8ec3005962daf7 # v1.2.0
+        if: needs.detect.outputs.swift == 'true'
+        with:
+          swift-version: ${{ inputs.swift-version || '6.4.1' }}
+          use-preinstalled: 'true'
+      - name: Swift format, static lint and source size
+        if: needs.detect.outputs.swift == 'true'
+        run: |
+          paths=()
+          if [[ -n "$SWIFT_SOURCES" ]]; then
+            while IFS= read -r path; do
+              if [[ -n "$path" ]]; then paths+=("$path"); fi
+            done <<< "$SWIFT_SOURCES"
+          else
+            paths+=("$SWIFT_PACKAGE")
+          fi
+          python3 "$PIPELINE/check_swift.py" "${paths[@]}"
+
+  workflows:
+    needs: detect
+    if: needs.detect.outputs.workflows == 'true' && github.event_name != 'schedule'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Materialize the validated tree
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CI_BASE: ${{ needs.detect.outputs.base }}
+        run: bash "$PIPELINE/checkout-base.sh"
+      - name: Validate workflow syntax, shell and expressions
+        run: |
+          docker run --rm -v "$PWD:/repo:ro" -w /repo \
+            rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667 \
+            -ignore "unexpected key .queue. for .concurrency. section"
+      - name: Audit workflow security
+        uses: zizmorcore/zizmor-action@45d7276c9ca790aabd705e31ca99c6185c3e76dd # v0.8.1
+        with:
+          advanced-security: false
+          annotations: true
+          config: .github/zizmor.yml
+          online-audits: false
+          min-confidence: medium
+          version: 1.32.0
+      - name: Test the pipeline scripts
+        if: env.SWIFT_MODE == 'standalone'
+        run: python3 -m unittest discover -s experiments -p 'test_*.py' -v
+      - name: Verify UI's embedded Swift scopes
+        if: env.SWIFT_MODE == 'embedded'
+        run: python3 -B experiments/check-embedded-swift-scope.py
+
+  docs:
+    needs: detect
+    if: needs.detect.outputs.docs == 'true' && github.event_name != 'schedule'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Materialize the validated tree
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CI_BASE: ${{ needs.detect.outputs.base }}
+        run: bash "$PIPELINE/checkout-base.sh"
+      - name: Validate document structure
+        run: python3 "$PIPELINE/docs.py" "$SWIFT_MODE" "$PIPELINE"
+      - name: Check local documentation links
+        if: env.SWIFT_MODE == 'standalone'
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
+        with:
+          args: "--offline --no-progress 'README.md' 'CHANGELOG.md' 'docs/**/*.md' 'swift/**/*.md'"
+          token: ''
+
+  external-links:
+    if: github.event_name == 'schedule' && inputs.mode == 'standalone'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Check public documentation URLs
+        id: links
+        continue-on-error: true
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
+        with:
+          args: "--no-progress --timeout 15 'README.md' 'docs/**/*.md' 'swift/**/*.md'"
+          token: ''
+      - name: Explain upstream link failures
+        if: steps.links.outcome == 'failure'
+        run: echo "::warning::An external link check was unsuccessful. See the link report for HTTP errors."
+
+  dependencies:
+    needs: detect
+    if: needs.detect.outputs.swift == 'true' || github.event_name == 'schedule'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Materialize the validated tree
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CI_BASE: ${{ needs.detect.outputs.base }}
+        run: bash "$PIPELINE/checkout-base.sh"
+      - name: Audit SwiftPM pins
+        run: bash "$PIPELINE/audit.sh"
+
+  tests:
+    needs: [detect, quality, workflows, docs, dependencies]
+    if: >-
+      !cancelled() && needs.detect.outputs.swift == 'true' &&
+      needs.quality.result == 'success' && needs.dependencies.result == 'success' &&
+      !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Materialize the validated tree
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CI_BASE: ${{ needs.detect.outputs.base }}
+        run: bash "$PIPELINE/checkout-base.sh"
+      - uses: tryswift/setup-swift@ce5fe39afee72fd792fabab6db8ec3005962daf7 # v1.2.0
+        with:
+          swift-version: ${{ inputs.swift-version || '6.4.1' }}
+          use-preinstalled: 'true'
+      - name: Compile with warnings as errors and run tests
+        id: compile
+        run: bash "$PIPELINE/test-package.sh" 2>&1 | tee "$RUNNER_TEMP/swift-test.log"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: failure() && steps.compile.outcome == 'failure'
+        with:
+          name: swift-log-${{ strategy.job-index }}-${{ inputs.package-directory == '.' && 'root' || github.job }}
+          path: ${{ runner.temp }}/swift-test.log
+          if-no-files-found: error
+
+  container:
+    needs: [detect, tests, quality]
+    if: >-
+      !cancelled() && needs.detect.outputs.container == 'true' &&
+      (github.event_name == 'pull_request' || github.event_name == 'merge_group') &&
+      vars.ENABLE_SWIFT_IMAGE_CHECKS == 'true' && needs.quality.result == 'success' &&
+      (needs.tests.result == 'success' || (needs.tests.result == 'skipped' && needs.detect.outputs.swift == 'false'))
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            arch: amd64
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Materialize the validated tree
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CI_BASE: ${{ needs.detect.outputs.base }}
+        run: bash "$PIPELINE/checkout-base.sh"
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4
+      - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          load: true
+          platforms: linux/${{ matrix.arch }}
+          tags: swift-pipeline-smoke:test
+          cache-from: type=gha,scope=swift-${{ matrix.arch }}
+          cache-to: type=gha,mode=max,scope=swift-${{ matrix.arch }}
+      - name: Smoke-test the Linux executable
+        run: test "$(docker run --rm swift-pipeline-smoke:test CI)" = 'Hello, CI!'
+
+  status:
+    name: Swift pipeline status
+    needs: [detect, quality, workflows, docs, dependencies, tests, container]
+    if: '!cancelled()'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Require every applicable job to pass
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+          ENABLE_IMAGES: ${{ vars.ENABLE_SWIFT_IMAGE_CHECKS }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+
+          jobs = json.loads(os.environ["NEEDS"])
+          scope = jobs["detect"]["outputs"]
+          event = os.environ["GITHUB_EVENT_NAME"]
+          scheduled = event == "schedule"
+          expected = {
+              "detect": True,
+              "quality": not scheduled,
+              "workflows": not scheduled and scope.get("workflows") == "true",
+              "docs": not scheduled and scope.get("docs") == "true",
+              "dependencies": scheduled or scope.get("swift") == "true",
+              "tests": not scheduled and scope.get("swift") == "true",
+              "container": event in ("pull_request", "merge_group")
+              and os.environ["ENABLE_IMAGES"] == "true" and scope.get("container") == "true",
+          }
+          failed = False
+          for name, needed in expected.items():
+              result = jobs[name]["result"]
+              if (needed and result != "success") or result in ("failure", "cancelled"):
+                  print(f"::error::{name}: {result}")
+                  failed = True
+          if os.environ["ENABLE_IMAGES"] != "true" and scope.get("container") == "true":
+              print("::notice::Container checks are disabled. Set ENABLE_SWIFT_IMAGE_CHECKS=true to enable them.")
+          raise SystemExit(failed)
+          PY

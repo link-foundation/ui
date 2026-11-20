@@ -61,7 +61,10 @@ final class UiDocumentModelTests: XCTestCase {
         let body = try XCTUnwrap(model.element(id: "body"))
         let greeting = try XCTUnwrap(model.element(id: "greeting"))
         let ok = try XCTUnwrap(model.element(id: "ok"))
-        let bodyChanged = watch { _ = body.node; _ = body.children }
+        let bodyChanged = watch {
+            _ = body.node
+            _ = body.children
+        }
         let okChanged = watch { _ = ok.node }
         let greetingChanged = watch { _ = greeting.node }
         let rootsChanged = watch { _ = model.roots }
