@@ -1,5 +1,13 @@
 # @link-foundation/ui-core
 
+## 0.1.1
+
+### Patch Changes
+
+- Point the VK embed documentation to an archived snapshot of the official post widget reference.
+
+  Skip the pull request release dry run when the merged checkout has no pending changesets.
+
 ## 0.1.0
 
 ### Minor Changes
