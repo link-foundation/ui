@@ -197,6 +197,26 @@ export function hasLibraryEntryPoint(packageJson) {
   return Boolean(packageJson.exports || packageJson.main || packageJson.module);
 }
 
+export function readSmokeTestConfig(packageJson) {
+  const config = packageJson.smokeTest ?? {};
+  return {
+    libraryImport:
+      typeof config.libraryImport === 'string' ? config.libraryImport : '',
+    skipCli: config.skipCli === true,
+    skipLibrary: config.skipLibrary === true,
+  };
+}
+
+export function resolveSmokeTestSettings(
+  { skipCli, skipLibrary },
+  packageConfig
+) {
+  return {
+    skipCli: skipCli || packageConfig.skipCli,
+    skipLibrary: skipLibrary || packageConfig.skipLibrary,
+  };
+}
+
 export function resolveBinShim(
   workspace,
   binName,
@@ -210,9 +230,9 @@ export function formatOutputPreview(output, maxLines = DEFAULT_PREVIEW_LINES) {
   return String(output).trimEnd().split(/\r?\n/).slice(0, maxLines).join('\n');
 }
 
-export function buildLibraryCheckSource(packageName) {
+export function buildLibraryCheckSource(packageName, importName = packageName) {
   return [
-    `import * as packageModule from ${JSON.stringify(packageName)};`,
+    `import * as packageModule from ${JSON.stringify(importName)};`,
     '',
     'const exportNames = Object.keys(packageModule);',
     'if (exportNames.length === 0) {',
@@ -276,13 +296,17 @@ export async function installFromNpm({
 }
 
 export function checkLibraryEntryPoint({
+  importName = '',
   packageName,
   runCommandFn = runCommand,
   workspace,
   writeFileFn = writeFileSync,
 }) {
   const checkFile = join(workspace, 'check-library.mjs');
-  writeFileFn(checkFile, buildLibraryCheckSource(packageName));
+  writeFileFn(
+    checkFile,
+    buildLibraryCheckSource(packageName, importName || packageName)
+  );
   runCommandFn(process.execPath, [checkFile], {
     cwd: workspace,
     stdio: 'inherit',
@@ -315,6 +339,7 @@ export function checkCliEntryPoints({
 }
 
 export function checkConfiguredLibraryEntryPoint({
+  importName = '',
   installedPackageJson,
   packageName,
   runCommandFn = runCommand,
@@ -328,7 +353,7 @@ export function checkConfiguredLibraryEntryPoint({
   }
 
   stdout('Checking library entry point');
-  checkLibraryEntryPoint({ packageName, runCommandFn, workspace });
+  checkLibraryEntryPoint({ importName, packageName, runCommandFn, workspace });
 }
 
 export function checkConfiguredCliEntryPoints({
@@ -469,12 +494,18 @@ export async function smokeTestPackage({
     const installedPackageJson = readJsonFile(
       getInstalledPackageJsonPath(workspace, packageName)
     );
+    const smokeTestConfig = readSmokeTestConfig(installedPackageJson);
+    const smokeTestSettings = resolveSmokeTestSettings(
+      { skipCli, skipLibrary },
+      smokeTestConfig
+    );
 
     checkConfiguredLibraryEntryPoint({
+      importName: smokeTestConfig.libraryImport,
       installedPackageJson,
       packageName,
       runCommandFn,
-      skipLibrary,
+      skipLibrary: smokeTestSettings.skipLibrary,
       stdout,
       workspace,
     });
@@ -484,7 +515,7 @@ export async function smokeTestPackage({
       installedPackageJson,
       packageName,
       runCommandFn,
-      skipCli,
+      skipCli: smokeTestSettings.skipCli,
       stdout,
       workspace,
     });
