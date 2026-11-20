@@ -1,6 +1,6 @@
 {
   "name": "@link-foundation/ui-store",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Mutable links network store of the associative UI framework: stable IDs, change events, transactions, undo/redo, an operation log in Links Notation and IndexedDB persistence compatible with doublets-web",
   "type": "module",
   "exports": {
@@ -42,7 +42,7 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@link-foundation/ui-core": "^0.0.0"
+    "@link-foundation/ui-core": "^0.1.0"
   },
   "peerDependencies": {
     "doublets-web": "^0.1.3"
@@ -53,7 +53,7 @@
     }
   },
   "devDependencies": {
-    "@link-foundation/ui-links": "^0.0.0",
+    "@link-foundation/ui-links": "^0.1.0",
     "doublets-web": "^0.1.3",
     "fake-indexeddb": "^6.2.7",
     "test-anywhere": "^0.8.48"

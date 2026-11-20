@@ -1,6 +1,6 @@
 {
   "name": "@link-foundation/ui-style",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Style rules of the associative UI framework written in Links Notation: selectors, states, media and container conditions, resolved against ui-tokens into a CSS stylesheet or a resolved style per element",
   "type": "module",
   "exports": {
@@ -38,8 +38,8 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@link-foundation/ui-core": "^0.0.0",
-    "@link-foundation/ui-tokens": "^0.0.0"
+    "@link-foundation/ui-core": "^0.1.0",
+    "@link-foundation/ui-tokens": "^0.1.0"
   },
   "devDependencies": {
     "postcss": "^8.5.6",

@@ -1,6 +1,6 @@
 {
   "name": "@link-foundation/ui-vue",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Vue 3 adapter of the associative UI framework written in Links Notation: a UiView component over the ui-dom renderer, a plugin that provides the store and the actions, composables over the ui-store store and Vue components for custom kinds",
   "type": "module",
   "exports": {
@@ -40,9 +40,9 @@
     "vue": "^3.4.0"
   },
   "dependencies": {
-    "@link-foundation/ui-core": "^0.0.0",
-    "@link-foundation/ui-dom": "^0.0.0",
-    "@link-foundation/ui-store": "^0.0.0"
+    "@link-foundation/ui-core": "^0.1.0",
+    "@link-foundation/ui-dom": "^0.1.0",
+    "@link-foundation/ui-store": "^0.1.0"
   },
   "devDependencies": {
     "@vue/test-utils": "^2.5.1",

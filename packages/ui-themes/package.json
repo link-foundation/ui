@@ -1,6 +1,6 @@
 {
   "name": "@link-foundation/ui-themes",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Links Notation theme packages for the associative UI framework",
   "type": "module",
   "exports": {
@@ -38,9 +38,9 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@link-foundation/ui-tokens": "^0.0.0",
+    "@link-foundation/ui-tokens": "^0.1.0",
     "@material/material-color-utilities": "0.3.0",
-    "@link-foundation/ui-core": "^0.0.0"
+    "@link-foundation/ui-core": "^0.1.0"
   },
   "publishConfig": {
     "access": "public"

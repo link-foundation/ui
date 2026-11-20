@@ -1,6 +1,6 @@
 {
   "name": "@link-foundation/ui-dom",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Reference DOM renderer of the associative UI framework written in Links Notation: a ui-store document as plain custom elements in the light DOM, patched incrementally from store events, with adopted token and style CSS and static HTML output",
   "type": "module",
   "exports": {
@@ -41,10 +41,10 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@link-foundation/ui-core": "^0.0.0",
-    "@link-foundation/ui-store": "^0.0.0",
-    "@link-foundation/ui-style": "^0.0.0",
-    "@link-foundation/ui-tokens": "^0.0.0"
+    "@link-foundation/ui-core": "^0.1.0",
+    "@link-foundation/ui-store": "^0.1.0",
+    "@link-foundation/ui-style": "^0.1.0",
+    "@link-foundation/ui-tokens": "^0.1.0"
   },
   "devDependencies": {
     "jsdom": "^30.1.3",

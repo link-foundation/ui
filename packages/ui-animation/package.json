@@ -1,6 +1,6 @@
 {
   "name": "@link-foundation/ui-animation",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Animations of the associative UI framework written in Links Notation: a declarative model of keyframe tracks, easings, springs, timelines and state triggers, a pure seeded sampler, safety validators and a WAAPI player",
   "type": "module",
   "exports": {
@@ -63,12 +63,12 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@link-foundation/ui-core": "^0.0.0",
-    "@link-foundation/ui-store": "^0.0.0",
-    "@link-foundation/ui-themes": "^0.0.0"
+    "@link-foundation/ui-core": "^0.1.0",
+    "@link-foundation/ui-store": "^0.1.0",
+    "@link-foundation/ui-themes": "^0.1.0"
   },
   "devDependencies": {
-    "@link-foundation/ui-tokens": "^0.0.0",
+    "@link-foundation/ui-tokens": "^0.1.0",
     "esbuild": "0.27.0",
     "jsdom": "^30.1.3",
     "test-anywhere": "^0.8.48"

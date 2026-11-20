@@ -1,6 +1,6 @@
 {
   "name": "@link-foundation/ui-config",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Layered configuration of the associative UI framework: defaults < theme < site < user < session, explained per value, with overrides read and written as Links Notation patches",
   "type": "module",
   "exports": {
@@ -36,8 +36,8 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@link-foundation/ui-core": "^0.0.0",
-    "@link-foundation/ui-store": "^0.0.0"
+    "@link-foundation/ui-core": "^0.1.0",
+    "@link-foundation/ui-store": "^0.1.0"
   },
   "devDependencies": {
     "test-anywhere": "^0.8.48"
