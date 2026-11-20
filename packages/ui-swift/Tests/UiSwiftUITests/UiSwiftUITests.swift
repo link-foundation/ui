@@ -111,8 +111,10 @@ final class UiViewAccessibilityTests: XCTestCase {
     /// Accessibility Inspector) sets on the app. Without them the hosting view
     /// has no children at all.
     private func enableAccessibility() {
+        // These raw attributes have no setter in NSAccessibilityProtocol.
+        let setter = NSSelectorFromString("accessibilitySetValue:forAttribute:")
         for attribute in ["AXEnhancedUserInterface", "AXManualAccessibility"] {
-            NSApp.accessibilitySetValue(true, forAttribute: NSAccessibility.Attribute(rawValue: attribute))
+            _ = NSApp.perform(setter, with: NSNumber(value: true), with: attribute)
         }
     }
 

@@ -88,7 +88,7 @@ window.contentView = NSHostingView(rootView: DemoView(model: model, theme: theme
 window.isReleasedWhenClosed = false
 window.center()
 window.makeKeyAndOrderFront(nil)
-app.activate(ignoringOtherApps: true)
+app.activate()
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
