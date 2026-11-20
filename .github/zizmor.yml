@@ -33,3 +33,4 @@ rules:
       - security.yml
       - ui-tests.yml
       - site.yml
+      - kotlin.yml
