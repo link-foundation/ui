@@ -76,9 +76,6 @@ jobs:
       cancel-in-progress: true
     permissions:
       contents: read
-    defaults:
-      run:
-        working-directory: ${{ inputs.project-directory }}
     # The Android target is configured only where an Android SDK is found;
     # this job leaves it out so the other targets do not depend on it (the
     # android job below builds and tests it).
@@ -100,6 +97,7 @@ jobs:
           java-version: '21'
 
       - name: Run the JVM, JS and Wasm tests
+        working-directory: ${{ inputs.project-directory }}
         env:
           FAST_TASKS: ${{ inputs.fast-tasks }}
           TEST_TASKS: ${{ inputs.test-tasks }}
@@ -126,9 +124,6 @@ jobs:
       cancel-in-progress: true
     permissions:
       contents: read
-    defaults:
-      run:
-        working-directory: ${{ inputs.project-directory }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -143,6 +138,7 @@ jobs:
       # The hosted image ships an Android SDK and sets ANDROID_HOME; the
       # build applies the Android target only when it finds one.
       - name: Build the Android library and run its host tests
+        working-directory: ${{ inputs.project-directory }}
         run: ./gradlew --no-daemon --console=plain :links-notation-kotlin:assemble :links-notation-kotlin:testAndroidHostTest
 
       - name: Show how many tests each target ran
@@ -163,9 +159,6 @@ jobs:
       cancel-in-progress: true
     permissions:
       contents: read
-    defaults:
-      run:
-        working-directory: ${{ inputs.project-directory }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -178,6 +171,7 @@ jobs:
           java-version: '21'
 
       - name: Run the iOS simulator tests
+        working-directory: ${{ inputs.project-directory }}
         run: ./gradlew --no-daemon --console=plain :links-notation-kotlin:iosSimulatorArm64Test
 
       - name: Show how many tests each target ran
@@ -199,9 +193,6 @@ jobs:
       cancel-in-progress: true
     permissions:
       contents: read
-    defaults:
-      run:
-        working-directory: ${{ inputs.project-directory }}
     # The Android target is configured only where an Android SDK is found;
     # this job leaves it out (the ui-kotlin-android job below builds it).
     env:
@@ -227,6 +218,7 @@ jobs:
       # Every test: render-tree snapshots of the shared fixtures, themes,
       # actions and UiView in a headless Compose window.
       - name: Run ./gradlew check
+        working-directory: ${{ inputs.project-directory }}
         run: ./gradlew --no-daemon --console=plain :ui-kotlin:check
 
       - name: Show how many tests ran
@@ -237,6 +229,7 @@ jobs:
       # examples/kotlin is its own build (it includes this one); building it
       # compiles Main.kt against the library.
       - name: Build the desktop example
+        working-directory: ${{ inputs.project-directory }}
         run: ./gradlew --no-daemon --console=plain :ui-kotlin-example:build
 
   ui-kotlin-android:
@@ -251,9 +244,6 @@ jobs:
       cancel-in-progress: true
     permissions:
       contents: read
-    defaults:
-      run:
-        working-directory: ${{ inputs.project-directory }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -271,6 +261,7 @@ jobs:
       # The hosted image ships an Android SDK and sets ANDROID_HOME; the
       # build applies the Android library target only when it finds one.
       - name: Build the Android library
+        working-directory: ${{ inputs.project-directory }}
         run: ./gradlew --no-daemon --console=plain :ui-kotlin:assemble :ui-kotlin:bundleAndroidMainAar
 
   # Terminal status gate: runs even when the jobs above fail or are
