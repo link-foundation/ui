@@ -1,5 +1,11 @@
 # @link-foundation/ui-core
 
+## 0.1.2
+
+### Patch Changes
+
+- 40db540: Pilot the read-only Kotlin CI workflow from a shared Gradle entry point and skip Gradle when Kotlin inputs are unchanged.
+
 ## 0.1.1
 
 ### Patch Changes
