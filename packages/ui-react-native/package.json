@@ -56,6 +56,9 @@
   "publishConfig": {
     "access": "public"
   },
+  "smokeTest": {
+    "libraryImport": "@link-foundation/ui-react-native/map"
+  },
   "peerDependenciesMeta": {
     "react-native": {
       "optional": true

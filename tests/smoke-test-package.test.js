@@ -10,7 +10,9 @@ import {
   installFromNpm,
   parseArgs,
   parseCommandArgs,
+  readSmokeTestConfig,
   resolveBinShim,
+  resolveSmokeTestSettings,
 } from '../scripts/smoke-test-package.mjs';
 
 describe('smoke-test-package.mjs', () => {
@@ -110,6 +112,48 @@ describe('smoke-test-package.mjs', () => {
 
     expect(source).toContain('import * as packageModule from "@scope/pkg"');
     expect(source).toContain('Object.keys(packageModule)');
+  });
+
+  it('probes a declared subpath entry', () => {
+    const source = buildLibraryCheckSource(
+      '@scope/pkg',
+      '@scope/pkg/pure-entry'
+    );
+
+    expect(source).toContain(
+      'import * as packageModule from "@scope/pkg/pure-entry"'
+    );
+    expect(source).not.toContain('from "@scope/pkg"');
+  });
+
+  it('reads optional per-package smoke test settings', () => {
+    expect(
+      readSmokeTestConfig({
+        smokeTest: {
+          libraryImport: '@scope/pkg/pure-entry',
+          skipCli: true,
+          skipLibrary: true,
+        },
+      })
+    ).toEqual({
+      libraryImport: '@scope/pkg/pure-entry',
+      skipCli: true,
+      skipLibrary: true,
+    });
+    expect(readSmokeTestConfig({})).toEqual({
+      libraryImport: '',
+      skipCli: false,
+      skipLibrary: false,
+    });
+  });
+
+  it('combines CLI and package smoke test settings', () => {
+    expect(
+      resolveSmokeTestSettings(
+        { skipCli: false, skipLibrary: true },
+        { skipCli: true, skipLibrary: false }
+      )
+    ).toEqual({ skipCli: true, skipLibrary: true });
   });
 });
 
