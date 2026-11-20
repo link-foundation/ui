@@ -1,5 +1,11 @@
 # @link-foundation/ui-core
 
+## 0.1.3
+
+### Patch Changes
+
+- 26e3345: Qualify both Swift packages through the shared Swift CI template while preserving the macOS demo checks.
+
 ## 0.1.2
 
 ### Patch Changes
