@@ -2,7 +2,7 @@ import { add, scale, segmentLength, fmt } from './geometry.js';
 import { rotate, radians } from './doublet-layout.js';
 import { curveAtDistance } from './doublet-curves.js';
 
-function arrowJoin(options) {
+export function doubletMarkerJoin(options) {
   return options.arrowJoin === 'inherit' ? options.linejoin : options.arrowJoin;
 }
 
@@ -10,7 +10,7 @@ function arrowJoin(options) {
 export function markerTipExtension(marker, o) {
   const half = o.strokeWidth / 2,
     sine = Math.sin(radians(marker.angle)),
-    join = arrowJoin(o);
+    join = doubletMarkerJoin(o);
   if (join === 'round') {
     return half;
   }
@@ -39,28 +39,62 @@ export function markerExtent(marker, o) {
   return marker.size + Math.abs(marker.offset) + Math.abs(marker.across) + tip;
 }
 const coordinate = (x, y) => `${fmt(x, 8)} ${fmt(y, 8)}`;
+export function doubletMarkerVertices(marker) {
+  const { shape, size, angle } = marker;
+  const r = size / 2;
+  if (shape === 'bar') {
+    return [
+      [0, -r],
+      [0, r],
+    ];
+  }
+  if (shape === 'square') {
+    return [
+      [-r, -r],
+      [r, -r],
+      [r, r],
+      [-r, r],
+    ];
+  }
+  if (shape === 'diamond') {
+    return [
+      [-r, 0],
+      [0, -r],
+      [r, 0],
+      [0, r],
+    ];
+  }
+  const x = size * Math.cos(radians(angle));
+  const y = size * Math.sin(radians(angle));
+  const back = shape === 'tail' ? x : -x;
+  return [
+    [back, -y],
+    [0, 0],
+    [back, y],
+  ];
+}
+
+export function markerMiterLimit(marker) {
+  return Math.max(4, 1 / Math.sin(radians(marker.angle)) + 0.01);
+}
+
 export function doubletMarkerPath(marker) {
-  const { shape, size, angle } = marker,
+  const { shape, size } = marker,
     r = size / 2;
-  const x = size * Math.cos(radians(angle)),
-    y = size * Math.sin(radians(angle));
   if (shape === 'none') {
     return '';
   }
   if (shape === 'bar') {
     return `M 0 ${fmt(-r)} L 0 ${fmt(r)}`;
   }
-  if (['arrow', 'triangle', 'tail'].includes(shape)) {
-    const back = shape === 'tail' ? x : -x;
-    return `M ${coordinate(back, -y)} L 0 0 L ${coordinate(back, y)}${shape === 'triangle' ? ' Z' : ''}`;
+  if (['circle', 'dot'].includes(shape)) {
+    return `M ${fmt(r)} 0 A ${fmt(r)} ${fmt(r)} 0 1 1 ${fmt(-r)} 0 A ${fmt(r)} ${fmt(r)} 0 1 1 ${fmt(r)} 0 Z`;
   }
-  if (shape === 'square') {
-    return `M ${coordinate(-r, -r)} L ${coordinate(r, -r)} L ${coordinate(r, r)} L ${coordinate(-r, r)} Z`;
-  }
-  if (shape === 'diamond') {
-    return `M ${coordinate(-r, 0)} L ${coordinate(0, -r)} L ${coordinate(r, 0)} L ${coordinate(0, r)} Z`;
-  }
-  return `M ${fmt(r)} 0 A ${fmt(r)} ${fmt(r)} 0 1 1 ${fmt(-r)} 0 A ${fmt(r)} ${fmt(r)} 0 1 1 ${fmt(r)} 0 Z`;
+  const points = doubletMarkerVertices(marker).map(([x, y]) =>
+    coordinate(x, y)
+  );
+  const close = ['arrow', 'tail'].includes(shape) ? '' : ' Z';
+  return `M ${points.join(' L ')}${close}`;
 }
 
 export function placeDoubletMarkers(curve, gaps, o) {
@@ -109,6 +143,6 @@ export function doubletMarkerSvg(placement, o) {
     ? 'currentColor'
     : 'none';
   const stroke = marker.shape === 'dot' ? 'none' : 'currentColor';
-  const limit = Math.max(4, 1 / Math.sin(radians(marker.angle)) + 0.01);
-  return `<path data-marker="${marker.shape}" data-end="${end}" d="${doubletMarkerPath(marker)}" transform="translate(${fmt(point.x, 8)} ${fmt(point.y, 8)}) rotate(${fmt(angle, 8)})" fill="${fill}" stroke="${stroke}" stroke-width="${o.strokeWidth}" stroke-linejoin="${arrowJoin(o)}" stroke-linecap="butt" stroke-miterlimit="${limit}"></path>`;
+  const limit = markerMiterLimit(marker);
+  return `<path data-marker="${marker.shape}" data-end="${end}" d="${doubletMarkerPath(marker)}" transform="translate(${fmt(point.x, 8)} ${fmt(point.y, 8)}) rotate(${fmt(angle, 8)})" fill="${fill}" stroke="${stroke}" stroke-width="${o.strokeWidth}" stroke-linejoin="${doubletMarkerJoin(o)}" stroke-linecap="butt" stroke-miterlimit="${limit}"></path>`;
 }

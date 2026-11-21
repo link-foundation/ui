@@ -223,6 +223,75 @@ test('ClipboardItem is constructed in the image click activation stack', async (
   await expect(page.getByRole('status')).toHaveText('Done');
 });
 
+test('Apply uses the default worker and saves a clean 22 11 with the original fit', async ({
+  page,
+}) => {
+  await page.goto(`${path}?code=2211`);
+  await page.waitForFunction(() => globalThis.networkEditorExample);
+  const original = await page.evaluate(
+    () =>
+      globalThis.networkEditorExample.presentation.snapshot().frame.transform
+  );
+  const worker = page.waitForEvent('worker');
+  await page.getByRole('button', { name: 'Apply', exact: true }).click();
+  expect((await worker).url()).toContain('network-collision.worker.mjs');
+  await ready(page);
+  await expect(page.getByRole('status')).toHaveText('Collisions 2 → 0');
+  await expect
+    .poll(() => new globalThis.URL(page.url()).searchParams.has('frame'))
+    .toBe(true);
+  const after = await page.evaluate(() => {
+    const { presentation, editor } = globalThis.networkEditorExample;
+    return {
+      transform: presentation.snapshot().frame.transform,
+      options: editor.snapshot().options,
+      preview: document.querySelector('#preview').innerHTML,
+      svg: presentation.toSvg(),
+    };
+  });
+  expect(after.transform).toEqual(original);
+  expect(after.options.turns[0][0] * after.options.turns[0][1]).toBeLessThan(0);
+  expect(after.options.linkGaps).toEqual([]);
+  expect(after.preview).toBe(after.svg);
+  await expectAccessible(page);
+});
+
+test('a real worker terminates during dense search and rejects before the next frame', async ({
+  page,
+}) => {
+  await open(page);
+  const result = await page.evaluate(async () => {
+    const { createCollisionSolver } =
+      await import('/packages/ui-components/src/links-view/collision-job.js');
+    let terminated = false;
+    class ObservedWorker extends globalThis.Worker {
+      terminate() {
+        terminated = true;
+        super.terminate();
+      }
+    }
+    const links = Array.from({ length: 24 }, (_, i) => [
+      ((i + 9) % 24) + 1,
+      ((i + 14) % 24) + 1,
+    ]);
+    const controller = new AbortController();
+    const solve = createCollisionSolver({ Worker: ObservedWorker });
+    const pending = solve(links, {}, { signal: controller.signal }).catch(
+      (error) => error.name
+    );
+    await new Promise((resolve) => globalThis.setTimeout(resolve, 150));
+    controller.abort();
+    const name = await Promise.race([
+      pending,
+      new Promise((resolve) =>
+        globalThis.requestAnimationFrame(() => resolve('late'))
+      ),
+    ]);
+    return { name, terminated };
+  });
+  expect(result).toEqual({ name: 'AbortError', terminated: true });
+});
+
 test('host mounts localize actions and release a held key outside the default root', async ({
   page,
 }) => {

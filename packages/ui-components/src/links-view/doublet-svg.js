@@ -135,19 +135,21 @@ function curveData(visible) {
   return data.trim();
 }
 
+const DASHES = Object.freeze({
+  solid: Object.freeze([]),
+  dashed: Object.freeze([4, 2]),
+  dotted: Object.freeze([0, 2]),
+  dashdot: Object.freeze([4, 2, 0, 2]),
+  long: Object.freeze([8, 3]),
+});
+
+export function doubletDashLengths(options) {
+  return DASHES[options.dash].map((v) => v * options.strokeWidth);
+}
+
 function linksSvg(frame, id) {
   const o = frame.options;
-  const dash = {
-    solid: '',
-    dashed: '4 2',
-    dotted: '0 2',
-    dashdot: '4 2 0 2',
-    long: '8 3',
-  }[o.dash]
-    .split(' ')
-    .filter(Boolean)
-    .map((v) => Number(v) * o.strokeWidth)
-    .join(' ');
+  const dash = doubletDashLengths(o).join(' ');
   const items = frame.curves
     .map((curve) => {
       const d = curveData(curve.visible);

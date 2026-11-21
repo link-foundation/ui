@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/** Bundle pinned layout dependencies: browser workers cannot use import maps. */
+/** Bundle worker dependencies because browser workers cannot use import maps. */
 import { build } from 'esbuild';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
@@ -8,23 +8,25 @@ export async function buildNetworkWorker(
   root = fileURLToPath(new globalThis.URL('../', import.meta.url))
 ) {
   await build({
-    entryPoints: [
-      resolve(
+    entryPoints: {
+      'network-layout.worker': resolve(
         root,
         'packages/ui-components/src/links-view/layout-worker-entry.mjs'
       ),
-    ],
-    outfile: resolve(
-      root,
-      'packages/ui-components/dist/network-layout.worker.mjs'
-    ),
+      'network-collision.worker': resolve(
+        root,
+        'packages/ui-components/src/links-view/collision-worker-entry.mjs'
+      ),
+    },
+    outdir: resolve(root, 'packages/ui-components/dist'),
+    outExtension: { '.js': '.mjs' },
     bundle: true,
     format: 'esm',
     platform: 'browser',
     minify: true,
     legalComments: 'inline',
     banner: {
-      js: '// Bundled layout worker: d3-force and dependencies (ISC), Dagre (MIT). See network-layout-NOTICE.md.',
+      js: '// See network-layout-NOTICE.md for bundled dependency licenses.',
     },
   });
   const { mkdir, copyFile, writeFile } = await import('node:fs/promises');
@@ -44,7 +46,7 @@ export async function buildNetworkWorker(
   }
   await writeFile(
     resolve(directory, 'network-layout-NOTICE.md'),
-    '# Layout worker dependencies\n\nBundled from pinned npm dependencies: d3-force 3.0.0, d3-dispatch,\nd3-quadtree and d3-timer (ISC); @dagrejs/dagre 3.1.3 (MIT).\nTheir copyright and license notices accompany this worker as\nnetwork-layout-*-LICENSE.txt. Repository code is Unlicense.\n'
+    '# Network worker dependencies\n\nThe layout and collision workers bundle d3-force 3.0.0, d3-dispatch,\nd3-quadtree and d3-timer (ISC), and @dagrejs/dagre 3.1.3 (MIT).\nTheir copyright and license notices are in network-layout-*-LICENSE.txt.\nThe collision worker also bundles links-notation (Unlicense).\nRepository code is Unlicense.\n'
   );
 }
 
