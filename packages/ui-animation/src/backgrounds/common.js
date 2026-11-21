@@ -13,6 +13,10 @@ export const bounded = (options, ranges) => ({
     ])
   ),
 });
+export function wrapGrid(value, cellSize) {
+  const remainder = value % cellSize;
+  return remainder < 0 ? remainder + cellSize : remainder;
+}
 export const radians = (degrees) => (Number(degrees) * Math.PI) / 180;
 export const noop = () => ({ update() {}, animate() {}, dispose() {} });
 export const changed = (a, b, keys) => keys.some((key) => a[key] !== b[key]);

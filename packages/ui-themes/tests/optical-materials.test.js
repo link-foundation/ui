@@ -97,3 +97,46 @@ it('scoped presets keep geometry and comfort preferences', () => {
     { ...current, blur: 20 }
   );
 });
+
+it('accepts a host texture, lighting, theme tokens and clip on the material surface', () => {
+  const m = readMaterial(`material
+  opacity 0.5
+  blur 4
+  noise 0.25
+  highlight 0.4
+`);
+  let textures = 0;
+  const options = {
+    prefix: 'glass',
+    surfaceColor: 'var(--palette-glass)',
+    clipPath: 'var(--panel-contour)',
+    texture({ material, opacity }) {
+      textures++;
+      assert.equal(material.noise * opacity, 0.125);
+      return 'linear-gradient(red, blue)';
+    },
+    lighting({ surfaceColor, transparent }) {
+      assert.equal(surfaceColor, 'var(--palette-glass)');
+      return {
+        shadows: ['inset 0 1px white'],
+        borderColor: 'var(--palette-edge)',
+        images: transparent ? ['linear-gradient(white, transparent)'] : [],
+      };
+    },
+  };
+  const style = materialStyle(m, {}, options);
+  assert.equal(
+    style['background-image'],
+    'linear-gradient(red, blue), linear-gradient(white, transparent)'
+  );
+  assert.equal(style['box-shadow'], 'inset 0 1px white');
+  assert.equal(style['border-color'], 'var(--palette-edge)');
+  assert.equal(style['clip-path'], 'var(--panel-contour)');
+  assert.equal(style['--glass-noise'], '0.25');
+  assert.match(style.background, /var\(--palette-glass\) 50%/u);
+  const reduced = materialStyle(m, { reducedTransparency: true }, options);
+  assert.equal(textures, 1);
+  assert.equal(reduced['background-image'], 'none');
+  assert.equal(reduced['backdrop-filter'], 'none');
+  assert.match(reduced.background, /var\(--palette-glass\) 100%/u);
+});

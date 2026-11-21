@@ -1,0 +1,21 @@
+frames
+  panel
+    corner top-left cut
+      size 58
+    corner top-right round
+      size 42
+    corner bottom-right cut
+      size 22
+    corner bottom-left round
+      size 30
+    edge top line
+      stroke 4
+      inset-start 13
+      inset-end 6
+  block
+    extends panel
+      scale 0.45
+    corner top-right cut
+      size 28
+    edge top line
+      stroke 2

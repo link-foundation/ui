@@ -90,6 +90,32 @@ it('accepts fractional edge widths independently of half-pixel corner controls',
   assert.equal(frame.corners['top-left'].stroke, 1.2);
 });
 
+it('cuts each edge toward its physical start and end without changing the contour', () => {
+  const frames = readFrames(`frames
+  panel
+    corner top-left cut
+      size 20
+    edge top line
+      inset-start 11
+    edge bottom line
+      inset-start 13
+      inset-end 7
+    edge left line
+      inset-start 3
+      inset-end 4
+`);
+  const frame = resolveFrame(frames, 'panel');
+  const { path, borderSvg } = frameGeometry(frame, 200, 100);
+  assert.match(borderSvg, /d="M 31 0 L 200 0"/u);
+  assert.match(borderSvg, /d="M 193 100 L 13 100"/u);
+  assert.match(borderSvg, /d="M 0 96 L 0 23"/u);
+  assert.match(path, /^M 0 20 L 20 0 L 200 0/u);
+  const border = frameGeometry({ ...frame, mode: 'border' }, 200, 100);
+  assert.match(border.borderSvg, /d="M 0 0 L 200 0"/u);
+  assert.match(border.borderSvg, /d="M 200 100 L 0 100"/u);
+  assert.match(border.borderSvg, /d="M 0 100 L 0 0"/u);
+});
+
 it('uses nested-block and control defaults while keeping stroke widths and explicit dimensions independent', () => {
   const frames = readFrames(`frames
   panel

@@ -1,6 +1,12 @@
 import { describe, it, expect } from 'test-anywhere';
 import { createSoundBus, playVoice, createSoundPlayer } from '../src/index.js';
-import { fakeAudio, loadTheme, seeded, settings } from './helpers.js';
+import {
+  fakeAudio,
+  gestureTarget,
+  loadTheme,
+  seeded,
+  settings,
+} from './helpers.js';
 import { JSDOM } from 'jsdom';
 
 function setup(options = {}) {
@@ -247,4 +253,40 @@ it('preserves event throttling for muted visual cues without queuing audio', asy
   expect(cues).toEqual(['click', 'click']);
   expect(s.contexts()).toBe(0);
   await s.dispose();
+});
+
+it('resolves the preview destination lazily in the player context', async () => {
+  const audio = fakeAudio();
+  const target = gestureTarget();
+  const destination = audio.createGain();
+  let contexts = 0;
+  let destinations = 0;
+  const player = createSoundPlayer({
+    theme: loadTheme(),
+    config: settings({ 'sound.enabled': true }),
+    gestureTarget: target,
+    createContext: () => {
+      contexts++;
+      return audio;
+    },
+    hasBeenActive: () => false,
+    bus: {
+      gainPlacement: 'input',
+      destination(context) {
+        expect(context).toBe(audio);
+        destinations++;
+        return destination;
+      },
+    },
+  });
+  expect(player.preview('tick')).toEqual([]);
+  expect(contexts).toBe(0);
+  target.dispatchEvent(new target.Event('keydown'));
+  expect(player.preview('tick')).toEqual(['tick']);
+  expect(contexts).toBe(1);
+  expect(destinations).toBe(1);
+  expect(
+    audio.nodes.find((node) => node.kind === 'compressor').connections
+  ).toEqual([destination]);
+  await player.dispose();
 });

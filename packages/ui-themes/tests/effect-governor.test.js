@@ -288,3 +288,20 @@ it('allows invalidation to bypass a cap and cancellation to remove a queued repa
   remove();
   assert.equal(c.queue.size, 0);
 });
+
+it('the exported quality watcher accepts host gaps without scheduling frames', async () => {
+  const { createQualityWatcher } =
+    await import('@link-foundation/ui-themes/classic/materials');
+  const watcher = createQualityWatcher({ resolution: false });
+  for (const gap of [200, 200, 200, 200, 200, 0, 5000]) {
+    assert.equal(watcher.feed(gap), false);
+  }
+  for (let step = 0; step < 2; step++) {
+    const signals = Array.from({ length: 17 }, () => watcher.feed(60));
+    assert.equal(signals.filter(Boolean).length, 1);
+    assert.equal(signals.at(-1), true);
+  }
+  assert.deepEqual(watcher.snapshot(), { scale: 1, fps: 0.25 });
+  watcher.reset();
+  assert.deepEqual(watcher.snapshot(), { scale: 1, fps: 0.25 });
+});

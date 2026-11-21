@@ -1,4 +1,4 @@
-import { mountLayer, changed, bounded } from './common.js';
+import { mountLayer, changed, bounded, wrapGrid } from './common.js';
 
 const defaults = {
   cellSize: 64,
@@ -11,26 +11,24 @@ const defaults = {
   radialFade: false,
   period: 30,
   onDrift: undefined,
+  drift: undefined,
+  originX: 0,
+  originY: 0,
+  tokens: undefined,
 };
 
-function background(element, win, o) {
-  const token = {
-    line: '--color-line',
-    accent: '--color-accent',
-    'second-accent': '--color-accent-2',
-  }[o.tint];
-  const color =
-    (token && win.getComputedStyle?.(element).getPropertyValue(token).trim()) ||
-    o.color;
-  const escaped = color
-    .replaceAll('&', '&amp;')
-    .replaceAll('"', '&quot;')
-    .replaceAll('<', '&lt;');
+const defaultTokens = {
+  line: '--color-line',
+  accent: '--color-accent',
+  'second-accent': '--color-accent-2',
+};
+
+function mask(o) {
   const cell = o.cellSize,
     mark = cell * o.markLength;
   let artwork;
   if (o.pattern === 'dots') {
-    artwork = `<circle cx="${cell / 2}" cy="${cell / 2}" r="${o.lineWidth}" fill="${escaped}"/>`;
+    artwork = `<circle cx="${cell / 2}" cy="${cell / 2}" r="${o.lineWidth}" fill="white"/>`;
   } else {
     const center = cell / 2;
     let path = `M0 ${center}H${cell}M${center} 0V${cell}`;
@@ -39,13 +37,13 @@ function background(element, win, o) {
     }
     const dash =
       o.pattern === 'dashed' ? `stroke-dasharray="${mark} ${cell - mark}"` : '';
-    artwork = `<path d="${path}" stroke="${escaped}" stroke-width="${o.lineWidth}" ${dash}/>`;
+    artwork = `<path d="${path}" stroke="white" stroke-width="${o.lineWidth}" ${dash}/>`;
   }
   // Original CSS image, offset by half a cell so marks land on grid lines.
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${cell}" height="${cell}" viewBox="0 0 ${cell} ${cell}">${artwork}</svg>`;
   return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
 }
-function create(element, win) {
+function create(element) {
   let o,
     offset = 0,
     dirty = true;
@@ -58,6 +56,8 @@ function create(element, win) {
     }
     dirty = false;
     const cell = o.cellSize;
+    const colorToken = o.tokens?.[o.tint] ?? defaultTokens[o.tint];
+    const alphaToken = o.tokens?.alpha;
     Object.assign(element.style, {
       overflow: 'hidden',
       maskImage: o.radialFade
@@ -67,12 +67,15 @@ function create(element, win) {
     Object.assign(pattern.style, {
       position: 'absolute',
       inset: `-${cell}px 0 0`,
-      backgroundImage: background(element, win, o),
-      backgroundSize: `${cell}px ${cell}px`,
-      backgroundPosition: `${-cell / 2}px ${-cell / 2}px`,
-      backgroundRepeat: 'repeat',
+      backgroundColor: colorToken ? `var(${colorToken}, ${o.color})` : o.color,
+      maskImage: mask(o),
+      maskSize: `${cell}px ${cell}px`,
+      maskPosition: `${wrapGrid(o.originX, cell) - cell / 2}px ${wrapGrid(o.originY, cell) - cell / 2}px`,
+      maskRepeat: 'repeat',
       transform: `translateY(${offset}px)`,
-      opacity: String(o.level / 4),
+      opacity: alphaToken
+        ? `calc(${o.level / 4} * var(${alphaToken}, 1))`
+        : String(o.level / 4),
     });
   }
   return {
@@ -95,9 +98,12 @@ function create(element, win) {
         'tint',
         'color',
         'radialFade',
+        'originX',
+        'originY',
+        'tokens',
       ]);
       dirty ||= visual;
-      return visual;
+      return visual || next.drift !== before.drift;
     },
     invalidate() {
       dirty = true;
@@ -105,10 +111,13 @@ function create(element, win) {
     resize() {},
     draw(dt, { still }) {
       const cell = o.cellSize;
-      if (!still && o.period > 0) {
-        offset += (dt * cell) / o.period;
+      if (Number.isFinite(o.drift)) {
+        offset = wrapGrid(o.drift, cell);
+      } else if (!still && o.period > 0) {
+        offset = wrapGrid(offset + (dt * cell) / o.period, cell);
+      } else {
+        offset = wrapGrid(offset, cell);
       }
-      offset %= cell;
       paint();
       o.onDrift?.(offset);
     },
@@ -117,6 +126,11 @@ function create(element, win) {
     },
   };
 }
+/** Convert a host clock in milliseconds to a one-cell phase. */
+export function gridOffset(time, cellSize, period) {
+  return period > 0 ? (wrapGrid(time, period) / period) * cellSize : 0;
+}
+
 /** Mount on a positioned div; other layers mount on canvases. */
 export const mount = (element, options = {}) =>
   mountLayer(element, options, create);

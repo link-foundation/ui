@@ -1,5 +1,5 @@
 import { seededRandom } from '../random.js';
-import { mountLayer, changed, clamp, bounded } from './common.js';
+import { mountLayer, changed, clamp, bounded, wrapGrid } from './common.js';
 import { alphaCleanup } from './rain-cleanup.js';
 
 const defaultPaint = (ctx, glyph, x, y, size) => {
@@ -21,33 +21,44 @@ const defaults = {
   drift: 0,
   paint: defaultPaint,
   pick: undefined,
+  random: seededRandom,
+  calibration: 'rolling',
+  originX: 0,
+  originY: 0,
 };
 
 /** Quantize to whole measured display frames; never take two steps in one frame. */
-export function createCadence() {
+export function createCadence(mode = 'rolling') {
   const gaps = [];
+  let frameMs = 1000 / 60;
   let frames = 0;
+  const batched = mode === 'batched';
   return {
     frame(gap) {
-      if (gap > 0 && gap < 100) {
-        gaps.push(gap);
-        if (gaps.length > 30) {
-          gaps.shift();
-        }
+      if (gap <= 0 || gap >= 100 || !Number.isFinite(gap)) {
+        return;
+      }
+      gaps.push(gap);
+      if (batched && gaps.length < 30) {
+        return;
+      }
+      if (gaps.length > 30) {
+        gaps.shift();
+      }
+      const sorted = gaps.toSorted((a, b) => a - b);
+      const middle = Math.floor(sorted.length / 2);
+      frameMs = sorted[middle];
+      if (batched) {
+        gaps.length = 0;
+      } else if (sorted.length % 2 === 0) {
+        frameMs = (frameMs + sorted[middle - 1]) / 2;
       }
     },
     ready(step, fps) {
-      const sorted = [...gaps].sort((a, b) => a - b);
-      const middle = Math.floor(sorted.length / 2);
-      const median = sorted.length
-        ? (sorted[middle] +
-            sorted[Math.max(0, Math.ceil(sorted.length / 2) - 1)]) /
-          2
-        : 1000 / 60;
       frames++;
       const count = Math.max(
         1,
-        Math.round(Math.max(clamp(step, 20, 400), 1000 / fps) / median)
+        Math.round(Math.max(clamp(step, 20, 400), 1000 / fps) / frameMs)
       );
       if (frames < count) {
         return false;
@@ -57,25 +68,28 @@ export function createCadence() {
     },
     reset() {
       frames = 0;
+      if (batched) {
+        gaps.length = 0;
+      }
     },
   };
 }
 
-function shiftCanvas(canvas, ctx, dy) {
-  if (!dy) {
+function shiftCanvas(canvas, ctx, dx, dy) {
+  if (!dx && !dy) {
     return;
   }
   ctx.save();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.globalCompositeOperation = 'copy';
   ctx.globalAlpha = 1;
-  ctx.drawImage(canvas, 0, dy);
+  ctx.drawImage(canvas, dx, dy);
   ctx.restore();
 }
 
 function stillField(ctx, area, columns, o, glyph) {
   ctx.clearRect(0, 0, area.width, area.height);
-  const fieldRandom = seededRandom(o.seed);
+  const fieldRandom = o.random(o.seed);
   for (const column of columns) {
     if (!column.active) {
       continue;
@@ -103,18 +117,19 @@ function create(canvas) {
     return null;
   }
   const cleanup = alphaCleanup(canvas, ctx);
-  const cadence = createCadence();
-  let o,
+  let cadence,
+    o,
     area,
     columns = [],
     random,
     steps = 0,
     cleanupTime = 0,
-    priorDrift = 0;
+    previousX = 0,
+    previousY = 0;
   const pick = () =>
     o.pick?.() ?? String.fromCharCode(0x30 + Math.floor(random() * 10));
   function seed() {
-    random = seededRandom(o.seed);
+    random = o.random(o.seed);
     const spacing = clamp(o.cellSize, 32, 128) / 2;
     columns = Array.from(
       { length: Math.ceil(area.width / spacing) },
@@ -137,8 +152,8 @@ function create(canvas) {
     o.paint(
       ctx,
       column.glyph,
-      column.x + padding,
-      column.y + o.drift,
+      column.x + padding + wrapGrid(o.originX, spacing),
+      column.y + o.drift + wrapGrid(o.originY, spacing),
       Math.max(1, spacing - padding),
       glow
     );
@@ -146,9 +161,9 @@ function create(canvas) {
   }
   return {
     defaults,
-    frame: cadence.frame,
+    frame: (gap) => cadence.frame(gap),
     cadence: (fps) => cadence.ready(o.step, fps),
-    resetClock: cadence.reset,
+    resetClock: () => cadence.reset(),
     update(next, before) {
       o = bounded(next, {
         cellSize: [32, 128],
@@ -160,17 +175,19 @@ function create(canvas) {
         glow: [0, 40],
         padding: [0, 16],
       });
-      if (area && changed(next, before, ['cellSize', 'seed'])) {
-        seed();
+      if (!cadence || next.calibration !== before.calibration) {
+        cadence = createCadence(o.calibration);
       }
-      if (area && next.density !== before.density) {
-        const active = seededRandom(o.seed);
+      if (area && changed(next, before, ['cellSize', 'seed', 'random'])) {
+        seed();
+      } else if (area && next.density !== before.density) {
+        const active = o.random(o.seed);
         columns.forEach((c) => {
           c.active = active() < o.density;
         });
       }
       if (area && next.columnSteps !== before.columnSteps) {
-        const speed = seededRandom(o.seed);
+        const speed = o.random(o.seed);
         columns.forEach((c) => {
           c.every = 1 + Math.floor(speed() * clamp(o.columnSteps, 1, 8));
         });
@@ -179,7 +196,10 @@ function create(canvas) {
         next,
         before,
         Object.keys(defaults).filter(
-          (key) => !['step', 'columnSteps', 'restart', 'fade'].includes(key)
+          (key) =>
+            !['step', 'columnSteps', 'restart', 'fade', 'calibration'].includes(
+              key
+            )
         )
       );
     },
@@ -192,9 +212,14 @@ function create(canvas) {
     draw(dt, { still, frame }) {
       ctx.setTransform(area.ratio, 0, 0, area.ratio, 0, 0);
       // Round the absolute offset so subpixel deltas accumulate across frames.
-      const drift = Math.round(o.drift * area.ratio);
-      shiftCanvas(canvas, ctx, drift - priorDrift);
-      priorDrift = drift;
+      const spacing = o.cellSize / 2;
+      const x = Math.round(wrapGrid(o.originX, spacing) * area.ratio);
+      const y = Math.round(
+        (o.drift + wrapGrid(o.originY, spacing)) * area.ratio
+      );
+      shiftCanvas(canvas, ctx, x - previousX, y - previousY);
+      previousX = x;
+      previousY = y;
       if (!o.visible) {
         return;
       }

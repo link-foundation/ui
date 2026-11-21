@@ -2,8 +2,11 @@
 export function observeMaterialVisibility(
   root,
   selector,
-  { margin = '200px 0px', onVisibility } = {}
+  { margin = '200px 0px', onVisibility, pseudoElement = '' } = {}
 ) {
+  if (!['', '::before', '::after'].includes(pseudoElement)) {
+    throw new TypeError('Expected a before or after material pseudo-element');
+  }
   const document = root.ownerDocument ?? root;
   const view = document.defaultView;
   if (!view?.IntersectionObserver) {
@@ -19,7 +22,7 @@ export function observeMaterialVisibility(
   // An inline important rule also applies in print, so use an author stylesheet.
   // Repeated IDs make this override every framework selector, including hover.
   const priority = ':is(#ui-budget#ui-budget#ui-budget, *)';
-  style.textContent = `@media screen { [${marker}]${priority} { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; } }`;
+  style.textContent = `@media screen { [${marker}]${priority}${pseudoElement} { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; } }`;
   (document.head ?? document.documentElement).append(style);
   const tracked = new Map();
   const observer = new view.IntersectionObserver(

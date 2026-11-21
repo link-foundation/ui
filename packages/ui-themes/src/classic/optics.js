@@ -71,12 +71,9 @@ function opticalShadows(m, alpha) {
   return shadows;
 }
 
-function opticalImages(m, alpha) {
+function opticalImages(m, alpha, surfaceColor) {
   const light = (n) => `rgb(255 255 255 / ${n * alpha})`;
   const images = [];
-  if (m.noise && alpha) {
-    images.push(materialNoise(m.noise, alpha));
-  }
   if (m.sheen && alpha) {
     images.push(
       `linear-gradient(${m['sheen-angle'] ?? 0}deg, transparent, ${light(m.sheen)}, transparent)`,
@@ -84,24 +81,39 @@ function opticalImages(m, alpha) {
     );
   }
   if (m['tint-level'] && alpha) {
-    const tint =
-      !m.tint || m.tint === 'theme'
-        ? 'var(--color-surface, currentColor)'
-        : m.tint;
+    const tint = !m.tint || m.tint === 'theme' ? surfaceColor : m.tint;
     const color = `color-mix(in srgb, ${tint} ${m['tint-level'] * alpha * 100}%, transparent)`;
     images.push(`linear-gradient(${color}, ${color})`);
   }
   return images;
 }
 
-export function opticalStyle(m, alpha) {
-  const shadows = opticalShadows(m, alpha);
-  const images = opticalImages(m, alpha);
+function textureImage(input, texture) {
+  const { material, opacity, transparent } = input;
+  if (!transparent || !material.noise || !opacity) {
+    return null;
+  }
+  return texture ? texture(input) : materialNoise(material.noise, opacity);
+}
+
+export function opticalStyle(material, transparent, options) {
+  const { texture, lighting } = options;
+  const surfaceColor =
+    options.surfaceColor ?? 'var(--color-surface, currentColor)';
+  const opacity = material.opacity;
+  const input = { material, opacity, transparent, surfaceColor };
+  const light = opacity ? lighting?.(input) : undefined;
+  const grain = textureImage(input, texture);
+  const images =
+    light?.images ?? opticalImages(material, opacity, surfaceColor);
+  const shadows = light?.shadows ?? opticalShadows(material, opacity);
   return {
-    'background-image': images.join(', ') || 'none',
-    'box-shadow': alpha ? shadows.join(', ') || 'none' : 'none',
-    'border-width': `${m['border-width'] ?? 0}px`,
+    'background-image': [grain, ...images].filter(Boolean).join(', ') || 'none',
+    'box-shadow': opacity ? shadows.join(', ') || 'none' : 'none',
+    'border-width': `${material['border-width'] ?? 0}px`,
     'border-style': 'solid',
-    'border-color': `rgb(255 255 255 / ${(m['border-light'] ?? 0) * alpha})`,
+    'border-color':
+      light?.borderColor ??
+      `rgb(255 255 255 / ${(material['border-light'] ?? 0) * opacity})`,
   };
 }

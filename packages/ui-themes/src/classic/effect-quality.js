@@ -1,4 +1,4 @@
-/** Internal per-effect watcher. Only valid frame gaps contribute to windows. */
+/** Accumulate host frame gaps and report each downward quality step. */
 export function createQualityWatcher({
   resolution = true,
   minScale = 0.4,

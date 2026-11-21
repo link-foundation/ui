@@ -54,9 +54,16 @@ A theme has named voices (oscillator/noise graphs, envelopes, optional
 filters/FM/delays/repeats), event modes `random`, `cycle`, `layer`, per-event
 throttling, a shelf/compressor/reverb bus, and per-voice provenance.
 [The specification](../../docs/spec/sound.md) defines all fields and bounds.
-`createSoundBus(context, settings, random)` and
+`createSoundBus(context, settings, random, options)` and
 `playVoice(context, voice, output, options)` also accept an offline or fake
 BaseAudioContext directly. `playVoice` returns the scheduled end time.
+
+The bus defaults to `gainPlacement: 'output'`, after the dry and wet signals
+meet at the compressor. Select `gainPlacement: 'input'` for presets authored
+for volume before the shelf, reverb and compressor. A `destination` accepts
+an AudioNode in the bus's context or a function receiving that context.
+Pass the same options as `bus` to `createSoundPlayer` to route its cues and
+previews. The player resolves the destination when audio activates.
 
 Bundled themes are `quiet` (five soft voices) and `immortality` (all 26
 patches, including noise, FM and stereo parts). The port is from

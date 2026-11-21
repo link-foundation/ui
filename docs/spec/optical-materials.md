@@ -61,6 +61,23 @@ image source unchanged, so the browser reuses its decoded image. No canvas,
 network requests, random source or unbounded image cache is used. Grain paints
 over tint and beneath content; the host's contour clips the layer.
 
+## Host texture and lighting
+
+Pass a third argument to `materialStyle` to use host artwork and theme tokens.
+`surfaceColor` accepts a CSS color expression such as
+`var(--host-glass-color)` for inherited material color and theme tint.
+`prefix` namespaces the noise and refraction properties, and `clipPath` accepts
+the host contour. Apply the resulting declarations to a dedicated surface.
+
+`texture({ material, opacity, surfaceColor, transparent })` supplies a CSS
+background image for visible grain. `lighting` receives the same values and
+can supply `images`, `shadows` and `borderColor`. Omitted lighting fields use
+the built-in appearance. The texture sits over the lighting images. Reduced
+transparency skips the texture and backdrop filters and sets the background
+color to full strength. The `transparent` input lets host lighting select a
+matching appearance. Surface declarations leave content and frame stroke opacity
+under host control.
+
 ## Refraction
 
 ```js
@@ -145,6 +162,8 @@ until their first intersection notification. Without IntersectionObserver the
 helper makes no changes. Disposal restores the original declarations and
 releases references to removed nodes. Visibility callbacks can feed one governor
 per surface; applications may aggregate them if several surfaces share a governor.
+Set `pseudoElement: '::before'` or `'::after'` to suppress the filter on an
+observed element's host-painted pseudo-element.
 
 The optional preset key list is an allowlist. Unlisted geometry and all current
 viewer preferences remain intact. With no list the original appearance-wide
