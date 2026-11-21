@@ -13,31 +13,14 @@ parsers live and how they are kept in step with it.
 
 ## Swift
 
-### Decision: vendored here until upstream decides
+### Distribution
 
-`links-notation` has bindings for JavaScript, Rust, Python, Java, Go, C#, PHP
-and C++, but none for Swift. The preferred home for a Swift port is upstream,
-next to the others. The proposal is
-[link-foundation/links-notation#369](https://github.com/link-foundation/links-notation/issues/369)
-("Add Swift implementation"). It suggests:
-
-- a `swift/` folder;
-- a `swift` entry in `parity/language-features.json`;
-- distribution through SwiftPM.
-
-Upstream has not yet decided whether it wants a Swift folder. If it does, it
-must also choose a layout, because SwiftPM needs `Package.swift` at the root of
-the repository it fetches. The two options are a root `Package.swift` whose
-targets point at `swift/Sources/LinksNotation`, or a separate repository.
-
-Until then, the port is **vendored here** in `native/swift/LinksNotation`. Its
-layout (`Package.swift`, `Sources/LinksNotation`, `Tests/LinksNotationTests`)
-lets it move upstream unchanged, as `swift/`. The SwiftUI renderer
-([#30](https://github.com/link-foundation/ui/issues/30), [`packages/ui-swift`](../packages/ui-swift/README.md))
-uses it through the `LinksNotation` target of the root `Package.swift`, which
-points at `native/swift/LinksNotation/Sources/LinksNotation`. When the parser
-moves upstream, that target should become a package dependency and this copy
-should be deleted.
+The source for the UI parser lives in
+[`native/swift/LinksNotation`](../native/swift/LinksNotation). The root UI
+package compiles those sources directly. The Swift release workflow also
+exports them as an independent Git package with its own version and tag.
+See the [standalone manifest and usage](../native/swift/LinksNotation/README.md)
+and the [Swift publishing guide](../swift/ci/README.md#publishing).
 
 ### The package
 
