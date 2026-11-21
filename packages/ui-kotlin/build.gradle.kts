@@ -17,7 +17,6 @@ version = "0.1.0"
 
 val composeVersion = "1.12.2"
 val material3Version = "1.9.0"
-val androidCompileSdk = 37 // Compose 1.12 AARs require API 37 (checkAarMetadata).
 
 // Android needs an SDK. CI has one; elsewhere the Android target is left out
 // rather than failing the build of the desktop target (the same rule as the
@@ -31,9 +30,7 @@ val withAndroid = androidSdk != null && file(androidSdk).isDirectory
 
 // The public release must contain the Android variant as well as desktop.
 if (providers.gradleProperty("uiKotlinRequireAndroid").isPresent) {
-    check(withAndroid && file("$androidSdk/platforms/android-$androidCompileSdk/android.jar").isFile) {
-        "Install Android SDK Platform $androidCompileSdk for the full ui-kotlin publication."
-    }
+    check(withAndroid) { "Set ANDROID_HOME to an Android SDK with Platform 37 for the full ui-kotlin publication." }
 }
 
 if (withAndroid) {
@@ -75,7 +72,7 @@ kotlin {
     if (withAndroid) {
         extensions.configure<com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget>("android") {
             namespace = "foundation.link.ui"
-            compileSdk = androidCompileSdk
+            compileSdk = 37 // Compose 1.12 AARs require API 37 (checkAarMetadata)
             minSdk = 23
         }
     }
