@@ -1420,8 +1420,8 @@ history and four light/dark skins. Try [the 10,000-message example](examples/cha
 Import `createSettingsPanel`, `controlFor` and `buildPanelModel` from
 `@link-foundation/ui-components/settings` and load `controls.css` and
 `settings.css` from this package. The panel uses the real `ui-settings`
-schema engine and the basic controls. See
-[`examples/settings.html`](examples/settings.html) (serve with
+schema engine and the basic controls. See the [host settings guide](src/settings/README.md).
+Try [`examples/settings.html`](examples/settings.html) (serve with
 `node scripts/serve-static.mjs`).
 
 ```js
@@ -1498,20 +1498,3 @@ Import X, Telegram and VK adapters from `@link-foundation/ui-components/embed/pr
 
 See [brand marks, presentation variants and static subsets](ICONS.md) for
 Simple Icons and localized inline messages.
-
-### Settings in host-owned layouts
-
-`buildPanelModel` exposes the sections and visible fields for a selection.
-Use `estimateSection` and `planSectionColumns` with initial values, tabs and
-levels to lay out the columns before mounting. With estimated columns the
-panel keeps each section in its initial column when a field changes.
-
-Use `mountSettingsRow(container, schema, field, options)` to mount an
-individual validated row. The row and panel accept `slots` for label, value,
-reset and hint markup, `mountControl` for an asset picker or another editor,
-and `layout` to move the row's labeled parts inside host markup. Return the
-primary focusable element from a custom control and call the supplied change
-handler when its value changes. `mountField` lets custom renderers fall back
-to the standard editor. For panel section and tab chrome use
-`renderSection` and `renderTab`. The panel retains the native details and
-keyboard-operable tab buttons around the rendered content.
