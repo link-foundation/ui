@@ -1,6 +1,6 @@
 {
   "name": "@link-foundation/ui-designer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "LiNo WYSIWYG designer with docked panels, transactional editing and source-preserving two-way sync",
   "type": "module",
   "exports": {
@@ -23,7 +23,7 @@
     "directory": "packages/ui-designer"
   },
   "dependencies": {
-    "@link-foundation/ui-components": "^0.1.0",
+    "@link-foundation/ui-components": "^0.2.0",
     "@link-foundation/ui-config": "^0.1.0",
     "@link-foundation/ui-core": "^0.1.0",
     "@link-foundation/ui-devmode": "^0.1.0",
