@@ -25,6 +25,7 @@ export const vkProvider = Object.freeze({
     container.lang = context.locale;
     const widgets = context.window.VK.Widgets;
     const widgetId = widgets.Post(container.id, owner, post, context.hash, {
+      ...context.widgetOptions?.vk,
       dark: context.theme === 'dark' ? 1 : 0,
       lang: context.locale,
       onReady: context.ready,

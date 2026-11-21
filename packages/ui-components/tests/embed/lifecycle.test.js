@@ -3,6 +3,68 @@ import { fixture, microtasks } from './support.js';
 import { createEmbed } from '../../src/embed/controller.js';
 
 describe('deferred embed lifecycle', () => {
+  it('shows an external archive in place and moves focus between live and fallback on retry', async () => {
+    const t = fixture({ script: null }, { enabled: false });
+    const archive = t.document.createElement('article');
+    const retry = t.document.createElement('button');
+    archive.append(retry);
+    t.host.after(archive);
+    t.controller.destroy();
+    const controller = createEmbed(t.host, {
+      provider: 'test',
+      id: '42',
+      archive,
+      labels: { title: 'Original post' },
+    });
+    t.observers.at(-1).enter();
+    await microtasks();
+    const live = t.host.querySelector('[data-part="embed"]');
+    expect(archive.hidden).toBe(true);
+    expect(t.host.nextElementSibling).toBe(archive);
+    expect(t.host.querySelector('details, button')).toBe(null);
+    live.focus();
+    t.renders[0].context.unavailable();
+    expect(t.document.activeElement).toBe(archive);
+    retry.focus();
+    controller.retry();
+    await microtasks();
+    expect(t.document.activeElement).toBe(live);
+    expect(live.getAttribute('aria-label')).toBe('Original post');
+    expect(archive.hidden).toBe(true);
+    controller.destroy();
+    expect(archive.hidden).toBe(false);
+    expect(archive.hasAttribute('tabindex')).toBe(false);
+    t.destroy();
+  });
+
+  it('keeps archive controls and custom toggle labels usable across fallback and retry', async () => {
+    const t = fixture(
+      { script: null },
+      {
+        toggle: true,
+        labels: { archive: 'Saved copy', showEmbed: 'Try again' },
+      }
+    );
+    t.enter();
+    await microtasks();
+    const details = t.host.querySelector('details');
+    const archive = details.querySelector('article');
+    const link = t.document.createElement('a');
+    link.href = '#saved';
+    archive.append(link);
+    details.open = true;
+    link.focus();
+    t.renders[0].context.unavailable();
+    expect(t.document.activeElement).toBe(link);
+    expect(t.host.querySelector('button').textContent).toBe('Try again');
+    t.controller.retry();
+    await microtasks();
+    expect(details.open).toBe(true);
+    expect(details.querySelector('summary').textContent).toBe('Saved copy');
+    expect(t.document.activeElement).toBe(link);
+    t.destroy();
+  });
+
   it('defers until the 400px viewport margin and shares scripts between hosts', async () => {
     const t = fixture();
     expect(t.document.scripts.length).toBe(0);
