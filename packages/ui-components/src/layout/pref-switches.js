@@ -109,7 +109,9 @@ function renderSound(options, button, icons, locale, enabled) {
     () => {
       if (button.firstChild !== icons[0]) {
         setText(button, '');
-        button.append(...icons);
+        for (const icon of icons) {
+          button.appendChild(icon);
+        }
       }
       for (const icon of icons) {
         setAttr(
