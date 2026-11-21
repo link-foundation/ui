@@ -30,6 +30,39 @@ const names = [
 const manifest = `icons\n${names.map((name) => `  'lucide:${name}'`).join('\n')}\n`;
 
 describe('app-chosen static subsets', () => {
+  it('writes standalone modules for representative brands, each with a single named mark and record', async () => {
+    const brands = {
+      telegram: 'Telegram',
+      x: 'X',
+      youtube: 'YouTube',
+      vk: 'VK',
+      discord: 'Discord',
+      stackoverflow: 'Stack Overflow',
+      habr: 'Habr',
+    };
+    await inFixture({}, async (root) => {
+      const { errors, written } = await buildIcons({
+        root,
+        out: 'out',
+        sets: ['brand'],
+      });
+      expect(errors).toEqual([]);
+      for (const [name, title] of Object.entries(brands)) {
+        const filename = `out/brand/${name}.js`;
+        expect(written.includes(filename)).toBe(true);
+        const module = read(join(root, filename));
+        const data = JSON.parse(
+          module.split('export default ')[1].trim().slice(0, -1)
+        );
+        expect(Object.keys(data.icons)).toEqual([name]);
+        const source = createStaticSource(data);
+        expect((await source.resolve(name)).title).toBe(title);
+        expect(source.records().map(({ id }) => id)).toEqual([`brand-${name}`]);
+      }
+      expect(written.includes('out/brand/linkedin.js')).toBe(false);
+    });
+  });
+
   it('ships exactly 20 icons, records, sprite symbols and license with no runtime resolver', async () => {
     await inFixture({ extra: { 'names.lino': manifest } }, async (root) => {
       const result = await buildIcons({

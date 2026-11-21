@@ -63,6 +63,10 @@
       "default": "./src/icons/adapters/material-symbols.js"
     },
     "./dist/icons/*": "./dist/icons/*",
+    "./icons/brand/*": {
+      "types": "./src/icons/brand.d.ts",
+      "default": "./dist/icons/brand/*.js"
+    },
     "./overlays": {
       "types": "./src/overlays/index.d.ts",
       "default": "./src/overlays/index.js"

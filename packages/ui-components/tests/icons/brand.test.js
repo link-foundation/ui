@@ -14,7 +14,9 @@ describe('Simple Icons brand set', () => {
     expect(icon.body).toContain('currentColor');
     expect(icon.record.license).toBe('CC0-1.0');
     expect(icon.record.attributionText).toContain('trademark');
-    expect(source.records()).toEqual([icon.record]);
+    expect(source.records().find(({ id }) => id === 'brand-github')).toEqual(
+      icon.record
+    );
   });
 
   it('diagnoses withdrawn names and a missing optional package and renders a placeholder', async () => {

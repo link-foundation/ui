@@ -10,6 +10,18 @@ export interface EmbedLabels {
   showEmbed: string;
   showArchive: string;
 }
+export interface EmbedWidgetOptions {
+  x?: Readonly<Record<string, unknown>> & {
+    width?: number;
+    align?: 'left' | 'center' | 'right';
+  };
+  vk?: Readonly<Record<string, unknown>> & { width?: number | string };
+  telegram?: {
+    checkAvailability?(
+      post: Pick<EmbedContext, 'id' | 'url' | 'locale' | 'theme' | 'signal'>
+    ): boolean | Promise<boolean>;
+  };
+}
 export interface EmbedContext extends EmbedPost {
   theme: 'light' | 'dark';
   locale: string;
@@ -17,11 +29,15 @@ export interface EmbedContext extends EmbedPost {
   url: string;
   window: Window;
   signal: AbortSignal;
+  scriptTimeout?: number;
+  widgetOptions?: EmbedWidgetOptions;
   ready(): void;
   unavailable(): void;
 }
 export interface EmbedProvider {
   script: string | null;
+  /** Require an explicit ready() signal even when an iframe has a height. */
+  readiness?: 'provider';
   validate(post: EmbedPost): boolean;
   url(
     post: EmbedPost,
@@ -45,10 +61,13 @@ export interface EmbedOptions {
   toggle?: boolean;
   debug?: boolean;
   labels?: Partial<EmbedLabels>;
+  /** Mount-time option. Show this element in place on fallback or when off. */
+  archive?: HTMLElement;
+  widgetOptions?: EmbedWidgetOptions;
   log?: (...args: unknown[]) => void;
 }
 export interface EmbedController {
-  update(options: Partial<EmbedOptions>): void;
+  update(options: Partial<Omit<EmbedOptions, 'archive'>>): void;
   retry(): void;
   destroy(): void;
 }

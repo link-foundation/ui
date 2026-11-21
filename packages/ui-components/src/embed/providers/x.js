@@ -12,6 +12,7 @@ export const xProvider = Object.freeze({
       context.id,
       container,
       {
+        ...context.widgetOptions?.x,
         theme: context.theme,
         lang: context.locale,
         dnt: true,
