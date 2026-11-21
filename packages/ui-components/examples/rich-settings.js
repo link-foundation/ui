@@ -33,6 +33,7 @@ frame-art:
   default clear
   section frame
   tab Shape
+  visible-when show-frame true
 width:
   type number
   label Width

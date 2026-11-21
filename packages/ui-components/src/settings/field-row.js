@@ -12,15 +12,17 @@ function element(parent, tag, text) {
   return node;
 }
 
-function associate(input, { id, label, hint, output, useLabel }) {
+function associate(input, { id, label, control, hint, output, useLabel }) {
   if (!input) {
     return;
   }
   input.id ||= `${id}-input`;
   label.htmlFor = input.id;
   output.htmlFor.value = input.id;
-  const hasInlineLabel = Array.from(input.labels ?? []).some(
-    (other) => other !== label
+  // A detached panel can have an editor label before input.labels includes it.
+  const hasInlineLabel = Array.from(control.querySelectorAll('label')).some(
+    (other) =>
+      other !== label && (other.htmlFor === input.id || other.contains(input))
   );
   if (
     useLabel ||
@@ -118,6 +120,7 @@ export function createFieldRow(parent, field, context, initial, change) {
     associate(input, {
       id,
       label,
+      control: container,
       hint,
       output,
       useLabel:
