@@ -45,8 +45,11 @@ class ParserTest {
         val built = listOf(Link("has space", listOf(ref("x"))), Link(null, listOf(ref("y"), ref("z"))))
         assertEquals("('has space': x)\n(y z)", formatLinks(built))
         assertEquals("('has space': x)\ny z", formatLinks(built, lessParentheses = true))
-        assertEquals("()", Link(null).format())
-        assertEquals("", Link(null).format(lessParentheses = true))
+        val empty = Link(null)
+        assertEquals("()", empty.format())
+        val formatted = empty.format(lessParentheses = true)
+        assertEquals("()", formatted)
+        assertEquals(listOf(empty), parse(formatted))
     }
 
     @Test
