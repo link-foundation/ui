@@ -1,5 +1,12 @@
 # @link-foundation/ui-sound
 
+## 0.2.1
+
+### Patch Changes
+
+- Updated dependencies [ebd9f37]
+  - @link-foundation/ui-settings@0.2.0
+
 ## 0.2.0
 
 ### Minor Changes

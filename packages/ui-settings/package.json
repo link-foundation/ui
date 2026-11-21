@@ -1,6 +1,6 @@
 {
   "name": "@link-foundation/ui-settings",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Settings schema engine of the associative UI framework: one Links Notation schema gives coercion, untrusted merging, diff-only values, presets, randomisation, migrations, share links and before-paint DOM application",
   "type": "module",
   "exports": {

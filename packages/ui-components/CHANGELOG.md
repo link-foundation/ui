@@ -1,5 +1,16 @@
 # @link-foundation/ui-components
 
+## 0.6.0
+
+### Minor Changes
+
+- ebd9f37: Expose presentation and interaction hooks for host-owned settings, preference buttons, navigation and charts. Read existing JSON and Links Notation looks through the same validation and projection flow.
+
+### Patch Changes
+
+- Updated dependencies [ebd9f37]
+  - @link-foundation/ui-settings@0.2.0
+
 ## 0.5.0
 
 ### Minor Changes

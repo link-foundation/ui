@@ -1,5 +1,12 @@
 # @link-foundation/ui-designer
 
+## 0.1.6
+
+### Patch Changes
+
+- Updated dependencies [ebd9f37]
+  - @link-foundation/ui-components@0.6.0
+
 ## 0.1.5
 
 ### Patch Changes
