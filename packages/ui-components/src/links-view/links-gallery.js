@@ -1,8 +1,4 @@
-import { defineLinksNetwork } from './links-network.js';
-import { circle } from './layouts/circle.js';
-import { networkGeometry } from './network-scene.js';
-import { pathBounds } from './geometry.js';
-import { fitView } from './scene.js';
+import { doubletGeometry, doubletToSvg } from './doublet.js';
 import {
   count,
   codeAt,
@@ -15,7 +11,6 @@ import {
 
 export const LINKS_GALLERY_TAG = 'links-gallery';
 export const GALLERY_PAGE_SIZE = 243;
-const THUMBNAIL_TAG = 'links-gallery-network';
 const CSS = `:host { display:block; color-scheme:light dark; font:inherit; }
 [role=tablist], .filters { display:flex; flex-wrap:wrap; gap:12px; margin-block:12px; }
 button { font:inherit; padding:8px; color:inherit; background:Canvas; border:1px solid GrayText; border-radius:4px; cursor:pointer; }
@@ -23,7 +18,10 @@ button { font:inherit; padding:8px; color:inherit; background:Canvas; border:1px
 a { color:LinkText; text-align:center; text-decoration:none; }
 a:focus-visible, button:focus-visible, input:focus-visible { outline:2px solid Highlight; outline-offset:3px; }
 .cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(80px,1fr)); gap:12px; }
-links-gallery-network { width:64px; height:64px; margin:auto; pointer-events:none; }
+.thumbnail { display:block; width:64px; height:64px; margin:auto; color:var(--links-gallery-foreground,CanvasText); pointer-events:none; }
+:host([theme=light]) .thumbnail { color-scheme:light; background:Canvas; }
+:host([theme=dark]) .thumbnail { color-scheme:dark; background:Canvas; }
+.thumbnail svg { display:block; }
 code { display:block; font-size:11px; }
 [hidden] { display:none; }`;
 const words = Object.freeze({
@@ -169,24 +167,6 @@ function renderGallery(host, state) {
   state.more.addEventListener('click', () => appendPage(host, state));
   appendPage(host, state);
 }
-function fitThumbnail(thumb) {
-  const positions = circle(thumb.network, { width: 192, height: 192 });
-  const bounds = [...thumb.network.links.values()].map((link) =>
-    pathBounds(networkGeometry(link, positions).path)
-  );
-  thumb.positions = positions;
-  thumb.view = fitView(
-    {
-      minX: Math.min(...bounds.map((b) => b.minX)) - 12,
-      minY: Math.min(...bounds.map((b) => b.minY)) - 12,
-      maxX: Math.max(...bounds.map((b) => b.maxX)) + 12,
-      maxY: Math.max(...bounds.map((b) => b.maxY)) + 12,
-    },
-    64,
-    64
-  );
-}
-
 function appendPage(host, state) {
   const win = state.win;
   const n = host.size,
@@ -214,24 +194,20 @@ function appendPage(host, state) {
       }
       card.href = url.href;
     }
-    const thumb = state.element(THUMBNAIL_TAG, null, card);
-    thumb.setAttribute('aria-hidden', 'true');
-    thumb.addEventListener('layoutend', () => fitThumbnail(thumb));
-    if (theme) {
-      thumb.setAttribute('theme', theme);
-    }
-    thumb.items = links.map(([source, target], i) => ({
-      id: i + 1,
-      source,
-      target,
-    }));
+    const frame = state.frameFor
+      ? state.frameFor(context)
+      : doubletGeometry(links, 'palette inherit', context.index);
+    const thumb = state.element('span', null, card);
+    thumb.className = 'thumbnail';
+    thumb.innerHTML = doubletToSvg(frame, {
+      width: 64,
+      height: 64,
+      decorative: true,
+      idPrefix: `thumbnail-${state.shown}-`,
+    });
     state.element('code', code, card);
   }
   state.cards.append(fragment);
-  // connectedCallback makes networks focusable; thumbnails are decorative.
-  for (const thumb of state.cards.querySelectorAll(THUMBNAIL_TAG)) {
-    thumb.tabIndex = -1;
-  }
   state.more.hidden = state.shown >= state.total;
 }
 /** Each host owns its URL callback, paging, locale and class enumeration cache. */
@@ -242,7 +218,6 @@ export function defineLinksGallery(
   if (win.customElements.get(tag)) {
     return win.customElements.get(tag);
   }
-  defineLinksNetwork(win, { tag: THUMBNAIL_TAG, worker: false });
   class LinksGallery extends win.HTMLElement {
     #state;
     static get observedAttributes() {
@@ -255,6 +230,7 @@ export function defineLinksGallery(
         win,
         root,
         url: null,
+        frameFor: null,
         cache: new Map(),
         shown: 0,
         total: 0,
@@ -289,6 +265,18 @@ export function defineLinksGallery(
     }
     get urlFor() {
       return this.#state.url;
+    }
+    set frameFor(value) {
+      if (value !== null && typeof value !== 'function') {
+        throw new TypeError('frameFor must be a function');
+      }
+      this.#state.frameFor = value;
+      if (this.isConnected) {
+        renderGallery(this, this.#state);
+      }
+    }
+    get frameFor() {
+      return this.#state.frameFor;
     }
     get size() {
       const value = Number(this.getAttribute('size') ?? 1);

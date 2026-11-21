@@ -3,6 +3,26 @@ import { createDoubletProvider } from '../doublet.js';
 import { normalize, fromOptions } from './options.js';
 import { networkOptionSchema } from './schema.js';
 
+function linkOverrides(options, index) {
+  const values = [];
+  const turns = options.turns[index];
+  const gaps = options.linkGaps[index];
+  const color = options.linkColors[index];
+  if (turns) {
+    values.push({ id: 'turns', values: turns.map(String) });
+  }
+  if (gaps) {
+    values.push({
+      id: 'gaps',
+      values: gaps.map((value) => (value === null ? '~' : String(value))),
+    });
+  }
+  if (color) {
+    values.push({ id: 'color', values: [color] });
+  }
+  return values;
+}
+
 /** Translate the editor vocabulary into the built-in renderer's nested LiNo. */
 export function rendererOptions(input, count) {
   const options = normalize(input),
@@ -10,7 +30,8 @@ export function rendererOptions(input, count) {
     groups = new Map();
   for (const field of networkOptionSchema) {
     if (
-      ['solver', 'palette'].includes(field.section) ||
+      field.section === 'solver' ||
+      field.key === 'quality' ||
       options[field.key] === field.default
     ) {
       continue;
@@ -38,21 +59,12 @@ export function rendererOptions(input, count) {
     });
   }
   for (const key of ['frame', 'order']) {
-    if (options[key]) {
+    if (options[key] && (key !== 'order' || options.order.length === count)) {
       filtered.push({ id: key, values: options[key].map(String) });
     }
   }
   for (let i = 0; i < count; i++) {
-    const values = [];
-    if (options.turns[i]) {
-      values.push({ id: 'turns', values: options.turns[i].map(String) });
-    }
-    if (options.linkGaps[i]) {
-      values.push({
-        id: 'gaps',
-        values: options.linkGaps[i].map((v) => (v === null ? '~' : String(v))),
-      });
-    }
+    const values = linkOverrides(options, i);
     if (values.length) {
       filtered.push({ values: ['link', String(i + 1), ...values] });
     }
@@ -66,28 +78,14 @@ export function createNetworkEditorProvider(configuration = {}) {
   return {
     geometry(context) {
       const options = fromOptions(context.input.options);
-      const frame = provider.geometry({
+      return provider.geometry({
         ...context,
         input: {
           ...context.input,
           options: rendererOptions(options, context.input.items.length),
         },
       });
-      return { ...frame, linkColors: options.linkColors };
     },
-    svg(context) {
-      let svg = provider.svg(context);
-      // The built-in renderer gives every link an identified group. Its paths
-      // and markers inherit currentColor, so one group attribute colors both.
-      context.frame.linkColors.forEach((color, i) => {
-        if (color) {
-          svg = svg.replace(
-            `<g data-doublet="${i + 1}">`,
-            `<g data-doublet="${i + 1}" color="${color}">`
-          );
-        }
-      });
-      return svg;
-    },
+    svg: provider.svg,
   };
 }

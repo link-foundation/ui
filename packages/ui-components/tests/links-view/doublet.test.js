@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   createDoubletProvider,
   doubletGeometry,
+  doubletToSvg,
 } from '../../src/links-view/doublet.js';
 import { createNetworkPresentation } from '../../src/links-view/presentation.js';
 import {
@@ -372,6 +373,18 @@ it('fits with marker-aware margins and a maximum scale of 60', async () => {
 
 it('exports all caption, background, border and line variants with safe text', () => {
   const provider = createDoubletProvider();
+  const compareSizes = (frame) => {
+    const desktop = provider.svg({ frame });
+    const thumbnail = doubletToSvg(frame, { width: 64, height: 64 });
+    assert.equal(
+      thumbnail,
+      desktop.replace(
+        `width="${frame.options.width}" height="${frame.options.height}"`,
+        'width="64" height="64"'
+      )
+    );
+    return desktop;
+  };
   for (const n of [1, 9, 12]) {
     const items = Array.from({ length: n }, (_, i) => [i + 1, i + 1]);
     for (const mode of [
@@ -387,7 +400,7 @@ it('exports all caption, background, border and line variants with safe text', (
         `caption\n  mode ${mode}\n  text '<script>&"'\n  size 14\nwidth 64\nheight 128`,
         '123456789012345678901234567890'
       );
-      const svg = provider.svg({ frame });
+      const svg = compareSizes(frame);
       if (mode === 'none') {
         assert.doesNotMatch(svg, /data-part="caption"/u);
       } else {
@@ -405,7 +418,7 @@ it('exports all caption, background, border and line variants with safe text', (
         [[0, 0]],
         `background\n  type ${type}\ncard\n  border ${border}\n  opacity 0.8\n  radius 12\n  inset 3\nglow 12\ndash dashdot`
       );
-      const svg = provider.svg({ frame });
+      const svg = compareSizes(frame);
       assert.match(svg, /data-part="card"/u);
       if (type !== 'transparent') {
         assert.match(svg, /data-part="background"/u);

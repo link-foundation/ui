@@ -32,6 +32,42 @@ The adapter uses the pure model, notations and canonical renaming available at
 `@link-foundation/ui-components/links-view/configurations`. A host may supply
 another `configurations` object implementing that module's contract.
 
+## Host panels and messages
+
+Supply `mounts` to place individual panels in host-owned HTML. Fields remain
+labelled and URL synchronization listens to every mounted panel.
+
+```js
+const editor = createNetworkEditor(editorRoot, {
+  presentation,
+  mounts: {
+    notations: notationSection,
+    links: linkSection,
+    styles: styleSection,
+    actions: actionSection,
+  },
+  messages: {
+    share: 'Compartir',
+    done: 'Listo',
+    'download.jpg': 'Guardar JPEG',
+    'target.Mastodon': 'En el fediverso',
+  },
+});
+```
+
+Use `networkEditorMessages` to inspect available keys and interpolation values.
+Overrides can replace action names, statuses, errors and control labels.
+The `error` template receives `{detail}` from the underlying error.
+Notation validation uses `notationError.<code>` overrides and the configured
+notation locale. Disposing the editor removes the panels it mounted.
+
+For custom controls, `createNetworkEditorModel(presentation, { onChange, onBusy })`
+exposes the same state and actions without requiring a DOM. Use `snapshot()`
+to read editable state, `applyLinks` and `changeOptions` to edit, or `applyStyle`
+to replace a look. It also exposes `removeLink`, `canonicalize`, `restore`,
+`solve` and `dispose`. Subscribe to the presentation directly for updates to
+committed artwork.
+
 ## Options and provider boundary
 
 `networkOptionSchema` describes each scalar renderer/solver field with its
@@ -48,16 +84,22 @@ finite coordinates bounded by ±1e6 and scale in `(1e-9, 60]`. `order` is a
 permutation of the current IDs. Scalar defaults match the specifications in
 issues #227 and #228; passes are bounded to 1..10 for an interactive editor.
 
-`networkOptionsToParams` writes only nondefaults. Structured values use LiNo,
-not JSON. `networkOptionsFromParams` ignores unknown/malformed optional fields,
-understands legacy `gap`, and treats explicit colours without a palette as
-custom. A custom colour with the default palette normalizes to custom so the
-URL remains unambiguous. Selecting or resetting the default palette restores
-its scalar colours, while retaining per-link overrides and the pinned frame.
-The URL's `code` is separate from the options.
-`restoreUrl()` reads it with the current search parameters; call this explicitly
-on initial mount when the host did not already prepare the presentation from
-the URL. Back/forward events restore automatically.
+`networkOptionsToParams` writes only nondefaults. Structured values use LiNo.
+`networkOptionsFromParams` reads legacy flat field names including `placement`,
+marker fields such as `endSize`, `colors`, comma-separated `turns` and `gaps`,
+background, card and caption fields, and the shared `gap`. Options written
+with canonical names take precedence over their aliases. Legacy custom
+colours override entries in the original site palette. Flat turn lists and
+rotations above 180° also identify legacy bookmarks. Bookmarks with only
+shared keys, such as `code` and `width`, can be read with `{ legacy: true }`
+to select legacy defaults explicitly.
+
+In canonical state, setting a base colour without selecting a palette uses
+the custom palette. Selecting the default palette restores scalar colours and
+keeps per-link overrides and the pinned frame. The URL's `code` is separate
+from the options. Call `restoreUrl()` on initial mount when the host has
+yet to prepare the presentation from the URL. Back/forward events restore
+automatically.
 
 `networkOptionsToLino` / `networkOptionsFromLino` are the editor's canonical
 flat-key LiNo state. They are suitable for presentation providers built for this
@@ -68,10 +110,9 @@ per-link colours are not silently injected into another provider's grammar.
 
 `createNetworkEditorProvider()` adapts the built-in doublet renderer to this
 persisted vocabulary. It translates groups, global gaps, per-link turns/gaps,
-frames and circle order into the renderer's nested LiNo, leaving default marker
-fields implicit so tip compensation is preserved. Per-link colours apply to the
-identified SVG groups, whose paths and markers inherit currentColor. Preview
-and raster exports use that same markup. The example uses this provider.
+colours, frames and circle order into nested LiNo. Default marker fields stay
+implicit so tip compensation is preserved. Per-link colours are resolved on the
+fitted frame so preview, raster and `doubletToSvg` all use the same artwork.
 
 The collision algorithm in #228 remains independent upstream work. Hosts supply
 a solver callback; the editor does not substitute an algorithm or simulated
@@ -111,18 +152,26 @@ aborts the callback and discards stale results. Disposal aborts outstanding work
 The UI's contract tests use controlled callback results to test these boundaries;
 they do not claim to verify a collision algorithm.
 
-Downloads and copy actions use the committed presentation directly. PNG is the
-same `toRaster` output; JPEG passes `background.color` as its matte. SVG never
-recomputes geometry. Filenames are sanitized and capped at 160 characters.
+Downloads and copy actions use the committed presentation. The raster exports
+use the configured dimensions and quality, and JPEG uses `background.color`
+as its matte. SVG uses the prepared geometry. Filenames are sanitized and capped at 160 characters.
 The image ClipboardItem is constructed synchronously inside the click, holding
 a promise for the PNG. Web Share prepares PNG after a 200 ms debounce and drops
 stale preparation. Unsupported file sharing falls back to the URL. Share target
-links include X, Telegram, VK, Facebook, LinkedIn, Reddit, Bluesky,
-Mastodon (mastodon.social), WhatsApp and e-mail. Results use `aria-live`.
+links come from `networkShareDestinations`, an id-to-label-and-template map.
+Use `networkShareTargets(url, title, { mastodonInstance, emailBody })` to expand
+those templates in a custom UI, or pass the same options in the editor's
+`share` settings. An instance may be a hostname or an HTTPS origin.
+`emailBody` accepts `{title}` and `{url}` and defaults to both on separate lines.
+Supply `destinations` to replace the map. A destination template can use
+`{url}`, `{title}` and `{emailBody}` as individually URL-encoded values and
+`{mastodonOrigin}` as an HTTPS origin. Results use `aria-live`.
 
 `syncNetworkUrl(presentation, {urlFor, ...})` is independently usable. It calls
-`replaceState`, debounced 400 ms, preserves history state and never adds entries.
-Pointer/touch and slider-key holds defer writes until release. Failures, including
+`replaceState` only when the committed URL changes, debounced by 400 ms.
+The editor preserves unknown query parameters and history state.
+Pointer, touch and slider-key holds defer writes until release. Keyboard holds
+end on focus loss, including when the held control is removed. Failures, including
 SecurityError, retry at 1, 2, 4 and 8 seconds, stopping after five failures.
 New committed state starts a fresh attempt. Timers can be injected for tests;
 `debug(message, details)` is silent unless supplied. `dispose()` unsubscribes,
@@ -136,6 +185,7 @@ the host manage URL synchronization.
 - `npx playwright test packages/ui-components/tests/e2e/network-editor.spec.js --workers=1`
 
 The browser suite checks notation editing, a real 2-second slider hold, pinned
-frame URLs, byte-identical PNG/JPEG downloads, JPEG matte pixels, one-link-per-line
-LiNo, clipboard user activation, accessibility and notation-panel visual baselines.
+frame URLs, byte-identical PNG/JPEG/WebP downloads where the browser supports
+encoding, JPEG matte pixels, one-link-per-line LiNo, clipboard user activation,
+host-mounted panels, accessibility and notation-panel visual baselines.
 The example intentionally leaves Apply disabled without a real solver callback.
