@@ -9,7 +9,7 @@ parsers live and how they are kept in step with it.
 | Language | Where                                                                                                                                      | Status    | Issue                                                  |
 | -------- | ------------------------------------------------------------------------------------------------------------------------------------------ | --------- | ------------------------------------------------------ |
 | Swift    | [`native/swift/LinksNotation`](../native/swift/LinksNotation)                                                                              | vendored  | [#29](https://github.com/link-foundation/ui/issues/29) |
-| Kotlin   | [`io.github.link-foundation.kotlin:links-notation`](https://central.sonatype.com/artifact/io.github.link-foundation.kotlin/links-notation) | published | [#31](https://github.com/link-foundation/ui/issues/31) |
+| Kotlin   | [`io.github.link-foundation.kotlin:links-notation`](https://repo.maven.apache.org/maven2/io/github/link-foundation/kotlin/links-notation/) | published | [#31](https://github.com/link-foundation/ui/issues/31) |
 
 ## Swift
 
