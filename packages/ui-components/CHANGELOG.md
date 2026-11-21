@@ -1,5 +1,13 @@
 # @link-foundation/ui-components
 
+## 0.4.0
+
+### Minor Changes
+
+- 562b96b: Publish standalone browser-ready modules for eight Simple Icons brand marks that applications can import individually.
+
+  Size Telegram embeds with the official widget, support host availability checks and archive layouts, and forward X and VK widget options.
+
 ## 0.3.0
 
 ### Minor Changes
