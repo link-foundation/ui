@@ -10,9 +10,10 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose") version "2.4.21"
     id("org.jetbrains.compose") version "1.12.2"
     id("com.android.kotlin.multiplatform.library") version "9.5.0" apply false
+    id("com.vanniktech.maven.publish") version "0.37.0"
 }
 
-group = "foundation.link.ui"
+group = "io.github.link-foundation.kotlin"
 version = "0.1.0"
 
 val composeVersion = "1.12.2"
@@ -26,6 +27,11 @@ val androidSdk: String? =
         ?: file("local.properties").takeIf { it.isFile }?.readLines()
             ?.firstOrNull { it.startsWith("sdk.dir=") }?.substringAfter("=")
 val withAndroid = androidSdk != null && file(androidSdk).isDirectory
+
+// The public release must contain the Android variant as well as desktop.
+if (providers.gradleProperty("uiKotlinRequireAndroid").isPresent) {
+    check(withAndroid) { "Set ANDROID_HOME to an Android SDK with Platform 37 for the full ui-kotlin publication." }
+}
 
 if (withAndroid) {
     apply(plugin = "com.android.kotlin.multiplatform.library")
@@ -75,7 +81,8 @@ kotlin {
         commonMain {
             kotlin.srcDir(generateVocabulary)
             dependencies {
-                implementation(libs.links.notation)
+                // Public helpers such as UiValue.toLink() expose the parser's Link type.
+                api(libs.links.notation)
                 api("org.jetbrains.compose.runtime:runtime:$composeVersion")
                 api("org.jetbrains.compose.foundation:foundation:$composeVersion")
                 api("org.jetbrains.compose.ui:ui:$composeVersion")
@@ -94,6 +101,48 @@ kotlin {
                 // Reads the fixtures' .tree.json and .diagnostics.json (test only).
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
             }
+        }
+    }
+}
+
+mavenPublishing {
+    // Upload to the Portal for validation. The maintainer publishes the
+    // validated deployment explicitly in the Portal.
+    publishToMavenCentral(automaticRelease = false)
+    if (providers.gradleProperty("signingInMemoryKey").isPresent) {
+        signAllPublications()
+    }
+    pom {
+        name.set("Link Foundation UI for Kotlin")
+        description.set("A Compose Multiplatform renderer for the Link Foundation UI dialect.")
+        url.set("https://github.com/link-foundation/ui")
+        licenses {
+            license {
+                name.set("Unlicense")
+                url.set("https://unlicense.org/")
+                distribution.set("repo")
+            }
+        }
+        developers {
+            developer {
+                name.set("Link.Foundation")
+                organization.set("Link Foundation")
+                organizationUrl.set("https://github.com/link-foundation")
+            }
+        }
+        scm {
+            url.set("https://github.com/link-foundation/ui")
+            connection.set("scm:git:https://github.com/link-foundation/ui.git")
+            developerConnection.set("scm:git:ssh://git@github.com/link-foundation/ui.git")
+        }
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "Staging"
+            url = uri(layout.buildDirectory.dir("staging-repository"))
         }
     }
 }

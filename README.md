@@ -248,8 +248,9 @@ UiView(document: UiDocumentModel(lino: text)) { action in
 ### Jetpack Compose
 
 [`ui-kotlin`](packages/ui-kotlin/README.md) draws a LiNo document with Material 3
-Compose views (Compose Multiplatform desktop, optional Android). It is a
-Gradle Kotlin Multiplatform project; `examples/kotlin` is a desktop window:
+Compose views on desktop and Android. Add the dependency
+`io.github.link-foundation.kotlin:ui-kotlin:0.1.0` from Maven Central once
+the first release is published. The desktop example is in `examples/kotlin`.
 
 ```kotlin
 UiView(rememberUiDocumentState(text), onAction = { action ->

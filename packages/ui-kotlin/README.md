@@ -14,8 +14,9 @@ It is a Gradle Kotlin Multiplatform project:
   `local.properties`), so a machine without one still builds the desktop
   target.
 
-The renderer reads documents with the
-[published Kotlin Links Notation parser](https://central.sonatype.com/artifact/io.github.link-foundation.kotlin/links-notation).
+The renderer uses the official
+[`io.github.link-foundation.kotlin:links-notation:0.31.8`](https://repo.maven.apache.org/maven2/io/github/link-foundation/kotlin/links-notation/0.31.8/)
+parser from Maven Central.
 The [Kotlin version catalog](../../kotlin/gradle/libs.versions.toml) pins the
 version shared by the renderer and the parser fixture tests.
 
@@ -27,6 +28,14 @@ UPDATE_SNAPSHOTS=1 ./gradlew desktopTest --tests '*FixtureTest*'   # write missi
 ```
 
 ## Usage
+
+Add `google()` and `mavenCentral()` to your Gradle dependency repositories.
+Once the first release is published, add this dependency to the source set
+that uses the renderer. Gradle selects the desktop or Android variant.
+
+```kotlin
+implementation("io.github.link-foundation.kotlin:ui-kotlin:0.1.0")
+```
 
 ```kotlin
 val document = rememberUiDocumentState(File("document.lino").readText())
@@ -135,7 +144,9 @@ all of a drawn kind, and compares the result with
 `examples/kotlin` is a Compose Desktop window that renders
 `docs/case-studies/issue-1/samples/document.lino` with the theme
 `examples/kotlin/theme.lino` (light and `--dark`). Paths are relative to
-`examples/kotlin`.
+`examples/kotlin`. The example resolves `ui-kotlin` from Maven Central by
+default. Use the staging commands below to run it before the first release
+or to try an unpublished change.
 
 ```sh
 cd examples/kotlin
@@ -148,6 +159,53 @@ cd examples/kotlin
 | Light                                                | Dark                                               |
 | ---------------------------------------------------- | -------------------------------------------------- |
 | ![Light](../../docs/screenshots/ui-kotlin-light.png) | ![Dark](../../docs/screenshots/ui-kotlin-dark.png) |
+
+## Maven Central publication
+
+The first version is `0.1.0`. The release contains the Kotlin Multiplatform
+root artifact `ui-kotlin`, the JVM artifact `ui-kotlin-desktop`, and the
+Android artifact `ui-kotlin-android`. Install Android SDK Platform 37 and set
+`ANDROID_HOME` to stage all three from a checkout.
+
+Run these commands from the repository root to verify package assembly and
+build the example against the resulting Maven artifacts.
+
+```sh
+(cd packages/ui-kotlin && ./gradlew -PuiKotlinRequireAndroid=true publishAllPublicationsToStagingRepository)
+(cd examples/kotlin && ../../packages/ui-kotlin/gradlew \
+  -PuiKotlinStagingRepository="$PWD/../../packages/ui-kotlin/build/staging-repository" build)
+```
+
+Use `run` in place of `build` to open the example. The Kotlin CI workflow
+also signs and verifies each staged package file with an ephemeral key.
+
+To configure and test the first Central upload:
+
+1. Confirm that the publishing account can use the
+   [verified namespace](https://central.sonatype.org/register/namespace/)
+   `io.github.link-foundation.kotlin`, which already hosts Links Notation.
+   Generate a [Central Portal user token](https://central.sonatype.org/publish/generate-portal-token/).
+2. Generate a [passphrase-protected OpenPGP signing key](https://central.sonatype.org/publish/requirements/gpg/)
+   and distribute its public key to a Central-supported keyserver.
+3. In GitHub Actions, restrict the `maven-central` environment to the
+   `main` branch and set its secrets.
+
+   | Secret             | Value                                                                                  |
+   | ------------------ | -------------------------------------------------------------------------------------- |
+   | `CENTRAL_USERNAME` | Username from the Portal token                                                         |
+   | `CENTRAL_TOKEN`    | Password from the Portal token                                                         |
+   | `GPG_PRIVATE_KEY`  | ASCII-armored secret signing key from `gpg --armor --export-secret-keys <fingerprint>` |
+   | `GPG_PASSPHRASE`   | Signing key passphrase                                                                 |
+
+4. Run **Stage ui-kotlin on Maven Central** from `main` in GitHub Actions.
+   Find the deployment ID in the upload log and check that the
+   [Central Portal](https://central.sonatype.com/) reports `VALIDATED` for
+   the root, desktop, and Android artifacts. The workflow uses a
+   user-managed deployment.
+5. For an authorized release, select **Publish** in the Portal. Once Central
+   serves that version, run the example with the default Gradle repositories.
+   For a validation-only run, select **Drop** in the Portal to clear the
+   staged deployment.
 
 ## Dependencies and licences
 
@@ -163,6 +221,7 @@ Multiplatform 1.12.2, Material 3 1.9.0):
 | Skiko (`org.jetbrains.skiko`, bundles Skia, BSD-3-Clause)                                                                  | Apache-2.0   | runtime    |
 | JSpecify (`org.jspecify`)                                                                                                  | Apache-2.0   | runtime    |
 | Links Notation Kotlin parser (`io.github.link-foundation.kotlin:links-notation`)                                           | Unlicense    | runtime    |
+| Vanniktech Maven Publish Gradle plugin                                                                                     | Apache-2.0   | build only |
 | Compose UI test (`ui-test`), kotlin-test, kotlinx-serialization-json                                                       | Apache-2.0   | tests only |
 | JUnit 4.13.2                                                                                                               | EPL-1.0      | tests only |
 | Hamcrest core 1.3                                                                                                          | BSD-3-Clause | tests only |

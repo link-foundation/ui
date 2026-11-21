@@ -17,4 +17,3 @@ rootProject.name = "ui-kotlin-checks"
 
 include(":parser-tests")
 includeBuild("../packages/ui-kotlin")
-includeBuild("../examples/kotlin") { name = "ui-kotlin-example" }

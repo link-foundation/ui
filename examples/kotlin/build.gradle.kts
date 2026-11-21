@@ -37,7 +37,7 @@ sourceSets {
 }
 
 dependencies {
-    implementation("foundation.link.ui:ui-kotlin:0.1.0")
+    implementation("io.github.link-foundation.kotlin:ui-kotlin:0.1.0")
     implementation(compose.desktop.currentOs)
 }
 

@@ -13,13 +13,16 @@ pluginManagement {
 
 dependencyResolutionManagement {
     repositories {
+        // CI supplies a file-based Maven repository to test the release before upload.
+        providers.gradleProperty("uiKotlinStagingRepository").orNull?.let { staging ->
+            exclusiveContent {
+                forRepository { maven { url = uri(staging) } }
+                filter { includeModuleByRegex("io\\.github\\.link-foundation\\.kotlin", "ui-kotlin(-.*)?") }
+            }
+        }
         google()
         mavenCentral()
     }
 }
 
 rootProject.name = "ui-kotlin-example"
-
-// Gradle substitutes the foundation.link.ui:ui-kotlin coordinates with this
-// build (and, through it, the Links Notation parser of native/kotlin).
-includeBuild("../../packages/ui-kotlin")
