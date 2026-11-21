@@ -16,14 +16,16 @@
     "npm:@dagrejs/dagre@3.1.3": "3.1.3",
     "npm:@eslint/js@^10.0.1": "10.0.1_eslint@10.13.0",
     "npm:@floating-ui/dom@1.8.0": "1.8.0",
+    "npm:@fluentui/tokens@1.0.0-alpha.24": "1.0.0-alpha.24",
     "npm:@lezer/highlight@1.2.5": "1.2.5",
-    "npm:@link-foundation/link-cli-client@0.1": "0.1.0",
+    "npm:@link-foundation/link-cli-client@0.5": "0.5.0",
+    "npm:@link-foundation/link-cli-client@0.5.0": "0.5.0",
     "npm:@lottie-animation-community/lottie-specs@~0.3.2": "0.3.2",
     "npm:@material-symbols/svg-400@~0.48.2": "0.48.2",
     "npm:@material/material-color-utilities@0.3.0": "0.3.0",
     "npm:@playwright/test@1.59.1": "1.59.1",
     "npm:@tabler/icons@^3.50.0": "3.50.0",
-    "npm:@vitejs/plugin-vue@^6.0.10": "6.0.10_vite@6.4.5_vue@3.5.44",
+    "npm:@vitejs/plugin-vue@^6.0.10": "6.0.10_vite@7.3.8_vue@3.5.44",
     "npm:@vue/compiler-dom@^3.5.44": "3.5.44",
     "npm:@vue/test-utils@^2.5.1": "2.5.1_@vue+compiler-dom@3.5.44_vue@3.5.44",
     "npm:ajv@^6.15.0": "6.15.0",
@@ -40,10 +42,11 @@
     "npm:eslint-plugin-prettier@^5.5.4": "5.5.6_eslint@10.13.0_eslint-config-prettier@10.1.8_prettier@3.8.4",
     "npm:eslint@^10.13.0": "10.13.0",
     "npm:fake-indexeddb@^6.2.7": "6.2.7",
+    "npm:fflate@~0.8.2": "0.8.3",
     "npm:husky@^9.1.7": "9.1.7",
     "npm:jscpd@^5.4.0": "5.4.0",
     "npm:jsdom@^30.1.3": "30.1.3",
-    "npm:links-notation@~0.27.1": "0.27.1",
+    "npm:links-notation@~0.31.8": "0.31.8",
     "npm:lino-arguments@0.4.0": "0.4.0",
     "npm:lino-i18n@0.5.0": "0.5.0_eslint@10.13.0_react@19.3.1_react-dom@19.3.1_vue@3.5.44",
     "npm:lint-staged@^16.4.0": "16.4.0",
@@ -61,6 +64,8 @@
     "npm:svgo@^4.1.0": "4.1.0",
     "npm:test-anywhere@~0.8.48": "0.8.50",
     "npm:vite@^6.4.5": "6.4.5",
+    "npm:vite@^7.3.1": "7.3.8",
+    "npm:vite@^7.3.7": "7.3.8",
     "npm:vue@^3.5.44": "3.5.44",
     "npm:ws@^8.22.1": "8.22.1"
   },
@@ -842,6 +847,12 @@
     "@floating-ui/utils@0.2.12": {
       "integrity": "sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww=="
     },
+    "@fluentui/tokens@1.0.0-alpha.24": {
+      "integrity": "sha512-YrjGQfnxBR+9o8wXyTflON3Ohsv7OrZWYLVRU+7RaiFO1gcu36iDm3WjudlVmYuWRLDO0Gmxotm6RQNhbZuEQQ==",
+      "dependencies": [
+        "@swc/helpers"
+      ]
+    },
     "@formatjs/fast-memoize@3.1.7": {
       "integrity": "sha512-zXfhLpvA6T7+efdt9JLbBwZ00tT7NsBMDVnDu8rpHeNNv8KfRZAMo2gkG0k9lK/Nzc//3kJ9pImsfuJxk3KhUA=="
     },
@@ -973,8 +984,8 @@
         "@lezer/highlight"
       ]
     },
-    "@link-foundation/link-cli-client@0.1.0": {
-      "integrity": "sha512-Uv0HQyCCgB401mL6bH6C9AWCTkXWccIRWwe8R0a9fKY+da2Hzc6skRWH/Xm1H5I8O6CpPBfs/X/iWpo1Cp0olQ=="
+    "@link-foundation/link-cli-client@0.5.0": {
+      "integrity": "sha512-MxFZeJv6j5mBelrXm2Xep+cxZMkRM0ui+p45RDoFblmiwJx5/GoxcvWgFdEubpRp752n9RiJrGoSLkxUWxQ24g=="
     },
     "@lottie-animation-community/lottie-specs@0.3.2": {
       "integrity": "sha512-riB112WfFOGSk/jssZqDxTMIofB67zOh+lEoJYvmuhOLcsBr94Lghm3saihsrcZ33lk1z5hyiE09l0DB4bs6qg==",
@@ -1256,6 +1267,9 @@
     "@sindresorhus/merge-streams@4.0.0": {
       "integrity": "sha512-tlqY9xq5ukxTUZBmoOp+m61cqwQD5pHJtFY3Mn8CA8ps6yghLH/Hw8UPdqg4OLmFW3IFlcXnQNmo/dh8HzXYIQ=="
     },
+    "@swc/helpers@0.5.24": {
+      "integrity": "sha512-6tcXo4kA8HgGO7AVmawB57RYi/piBPYVHVcO6dXjX+SZw8GoHmi262sp4v2Ha2kNP9Cx84qei27yT+fjS1lxgg=="
+    },
     "@tabler/icons@3.50.0": {
       "integrity": "sha512-HflLxyrH1cqC7s7jzQGSjpsTAVIoaf7+/yHjbdM59rJQBMjliibp+LYhDPFxOMcwa1M8DNpOk6ENzQiWn9a1Dg=="
     },
@@ -1444,11 +1458,11 @@
         "d3-transition"
       ]
     },
-    "@vitejs/plugin-vue@6.0.10_vite@6.4.5_vue@3.5.44": {
+    "@vitejs/plugin-vue@6.0.10_vite@7.3.8_vue@3.5.44": {
       "integrity": "sha512-b80aUQh3n+qEzzZm5oQp3rT2QImeCx58K6eFl/RkJ3d65KW0kTuv5lNsLRVAjbW9YRUpo/wzmvzMgV34bTAItA==",
       "dependencies": [
         "@rolldown/pluginutils",
-        "vite",
+        "vite@7.3.8",
         "vue"
       ]
     },
@@ -2343,6 +2357,9 @@
         "picomatch"
       ]
     },
+    "fflate@0.8.3": {
+      "integrity": "sha512-tbZNuJrLwGUp3zshBtdy4W+ORxZuIh8a5ilyIEQDC5rY1f3U20JMry0Ll3WBzU58EZKsEuJFXhb5gwv8CsPvgA=="
+    },
     "figures@6.1.0": {
       "integrity": "sha512-d+l3qxjSesT4V7v2fh+QnmFnUWv9lSpjarhShNTgBOfA0ttejbQUAlHLitbjkoRiDulW0OPoQPYIGhIC8ohejg==",
       "dependencies": [
@@ -2668,6 +2685,9 @@
     },
     "links-notation@0.27.1": {
       "integrity": "sha512-fTmzw/t3AHRTYhR6Ry8hCHzf0eroYGEH/8JsC7FALyGtWxQE0cHdp4YuZnMXqKqmcpMWWiTWoQiIo1D5AvsbQA=="
+    },
+    "links-notation@0.31.8": {
+      "integrity": "sha512-jUGSCZEqlRV4NkofLMfD2eziJBz86kG/QfqoOCcYXEMh+e4JWba5Wc+4gJKD1Pi6TqlrBMJSerBRj7P6n/f9ig=="
     },
     "lino-arguments@0.3.0": {
       "integrity": "sha512-46RbNaq0kpDxjyzBqhiCjPypHy9tuL0ITC9LgEolFH65PKtwl0/kRxryleG+5HnqS1JLnUUypZ2GoHWhLWH/PQ==",
@@ -3242,7 +3262,8 @@
       ]
     },
     "tldts-core@7.4.20": {
-      "integrity": "sha512-C630TWXZCZmLq0F2bW4QqwnaaxCQ/svpAqvJwnC4JvgEM5ohhBnGsEzTLSOXcN+xjz+kEaHS5uoWIw2klnqd0A=="
+      "integrity": "sha512-C630TWXZCZmLq0F2bW4QqwnaaxCQ/svpAqvJwnC4JvgEM5ohhBnGsEzTLSOXcN+xjz+kEaHS5uoWIw2klnqd0A==",
+      "deprecated": true
     },
     "tldts@7.4.19": {
       "integrity": "sha512-48dH6aSpQnpbzDUc4vIQZ1VjB8tkK+e8c1yx05/SZK+rkssgjEOlxDd/yU8/a4vGYQ9vRgJr9dwMq9TJ0b3X2Q==",
@@ -3295,6 +3316,21 @@
       "integrity": "sha512-4enwjFfi4IwtEh0w+jPzpLVOFQiPHmmzPxcHXQOyEur47o6u0jE573DmGpjA+7irXoMLYRZD5ZaFUEneS3abPg==",
       "dependencies": [
         "esbuild@0.25.12",
+        "fdir",
+        "picomatch",
+        "postcss",
+        "rollup",
+        "tinyglobby"
+      ],
+      "optionalDependencies": [
+        "fsevents@2.3.3"
+      ],
+      "bin": true
+    },
+    "vite@7.3.8": {
+      "integrity": "sha512-3tTi78MAKhVk9h+YZVXMQ8POmneJuE97QUPAWtJghHzhH7BAyiqQOC2KZh1DWOsu/USB2cRXhznPByaabvYXfw==",
+      "dependencies": [
+        "esbuild@0.27.0",
         "fdir",
         "picomatch",
         "postcss",
@@ -3372,6 +3408,9 @@
         "strip-ansi@7.2.0"
       ]
     },
+    "ws@8.22.1": {
+      "integrity": "sha512-oyL6OPYme/CmiFvNuGzeoxCJ4nOrZE2O1FwM9MWM1AsGri6nLXB2pg+lNA8aLeXMSav0J6eIVS1j6vUPzUtK9g=="
+    },
     "xml-name-validator@5.0.0": {
       "integrity": "sha512-EvGK8EJ3DhaHfbRlETOWAS5pO9MZITeauHKJyb8wyajUfQUenkIg2MvLDTZ4T/TgIcm3HU0TFBgWWboAZ30UHg=="
     },
@@ -3420,9 +3459,6 @@
     "yoctocolors@2.2.0": {
       "integrity": "sha512-xYqdZFUK/VYazNl/oCDYN+3WloWQwMfZxBoiNt6qNyk+xfOdi598muWE42rNZFp1kNOiqW936q5RhUdnpqElSg=="
     },
-    "ws@8.22.1": {
-      "integrity": "sha512-oyL6OPYme/CmiFvNuGzeoxCJ4nOrZE2O1FwM9MWM1AsGri6nLXB2pg+lNA8aLeXMSav0J6eIVS1j6vUPzUtK9g=="
-    },
     "zrender@6.1.0": {
       "integrity": "sha512-oEGMDB6pOP2S6OwRR4PdVv610zrjnA3Bh+JnSG12fYJlBKjtNAoEb5fSUoCOOINlH96I2fU38/A2UpRKs67xYQ==",
       "dependencies": [
@@ -3436,7 +3472,7 @@
         "npm:@axe-core/playwright@4.14.0",
         "npm:@changesets/cli@^3.0.3",
         "npm:@eslint/js@^10.0.1",
-        "npm:@link-foundation/link-cli-client@0.1",
+        "npm:@link-foundation/link-cli-client@0.5.0",
         "npm:@playwright/test@1.59.1",
         "npm:axe-core@4.14.0",
         "npm:command-stream@2.4.0",
@@ -3446,7 +3482,7 @@
         "npm:eslint@^10.13.0",
         "npm:husky@^9.1.7",
         "npm:jscpd@^5.4.0",
-        "npm:links-notation@~0.27.1",
+        "npm:links-notation@~0.31.8",
         "npm:lino-arguments@0.4.0",
         "npm:lint-staged@^16.4.0",
         "npm:prettier@^3.6.2",
@@ -3455,13 +3491,30 @@
       ]
     },
     "members": {
+      "packages/site": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@link-foundation/ui-components@*",
+            "npm:@link-foundation/ui-config@*",
+            "npm:@link-foundation/ui-core@*",
+            "npm:@link-foundation/ui-devmode@*",
+            "npm:@link-foundation/ui-dom@*",
+            "npm:@link-foundation/ui-i18n@*",
+            "npm:@link-foundation/ui-store@*",
+            "npm:@link-foundation/ui-themes@*",
+            "npm:@link-foundation/ui-tokens@*",
+            "npm:jsdom@^30.1.3",
+            "npm:vite@^7.3.1"
+          ]
+        }
+      },
       "packages/ui-animation": {
         "packageJson": {
           "dependencies": [
-            "npm:@link-foundation/ui-core@^0.0.0",
-            "npm:@link-foundation/ui-store@^0.0.0",
-            "npm:@link-foundation/ui-themes@^0.0.0",
-            "npm:@link-foundation/ui-tokens@^0.0.0",
+            "npm:@link-foundation/ui-core@0.1",
+            "npm:@link-foundation/ui-store@0.1",
+            "npm:@link-foundation/ui-themes@0.1",
+            "npm:@link-foundation/ui-tokens@0.1",
             "npm:esbuild@0.27.0",
             "npm:jsdom@^30.1.3",
             "npm:test-anywhere@~0.8.48"
@@ -3483,11 +3536,11 @@
             "npm:@dagrejs/dagre@3.1.3",
             "npm:@floating-ui/dom@1.8.0",
             "npm:@lezer/highlight@1.2.5",
-            "npm:@link-foundation/ui-core@^0.0.0",
-            "npm:@link-foundation/ui-dom@^0.0.0",
-            "npm:@link-foundation/ui-settings@^0.0.0",
-            "npm:@link-foundation/ui-style@^0.0.0",
-            "npm:@link-foundation/ui-tokens@^0.0.0",
+            "npm:@link-foundation/ui-core@~0.1.1",
+            "npm:@link-foundation/ui-dom@0.1",
+            "npm:@link-foundation/ui-settings@0.1",
+            "npm:@link-foundation/ui-style@0.1",
+            "npm:@link-foundation/ui-tokens@0.1",
             "npm:@material-symbols/svg-400@~0.48.2",
             "npm:@tabler/icons@^3.50.0",
             "npm:d3-force@3.0.0",
@@ -3496,7 +3549,7 @@
             "npm:echarts@6.1.0",
             "npm:eslint@^10.13.0",
             "npm:jsdom@^30.1.3",
-            "npm:links-notation@~0.27.1",
+            "npm:links-notation@~0.31.8",
             "npm:lucide@^1.66.0",
             "npm:mermaid@11.17.2",
             "npm:monaco-editor@0.58.0-dev-20261103",
@@ -3508,8 +3561,8 @@
       "packages/ui-config": {
         "packageJson": {
           "dependencies": [
-            "npm:@link-foundation/ui-core@^0.0.0",
-            "npm:@link-foundation/ui-store@^0.0.0",
+            "npm:@link-foundation/ui-core@0.1",
+            "npm:@link-foundation/ui-store@0.1",
             "npm:test-anywhere@~0.8.48"
           ]
         }
@@ -3518,16 +3571,16 @@
         "packageJson": {
           "dependencies": [
             "npm:@babel/parser@^7.29.12",
-            "npm:@link-foundation/ui-core@^0.0.0",
-            "npm:@link-foundation/ui-react@^0.0.0",
-            "npm:@link-foundation/ui-tokens@^0.0.0",
-            "npm:@link-foundation/ui-vue@^0.0.0",
+            "npm:@link-foundation/ui-core@0.1",
+            "npm:@link-foundation/ui-react@0.1",
+            "npm:@link-foundation/ui-tokens@0.1",
+            "npm:@link-foundation/ui-vue@0.1",
             "npm:@lottie-animation-community/lottie-specs@~0.3.2",
             "npm:@vitejs/plugin-vue@^6.0.10",
             "npm:@vue/compiler-dom@^3.5.44",
             "npm:ajv@^8.17.1",
             "npm:jsdom@^30.1.3",
-            "npm:links-notation@~0.27.1",
+            "npm:links-notation@~0.31.8",
             "npm:lottie-web@^5.13.0",
             "npm:parse5@^8.0.1",
             "npm:prettier@^3.6.2",
@@ -3542,32 +3595,55 @@
       "packages/ui-core": {
         "packageJson": {
           "dependencies": [
-            "npm:links-notation@~0.27.1",
+            "npm:links-notation@~0.31.8",
             "npm:test-anywhere@~0.8.48"
+          ]
+        }
+      },
+      "packages/ui-designer": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@link-foundation/ui-animation@0.1",
+            "npm:@link-foundation/ui-components@0.1",
+            "npm:@link-foundation/ui-config@0.1",
+            "npm:@link-foundation/ui-core@0.1",
+            "npm:@link-foundation/ui-devmode@0.1",
+            "npm:@link-foundation/ui-dom@0.1",
+            "npm:@link-foundation/ui-store@0.1",
+            "npm:jsdom@^30.1.3"
           ]
         }
       },
       "packages/ui-devmode": {
         "packageJson": {
           "dependencies": [
-            "npm:@link-foundation/ui-config@^0.0.0",
-            "npm:@link-foundation/ui-core@^0.0.0",
-            "npm:@link-foundation/ui-dom@^0.0.0",
-            "npm:@link-foundation/ui-store@^0.0.0",
-            "npm:@link-foundation/ui-style@^0.0.0",
-            "npm:@link-foundation/ui-tokens@^0.0.0",
+            "npm:@link-foundation/ui-config@0.1",
+            "npm:@link-foundation/ui-convert@0.1",
+            "npm:@link-foundation/ui-core@0.1",
+            "npm:@link-foundation/ui-dom@0.1",
+            "npm:@link-foundation/ui-store@0.1",
+            "npm:@link-foundation/ui-style@0.1",
+            "npm:@link-foundation/ui-tokens@0.1",
             "npm:jsdom@^30.1.3",
-            "npm:test-anywhere@~0.8.48"
+            "npm:test-anywhere@~0.8.48",
+            "npm:vite@^7.3.7"
+          ]
+        }
+      },
+      "packages/ui-devmode-extension": {
+        "packageJson": {
+          "dependencies": [
+            "npm:fflate@~0.8.2"
           ]
         }
       },
       "packages/ui-dom": {
         "packageJson": {
           "dependencies": [
-            "npm:@link-foundation/ui-core@^0.0.0",
-            "npm:@link-foundation/ui-store@^0.0.0",
-            "npm:@link-foundation/ui-style@^0.0.0",
-            "npm:@link-foundation/ui-tokens@^0.0.0",
+            "npm:@link-foundation/ui-core@0.1",
+            "npm:@link-foundation/ui-store@0.1",
+            "npm:@link-foundation/ui-style@0.1",
+            "npm:@link-foundation/ui-tokens@0.1",
             "npm:jsdom@^30.1.3",
             "npm:test-anywhere@~0.8.48"
           ]
@@ -3576,8 +3652,8 @@
       "packages/ui-i18n": {
         "packageJson": {
           "dependencies": [
-            "npm:@link-foundation/ui-config@^0.0.0",
-            "npm:@link-foundation/ui-core@^0.0.0",
+            "npm:@link-foundation/ui-config@0.1",
+            "npm:@link-foundation/ui-core@0.1",
             "npm:lino-i18n@0.5.0",
             "npm:test-anywhere@~0.8.48"
           ]
@@ -3586,11 +3662,11 @@
       "packages/ui-links": {
         "packageJson": {
           "dependencies": [
-            "npm:@link-foundation/link-cli-client@0.1",
-            "npm:@link-foundation/ui-core@^0.0.0",
+            "npm:@link-foundation/link-cli-client@0.5",
+            "npm:@link-foundation/ui-core@0.1",
             "npm:doublets-web@~0.1.3",
             "npm:fake-indexeddb@^6.2.7",
-            "npm:links-notation@~0.27.1",
+            "npm:links-notation@~0.31.8",
             "npm:test-anywhere@~0.8.48",
             "npm:ws@^8.22.1"
           ]
@@ -3599,9 +3675,9 @@
       "packages/ui-react": {
         "packageJson": {
           "dependencies": [
-            "npm:@link-foundation/ui-core@^0.0.0",
-            "npm:@link-foundation/ui-dom@^0.0.0",
-            "npm:@link-foundation/ui-store@^0.0.0",
+            "npm:@link-foundation/ui-core@0.1",
+            "npm:@link-foundation/ui-dom@0.1",
+            "npm:@link-foundation/ui-store@0.1",
             "npm:jsdom@^30.1.3",
             "npm:react-dom@^19.3.1",
             "npm:react@^19.3.1",
@@ -3612,9 +3688,9 @@
       "packages/ui-react-native": {
         "packageJson": {
           "dependencies": [
-            "npm:@link-foundation/ui-core@^0.0.0",
-            "npm:@link-foundation/ui-react@^0.0.0",
-            "npm:@link-foundation/ui-store@^0.0.0",
+            "npm:@link-foundation/ui-core@0.1",
+            "npm:@link-foundation/ui-react@0.1",
+            "npm:@link-foundation/ui-store@0.1",
             "npm:react-test-renderer@^19.3.1",
             "npm:react@^19.3.1",
             "npm:test-anywhere@~0.8.48"
@@ -3624,8 +3700,8 @@
       "packages/ui-settings": {
         "packageJson": {
           "dependencies": [
-            "npm:@link-foundation/ui-config@^0.0.0",
-            "npm:@link-foundation/ui-core@^0.0.0",
+            "npm:@link-foundation/ui-config@0.1",
+            "npm:@link-foundation/ui-core@0.1",
             "npm:jsdom@^30.1.3",
             "npm:test-anywhere@~0.8.48"
           ]
@@ -3634,12 +3710,12 @@
       "packages/ui-sound": {
         "packageJson": {
           "dependencies": [
-            "npm:@link-foundation/ui-components@^0.0.0",
-            "npm:@link-foundation/ui-config@^0.0.0",
-            "npm:@link-foundation/ui-core@^0.0.0",
-            "npm:@link-foundation/ui-settings@^0.0.0",
+            "npm:@link-foundation/ui-components@0.1",
+            "npm:@link-foundation/ui-config@0.1",
+            "npm:@link-foundation/ui-core@0.1",
+            "npm:@link-foundation/ui-settings@0.1",
             "npm:jsdom@^30.1.3",
-            "npm:links-notation@~0.27.1",
+            "npm:links-notation@~0.31.8",
             "npm:test-anywhere@~0.8.48"
           ]
         }
@@ -3647,8 +3723,8 @@
       "packages/ui-store": {
         "packageJson": {
           "dependencies": [
-            "npm:@link-foundation/ui-core@^0.0.0",
-            "npm:@link-foundation/ui-links@^0.0.0",
+            "npm:@link-foundation/ui-core@0.1",
+            "npm:@link-foundation/ui-links@0.1",
             "npm:doublets-web@~0.1.3",
             "npm:fake-indexeddb@^6.2.7",
             "npm:test-anywhere@~0.8.48"
@@ -3658,8 +3734,8 @@
       "packages/ui-style": {
         "packageJson": {
           "dependencies": [
-            "npm:@link-foundation/ui-core@^0.0.0",
-            "npm:@link-foundation/ui-tokens@^0.0.0",
+            "npm:@link-foundation/ui-core@0.1",
+            "npm:@link-foundation/ui-tokens@0.1",
             "npm:postcss@^8.5.6",
             "npm:test-anywhere@~0.8.48"
           ]
@@ -3668,11 +3744,12 @@
       "packages/ui-themes": {
         "packageJson": {
           "dependencies": [
-            "npm:@link-foundation/ui-core@^0.0.0",
-            "npm:@link-foundation/ui-tokens@^0.0.0",
+            "npm:@fluentui/tokens@1.0.0-alpha.24",
+            "npm:@link-foundation/ui-core@0.1",
+            "npm:@link-foundation/ui-tokens@0.1",
             "npm:@material/material-color-utilities@0.3.0",
             "npm:jsdom@^30.1.3",
-            "npm:links-notation@^0.27.1",
+            "npm:links-notation@~0.31.8",
             "npm:prettier@^3.6.2"
           ]
         }
@@ -3680,8 +3757,8 @@
       "packages/ui-tokens": {
         "packageJson": {
           "dependencies": [
-            "npm:@link-foundation/ui-core@^0.0.0",
-            "npm:@link-foundation/ui-style@^0.0.0",
+            "npm:@link-foundation/ui-core@0.1",
+            "npm:@link-foundation/ui-style@0.1",
             "npm:ajv@^6.15.0",
             "npm:test-anywhere@~0.8.48"
           ]
@@ -3690,9 +3767,9 @@
       "packages/ui-vue": {
         "packageJson": {
           "dependencies": [
-            "npm:@link-foundation/ui-core@^0.0.0",
-            "npm:@link-foundation/ui-dom@^0.0.0",
-            "npm:@link-foundation/ui-store@^0.0.0",
+            "npm:@link-foundation/ui-core@0.1",
+            "npm:@link-foundation/ui-dom@0.1",
+            "npm:@link-foundation/ui-store@0.1",
             "npm:@vue/test-utils@^2.5.1",
             "npm:jsdom@^30.1.3",
             "npm:test-anywhere@~0.8.48",
