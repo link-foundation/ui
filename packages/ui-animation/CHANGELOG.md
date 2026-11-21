@@ -1,5 +1,18 @@
 # @link-foundation/ui-animation
 
+## 0.2.0
+
+### Minor Changes
+
+- c0d7501: - Sound buses and players support input gain before the effects chain and host-selected destinations.
+  - Background layers accept host star layouts and sprites, seeded randomness, saved shader clocks, batched rain calibration and a shared grid phase with live theme tokens.
+  - Themes expose the effect quality watcher and reusable frame geometry declarations, with independent edge cuts, material appearance callbacks and backdrop budgeting for host pseudo-elements.
+
+### Patch Changes
+
+- Updated dependencies [c0d7501]
+  - @link-foundation/ui-themes@0.2.0
+
 ## 0.1.0
 
 ### Minor Changes
