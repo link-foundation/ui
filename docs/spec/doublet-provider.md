@@ -9,6 +9,7 @@ consumer code. Existing `link-view`, layouts and `networkToSvg` remain available
 import {
   createNetworkPresentation,
   createDoubletProvider,
+  doubletToSvg,
 } from '@link-foundation/ui-components/links-view';
 
 const presentation = createNetworkPresentation(createDoubletProvider());
@@ -23,6 +24,13 @@ await presentation.update({
 });
 const svg = presentation.toSvg();
 const png = await presentation.toRaster('image/png'); // in a browser
+const frame = presentation.snapshot().frame;
+const glyph = doubletToSvg(frame, {
+  width: 64,
+  height: 64,
+  decorative: true,
+  idPrefix: 'background-glyph-',
+});
 // An existing <links-network> can display exactly this scene:
 // element.presentation = presentation;
 ```
@@ -45,6 +53,9 @@ options verbatim; a new options string replaces the whole options document.
 layout circle
 order 3 1 2
 layoutAspect 1
+linejoin bevel
+arrowJoin inherit
+palette print
 columns 0
 spread 1
 rotation 0
@@ -54,6 +65,7 @@ gaps 0.08 0.08 0 0
 link 1
   turns 30 -30
   gaps 0.2 ~ 5 ~
+  color '#134e4a'
 start
   shape bar
   size 2.5
@@ -81,35 +93,41 @@ card
   inset 3
 caption
   mode pairs
+  position top
   font mono
   size 5
-width 640
-height 640
+title 'Three linked pairs'
+width 1200
+height 630
 ```
 
-| Fields                       | Default and range                                                                                                             |
-| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `layout`                     | `auto`: circle for 1–4, hex otherwise. Also grid, spiral, dice, cards, force, layered                                         |
-| `order`                      | Circle permutation of every id, e.g. `3 1 2`                                                                                  |
-| `layoutAspect`               | 1, 0.3..3; multiply x by its square root and divide y by it                                                                   |
-| `columns`                    | 0 (auto), integer 0..30; row/tile layouts use this count                                                                      |
-| `spread`, `rotation`         | 1 (0..100), 0 degrees (−180..180), applied before fit                                                                         |
-| `free`, `loop`               | 1 (0..10); free length 0.42 (lone 0.9), loop handle radius 0.8 (lone 1.25) times the multiplier                               |
-| `bulge`, `loopBend`          | 0 degrees (−180..180); loop width multiplier is `exp((bulge + loopBend)/180)`                                                 |
-| `angles`                     | `fixed` or `mirror`                                                                                                           |
-| `sourceAngle`, `targetAngle` | 30 degrees (−180..180), turned toward the mirror side; aligned chords stay straight with no turns                             |
-| `tension`                    | 0.4 (0..2), times chord length                                                                                                |
-| `gaps`                       | Start/end 0.08 layout units (0..1), before/after middle 0 box units (0..30)                                                   |
-| `link <id>`                  | Nested `turns` (two integer degrees, −180..180) and/or `gaps` (four values); `~` or `null` inherits a global gap              |
-| `padding`                    | 9 (0..48); margin is min(48, max(padding, largest marker extent + half stroke width))                                         |
-| `frame`                      | Optional `scale x y` or quoted `'scale x y'`; skips fit, three finite values with absolute value ≤ 1e6, scale > 1e-9 and ≤ 60 |
-| `start`, `end`, `middle`     | Nested marker fields below                                                                                                    |
-| `strokeWidth`, `color`       | 1 (0.5..10), `#202b3d`                                                                                                        |
-| `dash`                       | `solid`, `dashed`, `dotted`, `dashdot`, `long`; lengths relative to stroke width                                              |
-| `linecap`, `arrowJoin`       | `round` / `butt` / `square`; `miter` / `round` / `bevel`                                                                      |
-| `opacity`, `glow`            | 1 (0.1..1), 0 (0..12); Gaussian blur combined with the sharp scene                                                            |
-| `balanceArrows`              | true; compensates end arrow/triangle and start tail tips                                                                      |
-| `width`, `height`            | 640 px each (64..4096); shorter viewBox side is always 100                                                                    |
+| Fields                                           | Default and range                                                                                                                                                                                             |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `layout`                                         | `auto`: circle for 1–4, hex otherwise. Also grid, spiral, dice, cards, force, layered                                                                                                                         |
+| `order`                                          | Circle permutation of every id, e.g. `3 1 2`                                                                                                                                                                  |
+| `forceDistance`, `forceCharge`, `forceCollision` | Spring length 1 (0.2..3), repulsion 0.6 (0..3), collision padding 0 (0..3). Force layout accounts for self-loops when padding is enabled.                                                                     |
+| `layoutAspect`                                   | 1, 0.3..3; multiply x by its square root and divide y by it                                                                                                                                                   |
+| `columns`                                        | 0 (auto), integer 0..30; row/tile layouts use this count                                                                                                                                                      |
+| `spread`, `rotation`                             | 1 (0..100), 0 degrees (−180..180), applied before fit                                                                                                                                                         |
+| `free`, `loop`                                   | 1 (0..10); free length 0.42 (lone 0.9), loop handle radius 0.8 (lone 1.25) times the multiplier                                                                                                               |
+| `bulge`, `loopBend`                              | 0 degrees (−180..180); loop width multiplier is `exp((bulge + loopBend)/180)`                                                                                                                                 |
+| `bendMode`, `lens`                               | `curve` (default) anchors the ends when bending; `rotate` uses tangent rotation. A true `lens` (default) mirrors references to the same other link.                                                           |
+| `angles`                                         | `fixed` or `mirror`                                                                                                                                                                                           |
+| `sourceAngle`, `targetAngle`                     | 30 degrees (−180..180), turned toward the mirror side; aligned chords stay straight with no turns                                                                                                             |
+| `tension`                                        | 0.4 (0..2), times chord length                                                                                                                                                                                |
+| `gaps`                                           | Start/end 0.08 layout units (0..1), before/after middle 0 box units (0..30)                                                                                                                                   |
+| `link <id>`                                      | Nested `turns` (two integer degrees, −180..180), `gaps` (four values), and/or `color`. `~` or `null` inherits a global gap.                                                                                   |
+| `padding`                                        | 9 (0..48); margin is min(48, max(padding, largest marker extent + half stroke width))                                                                                                                         |
+| `frame`                                          | Optional `scale x y` or quoted `'scale x y'`; skips fit, three finite values with absolute value ≤ 1e6, scale > 1e-9 and ≤ 60                                                                                 |
+| `start`, `end`, `middle`                         | Nested marker fields below                                                                                                                                                                                    |
+| `strokeWidth`, `color`                           | 1 (0.5..10), `#202b3d`                                                                                                                                                                                        |
+| `palette`                                        | `default`, `custom` and `mono` use `color`; `inherit` uses `currentColor`. Named palettes `site`, `print`, `neon`, `pastel`, `warm` and `cold` cycle by link ID. An explicit link colour overrides its entry. |
+| `dash`                                           | `solid`, `dashed`, `dotted`, `dashdot`, `long`; lengths relative to stroke width                                                                                                                              |
+| `linecap`, `linejoin`, `arrowJoin`               | `round` / `butt` / `square` caps; `miter` (default) / `round` / `bevel` joins. Use `arrowJoin inherit` to follow `linejoin`.                                                                                  |
+| `opacity`, `glow`                                | 1 (0.1..1), 0 (0..12); Gaussian blur combined with the sharp scene                                                                                                                                            |
+| `balanceArrows`                                  | true; compensates end arrow/triangle and start tail tips                                                                                                                                                      |
+| `title`                                          | Optional accessible SVG title.                                                                                                                                                                                |
+| `width`, `height`                                | 640 px each (64..4096); shorter viewBox side is always 100                                                                                                                                                    |
 
 Marker shapes are `bar`, `arrow`, `triangle`, `tail`, `dot`, `circle` (ring),
 `square`, `diamond`, `none`. Each independently accepts `size` (0.5..15),
@@ -134,7 +152,9 @@ Background fields: `type` is transparent (default), solid, linear or radial;
 Card fields: `color` white, `opacity` 0 (0..1), `border` none/solid/dashed/dotted/double,
 `borderColor` `#202b3d`, `width` 1 (0.1..6), `radius` 0 (0..50), `inset` 0 (0..30).
 Caption fields: `mode` none/theory/pairs/number/links/custom, `text` at most 80
-Unicode characters, `font` mono/sans/serif, `size` 5 (3..14), `color` `#202b3d`.
+Unicode characters, `font` mono/sans/serif, `size` 5 (3..14), `color` `#202b3d`,
+`position` bottom (default) or top. Set `notation` to `L` or `R` for a theory
+caption using that symbol and the configurations module's mapping syntax.
 
 Caption notation is defined here: theory is `L = {1=(s,t), ...}`, pairs is
 `(s, t) ...`, number is the presentation's decimal index, links is
@@ -182,8 +202,21 @@ controls, including `free`, `loop`, `loopBend`, `angles`, `sourceAngle`,
 `targetAngle`, `order`, `columns`, `padding`, caption/background fields and
 marker balancing. Editors can use these to hide inert controls.
 `createDoubletProvider({debug})` optionally reports geometry counts and fit
-transforms; it is silent by default. The existing presentation bridge provides
-transactional updates, SVG preview/export equality, and PNG/JPEG/WebP encoding.
+transforms. Each fitted curve exposes the resolved `color`.
+
+`doubletToSvg(frame, { width, height })` reuses that frame's viewBox, curves,
+markers, background, card and caption at another output size. It preserves the
+fitted aspect ratio even in a square thumbnail. `decorative: true` hides an
+inline glyph from assistive technology. Supply distinct `idPrefix` values when
+mounting repeated instances of the same frame with SVG definitions in one tree.
+
+`currentColor` inherits the inline host's foreground. Pass `foreground` to
+`doubletToSvg` or `createDoubletProvider` to give standalone SVG files and raster
+exports the same foreground when they leave that host. A standalone SVG can
+also be passed to `networkToRaster` with its output format and quality.
+The gallery's `frameFor(entry)` accepts a prepared `DoubletFrame` and renders it
+at 64×64. The gallery defaults to the browser's text colour for its selected
+theme. Set `--links-gallery-foreground` to use a host-defined colour.
 
 See the [original browser gallery](../../packages/ui-components/examples/doublet-network.html)
 and [verification inventory](../case-studies/issue-227/README.md).
