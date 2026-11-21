@@ -10,6 +10,11 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
+    versionCatalogs {
+        create("libs") {
+            from(files("../../kotlin/gradle/libs.versions.toml"))
+        }
+    }
     repositories {
         google()
         mavenCentral()
@@ -17,4 +22,3 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "ui-kotlin"
-

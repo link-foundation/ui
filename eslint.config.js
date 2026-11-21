@@ -257,8 +257,8 @@ export default [
       'native/**/build/**',
       'native/**/.gradle/**',
       // Gradle build outputs (test reports) of the coordinator, ui-kotlin and its example
-      'kotlin/build/**',
-      'kotlin/.gradle/**',
+      'kotlin/**/build/**',
+      'kotlin/**/.gradle/**',
       'packages/ui-kotlin/build/**',
       'packages/ui-kotlin/.gradle/**',
       'examples/kotlin/build/**',

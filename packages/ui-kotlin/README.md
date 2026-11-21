@@ -17,6 +17,8 @@ It is a Gradle Kotlin Multiplatform project:
 The renderer uses the official
 [`io.github.link-foundation.kotlin:links-notation:0.31.8`](https://repo.maven.apache.org/maven2/io/github/link-foundation/kotlin/links-notation/0.31.8/)
 parser from Maven Central.
+The [Kotlin version catalog](../../kotlin/gradle/libs.versions.toml) pins the
+version shared by the renderer and the parser fixture tests.
 
 ```sh
 cd packages/ui-kotlin

@@ -1,20 +1,24 @@
 # Kotlin differential test
 
-Compares the Kotlin Links Notation port (`native/kotlin/links-notation`) with
+Compares the published Kotlin Links Notation parser with
 the JavaScript reference parser (`links-notation`, the version in
 `package.json`) on random documents: the parsed links, the `formatLinks` text,
 and for a refused document the error kind, line, column and full message.
 
 ```sh
-(cd native/kotlin/links-notation && ./gradlew jvmJar)
+# Use the version pinned in kotlin/gradle/libs.versions.toml.
+version=0.31.8
+export LINKS_NOTATION_JAR="${TMPDIR:-/tmp}/links-notation-jvm-$version.jar"
+curl --fail --location --output "$LINKS_NOTATION_JAR" \
+  "https://repo.maven.apache.org/maven2/io/github/link-foundation/kotlin/links-notation-jvm/$version/links-notation-jvm-$version.jar"
 kotlinc experiments/kotlin-differential/Differential.kt \
-  -cp native/kotlin/links-notation/build/libs/links-notation-kotlin-jvm-0.1.0.jar \
+  -cp "$LINKS_NOTATION_JAR" \
   -d experiments/kotlin-differential/differential.jar
 cd experiments/kotlin-differential
 node differential.mjs 5000 1 64   # <count> <seed> <maxDepth>
 ```
 
-Results for the port as committed (about 5,000 documents per seed):
+Historical results for the original vendored port (about 5,000 documents per seed):
 
 | Seeds | `maxDepth` | Mismatches |
 | ----- | ---------- | ---------- |

@@ -40,7 +40,7 @@
     "@link-foundation/ui-config": "^0.1.0",
     "@link-foundation/ui-core": "^0.1.0",
     "@link-foundation/ui-settings": "^0.1.0",
-    "links-notation": "^0.27.1"
+    "links-notation": "^0.31.8"
   },
   "devDependencies": {
     "@link-foundation/ui-components": "^0.1.0",

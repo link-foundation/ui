@@ -17,7 +17,6 @@ jobs:
     with:
       project-directory: kotlin
       additional-paths: |
-        native/kotlin
         packages/ui-kotlin
         examples/kotlin
         native/parity
@@ -29,5 +28,5 @@ jobs:
         .github/workflows/publish-kotlin.yml
         scripts/check-pipeline-status.sh
         scripts/read-job-cancel-in-progress.sh
-      fast-tasks: :links-notation-kotlin:compileTestKotlinJvm :links-notation-kotlin:compileTestKotlinJs
-      test-tasks: :links-notation-kotlin:jvmTest :links-notation-kotlin:jsTest :links-notation-kotlin:wasmJsTest
+      fast-tasks: :parser-tests:compileTestKotlinJvm :parser-tests:compileTestKotlinJs
+      test-tasks: :parser-tests:jvmTest :parser-tests:jsTest :parser-tests:wasmJsTest
