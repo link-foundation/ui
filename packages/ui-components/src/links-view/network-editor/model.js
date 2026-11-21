@@ -138,6 +138,12 @@ export function createNetworkEditorModel(
         job = revision;
       onBusy(true);
       try {
+        if (!callback) {
+          const committed = await presentation.solve({ signal: active.signal });
+          return committed && !disposed
+            ? (presentation.snapshot().frame.solution ?? null)
+            : null;
+        }
         const result = await callback(
           globalThis.structuredClone(links),
           normalize(options),

@@ -44,6 +44,30 @@ function checkedFrame(frame) {
   return clone(frame);
 }
 
+function checkedResult(kind, result, candidate) {
+  // Frame-only providers keep the input. Solvers can pair a new frame and
+  // option text so that subscribers see both changes at the same revision.
+  if (
+    kind === 'solve' &&
+    result &&
+    'frame' in Object(result) &&
+    !('positions' in Object(result))
+  ) {
+    return {
+      frame: checkedFrame(result.frame),
+      input: checkedInput(candidate, { options: result.options }),
+    };
+  }
+  return { frame: checkedFrame(result), input: candidate };
+}
+
+const positionLinks = (points) =>
+  [...points].map(([id, point]) => [
+    String(id),
+    String(point.x),
+    String(point.y),
+  ]);
+
 /**
  * Transactional bridge for host geometry, collision solver and export backends.
  * Providers receive detached snapshots. Only the most recent completed job may
@@ -80,7 +104,7 @@ export function createNetworkPresentation(provider, { debug } = {}) {
       listener(snapshot());
     }
   };
-  async function run(kind, patch) {
+  async function run(kind, patch, signal) {
     if (disposed) {
       throw new Error('Network presentation is disposed');
     }
@@ -100,17 +124,20 @@ export function createNetworkPresentation(provider, { debug } = {}) {
       revision: job,
       input: clone(candidate),
       frame: clone(frame),
-      signal: active.signal,
+      signal: signal
+        ? globalThis.AbortSignal.any([active.signal, signal])
+        : active.signal,
     };
     debug?.('network-provider:start', { kind, revision: job });
     try {
+      request.signal.throwIfAborted();
       const result = await provider[kind](request);
+      request.signal.throwIfAborted();
       if (disposed || job !== revision) {
         return false;
       }
-      const next = checkedFrame(result);
-      input = candidate;
-      frame = next;
+      ({ input, frame } = checkedResult(kind, result, candidate));
+      requestedInput = input;
       committedRevision = job;
       debug?.('network-provider:commit', { kind, revision: job });
       notify();
@@ -138,9 +165,10 @@ export function createNetworkPresentation(provider, { debug } = {}) {
   }
   return {
     update: (patch) => run('geometry', patch),
-    solve: () => {
+    canSolve: typeof provider.solve === 'function',
+    solve: ({ signal } = {}) => {
       assertReady();
-      return run('solve', {});
+      return run('solve', {}, signal);
     },
     snapshot,
     toSvg,
@@ -157,12 +185,6 @@ export function createNetworkPresentation(provider, { debug } = {}) {
     },
     toLino() {
       assertReady();
-      const positionLinks = (points) =>
-        [...points].map(([id, point]) => [
-          String(id),
-          String(point.x),
-          String(point.y),
-        ]);
       return formatLinks([
         {
           id: 'presentation',

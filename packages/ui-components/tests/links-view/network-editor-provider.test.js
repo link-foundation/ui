@@ -48,6 +48,7 @@ it('adapts renderer options and all per-link overrides without marking default m
   assert.deepEqual(parsed.frame, [2, 10, -5]);
   assert.deepEqual(parsed.order, [2, 1]);
   assert.deepEqual(parsed.gaps, [0.2, 0.08, 0, 0]);
+  assert.equal(parsed.passes, 5);
   const presentation = createNetworkPresentation(createNetworkEditorProvider());
   try {
     await presentation.update({
@@ -71,6 +72,40 @@ it('adapts renderer options and all per-link overrides without marking default m
     assert.match(presentation.toSvg(), /stroke-linejoin="bevel"/u);
     assert.equal(presentation.snapshot().frame.options.tension, 0.8);
     assert.deepEqual(presentation.snapshot().frame.transform, [2, 10, -5]);
+  } finally {
+    presentation.dispose();
+  }
+});
+
+it('keeps the fitted caption room and link colours through the default solve', async () => {
+  const presentation = createNetworkPresentation(
+    createNetworkEditorProvider({ Worker: undefined, idPrefix: 'test-' })
+  );
+  try {
+    await presentation.update({
+      items: [
+        [2, 2],
+        [1, 1],
+      ],
+      index: '2211',
+      options: toOptions({
+        palette: 'print',
+        linkColors: ['#abcdef'],
+        'caption.mode': 'number',
+        'caption.position': 'top',
+      }),
+    });
+    const { frame: original } = presentation.snapshot();
+    assert.equal(await presentation.solve(), true);
+    const { frame } = presentation.snapshot();
+    assert.equal(frame.solution.before, 2);
+    assert.equal(frame.solution.after, 0);
+    assert.deepEqual(frame.transform, original.transform);
+    assert.deepEqual(
+      frame.curves.map(({ color }) => color),
+      ['#abcdef', '#9333ea']
+    );
+    assert.match(presentation.toSvg(), /data-part="caption".*>2211<\/text>/u);
   } finally {
     presentation.dispose();
   }
