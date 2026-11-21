@@ -1,6 +1,6 @@
 {
   "name": "@link-foundation/ui-links",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Associative links storages behind one doublets interface (memory, doublets-web, SQLite, IndexedDB, localStorage, Links Notation text), link-cli's substitution queries, types and permissions as links, a links protocol server and a synced client that keeps a partial copy",
   "type": "module",
   "exports": {

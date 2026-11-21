@@ -1,5 +1,11 @@
 # @link-foundation/ui-links
 
+## 0.1.1
+
+### Patch Changes
+
+- 70b14e7: Fix substitution queries with a two-pattern restriction by reading two top-level groups as the restriction and substitution. A single wrapper must contain exactly two sides.
+
 ## 0.1.0
 
 ### Minor Changes
