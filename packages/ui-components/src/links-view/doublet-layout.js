@@ -93,7 +93,7 @@ export function doubletPlaces(pairs, o) {
   const n = pairs.length;
   const layout = o.layout === 'auto' ? (n <= 4 ? 'circle' : 'hex') : o.layout;
   const points = ['force', 'layered'].includes(layout)
-    ? graphPlaces(pairs, layout)
+    ? graphPlaces(pairs, layout, o)
     : Array.from({ length: n }, (_, i) => place(layout, i, n, o));
   if (layout === 'spiral') {
     normalizeSpacing(points);
@@ -116,7 +116,7 @@ export function doubletPlaces(pairs, o) {
     ])
   );
 }
-function graphPlaces(pairs, layout) {
+function graphPlaces(pairs, layout, o) {
   const network = buildNetwork(
     pairs.map(([source, target], i) => ({ id: i + 1, source, target }))
   );
@@ -124,6 +124,14 @@ function graphPlaces(pairs, layout) {
     width: 300,
     height: 300,
     maxTicks: 100,
+    distance: 40 * o.forceDistance,
+    charge: -(35 / 0.6) * o.forceCharge,
+    collisionRadius: o.forceCollision
+      ? (node) =>
+          20 *
+          o.forceCollision *
+          (1 + 0.4 * pairs[node.id - 1].filter((ref) => ref === node.id).length)
+      : 0,
   });
   const points = pairs.map((_, i) => raw.get(i + 1));
   return normalizeSpacing(points);

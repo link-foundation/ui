@@ -2,14 +2,19 @@ import { add, scale, segmentLength, fmt } from './geometry.js';
 import { rotate, radians } from './doublet-layout.js';
 import { curveAtDistance } from './doublet-curves.js';
 
+export function doubletMarkerJoin(options) {
+  return options.arrowJoin === 'inherit' ? options.linejoin : options.arrowJoin;
+}
+
 /** Axial painted extension beyond the marker's geometric tip. */
 export function markerTipExtension(marker, o) {
   const half = o.strokeWidth / 2,
-    sine = Math.sin(radians(marker.angle));
-  if (o.arrowJoin === 'round') {
+    sine = Math.sin(radians(marker.angle)),
+    join = doubletMarkerJoin(o);
+  if (join === 'round') {
     return half;
   }
-  if (o.arrowJoin === 'bevel') {
+  if (join === 'bevel') {
     return half * sine;
   }
   return half / sine;
@@ -139,5 +144,5 @@ export function doubletMarkerSvg(placement, o) {
     : 'none';
   const stroke = marker.shape === 'dot' ? 'none' : 'currentColor';
   const limit = markerMiterLimit(marker);
-  return `<path data-marker="${marker.shape}" data-end="${end}" d="${doubletMarkerPath(marker)}" transform="translate(${fmt(point.x, 8)} ${fmt(point.y, 8)}) rotate(${fmt(angle, 8)})" fill="${fill}" stroke="${stroke}" stroke-width="${o.strokeWidth}" stroke-linejoin="${o.arrowJoin}" stroke-linecap="butt" stroke-miterlimit="${limit}"></path>`;
+  return `<path data-marker="${marker.shape}" data-end="${end}" d="${doubletMarkerPath(marker)}" transform="translate(${fmt(point.x, 8)} ${fmt(point.y, 8)}) rotate(${fmt(angle, 8)})" fill="${fill}" stroke="${stroke}" stroke-width="${o.strokeWidth}" stroke-linejoin="${doubletMarkerJoin(o)}" stroke-linecap="butt" stroke-miterlimit="${limit}"></path>`;
 }

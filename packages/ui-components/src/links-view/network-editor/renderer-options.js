@@ -2,13 +2,37 @@ import { formatLinks } from '@link-foundation/ui-core';
 import { normalize } from './options.js';
 import { networkOptionSchema } from './schema.js';
 
+function linkOverrides(options, index) {
+  const values = [];
+  const turns = options.turns[index];
+  const gaps = options.linkGaps[index];
+  const color = options.linkColors[index];
+  if (turns) {
+    values.push({ id: 'turns', values: turns.map(String) });
+  }
+  if (gaps) {
+    values.push({
+      id: 'gaps',
+      values: gaps.map((value) => (value === null ? '~' : String(value))),
+    });
+  }
+  if (color) {
+    values.push({ id: 'color', values: [color] });
+  }
+  return values;
+}
+
 /** Translate the editor vocabulary into the built-in renderer's nested LiNo. */
 export function rendererOptions(input, count) {
   const options = normalize(input),
     records = [],
     groups = new Map();
   for (const field of networkOptionSchema) {
-    if (field.section === 'palette' || options[field.key] === field.default) {
+    if (
+      field.key === 'solve' ||
+      field.key === 'quality' ||
+      options[field.key] === field.default
+    ) {
       continue;
     }
     const [group, key] = field.key.split('.');
@@ -34,21 +58,12 @@ export function rendererOptions(input, count) {
     });
   }
   for (const key of ['frame', 'order']) {
-    if (options[key]) {
+    if (options[key] && (key !== 'order' || options.order.length === count)) {
       filtered.push({ id: key, values: options[key].map(String) });
     }
   }
   for (let i = 0; i < count; i++) {
-    const values = [];
-    if (options.turns[i]) {
-      values.push({ id: 'turns', values: options.turns[i].map(String) });
-    }
-    if (options.linkGaps[i]) {
-      values.push({
-        id: 'gaps',
-        values: options.linkGaps[i].map((v) => (v === null ? '~' : String(v))),
-      });
-    }
+    const values = linkOverrides(options, i);
     if (values.length) {
       filtered.push({ values: ['link', String(i + 1), ...values] });
     }

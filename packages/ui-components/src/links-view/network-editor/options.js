@@ -1,7 +1,20 @@
 import { parseNested, formatLinks } from '@link-foundation/ui-core';
 import { networkOptionSchema } from './schema.js';
+import {
+  hasLegacyOptions,
+  readLegacyOptions,
+  legacyAngle,
+  legacyOptionKeys,
+  legacyRows,
+} from './legacy-options.js';
 export { networkOptionSchema, optionAvailable } from './schema.js';
 
+const cssColor = (value, fallback = null) => {
+  if (typeof value === 'string' && /^#[\da-f]{6}$/iu.test(value)) {
+    return value.toLowerCase();
+  }
+  return value === 'currentColor' ? value : fallback;
+};
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const clamp = (value, min, max, fallback) => {
   const n = value === '' || value === null ? NaN : Number(value);
@@ -13,9 +26,9 @@ function scalar(field, value) {
     return field.step === 1 ? Math.round(n) : n;
   }
   if (field.type === 'boolean') {
-    return value === true || value === 'true'
+    return [true, 'true', '1'].includes(value)
       ? true
-      : value === false || value === 'false'
+      : [false, 'false', '0'].includes(value)
         ? false
         : field.default;
   }
@@ -23,9 +36,7 @@ function scalar(field, value) {
     return field.choices.includes(value) ? value : field.default;
   }
   if (field.type === 'color') {
-    return typeof value === 'string' && /^#[\da-f]{6}$/iu.test(value)
-      ? value.toLowerCase()
-      : field.default;
+    return cssColor(value, field.default);
   }
   return typeof value === 'string'
     ? [...value].slice(0, 80).join('')
@@ -102,11 +113,7 @@ export function normalize(input = {}) {
       )
     : [];
   output.linkColors = Array.isArray(source.linkColors)
-    ? source.linkColors.map((v) =>
-        typeof v === 'string' && /^#[\da-f]{6}$/iu.test(v)
-          ? v.toLowerCase()
-          : null
-      )
+    ? source.linkColors.map((v) => cssColor(v))
     : [];
   output.order =
     Array.isArray(source.order) &&
@@ -178,26 +185,38 @@ function parseValue(key, text) {
       : [atom(links[0])]
     : [];
 }
-export function fromParams(value) {
+const optionKeys = Object.freeze(
+  networkOptionSchema.map((field) => field.key).concat('gap', specialKeys)
+);
+export const networkUrlOptionKeys = Object.freeze(
+  optionKeys.concat(legacyOptionKeys)
+);
+
+export function fromParams(value, { legacy } = {}) {
   const params = new globalThis.URLSearchParams(value);
-  const raw = {};
-  for (const key of [
-    ...networkOptionSchema.map((field) => field.key),
-    'gap',
-    ...specialKeys,
-  ]) {
+  const legacyUrl = legacy ?? hasLegacyOptions(params);
+  const raw = readLegacyOptions(params, legacyUrl);
+  for (const key of optionKeys) {
     if (!params.has(key)) {
       continue;
     }
     try {
-      raw[key] = specialKeys.includes(key)
-        ? parseValue(key, params.get(key))
-        : params.get(key);
+      const value = params.get(key);
+      const parsed = specialKeys.includes(key) ? parseValue(key, value) : value;
+      raw[key] =
+        key === 'turns' && !parsed.length && value ? legacyRows(value) : parsed;
     } catch {
-      /* Ignore malformed optional URL values. */
+      if (key === 'turns') {
+        raw.turns = legacyRows(params.get(key));
+      }
     }
   }
-  // Defaults must not become explicit colours, which imply a custom palette.
+  if (legacyUrl) {
+    raw.rotation = legacyAngle(raw.rotation);
+    if (raw.palette === 'custom') {
+      raw.palette = 'site';
+    }
+  }
   return normalize(raw);
 }
 
@@ -212,7 +231,7 @@ export function fromOptions(text = '') {
       params.set(link.values[0].id, link.values[1].id);
     }
   }
-  return fromParams(params);
+  return fromParams(params, { legacy: false });
 }
 
 export function editOptions(input, patch, { countChanged = false } = {}) {
@@ -243,6 +262,10 @@ export function editOptions(input, patch, { countChanged = false } = {}) {
         'linkGaps',
         'order',
         'strokeWidth',
+        'linecap',
+        'linejoin',
+        'arrowJoin',
+        'balanceArrows',
         'glow',
         'card.inset',
         'card.width',
@@ -252,6 +275,7 @@ export function editOptions(input, patch, { countChanged = false } = {}) {
         (field) =>
           field.key === key &&
           field.type !== 'color' &&
+          !['title', 'quality'].includes(key) &&
           geometry.has(field.section)
       )
   );

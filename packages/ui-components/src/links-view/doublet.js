@@ -21,7 +21,12 @@ function isUnchanged(frame, solution) {
 }
 
 /** Built-in provider for createNetworkPresentation and <links-network>. */
-export function createDoubletProvider({ debug, ...worker } = {}) {
+export function createDoubletProvider({
+  debug,
+  foreground,
+  idPrefix,
+  ...worker
+} = {}) {
   const solve = createCollisionSolver(worker);
   return {
     geometry({ input }) {
@@ -52,7 +57,7 @@ export function createDoubletProvider({ debug, ...worker } = {}) {
       if (!frame?.curves) {
         throw new TypeError('A prepared doublet frame is required');
       }
-      return doubletToSvg(frame);
+      return doubletToSvg(frame, { foreground, idPrefix });
     },
   };
 }
@@ -68,16 +73,24 @@ export function doubletOptionAvailability(items, options = '') {
   );
   const reference = referenceCounts.some((count) => count > 0);
   const singleReference = referenceCounts.includes(1);
+  const fixedAngles = reference && o.angles === 'fixed';
+  const forceMultiple = o.layout === 'force' && pairs.length > 1;
   const result = {
     ...Object.fromEntries(Object.keys(o).map((key) => [key, true])),
     loop,
-    loopBend: loop,
+    loopBend: loop && o.bendMode === 'curve',
+    lens:
+      o.angles === 'mirror' &&
+      pairs.some(([s, t], i) => s && s === t && s !== i + 1),
+    forceCharge: forceMultiple,
+    forceDistance: o.layout === 'force' && reference,
+    forceCollision: forceMultiple,
     free,
     bulge: loop || singleReference,
     tension: reference || free,
     angles: reference,
-    sourceAngle: reference && o.angles === 'fixed',
-    targetAngle: reference && o.angles === 'fixed',
+    sourceAngle: fixedAngles,
+    targetAngle: fixedAngles,
     turns: pairs.length > 0,
     order:
       pairs.length > 1 &&
@@ -110,6 +123,8 @@ export function doubletOptionAvailability(items, options = '') {
     'background.color': o.background.type !== 'transparent',
     'background.color2': ['linear', 'radial'].includes(o.background.type),
     'caption.text': o.caption.mode === 'custom',
+    'caption.position': o.caption.mode !== 'none',
+    'caption.notation': o.caption.mode === 'theory',
     'caption.font': o.caption.mode !== 'none',
     'caption.size': o.caption.mode !== 'none',
     'caption.color': o.caption.mode !== 'none',
@@ -131,3 +146,4 @@ function markerAvailability(key, marker, hasLinks) {
   };
 }
 export { DOUBLET_MARKERS, readDoubletOptions } from './doublet-options.js';
+export { doubletToSvg } from './doublet-svg.js';

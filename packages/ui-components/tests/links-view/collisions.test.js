@@ -210,13 +210,14 @@ test('the doublet provider preserves LiNo style and reuses the solution on a par
   );
   await p.update({
     items: reciprocal,
-    options: 'color "#123456"\nsolveGaps false',
+    options: 'color "#123456"\nsolveGaps false\n(link: 2 (color: "#345678"))',
   });
   await p.solve();
   const solved = p.snapshot();
   assert.equal(solved.frame.solution.after, 0);
   assert.match(solved.input.options, /solveGaps false/);
   assert.match(p.toSvg(), /#123456/);
+  assert.match(p.toSvg(), /data-doublet="2" color="#345678"/u);
   await p.update({ index: '23' });
   assert.deepEqual(p.snapshot().frame.curves, solved.frame.curves);
   p.dispose();

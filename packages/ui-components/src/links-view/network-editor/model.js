@@ -1,4 +1,5 @@
-import { normalize, editOptions } from './options.js';
+import * as configurations from '../configurations.js';
+import { normalize, editOptions, fromOptions, toOptions } from './options.js';
 import { replaceStyle } from './presets.js';
 import { remapOptions, canonicalMap } from './remap.js';
 
@@ -27,9 +28,16 @@ export function presentationPairs(snapshot) {
   return result;
 }
 
-export function createEditorModel(
+/** Editable network state and actions for a host-owned presentation. */
+export function createNetworkEditorModel(
   presentation,
-  { config, serializeOptions, readOptions, onChange, onBusy }
+  {
+    configurations: config = configurations,
+    serializeOptions = toOptions,
+    readOptions = fromOptions,
+    onChange = () => {},
+    onBusy = () => {},
+  } = {}
 ) {
   let state = presentation.snapshot();
   let links = presentationPairs(state),

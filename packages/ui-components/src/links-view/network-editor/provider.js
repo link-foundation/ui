@@ -10,14 +10,13 @@ export function createNetworkEditorProvider(configuration = {}) {
   return {
     geometry(context) {
       const options = fromOptions(context.input.options);
-      const frame = provider.geometry({
+      return provider.geometry({
         ...context,
         input: {
           ...context.input,
           options: rendererOptions(options, context.input.items.length),
         },
       });
-      return { ...frame, linkColors: options.linkColors };
     },
     async solve(context) {
       const { input } = context;
@@ -41,22 +40,9 @@ export function createNetworkEditorProvider(configuration = {}) {
                 linkGaps: solution.linkGaps,
                 frame: solution.frame,
               }),
-        frame: { ...frame, linkColors: options.linkColors },
+        frame,
       };
     },
-    svg(context) {
-      let svg = provider.svg(context);
-      // The built-in renderer gives every link an identified group. Its paths
-      // and markers inherit currentColor, so one group attribute colors both.
-      context.frame.linkColors.forEach((color, i) => {
-        if (color) {
-          svg = svg.replace(
-            `<g data-doublet="${i + 1}">`,
-            `<g data-doublet="${i + 1}" color="${color}">`
-          );
-        }
-      });
-      return svg;
-    },
+    svg: provider.svg,
   };
 }

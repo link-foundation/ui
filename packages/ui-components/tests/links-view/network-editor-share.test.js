@@ -6,6 +6,7 @@ import {
   networkFilename,
   networkShareTargets,
 } from '../../src/links-view/network-editor/share.js';
+import { networkShareDestinations } from '../../src/links-view/network-editor/share-targets.js';
 import { normalize } from '../../src/links-view/network-editor/options.js';
 
 it('uses safe bounded filenames and encodes every share target', () => {
@@ -95,4 +96,29 @@ it('prepares Web Share PNG after 200 ms, rejects stale preparation, and falls ba
   assert.equal(shares[1].files, undefined);
   panel.dispose();
   window.close();
+});
+
+it('expands destination templates with a selected Mastodon origin and email body', () => {
+  const url = 'https://example.test/?a=1&b=2';
+  const title = 'Network & friends';
+  assert.equal(networkShareDestinations.Mastodon.label, 'Mastodon');
+  assert.match(networkShareDestinations['e-mail'].template, /\{emailBody\}/u);
+  const targets = networkShareTargets(url, title, {
+    mastodonInstance: 'https://fosstodon.org/',
+    emailBody: 'See {title}\n{url}',
+  });
+  const mastodon = new globalThis.URL(targets.Mastodon);
+  assert.equal(mastodon.origin, 'https://fosstodon.org');
+  assert.equal(mastodon.searchParams.get('text'), `${title} ${url}`);
+  assert.equal(
+    new globalThis.URL(targets['e-mail']).searchParams.get('body'),
+    `See ${title}\n${url}`
+  );
+  assert.throws(
+    () =>
+      networkShareTargets(url, title, {
+        mastodonInstance: 'http://fosstodon.org',
+      }),
+    /Mastodon/u
+  );
 });

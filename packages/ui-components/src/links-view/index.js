@@ -106,6 +106,8 @@ export { createNetworkPresentation } from './presentation.js';
 export { createSolverJob, installSolverWorker } from './solver-job.js';
 
 export { createNetworkEditor } from './network-editor/editor.js';
+export { createNetworkEditorModel } from './network-editor/model.js';
+export { networkEditorMessages } from './network-editor/messages.js';
 export {
   networkOptionSchema,
   normalize as normalizeNetworkOptions,
@@ -117,10 +119,11 @@ export {
 } from './network-editor/options.js';
 export { syncNetworkUrl } from './network-editor/url-sync.js';
 export { networkLooks, networkSizePresets } from './network-editor/presets.js';
+export { networkFilename } from './network-editor/share.js';
 export {
-  networkFilename,
   networkShareTargets,
-} from './network-editor/share.js';
+  networkShareDestinations,
+} from './network-editor/share-targets.js';
 export { networkOverrideSchema } from './network-editor/schema.js';
 
 export {
@@ -132,6 +135,7 @@ export {
 export {
   createDoubletProvider,
   doubletGeometry,
+  doubletToSvg,
   doubletOptionAvailability,
   DOUBLET_MARKERS,
   readDoubletOptions,

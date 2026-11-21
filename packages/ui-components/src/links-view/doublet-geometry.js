@@ -8,12 +8,15 @@ import {
   compensatedMarker,
   markerTipExtension,
 } from './doublet-markers.js';
+import { doubletColor } from './doublet-colors.js';
 import { doubletCaption } from './doublet-svg.js';
 
-function fit(curves, o, pairs) {
+function fit(curves, o, pairs, index) {
   const width = 100 * Math.max(1, o.width / o.height),
     height = 100 * Math.max(1, o.height / o.width);
-  const caption = doubletCaption(pairs, o, '0') ? o.caption.size * 1.8 + 2 : 0;
+  const caption = doubletCaption(pairs, o, index)
+    ? o.caption.size * 1.8 + 2
+    : 0;
   const margin = Math.min(
     48,
     Math.max(
@@ -47,7 +50,8 @@ function fit(curves, o, pairs) {
   const transform = o.frame ?? [
     k,
     width / 2 - ((box.minX + box.maxX) * k) / 2,
-    (height - caption) / 2 - ((box.minY + box.maxY) * k) / 2,
+    (height + (o.caption.position === 'top' ? caption : -caption)) / 2 -
+      ((box.minY + box.maxY) * k) / 2,
   ];
   return {
     bounds: { x: 0, y: 0, width, height },
@@ -104,6 +108,7 @@ export function fittedCurve(curve, transform, o) {
   ];
   return {
     ...curve,
+    color: doubletColor(o, curve.id, o.links[curve.id]?.color),
     middle: point(curve.middle),
     path,
     visible,
@@ -120,7 +125,7 @@ export function doubletGeometry(items, options = '', index = '0') {
     o = readDoubletOptions(options, pairs.length);
   const places = doubletPlaces(pairs, o),
     layoutCurves = doubletCurves(pairs, places, o);
-  const fitted = fit(layoutCurves, o, pairs);
+  const fitted = fit(layoutCurves, o, pairs, index);
   const [k, x, y] = fitted.transform;
   return {
     ...fitted,

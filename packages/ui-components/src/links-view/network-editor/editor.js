@@ -1,6 +1,7 @@
 import * as configurations from '../configurations.js';
 import {
   normalize,
+  networkUrlOptionKeys,
   toParams,
   fromParams,
   toOptions,
@@ -9,28 +10,64 @@ import {
 import { notationPanel, linksPanel, stylePanel } from './panels.js';
 import { createNetworkShare } from './share.js';
 import { syncNetworkUrl } from './url-sync.js';
-import { createEditorModel, presentationPairs } from './model.js';
+import { createNetworkEditorModel, presentationPairs } from './model.js';
 import { CSS } from './styles.js';
 import { element, button } from './dom.js';
+import { editorMessage } from './messages.js';
 
 function stateUrl(state, href, win) {
   const url = new win.URL(href);
-  for (const key of [...Object.keys(normalize({})), 'gap', 'index']) {
-    url.searchParams.delete(key);
-  }
-  url.searchParams.set('code', state.code);
-  for (const [key, value] of toParams(state.options)) {
-    url.searchParams.set(key, value);
+  const params = toParams(state.options);
+  params.set('code', state.code);
+  for (const key of ['code', ...networkUrlOptionKeys, 'index']) {
+    const value = params.get(key);
+    const previous = url.searchParams.getAll(key);
+    if (value === null && previous.length) {
+      url.searchParams.delete(key);
+    } else if (
+      value !== null &&
+      (previous.length !== 1 || previous[0] !== value)
+    ) {
+      url.searchParams.set(key, value);
+    }
   }
   return url.href;
 }
 
-function committedState(state, config, readOptions) {
-  const links = presentationPairs(state);
+function panelMounts(root, mounts) {
+  const doc = root.ownerDocument;
+  const container = element(doc, 'div', undefined, root);
+  container.className = 'network-editor';
+  element(doc, 'style', CSS, container);
+  const roots = [container];
+  const mount = (key) => {
+    const host = mounts[key];
+    if (!host || host === root) {
+      return container;
+    }
+    const wrapper = element(doc, 'div', undefined, host);
+    wrapper.className = container.className;
+    if (host.getRootNode() !== root.getRootNode()) {
+      element(doc, 'style', CSS, wrapper);
+    }
+    roots.push(wrapper);
+    return wrapper;
+  };
+  return {
+    roots,
+    notations: mount('notations'),
+    links: mount('links'),
+    styles: mount('styles'),
+    actions: mount('actions'),
+  };
+}
+
+function editorState(snapshot, config, readOptions) {
+  const links = presentationPairs(snapshot);
   return {
     links,
     code: config.encode(links),
-    options: normalize(readOptions(state.input.options)),
+    options: normalize(readOptions(snapshot.input.options)),
   };
 }
 
@@ -41,6 +78,9 @@ export function createNetworkEditor(root, settings = {}) {
     configurations: config = configurations,
     solve,
     locale = 'en',
+    messages,
+    mounts = {},
+    share,
     serializeOptions = toOptions,
     readOptions = fromOptions,
     syncUrl = true,
@@ -49,10 +89,12 @@ export function createNetworkEditor(root, settings = {}) {
   const canSolve = Boolean(solve || presentation?.canSolve);
   const doc = root.ownerDocument,
     win = doc.defaultView;
-  const container = element(doc, 'div', undefined, root);
-  container.className = 'network-editor';
-  element(doc, 'style', CSS, container);
-  const { live, error } = statusNodes(doc, container);
+  const { roots, notations, links, styles, actions } = panelMounts(
+    root,
+    mounts
+  );
+  const { live, error } = statusNodes(doc, actions);
+  const message = editorMessage(messages);
   let disposed = false,
     pending = Promise.resolve();
   const panels = {};
@@ -62,21 +104,23 @@ export function createNetworkEditor(root, settings = {}) {
       error.textContent = '';
     }
   };
+  const fail = (failure) =>
+    announce(message('error', { detail: failure?.message ?? failure }), true);
   const run = (action) => {
     try {
       pending = Promise.resolve(action()).catch((failure) => {
-        if (!disposed && failure.name !== 'AbortError') {
-          announce(failure.message, true);
+        if (!disposed && failure?.name !== 'AbortError') {
+          fail(failure);
         }
       });
     } catch (failure) {
-      announce(failure.message, true);
+      fail(failure);
       pending = Promise.resolve();
     }
     return pending;
   };
-  const model = createEditorModel(presentation, {
-    config,
+  const model = createNetworkEditorModel(presentation, {
+    configurations: config,
     serializeOptions,
     readOptions,
     onChange(external) {
@@ -86,7 +130,9 @@ export function createNetworkEditor(root, settings = {}) {
       panels.share?.refresh();
     },
     onBusy(busy) {
-      container.setAttribute('aria-busy', String(busy));
+      for (const panel of roots) {
+        panel.setAttribute('aria-busy', String(busy));
+      }
       panels.share?.setBusy(busy);
       if (panels.apply) {
         panels.apply.disabled = busy || !canSolve;
@@ -95,7 +141,7 @@ export function createNetworkEditor(root, settings = {}) {
   });
   const getState = model.snapshot;
   const getCommittedState = () =>
-    committedState(presentation.snapshot(), config, readOptions);
+    editorState(presentation.snapshot(), config, readOptions);
   const getUrl = () => stateUrl(getCommittedState(), win.location.href, win);
   const context = {
     doc,
@@ -107,7 +153,10 @@ export function createNetworkEditor(root, settings = {}) {
       `network-editor-${doc.querySelectorAll('.network-editor').length}`,
     getState,
     announce,
+    message,
+    fail,
     run,
+    canSolve,
     draft: null,
     applyLinks: model.applyLinks,
     changeOptions: model.changeOptions,
@@ -115,38 +164,28 @@ export function createNetworkEditor(root, settings = {}) {
     removeLink: model.removeLink,
     canonicalize: model.canonicalize,
   };
-  panels.notations = notationPanel(container, context);
-  panels.cards = linksPanel(container, context);
-  panels.styles = stylePanel(container, context);
-  panels.apply = solverControls(container, {
-    model,
-    solve,
-    canSolve,
-    announce,
-    run,
-  });
-  panels.share = createNetworkShare(container, {
+  panels.notations = notationPanel(notations, context);
+  panels.cards = linksPanel(links, context);
+  panels.styles = stylePanel(styles, context);
+  panels.apply = solverControls(actions, model, solve, context);
+  panels.share = createNetworkShare(actions, {
     presentation,
     getState: getCommittedState,
     getUrl,
     announce,
+    message,
+    fail,
+    share,
     window: win,
   });
   panels.share.setBusy(false);
   const urlSync = syncUrl
     ? syncNetworkUrl(presentation, {
         window: win,
-        root: container,
+        root: roots,
         debug,
         urlFor: (state, href) =>
-          stateUrl(
-            {
-              code: config.encode(presentationPairs(state)),
-              options: readOptions(state.input.options),
-            },
-            href,
-            win
-          ),
+          stateUrl(editorState(state, config, readOptions), href, win),
       })
     : null;
   const restoreUrl = () =>
@@ -176,7 +215,7 @@ export function createNetworkEditor(root, settings = {}) {
       panels.share.dispose();
       panels.styles.dispose();
       win.removeEventListener('popstate', restoreUrl);
-      container.remove();
+      roots.forEach((wrapper) => wrapper.remove());
     },
   };
 }
@@ -190,22 +229,22 @@ function statusNodes(doc, container) {
   return { live, error };
 }
 
-function solverControls(container, { model, solve, canSolve, announce, run }) {
-  const doc = container.ownerDocument;
-  const solverPanel = element(doc, 'fieldset', undefined, container);
-  element(doc, 'legend', 'Solver', solverPanel);
-  const apply = button(doc, solverPanel, 'Apply', () =>
+function solverControls(actions, model, solve, context) {
+  const { doc, announce, run, message, canSolve } = context;
+  const solverPanel = element(doc, 'fieldset', undefined, actions);
+  element(doc, 'legend', message('solver'), solverPanel);
+  const apply = button(doc, solverPanel, message('apply'), () =>
     run(async () => {
-      announce('Solving…');
+      announce(message('solving'));
       const result = await model.solve(solve);
       if (result) {
-        announce(`Collisions ${result.before} → ${result.after}`);
+        announce(message('collisions', result));
       }
     })
   );
   apply.disabled = !canSolve;
   if (!canSolve) {
-    element(doc, 'p', 'Solver unavailable.', solverPanel);
+    element(doc, 'p', message('solverUnavailable'), solverPanel);
   }
   return apply;
 }

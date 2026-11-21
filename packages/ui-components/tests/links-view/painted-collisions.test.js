@@ -64,6 +64,10 @@ test('scores a filled marker interior, a hollow marker rim and an acute miter ti
   const tip = [marker('arrow', 10, 10), curve(line(2.6, -0.15, 2.6, 0.15))];
   assert.equal(score(scene(tip, 'clearance 0')).count, 1);
   assert.equal(score(scene(tip, 'clearance 0\narrowJoin bevel')).count, 0);
+  assert.equal(
+    score(scene(tip, 'clearance 0\nlinejoin bevel\narrowJoin inherit')).count,
+    0
+  );
 });
 
 test('clips the own-half joint and respects real breaks and dash gaps', () => {

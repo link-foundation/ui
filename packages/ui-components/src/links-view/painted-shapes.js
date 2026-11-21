@@ -1,7 +1,11 @@
 import { add, sub, scale, lerp } from './geometry.js';
 import { rotate } from './doublet-layout.js';
 import { splitCubic } from './doublet-curves.js';
-import { doubletMarkerVertices, markerMiterLimit } from './doublet-markers.js';
+import {
+  doubletMarkerJoin,
+  doubletMarkerVertices,
+  markerMiterLimit,
+} from './doublet-markers.js';
 
 const EPSILON = 1e-9;
 const FLATNESS = 0.05;
@@ -293,7 +297,7 @@ export function paintedMarker(placement, options) {
   const parts = markerStroke(points, strokeWidth / 2, {
     closed,
     cap: placement.linecap ?? 'butt',
-    join: placement.linejoin ?? options.arrowJoin,
+    join: placement.linejoin ?? doubletMarkerJoin(options),
     limit: placement.miterLimit ?? markerMiterLimit(marker),
   });
   if (closed && shape !== 'circle') {
