@@ -452,4 +452,5 @@ Replay or move the labelled time scrubber. The `<pre>` shows the sharable LiNo.
 
 Independent decorative canvas, WebGL and CSS entry points are documented in
 [backgrounds](src/backgrounds/README.md), with a runnable all-layer example,
-original nebula preset, host glyph hooks and reduced-motion/CSS fallbacks.
+original nebula preset, host artwork and clock hooks, and reduced-motion/CSS
+fallbacks.

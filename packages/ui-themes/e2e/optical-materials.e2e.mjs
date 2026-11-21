@@ -57,14 +57,27 @@ test('5,000 items, dynamic changes, hover, print and disposal', async ({
   await page.evaluate(() => {
     const root = document.querySelector('#items');
     root.innerHTML = '<div class="item"></div>'.repeat(5000);
+    const style = document.createElement('style');
+    style.textContent =
+      '.item::before { content: ""; backdrop-filter: blur(2px); }';
+    document.head.append(style);
     window.budget = window.optics.observeMaterialVisibility(root, '.item');
+    window.pseudoBudget = window.optics.observeMaterialVisibility(
+      root,
+      '.item',
+      {
+        pseudoElement: '::before',
+      }
+    );
   });
   await expect
     .poll(() =>
       page.evaluate(
         () =>
           [...document.querySelectorAll('.item')].filter(
-            (el) => getComputedStyle(el).backdropFilter !== 'none'
+            (el) =>
+              getComputedStyle(el).backdropFilter !== 'none' &&
+              getComputedStyle(el, '::before').backdropFilter !== 'none'
           ).length
       )
     )
@@ -74,7 +87,8 @@ test('5,000 items, dynamic changes, hover, print and disposal', async ({
       [...document.querySelectorAll('.item')].every((el) => {
         const rect = el.getBoundingClientRect();
         return (
-          getComputedStyle(el).backdropFilter === 'none' ||
+          (getComputedStyle(el).backdropFilter === 'none' &&
+            getComputedStyle(el, '::before').backdropFilter === 'none') ||
           rect.top <= innerHeight + 200
         );
       })
@@ -88,6 +102,14 @@ test('5,000 items, dynamic changes, hover, print and disposal', async ({
     'backdrop-filter',
     'none'
   );
+  const pseudoFilter = (locator) =>
+    locator.evaluate((el) => getComputedStyle(el, '::before').backdropFilter);
+  await expect
+    .poll(() => pseudoFilter(page.locator('.item').first()))
+    .toBe('none');
+  await expect
+    .poll(() => pseudoFilter(page.locator('.item').last()))
+    .toBe('blur(2px)');
   await page.locator('.item').last().hover();
   await expect(page.locator('.item').last()).toHaveCSS(
     'backdrop-filter',
@@ -98,6 +120,7 @@ test('5,000 items, dynamic changes, hover, print and disposal', async ({
     'backdrop-filter',
     'blur(4px)'
   );
+  expect(await pseudoFilter(page.locator('.item').first())).toBe('blur(2px)');
   await page.emulateMedia({ media: 'screen' });
   await page.evaluate(() => {
     const root = document.querySelector('#items');
@@ -112,11 +135,15 @@ test('5,000 items, dynamic changes, hover, print and disposal', async ({
   await expect
     .poll(() => page.evaluate(() => window.removed.attributes.length))
     .toBe(1);
-  await page.evaluate(() => window.budget.dispose());
+  await page.evaluate(() => {
+    window.budget.dispose();
+    window.pseudoBudget.dispose();
+  });
   await expect(page.locator('#added')).toHaveCSS(
     'backdrop-filter',
     'blur(4px)'
   );
+  expect(await pseudoFilter(page.locator('#added'))).toBe('blur(2px)');
 });
 
 test('static sheen respects reduced motion and explicit settings', async ({

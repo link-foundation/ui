@@ -130,3 +130,38 @@ it('composes partial geometry states without resolving currentColor inputs on th
     /@property --frame-panel-top-(?:color|image) \{/u
   );
 });
+
+it('exposes reusable declarations for a host skin with separately cut edges', () => {
+  const custom = readFrames(`frames
+  panel
+    corner top-left cut
+      size 20
+    edge top line
+      inset-start 12
+      inset-end 6
+  block
+    extends panel
+      scale 0.5
+`);
+  const css = framesCss(custom, {
+    prefix: 'skin',
+    scope: '[data-skin="glass"]',
+    levels: { panel: ['.card'], block: ['.card .card'] },
+    paint: false,
+  });
+  assert.doesNotMatch(
+    css.base + css.levels.panel + css.fit,
+    /data-frame-paint|position: relative/u
+  );
+  assert.equal(
+    css.geometry.levels.panel['--skin-g-top-inset-start'],
+    'var(--skin-panel-top-inset-start)'
+  );
+  assert.match(css.geometry.material['clip-path'], /^polygon\(/u);
+  assert.ok(css.geometry.corners.tl['clip-path']);
+  assert.ok(css.geometry.edges.top['clip-path']);
+  assert.match(
+    css.levels.block,
+    /--skin-block-top-inset-end: var\(--skin-panel-top-inset-end\)/u
+  );
+});

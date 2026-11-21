@@ -58,8 +58,15 @@ export function readSoundTheme(text: unknown): {
   theme: SoundTheme | null;
   diagnostics: Diagnostic[];
 };
+export interface SoundBusOptions {
+  /** Volume placement relative to the shelf, wet send and compressor. Default output. */
+  gainPlacement?: 'input' | 'output';
+  /** The output node, or a factory called with the lazily created context. */
+  destination?: AudioNode | ((audio: BaseAudioContext) => AudioNode);
+}
 export interface SoundBus {
   input: GainNode;
+  /** The volume node. Equal to input when gainPlacement is input. */
   master: GainNode;
   shelf: BiquadFilterNode;
   convolver: ConvolverNode;
@@ -75,7 +82,8 @@ export interface SoundBus {
 export function createSoundBus(
   audio: BaseAudioContext,
   settings: SoundTheme['bus'],
-  random?: () => number
+  random?: () => number,
+  options?: SoundBusOptions
 ): SoundBus;
 export function playVoice(
   audio: BaseAudioContext,
@@ -140,6 +148,7 @@ export function createSoundPlayer(options: {
   now?: () => number;
   random?: () => number;
   createContext?: () => AudioContext;
+  bus?: SoundBusOptions;
   gestureTarget?: EventTarget & { innerWidth?: number };
   document?: Document;
   hasBeenActive?: () => boolean;

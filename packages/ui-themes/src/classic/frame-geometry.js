@@ -131,12 +131,15 @@ function edgeStrokes(frame, cs, starts, ends, scale, stroke) {
     const fullLength = Math.hypot(b[0] - a[0], b[1] - a[1]);
     if (fullLength > 0 && frame.mode !== 'border') {
       const direction = a.map((value, j) => (b[j] - value) / fullLength);
-      const gapA =
-        cs[i].line === 'gap' ? Math.min(cs[i].arm * scale, fullLength / 2) : 0;
-      const gapB =
-        cs[next].line === 'gap'
-          ? Math.min(cs[next].arm * scale, fullLength / 2)
-          : 0;
+      const start = i < 2 ? 'inset-start' : 'inset-end';
+      const end = i < 2 ? 'inset-end' : 'inset-start';
+      const gap = (corner, key) =>
+        Math.min(
+          (corner.line === 'gap' ? corner.arm * scale : 0) + (edge[key] ?? 0),
+          fullLength / 2
+        );
+      const gapA = gap(cs[i], start);
+      const gapB = gap(cs[next], end);
       a = a.map((value, j) => value + direction[j] * gapA);
       b = b.map((value, j) => value - direction[j] * gapB);
     }

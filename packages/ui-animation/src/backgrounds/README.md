@@ -68,6 +68,14 @@ changes rebuild sprites and retain positions. Count changes retain the seeded
 prefix. `motion` is `still`, `drift`, `warp` or `orbit`; `direction` is degrees
 and `speed` is 0..400 CSS px/s. Nearer stars travel faster.
 
+For host artwork, pass `random(seed)` to return a repeatable stream.
+`layout({ count, width, height, dpr, random, options })` can use that stream and
+return normalized positions with optional sprite indices, scale, opacity, and
+rotation in degrees. `createSprites({ canvas, dpr, options })` returns
+`{ image, size }` entries with their destination sizes in CSS pixels. A color or
+sprite update keeps existing positions. Resizing the CSS bounds restarts
+the layout callback's stream from the supplied seed.
+
 ## Shader backdrop and original nebula
 
 `source` is a WebGL 1 fragment shader. The full-screen triangle mesh supplies
@@ -78,6 +86,13 @@ integrates independently, so changing a speed never jumps. `startTime` is a
 number or `random` (a seeded offset). Update uniform/time maps with complete
 replacement maps. Failed live shader replacement hides the canvas until a valid
 source is supplied. The context requests low power, opaque output and no MSAA.
+
+`startTime` also accepts a map of clock names to offsets. Pass `random(seed)`
+to use host random state. Random start offsets call it with a seed qualified
+by clock name (`${seed}:${name}`). `update({ clock: { time: seconds } })`
+renders host time even while paused. Remove the override with `clock: {}` to
+resume internal integration from that position. Register the uniform in
+`times` first.
 
 ```js
 import { mount } from '@link-foundation/ui-animation/backgrounds/shader';
@@ -117,7 +132,10 @@ step is every 6 frames at 60 Hz and 13 at 120 Hz. Destination-out fading keeps
 the canvas transparent. Old heads are repainted without glow. About once per
 second an SVG alpha table clears values ≤9/255; a pixel pass covers engines
 without working SVG filters. Reduced motion paints a deterministic static field
-with alpha 0.2..0.8.
+with alpha 0.2..0.8. Choose `calibration: 'batched'` to use 60 Hz until the
+first complete window, then the upper median of each non-overlapping
+30-gap window. A pause discards partial samples and keeps the calibrated rate.
+`createCadence('batched')` exposes the same quantizer for a host scheduler.
 
 ## Grid pattern and registration
 
@@ -125,7 +143,18 @@ with alpha 0.2..0.8.
 (`lines`, `dashed`, `crosses`, `dots`), `level` (0..4), `tint` (`line`, `accent`,
 `second-accent`, `custom`), `color`, `radialFade`, `period` (0..120 s, 0 still).
 Theme tints use `--color-line`, `--color-accent` and `--color-accent-2`.
+Use `tokens: { line: '--host-line', alpha: '--host-alpha' }` to bind a live
+theme color and an independent opacity multiplier. For raw RGB channel
+tokens, use `tint: 'custom'` with `color: 'rgb(var(--host-line-rgb))'`.
 
 The CSS pattern is one extra cell tall. `onDrift(px)` receives the shared offset;
 forward it to rain and beams with `update({drift: px})`. At a wrap, the offset
-shifts by exactly one cell. See the example's wiring.
+shifts by exactly one cell. Grid, beams and rain accept `originX` and
+`originY` in CSS pixels. Supply `gridOffset(timeMs, cellSize, periodMs)` as the
+grid's explicit `drift` to use a fixed host clock. Pass `drift: undefined`
+to the grid to resume internally integrated drift. Rain and beams also accept
+the host's `random(seed)` factory for repeatable fields and paths.
+
+The [host integration example](../../../../examples/themes/host-integration/)
+shows a host-drawn star reference alongside the mounted starfield, a saved
+shader clock and one phase shared by independently mounted layers.

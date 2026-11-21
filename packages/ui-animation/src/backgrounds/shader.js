@@ -9,6 +9,8 @@ const defaults = {
   times: { time: 1 },
   startTime: 0,
   seed: 224,
+  random: seededRandom,
+  clock: undefined,
 };
 function compile(gl, type, source) {
   const shader = gl.createShader(type);
@@ -57,6 +59,12 @@ function upload(gl, location, value) {
   } else if (value && typeof value.degrees === 'number') {
     gl.uniform1f(location, radians(value.degrees));
   }
+}
+function clockStart(value, name) {
+  if (value && typeof value === 'object') {
+    return Object.hasOwn(value, name) ? value[name] : 0;
+  }
+  return value ?? 0;
 }
 function create(canvas, win, initial) {
   const gl = canvas.getContext('webgl', {
@@ -107,17 +115,29 @@ function create(canvas, win, initial) {
           o.onError?.(error);
         }
       }
+      let reset = false;
       for (const name of Object.keys(next.times)) {
-        if (!clocks.has(name) || next.startTime !== before.startTime) {
+        const start = clockStart(next.startTime, name);
+        if (
+          !clocks.has(name) ||
+          start !== clockStart(before.startTime, name) ||
+          (start === 'random' && changed(next, before, ['seed', 'random']))
+        ) {
           clocks.set(
             name,
-            next.startTime === 'random'
-              ? seededRandom(`${next.seed}:${name}`)() * 1000
-              : Number(next.startTime)
+            start === 'random'
+              ? next.random(`${next.seed}:${name}`)() * 1000
+              : start
           );
+          reset = true;
         }
       }
-      return changed(next, before, ['source', 'uniforms', 'startTime']);
+      for (const name of clocks.keys()) {
+        if (!Object.hasOwn(next.times, name)) {
+          clocks.delete(name);
+        }
+      }
+      return reset || changed(next, before, ['source', 'uniforms', 'clock']);
     },
     resize(next) {
       area = next;
@@ -132,7 +152,10 @@ function create(canvas, win, initial) {
       gl.uniform2f(location('resolution'), canvas.width, canvas.height);
       gl.uniform1f(location('pixelRatio'), area.ratio);
       for (const [name, speed] of Object.entries(o.times)) {
-        const time = clocks.get(name) + (still ? 0 : dt * speed);
+        const time =
+          o.clock && Object.hasOwn(o.clock, name)
+            ? o.clock[name]
+            : clocks.get(name) + (still ? 0 : dt * speed);
         clocks.set(name, time);
         gl.uniform1f(location(name), time);
       }
