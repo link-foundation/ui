@@ -822,7 +822,7 @@ export interface NetworkEditorModel {
   ): Promise<boolean>;
   removeLink(index: number): Promise<boolean>;
   canonicalize(): Promise<boolean> | undefined;
-  solve(callback: NetworkEditorSolver): Promise<NetworkSolverResult | null>;
+  solve(callback?: NetworkEditorSolver): Promise<NetworkSolverResult | null>;
   dispose(): void;
 }
 export function createNetworkEditorModel(
@@ -1108,7 +1108,7 @@ export interface DoubletMarkerPlacement {
   vertices?: LinkPoint[];
   strokeWidth?: number;
   linecap?: DoubletOptions['linecap'];
-  linejoin?: DoubletOptions['arrowJoin'];
+  linejoin?: DoubletLineJoin;
   miterLimit?: number;
 }
 export interface DoubletCurve {

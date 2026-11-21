@@ -141,7 +141,7 @@ export function createNetworkEditorModel(
         if (!callback) {
           const committed = await presentation.solve({ signal: active.signal });
           return committed && !disposed
-            ? presentation.snapshot().frame.solution
+            ? (presentation.snapshot().frame.solution ?? null)
             : null;
         }
         const result = await callback(
