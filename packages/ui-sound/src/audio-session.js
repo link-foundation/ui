@@ -5,6 +5,7 @@ export function audioSession({
   theme,
   state,
   createContext,
+  busOptions,
   random,
   onDiagnostic,
   document,
@@ -39,7 +40,12 @@ export function audioSession({
     try {
       if (!audio) {
         audio = createContext();
-        bus = createSoundBus(audio, { ...theme.bus, room: state.room }, random);
+        bus = createSoundBus(
+          audio,
+          { ...theme.bus, room: state.room },
+          random,
+          busOptions
+        );
         // Start silent before routing the first source, then ramp to preference.
         bus.master.gain.value = 0;
         apply();

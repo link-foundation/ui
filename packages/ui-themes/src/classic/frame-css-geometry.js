@@ -1,4 +1,4 @@
-import { edgeGeometryCss } from './frame-css-edge-geometry.js';
+import { edgeDeclarations } from './frame-css-edge-geometry.js';
 
 /** Shared responsive geometry. All lengths resolve against the decoration layer,
  * never a layout containment boundary on the host. Quadratics are sampled at
@@ -38,10 +38,9 @@ const rule = (selector, declarations) =>
   `${selector} {\n${declarations.map(([k, v]) => `  ${k}: ${v};`).join('\n')}\n}\n`;
 export { rule };
 
-export function geometryCss(prefix) {
+export function geometryDeclarations(prefix) {
   const v = (name) => `var(--${prefix}-g-${name})`;
   const prop = (name) => `--${prefix}-g-${name}`;
-  const declarations = [];
   // Length division preserves container-unit ratios in both browser engines.
   // Denominators stay positive, including a completely square frame.
   const ratios = [
@@ -53,7 +52,7 @@ export function geometryCss(prefix) {
     ([extent, a, b]) =>
       `calc(${extent} / max(0.000001px, calc(${v(a)} + ${v(b)})))`
   );
-  declarations.push([prop('fit'), `min(1, ${ratios.join(', ')})`]);
+  const fit = { [prop('fit')]: `min(1, ${ratios.join(', ')})` };
   const at = (id, i, inset = false) => {
     const x = `calc(${v(`${id}-x${i}`)} * ${v(`${id}-${id === 'tr' || id === 'bl' ? 'h' : 'w'}`)} * ${v('fit')} * ${v('threshold')} * ${v('border')})`;
     const y = `calc(${v(`${id}-y${i}`)} * ${v(`${id}-${id === 'tr' || id === 'bl' ? 'w' : 'h'}`)} * ${v('fit')} * ${v('threshold')} * ${v('border')})`;
@@ -72,10 +71,8 @@ export function geometryCss(prefix) {
   const contour = IDS.flatMap((id) =>
     Array.from({ length: POINTS + 1 }, (_, i) => at(id, i).join(' '))
   );
-  let css = rule('[data-frame-paint] > *', declarations);
-  css += rule('[data-frame-material]', [
-    ['clip-path', `polygon(${contour.join(', ')})`],
-  ]);
+  const material = { 'clip-path': `polygon(${contour.join(', ')})` };
+  const corners = {};
   for (const id of IDS) {
     const points = Array.from({ length: POINTS + 1 }, (_, i) => at(id, i));
     const extension = `calc(${v(`${id}-extension`)} * ${v('fit')} * ${v('threshold')} * ${v('border')})`;
@@ -118,7 +115,7 @@ export function geometryCss(prefix) {
         })
         .join(' ')
     );
-    css += rule(`[data-frame-corner='${id}']`, [
+    corners[id] = Object.fromEntries([
       ...pointDeclarations,
       ['clip-path', `polygon(${polygon.join(', ')})`],
       ['background', v(`${id}-paint`)],
@@ -129,5 +126,5 @@ export function geometryCss(prefix) {
       ['z-index', v('layer')],
     ]);
   }
-  return css + edgeGeometryCss(prefix);
+  return { fit, material, corners, edges: edgeDeclarations(prefix) };
 }

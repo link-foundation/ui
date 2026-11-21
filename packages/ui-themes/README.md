@@ -59,6 +59,13 @@ shared opt-in animation/sound governor. See the
 [frame and material contract](../../docs/spec/frames.md) and the
 [original optical example](../../examples/themes/optical-frames/README.md).
 
+Existing surfaces can compose the declaration records from
+`framesCss(frames, { paint: false })` into their own CSS selectors.
+`materialStyle(material, preferences, options)` accepts host texture and
+lighting functions, live theme colors and a clip path. The
+[host integration example](../../examples/themes/host-integration/) paints a
+material and stroke on separate pseudo-elements with those APIs.
+
 ### Adaptive effect governor
 
 `createEffectGovernor` from `@link-foundation/ui-themes/classic/materials`
@@ -99,6 +106,11 @@ until `minScale` (0.4), then frame-rate share multiplies by `fpsFactor` (0.5)
 until `minFps` (0.25). Quality never increases. These four per-effect options
 accept positive numbers up to one; factors must be below one. `resolution: false`
 keeps scale at one and lowers only frame rate.
+
+Hosts with their own scheduler can import `createQualityWatcher` from the
+same entry point. Call `feed(gapMs)` with raw display gaps, read the current
+shares with `snapshot()`, and call `reset()` after a suspension to warm up
+again. The watcher creates no subscriptions or frame callbacks.
 
 An optional `fps` target of 5..60 throttles draws to
 `1000 / (fps * quality.fps)` milliseconds; omitting it preserves drawing on every

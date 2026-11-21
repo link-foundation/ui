@@ -287,3 +287,62 @@ test('each public effect bundles independently without importing other effects',
     }
   }
 });
+
+test('a host star layout consumes its own random order and reuses its sprite cache', () => {
+  const e = environment({ width: 1920, height: 1080, dpr: 1 });
+  const image = {};
+  let layouts = 0;
+  let spriteBuilds = 0;
+  const layer = stars(e.canvas, {
+    animate: false,
+    count: 1,
+    random: () => () => 0.25,
+    layout({ count, random }) {
+      layouts++;
+      assert.equal(count, 1);
+      return [{ x: random(), y: 0.5, sprite: 0, opacity: 0.75, scale: 2 }];
+    },
+    createSprites({ dpr }) {
+      spriteBuilds++;
+      assert.equal(dpr, 1);
+      return [{ image, size: 6 }];
+    },
+  });
+  assert.deepEqual(positions(e.calls), [[480, 540]]);
+  assert.deepEqual(
+    e.calls.find(([name]) => name === 'drawImage'),
+    ['drawImage', image, -6, -6, 12, 12]
+  );
+  layer.update({ brightness: 0.5 });
+  assert.equal(layouts, 1);
+  assert.equal(spriteBuilds, 1);
+  layer.dispose();
+});
+
+test('batched rain uses only complete 30-gap windows and takes the upper median', () => {
+  const cadence = createCadence('batched');
+  const firstStep = () => {
+    for (let frame = 1; frame <= 20; frame++) {
+      if (cadence.ready(105, 60)) {
+        return frame;
+      }
+    }
+  };
+  for (let i = 0; i < 15; i++) {
+    cadence.frame(8);
+  }
+  for (let i = 0; i < 14; i++) {
+    cadence.frame(25);
+  }
+  cadence.frame(5000);
+  assert.equal(firstStep(), 6);
+  cadence.frame(25);
+  assert.equal(firstStep(), 4);
+  for (let i = 0; i < 29; i++) {
+    cadence.frame(16);
+  }
+  assert.equal(firstStep(), 4);
+  cadence.reset();
+  cadence.frame(16);
+  assert.equal(firstStep(), 4);
+});

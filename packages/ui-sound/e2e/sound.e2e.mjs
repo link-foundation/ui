@@ -94,3 +94,64 @@ test('real audio envelopes stay silent before fractional sample starts', async (
   });
   expect(result).toEqual({ silent: [true, true, true], audible: true });
 });
+
+test('input gain feeds a quiet cue and stacked copies into the same limiter', async ({
+  page,
+}) => {
+  await page.goto('/packages/ui-sound/examples/index.html');
+  const levels = await page.evaluate(async () => {
+    const { createSoundBus, playVoice } =
+      await import('/packages/ui-sound/src/graph.js');
+    const patch = {
+      parts: [
+        {
+          kind: 'tone',
+          wave: 'sine',
+          frequency: 400,
+          to: 400,
+          gain: 1,
+          detune: 0,
+          pan: 0,
+          delay: 0,
+          envelope: { attack: 0.02, decay: 0.15, sustain: 1, release: 0.025 },
+        },
+      ],
+      repeat: 1,
+      gap: 0,
+      repeatDecay: 1,
+    };
+    const rate = 24000;
+    const render = async (gainPlacement, copies) => {
+      const audio = new window.OfflineAudioContext(1, rate / 2, rate);
+      const destination = audio.createGain();
+      destination.connect(audio.destination);
+      const bus = createSoundBus(
+        audio,
+        {
+          shelf: [1500, 0],
+          compressor: [-18, 12],
+          reverb: 0,
+        },
+        () => 0.5,
+        { gainPlacement, destination }
+      );
+      bus.configure({ volume: 0.125 });
+      for (let i = 0; i < copies; i++) {
+        playVoice(audio, patch, bus.input, { at: 0.2, gain: 1 });
+      }
+      const rendered = (await audio.startRendering()).getChannelData(0);
+      const slice = rendered.subarray(rate * 0.25, rate * 0.34);
+      return Math.sqrt(
+        slice.reduce((sum, sample) => sum + sample ** 2, 0) / slice.length
+      );
+    };
+    return {
+      input: [await render('input', 1), await render('input', 3)],
+      output: [await render('output', 1), await render('output', 3)],
+    };
+  });
+  expect(levels.input[0]).toBeGreaterThan(levels.output[0] * 2);
+  expect(levels.input[1]).toBeGreaterThan(levels.input[0]);
+  expect(levels.input[1]).toBeLessThan(levels.input[0] * 2.85);
+  expect(levels.output[1]).toBeLessThan(levels.input[1] / 2);
+});

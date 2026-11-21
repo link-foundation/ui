@@ -129,7 +129,7 @@ function readPart(result, kind, name, shape, properties) {
       properties,
       isCorner
         ? ['size', 'width', 'height', 'stroke', 'color', 'line', 'arm']
-        : ['stroke', 'color', 'gap', 'style']
+        : ['stroke', 'color', 'gap', 'style', 'inset-start', 'inset-end']
     ),
   };
   if (

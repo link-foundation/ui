@@ -52,6 +52,8 @@ export interface FrameEdge {
   stroke: number | 'auto';
   color: string;
   gap: number;
+  'inset-start'?: number;
+  'inset-end'?: number;
 }
 export interface FrameOptions {
   mode?: 'frame' | 'own' | 'border';
@@ -120,6 +122,8 @@ export interface FramesCssOptions {
   scope?: string;
   boundaryAttribute?: string;
   selected?: string[];
+  /** False emits controls and layout-independent geometry for host-owned paint. */
+  paint?: boolean;
 }
 export interface FrameControl {
   level: FrameLevel;
@@ -128,6 +132,14 @@ export interface FrameControl {
   inherits?: boolean;
   attribute?: string;
   choices?: string[];
+}
+export interface FrameCssGeometry {
+  /** Apply the selected level aliases and fit declarations to each paint surface. */
+  levels: Partial<Record<FrameLevel, Record<string, string>>>;
+  fit: Record<string, string>;
+  material: Record<string, string>;
+  corners: Record<'tl' | 'tr' | 'br' | 'bl', Record<string, string>>;
+  edges: Record<FrameEdgeName, Record<string, string>>;
 }
 export function framesCss(
   frames: Map<FrameLevel, FrameDefinition>,
@@ -138,6 +150,7 @@ export function framesCss(
   levels: Partial<Record<FrameLevel, string>>;
   fit: string;
   controls: FrameControl[];
+  geometry: FrameCssGeometry;
 };
 /** Insert first in a transparent, positioned frame host; content follows. */
 export function frameLayers(): string;

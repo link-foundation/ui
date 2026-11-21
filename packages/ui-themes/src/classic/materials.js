@@ -81,34 +81,46 @@ function materialFilter(material, preferences, transparent) {
   return chain.join(' ') || 'none';
 }
 
+function materialBackground(material, transparent, surfaceColor) {
+  const color = material.color === 'inherit' ? surfaceColor : material.color;
+  if (!color) {
+    return 'transparent';
+  }
+  const alpha =
+    !transparent && material.opacity > 0 ? 1 : material.opacity || 0;
+  return `color-mix(in srgb, ${color} ${alpha * 100}%, transparent)`;
+}
+
 /** Apply to a dedicated clipped layer, below content and frame strokes. */
-export function materialStyle(material, preferences = {}) {
+export function materialStyle(material, preferences = {}, options = {}) {
   validateMaterial(material);
+  const { prefix = 'material', surfaceColor, clipPath } = options;
+  if (!/^[a-zA-Z_][\w-]*$/u.test(prefix)) {
+    throw new TypeError('Invalid material variable prefix');
+  }
   const transparent = transparencyAllowed(preferences);
-  const alpha = transparent ? material.opacity : 1;
   const visible = material.opacity > 0;
+  const effects = transparent && visible;
   const result = {
-    background:
-      material.color === 'inherit'
-        ? 'transparent'
-        : `color-mix(in srgb, ${material.color} ${visible ? alpha * 100 : 0}%, transparent)`,
+    background: materialBackground(material, transparent, surfaceColor),
     'backdrop-filter': materialFilter(material, preferences, transparent),
-    '--material-noise': String(transparent && visible ? material.noise : 0),
-    '--material-refraction': String(
-      transparent && visible ? material.refraction : 0
-    ),
+    [`--${prefix}-noise`]: String(effects ? material.noise : 0),
+    [`--${prefix}-refraction`]: String(effects ? material.refraction : 0),
   };
+  if (clipPath !== undefined) {
+    result['clip-path'] = clipPath;
+  }
   const extended = Object.keys(material).some(
     (key) => !['color', 'opacity', 'blur', 'noise', 'refraction'].includes(key)
   );
-  if (extended || material.noise || !visible) {
-    Object.assign(
-      result,
-      opticalStyle(
-        { ...material, noise: transparent ? material.noise : 0 },
-        visible ? material.opacity : 0
-      )
-    );
+  if (
+    extended ||
+    material.noise ||
+    !visible ||
+    options.texture ||
+    options.lighting
+  ) {
+    Object.assign(result, opticalStyle(material, transparent, options));
   }
   return result;
 }
@@ -132,6 +144,7 @@ export function applyAppearancePreset(current, preset, keys) {
   };
 }
 
+export { createQualityWatcher } from './effect-quality.js';
 export { createEffectGovernor } from './effect-governor.js';
 
 export { createRefractionProvider } from './refraction.js';
