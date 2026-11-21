@@ -7,10 +7,10 @@ written in Links Notation with the Swift parser
 draws it with native SwiftUI views.
 
 This is a Swift package, not an npm workspace package. Its `Package.swift` is
-at the repository root, so SwiftPM users add the repository URL:
+at the repository root, so SwiftPM users add the repository URL and a released version:
 
 ```swift
-.package(url: "https://github.com/link-foundation/ui", branch: "main"),
+.package(url: "https://github.com/link-foundation/ui.git", from: "0.1.0"),
 // …
 .product(name: "UiSwiftUI", package: "ui"),
 ```
