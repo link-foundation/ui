@@ -1,4 +1,5 @@
 import { fmt } from './geometry.js';
+import { formatTheory } from './configuration-notations.js';
 import { escapeAttribute } from './markers.js';
 import { doubletMarkerSvg } from './doublet-markers.js';
 
@@ -26,6 +27,11 @@ export function doubletCaption(pairs, o, index) {
   }
   if (mode === 'links') {
     return pairs.map((p, i) => `${i + 1}: ${p.join(' ')}`).join('; ');
+  }
+  if (o.caption.notation !== 'default') {
+    return pairs.length
+      ? formatTheory(pairs, { set: o.caption.notation })
+      : `${o.caption.notation} = {}`;
   }
   return `L = {${pairs.map((p, i) => `${i + 1}=(${p.join(',')})`).join(', ')}}`;
 }
@@ -106,7 +112,11 @@ function captionSvg(frame) {
     [...text].length * o.caption.size > available
       ? ` textLength="${available}" lengthAdjust="spacingAndGlyphs"`
       : '';
-  return `<text data-part="caption" x="${frame.bounds.width / 2}" y="${frame.bounds.height - inset - o.caption.size * 0.3}" text-anchor="middle" font-family="${font}" font-size="${o.caption.size}" fill="${escapeAttribute(o.caption.color)}"${compress}>${escapeAttribute(text)}</text>`;
+  const baseline =
+    o.caption.position === 'top'
+      ? inset + o.caption.size
+      : frame.bounds.height - inset - o.caption.size * 0.3;
+  return `<text data-part="caption" x="${frame.bounds.width / 2}" y="${baseline}" text-anchor="middle" font-family="${font}" font-size="${o.caption.size}" fill="${escapeAttribute(o.caption.color)}"${compress}>${escapeAttribute(text)}</text>`;
 }
 function curveData(visible) {
   const point = (p) => `${fmt(p.x, 8)} ${fmt(p.y, 8)}`;
@@ -125,13 +135,8 @@ function curveData(visible) {
   return data.trim();
 }
 
-/** Deterministic preview/export markup, all measurements in the 100-unit box. */
-export function doubletToSvg(frame) {
-  const o = frame.options,
-    b = frame.bounds,
-    id = identifier(frame),
-    bg = background(o, b, id);
-  const label = `Links network${frame.pairs.length ? ` ${doubletNotation(frame.pairs)}` : ''}`;
+function linksSvg(frame, id) {
+  const o = frame.options;
   const dash = {
     solid: '',
     dashed: '4 2',
@@ -143,14 +148,52 @@ export function doubletToSvg(frame) {
     .filter(Boolean)
     .map((v) => Number(v) * o.strokeWidth)
     .join(' ');
-  const glow = o.glow
-    ? `<filter id="${id}-glow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="${o.glow / 3}"></feGaussianBlur><feMerge><feMergeNode></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter>`
-    : '';
   const items = frame.curves
     .map((curve) => {
       const d = curveData(curve.visible);
-      return `<g data-doublet="${curve.id}">${d ? `<path data-link="${curve.id}" d="${d}" fill="none" stroke="currentColor" stroke-width="${o.strokeWidth}" stroke-linecap="${o.linecap}" stroke-dasharray="${dash}"></path>` : ''}${curve.markers.map((p) => doubletMarkerSvg(p, o)).join('')}</g>`;
+      const color =
+        curve.color === 'currentColor'
+          ? ''
+          : ` color="${escapeAttribute(curve.color)}"`;
+      return `<g data-doublet="${curve.id}"${color}>${d ? `<path data-link="${curve.id}" d="${d}" fill="none" stroke="currentColor" stroke-width="${o.strokeWidth}" stroke-linecap="${o.linecap}" stroke-linejoin="${o.linejoin}" stroke-dasharray="${dash}"></path>` : ''}${curve.markers.map((p) => doubletMarkerSvg(p, o)).join('')}</g>`;
     })
     .join('');
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${o.width}" height="${o.height}" viewBox="0 0 ${b.width} ${b.height}" role="img" aria-label="${escapeAttribute(label)}"><title>${escapeAttribute(label)}</title><defs>${bg.defs}${glow}</defs>${bg.body}${cardSvg(o, b)}<g data-part="links" color="${escapeAttribute(o.color)}" opacity="${o.opacity}"${o.glow ? ` filter="url(#${id}-glow)"` : ''}>${items}</g>${captionSvg(frame)}</svg>`;
+  return `<g data-part="links" opacity="${o.opacity}"${o.glow ? ` filter="url(#${id}-glow)"` : ''}>${items}</g>`;
+}
+
+/** Deterministic preview/export markup, all measurements in the 100-unit box. */
+export function doubletToSvg(
+  frame,
+  {
+    width = frame.options.width,
+    height = frame.options.height,
+    title = frame.options.title,
+    foreground,
+    decorative = false,
+    idPrefix = '',
+  } = {}
+) {
+  if (![width, height].every((value) => Number.isFinite(value) && value > 0)) {
+    throw new RangeError('Doublet SVG dimensions must be positive and finite');
+  }
+  if (!/^[a-z0-9_-]*$/iu.test(idPrefix)) {
+    throw new TypeError(
+      'Doublet SVG idPrefix must use letters, digits, underscores or hyphens'
+    );
+  }
+  const o = frame.options,
+    b = frame.bounds,
+    id = idPrefix + identifier(frame),
+    bg = background(o, b, id);
+  const label = escapeAttribute(
+    title ||
+      `Links network${frame.pairs.length ? ` ${doubletNotation(frame.pairs)}` : ''}`
+  );
+  const semantics = decorative
+    ? 'aria-hidden="true"'
+    : `role="img" aria-label="${label}"`;
+  const glow = o.glow
+    ? `<filter id="${id}-glow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="${o.glow / 3}"></feGaussianBlur><feMerge><feMergeNode></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter>`
+    : '';
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${b.width} ${b.height}" ${semantics}${foreground ? ` color="${escapeAttribute(foreground)}"` : ''}>${decorative ? '' : `<title>${label}</title>`}<defs>${bg.defs}${glow}</defs>${bg.body}${cardSvg(o, b)}${linksSvg(frame, id)}${captionSvg(frame)}</svg>`;
 }

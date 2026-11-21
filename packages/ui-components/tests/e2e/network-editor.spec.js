@@ -47,8 +47,10 @@ test('URL writes wait for slider release and preserve or clear pinned frames', a
   await open(page);
   await page.evaluate(() => {
     globalThis.urlWrites = [];
-    const original = globalThis.history.replaceState.bind(globalThis.history);
-    globalThis.history.replaceState = (...args) => {
+    const original = globalThis.globalThis.history.replaceState.bind(
+      globalThis.history
+    );
+    globalThis.globalThis.history.replaceState = (...args) => {
       globalThis.urlWrites.push(args[2]);
       return original(...args);
     };
@@ -89,25 +91,47 @@ test('URL writes wait for slider release and preserve or clear pinned frames', a
     .toBe(false);
 });
 
-test('PNG and JPEG downloads are exactly the presentation raster and LiNo has one link per line', async ({
+test('raster downloads are exactly the presentation raster and LiNo has one link per line', async ({
   page,
 }, info) => {
   await open(page);
   await page.evaluate(() =>
     globalThis.networkEditorExample.editor.updateOptions({
       'background.color': '#123456',
+      width: 320,
+      height: 200,
+      quality: 0.67,
+      linkColors: ['#c05a14'],
+      linejoin: 'bevel',
+      'caption.mode': 'pairs',
+      'caption.position': 'top',
+      title: 'Rectangular network',
     })
   );
-  for (const [label, type, extension] of [
+  const formats = [
     ['PNG', 'image/png', 'png'],
     ['JPEG', 'image/jpeg', 'jpg'],
-  ]) {
+  ];
+  if (
+    await page.evaluate(() =>
+      document
+        .createElement('canvas')
+        .toDataURL('image/webp')
+        .startsWith('data:image/webp')
+    )
+  ) {
+    formats.push(['WEBP', 'image/webp', 'webp']);
+  }
+  const preview = page.locator('#preview svg');
+  await expect(preview).toHaveAttribute('viewBox', '0 0 160 100');
+  await expect(preview.locator('title')).toHaveText('Rectangular network');
+  for (const [label, type, extension] of formats) {
     const expected = await page.evaluate(async (type) => {
       const p = globalThis.networkEditorExample.presentation;
       return [
         ...new Uint8Array(
           await (
-            await p.toRaster(type, { background: '#123456' })
+            await p.toRaster(type, { background: '#123456', quality: 0.67 })
           ).arrayBuffer()
         ),
       ];
@@ -135,11 +159,15 @@ test('PNG and JPEG downloads are exactly the presentation raster and LiNo has on
     canvas.height = bitmap.height;
     const context = canvas.getContext('2d');
     context.drawImage(bitmap, 0, 0);
-    return [...context.getImageData(0, 0, 1, 1).data];
+    return {
+      dimensions: [bitmap.width, bitmap.height],
+      pixel: [...context.getImageData(0, 0, 1, 1).data],
+    };
   });
-  expect(Math.abs(result[0] - 18)).toBeLessThan(4);
-  expect(Math.abs(result[1] - 52)).toBeLessThan(4);
-  expect(Math.abs(result[2] - 86)).toBeLessThan(4);
+  expect(result.dimensions).toEqual([320, 200]);
+  expect(Math.abs(result.pixel[0] - 18)).toBeLessThan(4);
+  expect(Math.abs(result.pixel[1] - 52)).toBeLessThan(4);
+  expect(Math.abs(result.pixel[2] - 86)).toBeLessThan(4);
   const downloadPromise = page.waitForEvent('download');
   await page
     .getByRole('button', { name: 'Download LINO', exact: true })
@@ -179,4 +207,119 @@ test('ClipboardItem is constructed in the image click activation stack', async (
     promise: true,
   });
   await expect(page.getByRole('status')).toHaveText('Done');
+});
+
+test('host mounts localize actions and release a held key outside the default root', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(globalThis.navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: async (text) => {
+          if (text.startsWith('<svg')) {
+            throw new Error('clipboard denied');
+          }
+        },
+      },
+    });
+  });
+  await page.goto(`${path}?filter=one&code=11+22+12&filter=two`);
+  await page.waitForFunction(() => globalThis.networkEditorExample);
+  await page.evaluate(async () => {
+    const { createNetworkEditor } =
+      await import('/packages/ui-components/src/links-view/network-editor/editor.js');
+    const controlled = globalThis.networkEditorExample;
+    controlled.editor.dispose();
+    const root = document.getElementById('editor');
+    const mounts = {};
+    for (const panel of ['notations', 'links', 'styles', 'actions']) {
+      const section = document.createElement('section');
+      const heading = document.createElement('h2');
+      heading.textContent = panel;
+      section.id = `host-${panel}`;
+      section.append(heading);
+      root.before(section);
+      mounts[panel] = section;
+    }
+    controlled.editor = createNetworkEditor(root, {
+      presentation: controlled.presentation,
+      mounts,
+      messages: {
+        notations: 'Representaciones',
+        addLink: 'Añadir vínculo',
+        share: 'Compartir',
+        done: 'Listo',
+        error: 'Error de exportación: {detail}',
+        'download.jpg': 'Guardar JPEG',
+        'target.Mastodon': 'En el fediverso',
+      },
+      share: {
+        title: 'Mi red',
+        mastodonInstance: 'fosstodon.org',
+        emailBody: 'Mira {title}\n{url}',
+      },
+    });
+    globalThis.urlWrites = [];
+    const replaceState = globalThis.history.replaceState.bind(
+      globalThis.history
+    );
+    globalThis.history.replaceState = (...args) => {
+      globalThis.urlWrites.push(args[2]);
+      return replaceState(...args);
+    };
+  });
+  await expect(
+    page
+      .locator('#host-notations')
+      .getByRole('group', { name: 'Representaciones' })
+  ).toBeVisible();
+  await expect(
+    page.locator('#host-links').getByRole('button', { name: 'Añadir vínculo' })
+  ).toBeVisible();
+  const actions = page.locator('#host-actions');
+  await expect(
+    actions.getByRole('button', { name: 'Compartir' })
+  ).toBeVisible();
+  await expect(
+    actions.getByRole('button', { name: 'Guardar JPEG' })
+  ).toBeVisible();
+  await expect(
+    actions.getByRole('link', { name: 'En el fediverso' })
+  ).toHaveAttribute('href', /^https:\/\/fosstodon\.org\/share\?text=Mi%20red/u);
+  await actions.getByRole('button', { name: 'Copy link', exact: true }).click();
+  await expect(actions.getByRole('status')).toHaveText('Listo');
+  await actions.getByRole('button', { name: 'Copy SVG', exact: true }).click();
+  await expect(actions.getByRole('alert')).toHaveText(
+    'Error de exportación: clipboard denied'
+  );
+
+  const slider = page
+    .locator('#host-styles')
+    .getByLabel('tension', { exact: true });
+  await slider.focus();
+  await page.keyboard.down('ArrowRight');
+  await ready(page);
+  expect(await page.evaluate(() => globalThis.urlWrites)).toEqual([]);
+  await actions.getByRole('button', { name: 'Compartir' }).focus();
+  await page.evaluate(() =>
+    globalThis.networkEditorExample.editor.updateOptions({ width: 480 })
+  );
+  await expect
+    .poll(() => page.evaluate(() => globalThis.urlWrites.length))
+    .toBe(1);
+  const url = new globalThis.URL(page.url());
+  expect(url.searchParams.getAll('filter')).toEqual(['one', 'two']);
+  expect(url.searchParams.get('width')).toBe('480');
+  await page.evaluate(() =>
+    globalThis.networkEditorExample.presentation.update({})
+  );
+  await page.waitForTimeout(500);
+  expect(await page.evaluate(() => globalThis.urlWrites.length)).toBe(1);
+  await page.keyboard.up('ArrowRight');
+  await page.evaluate(() => globalThis.networkEditorExample.editor.dispose());
+  await expect(page.locator('#host-actions').getByRole('heading')).toHaveText(
+    'actions'
+  );
+  await expect(actions.getByRole('button')).toHaveCount(0);
 });

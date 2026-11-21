@@ -43,13 +43,13 @@ test('counts, filters, host URLs, localisation and accessibility', async ({
   ).toBeVisible();
   await expect(cards.first()).toHaveAttribute('href', /theme=dark$/);
   const sizes = await gallery
-    .locator('links-gallery-network')
+    .locator('.thumbnail svg')
     .first()
     .evaluate((el) => ({
       width: el.clientWidth,
       height: el.clientHeight,
       tabIndex: el.tabIndex,
-      items: el.items.length,
+      items: el.querySelectorAll('[data-doublet]').length,
     }));
   expect(sizes).toEqual({ width: 64, height: 64, tabIndex: -1, items: 2 });
   await expectAccessible(page);
@@ -86,28 +86,21 @@ test('every thumbnail draws and reconnecting preserves bounded state', async ({
   await page.goto(example);
   const gallery = page.locator('links-gallery');
   await expect(gallery.locator('.card')).toHaveCount(81);
-  await expect
-    .poll(() =>
-      gallery
-        .locator('links-gallery-network')
-        .evaluateAll((nodes) =>
-          nodes.every((el) => el.drawn && el.diagnostics.length === 0)
-        )
-    )
-    .toBe(true);
-  const bounds = await gallery
-    .locator('links-gallery-network')
-    .evaluateAll((nodes) =>
-      nodes.map((el) => {
-        const box = el.shadowRoot.querySelector('[data-part=items]').getBBox();
-        return {
-          x: box.x * el.view.k + el.view.x,
-          y: box.y * el.view.k + el.view.y,
-          right: (box.x + box.width) * el.view.k + el.view.x,
-          bottom: (box.y + box.height) * el.view.k + el.view.y,
-        };
-      })
-    );
+  await expect(gallery.locator('.thumbnail svg[aria-hidden=true]')).toHaveCount(
+    81
+  );
+  const bounds = await gallery.locator('.thumbnail svg').evaluateAll((nodes) =>
+    nodes.map((el) => {
+      const box = el.querySelector('[data-part=links]').getBBox();
+      const scale = 64 / el.viewBox.baseVal.width;
+      return {
+        x: box.x * scale,
+        y: box.y * scale,
+        right: (box.x + box.width) * scale,
+        bottom: (box.y + box.height) * scale,
+      };
+    })
+  );
   for (const box of bounds) {
     expect(box.x).toBeGreaterThanOrEqual(0);
     expect(box.y).toBeGreaterThanOrEqual(0);
@@ -124,4 +117,67 @@ test('every thumbnail draws and reconnecting preserves bounded state', async ({
     .click();
   await expect(gallery.locator('.card')).toHaveCount(4);
   await expectAccessible(page);
+});
+
+test('thumbnail projects the supplied frame and inherits the selected theme', async ({
+  page,
+}) => {
+  await page.goto(example);
+  const gallery = page.locator('links-gallery');
+  await expect(gallery.locator('.thumbnail svg')).toHaveCount(81);
+  const result = await gallery.evaluate(async (el) => {
+    const { doubletGeometry, doubletToSvg } =
+      await import('/packages/ui-components/src/links-view/doublet.js');
+    const frame = doubletGeometry(
+      [
+        [0, 2],
+        [2, 2],
+      ],
+      [
+        'width 480',
+        'height 320',
+        'linejoin bevel',
+        'arrowJoin inherit',
+        'caption',
+        '  mode custom',
+        '  text Artwork',
+        '  position top',
+        'link 1',
+        '  color currentColor',
+        'link 2',
+        "  color '#123456'",
+      ].join('\n')
+    );
+    const holder = document.createElement('div');
+    holder.innerHTML = doubletToSvg(frame, { foreground: '#112233' });
+    document.body.append(holder);
+    el.size = 1;
+    el.frameFor = () => frame;
+    const thumb = () => el.shadowRoot.querySelector('.thumbnail svg');
+    const details = (svg) => ({
+      viewBox: svg.getAttribute('viewBox'),
+      caption: svg.querySelector('[data-part=caption]').outerHTML,
+      pathMarkup: svg.querySelector('[data-part=links]').outerHTML,
+    });
+    const stroke = (svg) =>
+      globalThis.getComputedStyle(svg.querySelector('[data-link="1"]')).stroke;
+    el.setAttribute('theme', 'light');
+    const light = stroke(thumb());
+    el.setAttribute('theme', 'dark');
+    const dark = stroke(thumb());
+    return {
+      desktop: details(holder.firstElementChild),
+      thumbnail: details(thumb()),
+      light,
+      dark,
+      explicit: stroke(holder.firstElementChild),
+      override: globalThis.getComputedStyle(
+        thumb().querySelector('[data-link="2"]')
+      ).stroke,
+    };
+  });
+  expect(result.thumbnail).toEqual(result.desktop);
+  expect(result.light).not.toBe(result.dark);
+  expect(result.explicit).toBe('rgb(17, 34, 51)');
+  expect(result.override).toBe('rgb(18, 52, 86)');
 });

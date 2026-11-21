@@ -3,6 +3,7 @@ import {
   forceLink,
   forceManyBody,
   forceCenter,
+  forceCollide,
 } from 'd3-force';
 import { networkIds, networkEdges } from '../network-model.js';
 import { grid } from './grid.js';
@@ -16,6 +17,9 @@ export function createForceSimulation(network, options = {}) {
     alphaMin = 0.001,
     maxTicks = 300,
     pins = [],
+    charge = -35,
+    distance = 40,
+    collisionRadius = 0,
   } = options;
   const initial = grid(network, options);
   const fixed = new Map(pins);
@@ -33,14 +37,17 @@ export function createForceSimulation(network, options = {}) {
     .stop()
     .randomSource(random)
     .alphaMin(Math.max(0.000001, alphaMin))
-    .force('charge', forceManyBody().strength(-35))
+    .force('charge', forceManyBody().strength(charge))
     .force(
       'links',
       forceLink(networkEdges(network))
         .id((node) => node.id)
-        .distance(40)
+        .distance(distance)
     )
     .force('center', forceCenter(width / 2, height / 2));
+  if (collisionRadius) {
+    simulation.force('collision', forceCollide(collisionRadius));
+  }
   let ticks = 0;
   const limit = Math.max(1, Math.min(300, maxTicks));
   return {
