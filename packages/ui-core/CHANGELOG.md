@@ -1,5 +1,11 @@
 # @link-foundation/ui-core
 
+## 0.1.6
+
+### Patch Changes
+
+- 40feb99: Prepare the Kotlin renderer of the UI dialect for its first Maven Central release. It uses the published Kotlin Links Notation parser and ships desktop and Android variants.
+
 ## 0.1.5
 
 ### Patch Changes
