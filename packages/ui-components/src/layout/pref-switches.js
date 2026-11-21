@@ -55,6 +55,73 @@ function environment(options) {
   };
 }
 
+function renderButton(options, button, kind, detail, fallback) {
+  const state = { button, kind, ...detail };
+  button.setAttribute('aria-label', state.label);
+  const content = options.renderButton?.(state);
+  if (content === undefined) {
+    fallback();
+  } else if (content !== button.firstChild || button.childNodes.length !== 1) {
+    setText(button, '');
+    button.appendChild(
+      typeof content === 'string'
+        ? button.ownerDocument.createTextNode(content)
+        : content
+    );
+  }
+  if (options.tooltip) {
+    setAttr(button, 'title', options.tooltip(state));
+  }
+}
+
+function renderChoice(options, button, kind, { name, locale, ...params }) {
+  const label =
+    options.message?.(kind, params) ??
+    `${name}: ${params.current}, next ${params.next}`;
+  renderButton(options, button, kind, { ...params, locale, label }, () =>
+    setText(button, label)
+  );
+  if (options[`${kind}Behavior`] === 'toggle') {
+    button.setAttribute(
+      'aria-pressed',
+      String(params.effective === (kind === 'motion' ? 'on' : 'dark'))
+    );
+  }
+}
+
+function renderSound(options, button, icons, locale, enabled) {
+  button.setAttribute('aria-pressed', String(enabled));
+  const label =
+    options.message?.('sound', { enabled }) ??
+    `Sound: ${enabled ? 'on' : 'off'}`;
+  renderButton(
+    options,
+    button,
+    'sound',
+    {
+      label,
+      locale,
+      enabled,
+      current: enabled,
+      effective: enabled,
+      next: !enabled,
+    },
+    () => {
+      if (button.firstChild !== icons[0]) {
+        setText(button, '');
+        button.append(...icons);
+      }
+      for (const icon of icons) {
+        setAttr(
+          icon,
+          'hidden',
+          (icon.getAttribute('data-icon') === 'on') !== enabled
+        );
+      }
+    }
+  );
+}
+
 /** Create preference switches. Labels can be localized with `message(key, params)`.
  * The host persists its config layer and supplies a localizer and bindConfig
  * target shared with its sound/settings adapters.
@@ -75,8 +142,6 @@ export function createPrefSwitches(options = {}) {
   let values = initialPreferences(options);
   const media = win?.matchMedia?.('(prefers-reduced-motion: reduce)');
   const scheme = win?.matchMedia?.('(prefers-color-scheme: dark)');
-  const message = (key, params, fallback) =>
-    options.message?.(key, params) ?? fallback;
   function commit(key, value) {
     if (target) {
       target.update({ [key]: value });
@@ -94,25 +159,43 @@ export function createPrefSwitches(options = {}) {
     return button;
   });
   const sound = make(doc, 'button', { type: 'button' });
-  for (const [state, glyph] of [
+  const soundIcons = [
     ['on', '♪'],
     ['off', '♩'],
-  ]) {
-    sound.appendChild(
-      make(doc, 'span', { 'data-icon': state, 'aria-hidden': 'true' }, glyph)
-    );
-  }
+  ].map(([state, glyph]) =>
+    make(doc, 'span', { 'data-icon': state, 'aria-hidden': 'true' }, glyph)
+  );
   const motion = make(doc, 'button', { type: 'button' });
   const theme = make(doc, 'button', { type: 'button' });
+  const effectiveMotion = () =>
+    values['motion.mode'] === 'auto'
+      ? media?.matches
+        ? 'off'
+        : 'on'
+      : values['motion.mode'];
+  const effectiveTheme = () =>
+    values['theme.mode'] === 'system'
+      ? scheme?.matches
+        ? 'dark'
+        : 'light'
+      : values['theme.mode'];
+  const nextMotion = () =>
+    options.motionBehavior === 'toggle'
+      ? effectiveMotion() === 'on'
+        ? 'off'
+        : 'on'
+      : nextIn(MOTION, values['motion.mode']);
+  const nextTheme = () =>
+    options.themeBehavior === 'toggle'
+      ? effectiveTheme() === 'dark'
+        ? 'light'
+        : 'dark'
+      : nextIn(THEMES, values['theme.mode']);
   sound.addEventListener('click', () =>
     commit('sound.enabled', !values['sound.enabled'])
   );
-  motion.addEventListener('click', () =>
-    commit('motion.mode', nextIn(MOTION, values['motion.mode']))
-  );
-  theme.addEventListener('click', () =>
-    commit('theme.mode', nextIn(THEMES, values['theme.mode']))
-  );
+  motion.addEventListener('click', () => commit('motion.mode', nextMotion()));
+  theme.addEventListener('click', () => commit('theme.mode', nextTheme()));
   for (const button of [sound, motion, theme]) {
     element.appendChild(button);
   }
@@ -127,46 +210,24 @@ export function createPrefSwitches(options = {}) {
         String(languages[i].locale === locale)
       )
     );
-    const enabled = values['sound.enabled'];
-    sound.setAttribute('aria-pressed', String(enabled));
-    sound.setAttribute(
-      'aria-label',
-      message('sound', { enabled }, `Sound: ${enabled ? 'on' : 'off'}`)
-    );
-    for (const icon of sound.children) {
-      setAttr(
-        icon,
-        'hidden',
-        (icon.getAttribute('data-icon') === 'on') !== enabled
-      );
-    }
-    const mode = values['motion.mode'];
-    const nextMotion = nextIn(MOTION, mode);
-    setText(
-      motion,
-      message(
-        'motion',
-        { current: mode, next: nextMotion },
-        `Motion: ${mode}, next ${nextMotion}`
-      )
-    );
+    renderSound(options, sound, soundIcons, locale, values['sound.enabled']);
     const themeMode = values['theme.mode'];
-    const nextTheme = nextIn(THEMES, themeMode);
-    const themeLabel = message(
-      'theme',
-      { current: themeMode, next: nextTheme },
-      `Theme: ${themeMode}, next ${nextTheme}`
-    );
-    setText(theme, themeLabel);
-    theme.setAttribute('aria-label', themeLabel);
-    scope.setAttribute(
-      'data-motion',
-      mode === 'auto' ? (media?.matches ? 'off' : 'on') : mode
-    );
-    scope.setAttribute(
-      'data-scheme',
-      themeMode === 'system' ? (scheme?.matches ? 'dark' : 'light') : themeMode
-    );
+    renderChoice(options, motion, 'motion', {
+      name: 'Motion',
+      locale,
+      current: values['motion.mode'],
+      effective: effectiveMotion(),
+      next: nextMotion(),
+    });
+    renderChoice(options, theme, 'theme', {
+      name: 'Theme',
+      locale,
+      current: themeMode,
+      effective: effectiveTheme(),
+      next: nextTheme(),
+    });
+    scope.setAttribute('data-motion', effectiveMotion());
+    scope.setAttribute('data-scheme', effectiveTheme());
     scope.style.setProperty(
       'color-scheme',
       themeMode === 'system' ? 'light dark' : themeMode

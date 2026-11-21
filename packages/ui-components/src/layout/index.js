@@ -58,3 +58,4 @@ export {
 import './page-links.js';
 import './nav-strip.js';
 export { createPrefSwitches, PREF_SWITCHES_SCHEMA } from './pref-switches.js';
+export { attachScrollNavigation } from './scroll-navigation.js';

@@ -13,13 +13,16 @@ function isModified(event) {
   );
 }
 
-export function focusAnchor(event) {
+export function focusAnchor(event, a) {
   if (event.defaultPrevented || isModified(event)) {
     return;
   }
-  const a = event.currentTarget;
   const href = a.getAttribute('href');
-  if (!a.closest('ui-section-nav') || !href?.startsWith('#')) {
+  if (
+    !href?.startsWith('#') ||
+    (a.target && a.target !== '_self') ||
+    a.hasAttribute('download')
+  ) {
     return;
   }
   let id;
@@ -92,9 +95,6 @@ function linkSpec(card) {
       const node = ctx.document.createElement(card ? 'ui-link-card' : 'li');
       const link = LINK_KIND.create(el, ctx);
       node.appendChild(link.firstChild);
-      if (ctx.document.defaultView) {
-        node.firstChild.addEventListener('click', focusAnchor);
-      }
       return node;
     },
     update(node, el, changed, ctx) {

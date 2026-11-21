@@ -100,3 +100,21 @@ binding subscription and media listeners when using the factory directly.
 The browser fixture at `packages/ui-components/e2e/pages/page-layout.html`
 demonstrates wrapping, anchor focus, cards and persistent preferences. Run
 `npx playwright test packages/ui-components/e2e/page-layout.e2e.mjs --workers 1`.
+
+## Navigation on host markup
+
+Call `attachScrollNavigation(scroller, { kind: 'section' })` on the element
+that scrolls. Keep links as native anchors, including any SVG back-to-top
+control. The attachment focuses same-page section targets and exposes
+logical overflow on the scroller through `data-more` (`start`, `end`, or
+both). Use `kind: 'page'` for a route strip. `setActive(href)` centers the
+active link and marks it with `aria-current`. A predicate or a LiNo link ID
+can also select the active link. Leave `active` unset to use the host's
+`aria-current`. Call `disconnect()` when removing the strip.
+
+Quick preferences accept `motionBehavior: 'toggle'` and
+`themeBehavior: 'toggle'` to write a binary override based on the effective
+system or saved preference. `renderButton(state)` can return an SVG or a
+text label and `tooltip(state)` supplies localized title text. State includes
+the persisted value, the effective value, the next value and the active
+locale. Both hooks use the same preference target as the default buttons.
