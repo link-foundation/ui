@@ -1,5 +1,11 @@
 # @link-foundation/ui-components
 
+## 0.2.0
+
+### Minor Changes
+
+- a377df7: Accept established Links Notation, base-number and associative-theory inputs in network editors. Expose validation parameters and formatting options for one-line Links Notation and the N² theory label.
+
 ## 0.1.2
 
 ### Patch Changes
