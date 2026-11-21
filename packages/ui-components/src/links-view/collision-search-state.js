@@ -4,18 +4,17 @@ import { paintDoublet, paintedPair, ownScore } from './painted-collisions.js';
 
 const samePath = (a, b) =>
   a.path.every((part, i) =>
-    ['c1', 'c2'].every(
+    ['p0', 'c1', 'c2', 'p3'].every(
       (key) =>
         part[key].x === b.path[i][key].x && part[key].y === b.path[i][key].y
     )
   );
 
-function boundedCurve(raw, entry, baseline, transform, options, symmetric) {
-  const preview = fittedCurve(raw, transform, options);
+function boundedGaps(preview, entry, baseline, scale, options, symmetric) {
   const gaps = [...entry.gaps];
   const original = baseline.gaps.map((gap, i) => gap ?? options.gaps[i]);
   const outer = preview.lengths.map(
-    (length) => Math.min(30, length * 0.3) / transform[0]
+    (length) => Math.min(30, length * 0.3) / scale
   );
   const clamp = (i, cap) => {
     if (gaps[i] !== null && gaps[i] > original[i]) {
@@ -39,18 +38,11 @@ function boundedCurve(raw, entry, baseline, transform, options, symmetric) {
     clamp(0, outer[0]);
     clamp(1, outer[1]);
   }
-  let fitted = preview;
-  if (gaps[0] !== entry.gaps[0] || gaps[1] !== entry.gaps[1]) {
-    options.links[raw.id] = { turns: entry.turns, gaps };
-    fitted = fittedCurve(raw, transform, options);
-  }
-  clamp(2, Math.min(30, fitted.lengths[0] * 0.3, fitted.cutLengths[0] * 0.3));
-  clamp(3, Math.min(30, fitted.lengths[1] * 0.3, fitted.cutLengths[1] * 0.3));
-  if (gaps[2] === entry.gaps[2] && gaps[3] === entry.gaps[3]) {
-    return fitted;
-  }
-  options.links[raw.id] = { turns: entry.turns, gaps };
-  return fittedCurve(raw, transform, options);
+  clamp(2, Math.min(30, preview.lengths[0] * 0.3, preview.cutLengths[0] * 0.3));
+  clamp(3, Math.min(30, preview.lengths[1] * 0.3, preview.cutLengths[1] * 0.3));
+  return gaps.every((gap, i) => gap === entry.gaps[i])
+    ? entry
+    : { ...entry, gaps };
 }
 
 export function symmetricReferences(pairs, i) {
@@ -63,13 +55,67 @@ export function symmetricReferences(pairs, i) {
   );
 }
 
-const linkedOptions = (options, entries) => ({
+export function cutsWithinBounds(frame, entries, baseline) {
+  const { curves, options, pairs, transform } = frame;
+  return curves.every((curve, i) => {
+    const entry = entries[i];
+    return (
+      entry ===
+      boundedGaps(
+        curve,
+        entry,
+        baseline[i],
+        transform[0],
+        options,
+        symmetricReferences(pairs, i)
+      )
+    );
+  });
+}
+
+export const linkedOptions = (options, entries) => ({
   ...options,
   links: Object.fromEntries(entries.map((entry, i) => [i + 1, entry])),
 });
 
-export function searchState(frame, baseline) {
-  const { options, pairs, places, transform } = frame;
+function nativeCandidate({ pairs, places, transform }, options, bound, dirty) {
+  const layoutCurves = doubletCurves(pairs, places, options);
+  const curves = layoutCurves.map((raw, i) => {
+    if (!dirty(raw, i)) {
+      return null;
+    }
+    let fitted = fittedCurve(raw, transform, options);
+    for (let pass = 0; pass < 2 && bound(fitted, i); pass++) {
+      fitted = fittedCurve(raw, transform, options);
+    }
+    return fitted;
+  });
+  return { layoutCurves, curves };
+}
+
+function adaptedCandidate(pairs, options, geometry, bound, baseline) {
+  let candidate = geometry(pairs, options);
+  for (let pass = 0; pass < 2; pass++) {
+    if (!candidate.curves.map(bound).some(Boolean)) {
+      return candidate;
+    }
+    candidate = geometry(pairs, options);
+  }
+  let measuredAgain = false;
+  candidate.curves.forEach((curve, i) => {
+    if (bound(curve, i)) {
+      options.links[i + 1] = {
+        ...options.links[i + 1],
+        gaps: baseline[i].gaps,
+      };
+      measuredAgain = true;
+    }
+  });
+  return measuredAgain ? geometry(pairs, options) : candidate;
+}
+
+export function searchState(frame, baseline, geometry) {
+  const { options, pairs, transform } = frame;
   const symmetric = pairs.map((_, i) => symmetricReferences(pairs, i));
   const { strokeWidth, clearance } = options;
   const rawPair = (a, b) => paintedPair(a, b, clearance, strokeWidth);
@@ -94,28 +140,37 @@ export function searchState(frame, baseline) {
   );
 
   function evaluate(entries, changed) {
-    const candidate = linkedOptions(options, entries);
+    const optionsForCandidate = linkedOptions(
+      { ...options, frame: transform },
+      entries
+    );
     // Neutral collinear overlaps can bend an otherwise untouched half when an
     // adjacent reference turns. Compare the raw curves before reusing paint.
-    const raw = doubletCurves(pairs, places, candidate);
-    const dirty = raw.map(
-      (curve, i) =>
-        entries[i] !== current.entries[i] ||
-        changed.includes(i) ||
-        !samePath(curve, current.raw[i])
-    );
+    const dirtyCurve = (curve, i) =>
+      optionsForCandidate.links[i + 1] !== current.entries[i] ||
+      changed.includes(i) ||
+      !samePath(curve, current.raw[i]);
+    const bound = (curve, i) => {
+      const entry = optionsForCandidate.links[i + 1];
+      const next = boundedGaps(
+        curve,
+        entry,
+        baseline[i],
+        transform[0],
+        options,
+        symmetric[i]
+      );
+      optionsForCandidate.links[i + 1] = next;
+      return entry !== next;
+    };
+    const { layoutCurves: raw, curves } = geometry
+      ? adaptedCandidate(pairs, optionsForCandidate, geometry, bound, baseline)
+      : nativeCandidate(frame, optionsForCandidate, bound, dirtyCurve);
+    const dirty = raw.map(dirtyCurve);
     const painted = current.painted.slice();
     dirty.forEach((updated, i) => {
       if (updated) {
-        const curve = boundedCurve(
-          raw[i],
-          entries[i],
-          baseline[i],
-          transform,
-          candidate,
-          symmetric[i]
-        );
-        painted[i] = paintDoublet(curve, options, clearance);
+        painted[i] = paintDoublet(curves[i], options, clearance);
       }
     });
     const updates = [];
@@ -142,7 +197,7 @@ export function searchState(frame, baseline) {
       count,
       cost: count ? cost : 0,
       updates,
-      entries: entries.map((_, i) => candidate.links[i + 1]),
+      entries: entries.map((_, i) => optionsForCandidate.links[i + 1]),
     };
   }
 

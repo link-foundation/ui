@@ -12,6 +12,7 @@ import {
   scorePaintedCollisions,
   solveCollisions,
 } from '@link-foundation/ui-components/links-view';
+import { rendererOptions } from '../../src/links-view/network-editor/renderer-options.js';
 
 const reciprocal = [
   [2, 2],
@@ -69,6 +70,33 @@ test('returns the shared clean 22 11 fixture unchanged', () => {
     [0, 0],
     [0, 0],
   ]);
+});
+
+test('a host renderer supplies both the search geometry and the pinned fit', () => {
+  const geometry = (links, options) => {
+    const entries = Object.values(options.links);
+    return doubletGeometry(
+      links,
+      rendererOptions(
+        {
+          frame: options.frame ?? [45, 51, 52],
+          turns: entries.map((entry) => entry.turns),
+          linkGaps: entries.map((entry) => entry.gaps),
+        },
+        links.length
+      )
+    );
+  };
+  const fitted = doubletGeometry(reciprocal, 'frame: 45 51 52');
+  const result = solveCollisions(reciprocal, {}, { geometry });
+  assert.equal(result.before, scorePaintedCollisions(fitted).count);
+  assert.equal(result.after, 0);
+  assert.deepEqual(result.frame, fitted.transform);
+  const committed = rendererOptions(result, reciprocal.length);
+  assert.equal(
+    scorePaintedCollisions(doubletGeometry(reciprocal, committed)).count,
+    result.after
+  );
 });
 
 test('22 22 and 11 11 mirror turns and keep equal gaps at the closed link', async () => {

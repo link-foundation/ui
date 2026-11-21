@@ -3,7 +3,12 @@ import { doubletGeometry, fittedCurve } from './doublet-geometry.js';
 import { doubletPairs } from './doublet-options.js';
 import { rendererOptions } from './network-editor/renderer-options.js';
 import { scorePaintedCollisions } from './painted-collisions.js';
-import { searchState, symmetricReferences } from './collision-search-state.js';
+import {
+  cutsWithinBounds,
+  linkedOptions,
+  searchState,
+  symmetricReferences,
+} from './collision-search-state.js';
 
 const noGaps = () => [null, null, null, null];
 const noTurn = () => [0, 0];
@@ -333,6 +338,35 @@ function searchGaps(context, state) {
   }
 }
 
+function searchSymmetricGaps(context, state, range) {
+  const { pairs, options } = context.frame;
+  pairs.some((_, i) => {
+    if (!symmetricReferences(pairs, i)) {
+      return false;
+    }
+    const turns = turnVariants(context, state, i, {
+      range,
+      step: options.solveStep,
+      mirrorOnly: true,
+    });
+    return gapVariants(context, state, i).some(({ gaps }) => {
+      if (gaps[0] === null || gaps[0] !== gaps[1]) {
+        return false;
+      }
+      rank(
+        context,
+        state,
+        i,
+        turns.map((variant) => ({ ...variant, gaps })),
+        {
+          spacing: spacingPenalty(context.frame, i),
+        }
+      );
+      return state.current.count === 0;
+    });
+  });
+}
+
 function overrides(entries, field, length, isEmpty) {
   let last = entries.length;
   while (last > length && isEmpty(entries[last - 1][field])) {
@@ -352,22 +386,28 @@ function inputLengths(options, entries) {
   return [last('turns', 0), last('gaps', null)];
 }
 
-function exactScore(frame, entries) {
-  const options = {
-    ...frame.options,
-    links: Object.fromEntries(entries.map((entry, i) => [i + 1, entry])),
-  };
-  const curves = doubletCurves(frame.pairs, frame.places, options).map(
-    (curve) => fittedCurve(curve, frame.transform, options)
+function exactScore({ frame, geometry, original }, entries) {
+  const options = linkedOptions(
+    { ...frame.options, frame: frame.transform },
+    entries
   );
-  return scorePaintedCollisions({ ...frame, options, curves });
+  const curves = geometry
+    ? geometry(frame.pairs, options).curves
+    : doubletCurves(frame.pairs, frame.places, options).map((curve) =>
+        fittedCurve(curve, frame.transform, options)
+      );
+  const fitted = { ...frame, options, curves };
+  return (
+    cutsWithinBounds(fitted, entries, original) &&
+    scorePaintedCollisions(fitted)
+  );
 }
 
 function chooseWinner(context) {
-  const { frame, original, before } = context;
+  const { frame, original, before, geometry } = context;
   const { options } = frame;
   const near = Math.min(30, options.solveRange);
-  const turns = searchState(frame, original);
+  const turns = searchState(frame, original, geometry);
   const stages = [];
   const remember = (state, stage) => {
     stages.push(state.current);
@@ -389,7 +429,7 @@ function chooseWinner(context) {
   }
   remember(turns, 'full turns');
   if (turns.current.count && options.solveGaps) {
-    const gaps = searchState(frame, original);
+    const gaps = searchState(frame, original, geometry);
     searchGaps(context, gaps);
     remember(gaps, 'gaps');
     searchTurns(context, gaps, near);
@@ -399,6 +439,16 @@ function chooseWinner(context) {
     remember(gaps, 'gaps then turns');
     searchGaps(context, gaps);
     remember(gaps, 'gaps then turns then gaps');
+    if (
+      frame.pairs.length <= 2 &&
+      near &&
+      options.solveGapRange &&
+      frame.pairs.some((_, i) => symmetricReferences(frame.pairs, i))
+    ) {
+      const mirrors = searchState(frame, original, geometry);
+      searchSymmetricGaps(context, mirrors, near);
+      remember(mirrors, 'gaps with mirrored turns');
+    }
   }
   // The sort is stable: stage order breaks ties after total gap movement.
   return stages
@@ -415,20 +465,29 @@ function chooseWinner(context) {
           movement(b.entries, original, 'gaps', options.gaps)
     )
     .find((candidate) => {
-      const score = exactScore(frame, candidate.entries);
-      return score.count === candidate.count && score.cost <= before.cost;
+      const score = exactScore(context, candidate.entries);
+      return (
+        score && score.count === candidate.count && score.cost <= before.cost
+      );
     });
 }
 
 /** Synchronous painted clearance search. Use createCollisionSolver in a browser. */
-export function solveCollisions(links, options = {}, { signal } = {}) {
+export function solveCollisions(
+  links,
+  options = {},
+  { signal, geometry } = {}
+) {
   abort(signal);
   const pairs = doubletPairs(links);
   const source =
     typeof options === 'string'
       ? options
       : rendererOptions(options, pairs.length);
-  const frame = doubletGeometry(pairs, source);
+  const native = doubletGeometry(pairs, source);
+  const frame = geometry
+    ? { ...native, ...geometry(pairs, native.options) }
+    : native;
   const original = pairs.map(
     (_, i) =>
       frame.options.links[i + 1] ?? {
@@ -438,7 +497,7 @@ export function solveCollisions(links, options = {}, { signal } = {}) {
   );
   const before = scorePaintedCollisions(frame);
   const winner = before.count
-    ? chooseWinner({ frame, original, before, signal })
+    ? chooseWinner({ frame, original, before, signal, geometry })
     : undefined;
   const entries = winner?.entries ?? original;
   const [lastTurn, lastGap] = inputLengths(options, original);

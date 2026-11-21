@@ -233,3 +233,15 @@ A changed solution pins the original fitted transform as `frame` so the score
 can be reproduced when rendering. A clean input retains its options,
 including an unpinned fit. Both providers commit only turns, gaps and frame
 to the saved options.
+
+Hosts with their own doublet renderer can supply a `CollisionGeometry`
+function as `solveCollisions(links, options, { signal, geometry })`. It receives
+positional links and normalized doublet options, including the per-link edits.
+Return the layout curves, fitted curves and transform. Honor `options.frame`
+when present. The fitted curves describe the visible halves, fitted lengths
+before and after the outer cuts, and positioned markers. Marker placements may
+provide their actual fitted path vertices, stroke cap, join and miter limit.
+The search uses the same scoring and cut limits for these curves. In a
+custom module worker, import the geometry function and pass it to the solver
+registered with `installSolverWorker`. Use the same solver and geometry
+function as the fallback passed to `createSolverJob`.

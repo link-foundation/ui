@@ -215,6 +215,44 @@ function strokeJoin(previous, p, next, radius, join, limit) {
 
 const radiansForCircle = (i) => (i * Math.PI) / 16;
 const closedShapes = Object.freeze(['circle', 'square', 'diamond', 'triangle']);
+function markerStroke(points, radius, { closed, cap, join, limit }) {
+  const parts = [];
+  const open = Number(!closed);
+  const spans = points.length - open;
+  const extension = !closed && cap === 'square' ? radius : 0;
+  for (let i = 0; i < spans; i++) {
+    const strip = strokeStrip(
+      points[i],
+      points[(i + 1) % points.length],
+      radius,
+      i === 0 ? extension : 0,
+      i === spans - 1 ? extension : 0
+    );
+    if (strip) {
+      parts.push(strip);
+    }
+  }
+  if (!closed && cap === 'round') {
+    for (const p of [points[0], points.at(-1)]) {
+      parts.push(segment(p, p, radius));
+    }
+  }
+  for (let i = open; i < spans; i++) {
+    const corner = strokeJoin(
+      points.at(i - 1),
+      points[i],
+      points[(i + 1) % points.length],
+      radius,
+      join,
+      limit
+    );
+    if (corner) {
+      parts.push(corner);
+    }
+  }
+  return parts;
+}
+
 export function paintedMarker(placement, options) {
   const { marker, point, angle } = placement;
   const { shape, size } = marker;
@@ -224,7 +262,6 @@ export function paintedMarker(placement, options) {
   if (shape === 'dot') {
     return component([segment(point, point, size / 2)]);
   }
-  const radius = options.strokeWidth / 2;
   const closed = closedShapes.includes(shape);
   const local =
     shape === 'circle'
@@ -233,30 +270,17 @@ export function paintedMarker(placement, options) {
           return [(size / 2) * Math.cos(phase), (size / 2) * Math.sin(phase)];
         })
       : doubletMarkerVertices(marker);
-  const points = local.map(([x, y]) => add(point, rotate({ x, y }, angle)));
-  const parts = closed && shape !== 'circle' ? [polygon(points)] : [];
-  for (let i = 0; i < points.length - (closed ? 0 : 1); i++) {
-    const strip = strokeStrip(
-      points[i],
-      points[(i + 1) % points.length],
-      radius
-    );
-    if (strip) {
-      parts.push(strip);
-    }
-  }
-  for (let i = closed ? 0 : 1; i < points.length - (closed ? 0 : 1); i++) {
-    const join = strokeJoin(
-      points.at(i - 1),
-      points[i],
-      points[(i + 1) % points.length],
-      radius,
-      options.arrowJoin,
-      markerMiterLimit(marker)
-    );
-    if (join) {
-      parts.push(join);
-    }
+  const points =
+    placement.vertices ??
+    local.map(([x, y]) => add(point, rotate({ x, y }, angle)));
+  const parts = markerStroke(points, options.strokeWidth / 2, {
+    closed,
+    cap: placement.linecap ?? 'butt',
+    join: placement.linejoin ?? options.arrowJoin,
+    limit: placement.miterLimit ?? markerMiterLimit(marker),
+  });
+  if (closed && shape !== 'circle') {
+    parts.push(polygon(points));
   }
   return component(parts);
 }

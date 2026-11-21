@@ -1016,6 +1016,11 @@ export interface DoubletMarkerPlacement {
   compensated: boolean;
   extension: number;
   length: number;
+  /** Fitted path vertices for an alternate renderer, in drawing order. */
+  vertices?: LinkPoint[];
+  linecap?: DoubletOptions['linecap'];
+  linejoin?: DoubletOptions['arrowJoin'];
+  miterLimit?: number;
 }
 export interface DoubletCurve {
   id: number;
@@ -1056,14 +1061,19 @@ export function createDoubletProvider(
   configuration?: DoubletProviderConfiguration
 ): NetworkPresentationProvider;
 export function scorePaintedCollisions(
-  frame: DoubletFrame,
+  frame: Pick<DoubletFrame, 'options' | 'curves'>,
   options?: { clearance?: number }
 ): { count: number; cost: number };
+/** Prepare raw and fitted painted geometry, honoring a supplied fit. */
+export type CollisionGeometry = (
+  links: DoubletPair[],
+  options: DoubletOptions
+) => Pick<DoubletFrame, 'layoutCurves' | 'curves' | 'transform'>;
 /** LiNo renderer options or flat, normalized network editor options. */
 export function solveCollisions(
   links: DoubletInput,
   options?: string | (Record<string, unknown> & PaintedCollisionSettings),
-  context?: { signal?: AbortSignal }
+  context?: { signal?: AbortSignal; geometry?: CollisionGeometry }
 ): PaintedCollisionResult;
 export function createCollisionSolver(
   configuration?: CollisionWorkerConfiguration
