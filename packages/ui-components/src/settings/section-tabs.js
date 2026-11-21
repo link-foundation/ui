@@ -1,4 +1,5 @@
-import { fieldVisible, matchesCondition } from './conditions.js';
+import { matchesCondition } from './conditions.js';
+import { availableTabs, selectedTab } from './panel-model.js';
 
 /** ARIA tabs with automatic activation and roving keyboard focus. */
 export function tabBar(
@@ -115,25 +116,13 @@ export function refreshSection(chrome, state, context) {
   const { values, shown, level, sectionLevels, selectedTabs, query } = state;
   const activeLevel = sectionLevels[section.id] ?? level ?? section.levels?.[0];
   if (tabs) {
-    const available = section.tabs.filter((tab) =>
-      section.fields.some(
-        (field) =>
-          field.props.tab === tab &&
-          fieldVisible(
-            field,
-            values,
-            { tabs: { [section.id]: tab }, level: activeLevel },
-            section
-          ) &&
-          `${field.key} ${field.label ?? ''} ${field.description ?? ''} ${section.label ?? ''}`
-            .toLocaleLowerCase()
-            .includes(query.toLocaleLowerCase())
-      )
-    );
-    if (!available.includes(selectedTabs[section.id] ?? section.tabs[0])) {
-      selectedTabs[section.id] = available[0];
-    }
-    tabs.update(selectedTabs[section.id] ?? section.tabs[0], available);
+    const available = availableTabs(section, values, {
+      level: activeLevel,
+      query,
+    });
+    const active = selectedTab(section, selectedTabs, available);
+    selectedTabs[section.id] = active;
+    tabs.update(active, available);
     tabs.bar.hidden = available.length === 0;
     tabs.bar.setAttribute(
       'aria-label',
@@ -156,8 +145,41 @@ export function refreshSection(chrome, state, context) {
       );
     }
   }
+  renderIndicators(chrome, context, activeLevel, shown);
   preview?.update?.(shown, section, activeLevel);
   chrome.presets?.update(values);
+}
+
+function renderIndicators(chrome, { options }, activeLevel, values) {
+  const { section, summary, tabs, levels } = chrome;
+  if (options.renderSection) {
+    summary.replaceChildren(
+      options.renderSection({ section, values, level: activeLevel }) ??
+        section.label ??
+        section.id
+    );
+  }
+  for (const [kind, bar] of [
+    ['tab', tabs],
+    ['level', levels],
+  ]) {
+    for (const { tab, value } of bar?.entries ?? []) {
+      if (options.renderTab) {
+        tab.replaceChildren(
+          options.renderTab({
+            section,
+            kind,
+            value,
+            selected: tab.getAttribute('aria-selected') === 'true',
+            owned: tab.hasAttribute('data-owned'),
+          }) ?? value
+        );
+        if (kind === 'tab') {
+          tab.setAttribute('aria-label', value);
+        }
+      }
+    }
+  }
 }
 
 function mountSectionPreview(context, section, parent) {

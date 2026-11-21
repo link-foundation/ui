@@ -50,7 +50,8 @@
       }
       .frame-preview {
         grid-column: 1 / -1;
-        height: 90px;
+        min-height: 104px;
+        padding-block: 0.5rem;
         display: grid;
         place-items: center;
         background: repeating-conic-gradient(#eee 0% 25%, #fff 0% 50%) 0 / 16px
@@ -61,15 +62,21 @@
         padding: 8px 20px;
         background: transparent;
       }
+      .frame-preview .orbit-preview {
+        background: repeating-radial-gradient(
+          circle at 65% 75%,
+          #e6d9f3 0 5px,
+          #faf5ff 6px 12px
+        );
+      }
+      .frame-preview .inset-preview {
+        transform: scale(0.9);
+      }
     </style>
   </head>
   <body>
     <main>
       <h1>Rich settings extensions</h1>
-      <p>
-        Whole sections move between columns. Frame controls reveal conditional
-        fields and a transparent preview.
-      </p>
       <div id="panel"></div>
     </main>
     <script type="module" src="./rich-settings.js"></script>

@@ -29,6 +29,7 @@ export {
   toLino,
   fromLino,
   fromLegacyJson,
+  readSettingsText,
   toShareHash,
   fromShareHash,
   MAX_SHARE_HASH,
@@ -47,4 +48,4 @@ export { assertEverySettingUsed } from './testing.js';
 export { bindConfig } from './config.js';
 
 export { hexToChannels } from './color-channels.js';
-export { looksToLino, looksFromLino } from './looks.js';
+export { looksToLino, looksFromLino, looksFromText } from './looks.js';

@@ -1,9 +1,9 @@
-import { reset, isDefault } from '@link-foundation/ui-settings';
+import { reset } from '@link-foundation/ui-settings';
 import { buildPanelModel } from './panel-model.js';
-import { sectionColumns } from './section-layout.js';
+import { planSectionColumns, columnCount } from './section-layout.js';
 import { presetCards } from './preset-cards.js';
 import { sectionChrome } from './section-tabs.js';
-import { mountField } from './field-control.js';
+import { createFieldRow } from './field-row.js';
 
 export function panelNodes(doc, element, messages) {
   const node = (tag, text, parent = element) => {
@@ -63,21 +63,38 @@ export function createPanelHeader({
 }
 
 export function createRows(context) {
-  const { node, button, schema, commit, getValues, messages } = context;
+  const { node, button, schema, options, commit, getValues, messages } =
+    context;
   const rows = new Map();
   const sections = new Map();
   const body = node('div');
   body.className = 'settings-sections';
+  body.style.setProperty(
+    '--settings-columns',
+    String(columnCount(options.columns))
+  );
+  const plan = planSectionColumns(schema, getValues(), options);
+  const chromes = [];
+  // Reserve positions first, then mount in schema order for stable control IDs.
   const definitions = buildPanelModel(schema, getValues(), {
     includeAll: true,
   }).sections;
-  const place = sectionColumns(context, body, definitions);
-  const chromes = [];
+  for (const column of plan) {
+    const parent =
+      options.columns?.balance === 'estimate'
+        ? node('div', undefined, body)
+        : body;
+    if (parent !== body) {
+      parent.className = 'settings-column';
+    }
+    for (const section of column) {
+      sections.set(section.id, node('details', undefined, parent));
+    }
+  }
   for (const section of definitions) {
-    const group = node('details', undefined, body);
-    place(section, group);
+    const group = sections.get(section.id);
     group.open = true;
-    node('summary', section.label ?? section.id, group);
+    const summary = node('summary', section.label ?? section.id, group);
     // Reset includes filtered-out fields too.
     const keys = section.fields.map((f) => f.key);
     button(
@@ -85,11 +102,11 @@ export function createRows(context) {
       () => commit(reset(schema, getValues(), keys)),
       group
     );
-    sections.set(section.id, group);
     if (section.description) {
       node('p', section.description, group);
     }
     const chrome = sectionChrome(context, section, group);
+    chrome.summary = summary;
     if (section.presets?.length) {
       chrome.presets = presetCards(context, chrome.content, section.presets);
     }
@@ -103,8 +120,7 @@ export function createRows(context) {
 }
 
 function mountRow(context, { field, chrome, groups, rows }) {
-  const { node, button, id, commit, getValues, isPeeking, options, messages } =
-    context;
+  const { node, id, commit, getValues, options, messages } = context;
   let parent =
     chrome.tabs?.entries.find((e) => e.value === field.props.tab)?.panel ??
     chrome.content;
@@ -118,76 +134,43 @@ function mountRow(context, { field, chrome, groups, rows }) {
     }
     parent = groups.get(groupKey);
   }
-  const row = node('div', undefined, parent);
-  row.className = 'settings-row';
-  row.dataset.key = field.key;
-  const title = node('div', undefined, row);
-  node('strong', field.label ?? field.key, title);
-  if (field.description) {
-    node('p', field.description, title);
-  }
-  const container = node('div', undefined, row);
-  container.className = 'settings-control';
-  const mount = options.mountControl ?? mountField;
-  const control = mount(
-    container,
+  const row = createFieldRow(
+    parent,
     field,
-    getValues()[field.key],
-    (value) => {
-      if (!isPeeking()) {
-        commit({ [field.key]: value });
-      }
+    {
+      id: `${id}-${rows.size}`,
+      messages,
+      slots: options.slots,
+      layout: options.layout,
+      mountControl: options.mountControl,
+      mountPreview: options.mountPreview,
     },
-    `${id}-${rows.size}`,
-    { messages }
+    getValues(),
+    (value) => commit({ [field.key]: value })
   );
-  const output = node('output', undefined, row);
-  messages.attr(output, 'aria-label', 'value', {
-    label: field.label ?? field.key,
-  });
-  const marker = node('span', messages.message('changed'), title);
-  marker.className = 'settings-changed';
-  const resetButton = button(
-    messages.message('reset', { label: field.label ?? field.key }),
-    () => commit({ [field.key]: field.default }),
-    row
-  );
-  const preview =
-    field.props.preview &&
-    options.mountPreview?.({
-      container: node('div', undefined, row),
-      field,
-      values: getValues(),
-    });
-  rows.set(field.key, {
-    row,
-    control,
-    output,
-    marker,
-    resetButton,
-    preview,
-  });
+  rows.set(field.key, row);
 }
 
-export function refreshRows(
-  schema,
-  { rows, sections, model, values, shown, peeking, updateControls }
-) {
+export function refreshRows({
+  rows,
+  sections,
+  model,
+  values,
+  shown,
+  peeking,
+  updateControls,
+}) {
   const visible = new Set(
     model.sections.flatMap((s) => s.fields.map((f) => f.key))
   );
   const visibleSections = new Set(model.sections.map((s) => s.id));
   for (const [key, entry] of rows) {
-    const changed = !isDefault(schema, key, values[key]);
-    entry.row.hidden = !visible.has(key);
-    entry.row.toggleAttribute('data-changed', changed);
-    entry.marker.hidden = !changed;
-    entry.resetButton.disabled = !changed || peeking;
-    entry.output.textContent = `${Array.isArray(shown[key]) ? shown[key].join(', ') : shown[key]}${schema.fields.get(key).unit ?? ''}`;
-    entry.preview?.update(shown, schema.fields.get(key));
-    if (updateControls) {
-      entry.control.update(shown[key]);
-    }
+    entry.update(values, {
+      shown,
+      visible: visible.has(key),
+      peek: peeking,
+      updateControl: updateControls,
+    });
   }
   for (const [key, group] of sections) {
     group.hidden = !visibleSections.has(key);

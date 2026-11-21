@@ -342,3 +342,68 @@ export declare function defineChartElements(win?: Window): {
   gauge: CustomElementConstructor;
   sparkline: CustomElementConstructor;
 };
+
+/** A data-table twin ready to be inserted into the host markup. */
+export declare function createChartTable(
+  document: Document,
+  spec: AnyChartSpec,
+  id?: string
+): HTMLTableElement;
+
+export type ChartInteractionPoint =
+  | ChartPoint
+  | (Omit<ChartPoint, 'datum'> & {
+      datum: Exclude<AnyChartSpec, ChartSpec>;
+    });
+export type ChartInteractionLabel = (
+  point: ChartInteractionPoint,
+  spec: AnyChartSpec
+) => string | undefined;
+export interface ChartTooltipContext {
+  point: ChartInteractionPoint;
+  spec: AnyChartSpec;
+  source: Element;
+  trigger: 'pointer' | 'focus' | 'tap';
+  text: string;
+  theme: 'light' | 'dark';
+}
+export type ChartTooltipAnchor =
+  | Element
+  | {
+      contextElement?: Element;
+      getBoundingClientRect(): Omit<DOMRectReadOnly, 'toJSON'>;
+    };
+export declare function configureChartDocument(
+  document: Document,
+  options?: {
+    overlayRoot?: Element;
+    className?: string;
+    theme?: (source: Element) => 'light' | 'dark' | undefined;
+    label?: ChartInteractionLabel;
+    renderTooltip?: (state: ChartTooltipContext) => Node | string | undefined;
+    positionTooltip?: (
+      tooltip: HTMLElement,
+      anchor: ChartTooltipAnchor,
+      state: ChartTooltipContext
+    ) => (() => void) | void;
+  }
+): { refresh(): void; destroy(): void };
+
+export declare function attachChartInteraction(
+  container: Element,
+  spec: AnyChartSpec,
+  options?: {
+    layout?: ChartLayout;
+    mark?: (point: ChartInteractionPoint) => Element | null;
+    label?: ChartInteractionLabel;
+  }
+): {
+  readonly layout: ChartLayout | null;
+  readonly activePoint: ChartInteractionPoint | null;
+  focusPoint(
+    seriesIndex: number,
+    index: number
+  ): ChartInteractionPoint | undefined;
+  refresh(): void;
+  destroy(): void;
+};

@@ -181,7 +181,11 @@ export function toEChartsOption(spec, options = {}) {
     ...(spec.title
       ? { title: { text: spec.title, textStyle: { color: colors.text } } }
       : {}),
-    tooltip: { trigger: 'item', formatter: '{b}' },
+    tooltip: {
+      show: options.tooltip ?? true,
+      trigger: 'item',
+      formatter: '{b}',
+    },
     ...legend,
     series: arc
       ? arcSeries(spec, layout, colors)

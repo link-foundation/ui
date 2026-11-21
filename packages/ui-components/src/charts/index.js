@@ -43,7 +43,13 @@ export { CHART_TAG, createChartClass, defineChartElement } from './chart.js';
 export { GAUGE_TAG, defineGaugeElement } from './gauge.js';
 export { SPARKLINE_TAG, defineSparklineElement } from './sparkline.js';
 export { STAT_TILE_TAG, defineStatTileElement } from './stat-tile.js';
-export { LINO_SCRIPT_TYPE, ensureChartStyles } from './element.js';
+export { attachChartInteraction } from './chart-interaction.js';
+export { configureChartDocument } from './document.js';
+export {
+  LINO_SCRIPT_TYPE,
+  ensureChartStyles,
+  createTable as createChartTable,
+} from './element.js';
 
 /**
  * Define every chart element in a window (each once).

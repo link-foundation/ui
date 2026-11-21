@@ -2,6 +2,7 @@ import type { ChartSpec } from './index.js';
 
 export interface EChartsOptions {
   theme?: 'light' | 'dark';
+  tooltip?: boolean;
   width?: number;
   height?: number;
 }

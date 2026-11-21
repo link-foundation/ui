@@ -11,6 +11,7 @@ import {
   toLino,
   applyToRoot,
   beforePaintScript,
+  readSettingsText,
   paintSnapshot,
   createSettingsCodec,
   bindConfig,
@@ -235,4 +236,60 @@ migration
     migrate(schema, { version: 1, values: { n: '3' } }).rejected,
     ['n']
   );
+});
+
+test('before paint projects imported JSON and Links Notation through the same palette and inheritance rules', () => {
+  const { schema } = readSchema(`skin:
+  type choice
+  options light dark
+  default light
+radius:
+  type number
+  default 8
+  nullable true
+motion:
+  type choice
+  options auto off
+  default auto
+  comfort`);
+  function project({ skin, radius, motion }) {
+    return {
+      css: {
+        '--palette': skin === 'dark' ? '#112233' : '#ffffff',
+        '--material': skin === 'dark' ? '0.5' : '1',
+        '--corner': radius === null ? null : `${radius}px`,
+      },
+      attributes: { 'data-motion': motion },
+    };
+  }
+  const json = '{"v":1,"skin":"dark","radius":null,"motion":"off"}';
+  const lino = 'settings:\n  skin dark\n  radius null\n  motion off';
+  for (const text of [json, lino]) {
+    const dom = new JSDOM('<html style="--corner:8px"></html>', {
+      url: 'https://example.test',
+      runScripts: 'outside-only',
+    });
+    const { window } = dom;
+    const root = window.document.documentElement;
+    const expectProjection = () => {
+      assert.equal(root.style.getPropertyValue('--palette'), '#112233');
+      assert.equal(root.style.getPropertyValue('--material'), '0.5');
+      assert.equal(root.style.getPropertyValue('--corner'), '');
+      assert.equal(root.getAttribute('data-motion'), 'off');
+    };
+    window.eval(beforePaintScript(schema, { initialText: text, project }));
+    expectProjection();
+    root.setAttribute('style', '--corner:8px');
+    window.localStorage.setItem('appearance', text);
+    window.parseAppearance = (value) => readSettingsText(schema, value).values;
+    window.eval(
+      beforePaintScript(schema, {
+        storageKey: 'appearance',
+        project,
+        readStorage: (value) => globalThis.parseAppearance(value),
+      })
+    );
+    expectProjection();
+    dom.window.close();
+  }
 });

@@ -245,6 +245,16 @@ export interface PreferenceTarget {
   update(values: Record<string, unknown>): unknown;
   subscribe?(listener: (values: Record<string, unknown>) => void): () => void;
 }
+export interface PreferenceButtonState {
+  button: HTMLButtonElement;
+  kind: 'sound' | 'motion' | 'theme';
+  label: string;
+  locale: string;
+  enabled?: boolean;
+  current: string | boolean;
+  effective: string | boolean;
+  next: string | boolean;
+}
 export interface PrefSwitchOptions {
   document?: Document;
   target?: PreferenceTarget;
@@ -253,6 +263,10 @@ export interface PrefSwitchOptions {
   scope?: HTMLElement;
   label?: string;
   languageLabel?: string;
+  motionBehavior?: 'cycle' | 'toggle';
+  themeBehavior?: 'cycle' | 'toggle';
+  renderButton?: (state: PreferenceButtonState) => Node | string | undefined;
+  tooltip?: (state: PreferenceButtonState) => string | undefined;
   message?: (
     key: string,
     params: Record<string, unknown>
@@ -264,4 +278,22 @@ export function createPrefSwitches(options?: PrefSwitchOptions): {
   element: HTMLElement;
   refresh(): void;
   destroy(): void;
+};
+
+export type ScrollNavigationActive =
+  | string
+  | null
+  | ((link: HTMLAnchorElement) => boolean);
+export function attachScrollNavigation(
+  scroller: HTMLElement,
+  options?: {
+    content?: HTMLElement;
+    kind?: 'page' | 'section';
+    linkSelector?: string;
+    active?: ScrollNavigationActive;
+  }
+): {
+  refresh(): void;
+  setActive(active?: ScrollNavigationActive): void;
+  disconnect(): void;
 };

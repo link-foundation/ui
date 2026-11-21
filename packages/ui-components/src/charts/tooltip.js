@@ -2,10 +2,17 @@
 import { positionFloating, virtualAnchor } from '../overlays/position.js';
 
 export function tooltipContent(tooltip, point, spec) {
-  const content = spec.tooltip?.content?.(point.datum);
+  renderTooltipContent(
+    tooltip,
+    spec.tooltip?.content?.(point.datum),
+    point.text
+  );
+}
+
+export function renderTooltipContent(tooltip, content, text) {
   tooltip.replaceChildren();
   if (!content || typeof content !== 'object') {
-    tooltip.textContent = point.text;
+    tooltip.textContent = text;
     return;
   }
   const document = tooltip.ownerDocument;

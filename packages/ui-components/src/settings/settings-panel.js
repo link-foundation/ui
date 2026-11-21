@@ -13,6 +13,26 @@ function initialValues(schema, options) {
     .values;
 }
 
+function writeValues(schema, target, values) {
+  if (!target) {
+    return values;
+  }
+  target.update(values);
+  return merge(schema, target.values(), undefined).values;
+}
+
+function closeOnEscape(element, mode, close) {
+  const doc = element.ownerDocument;
+  const escape = (event) => {
+    if (event.key === 'Escape' && mode === 'drawer' && !element.hidden) {
+      event.preventDefault();
+      close();
+    }
+  };
+  doc.addEventListener('keydown', escape);
+  return () => doc.removeEventListener('keydown', escape);
+}
+
 /** Create a light-DOM settings-panel element. The optional target is a
  * ui-settings bindConfig binding (user or session), or the same interface.
  * @param {import('@link-foundation/ui-settings').SettingsSchema} schema
@@ -33,6 +53,7 @@ export function createSettingsPanel(schema, options = {}) {
   let peeking = false;
   let opener;
   let destroyed = false;
+  let editedKey;
   const { node, button, heading, search, count } = createPanelHeader({
     doc,
     element,
@@ -88,7 +109,7 @@ export function createSettingsPanel(schema, options = {}) {
     refreshPanel(
       context,
       { rows, sections, chromes, search, count, ...toolbar, changes },
-      { values, peeking, tabs, level, sectionLevels },
+      { values, peeking, tabs, level, sectionLevels, editedKey },
       updateControls
     );
     toolbar.updatePeek(peeking);
@@ -103,13 +124,15 @@ export function createSettingsPanel(schema, options = {}) {
       messages.content(status, 'rejected', { keys: result.rejected });
       return false;
     }
-    if (options.target) {
-      options.target.update(result.values);
-      values = merge(schema, options.target.values(), undefined).values;
-    } else {
-      values = result.values;
+    const keys = Object.keys(changes);
+    const oldKey = editedKey;
+    editedKey = keys.length === 1 ? keys[0] : undefined;
+    try {
+      values = writeValues(schema, options.target, result.values);
+      refresh();
+    } finally {
+      editedKey = oldKey;
     }
-    refresh();
     options.onChange?.({ ...values }, diff(schema, values));
     return true;
   }
@@ -117,13 +140,7 @@ export function createSettingsPanel(schema, options = {}) {
     values = merge(schema, next, undefined).values;
     refresh();
   });
-  const escape = (event) => {
-    if (event.key === 'Escape' && mode === 'drawer' && !element.hidden) {
-      event.preventDefault();
-      close();
-    }
-  };
-  doc.addEventListener('keydown', escape);
+  const unbindEscape = closeOnEscape(element, mode, close);
   refresh();
   if (options.sharedHash) {
     saved.applyShared(options.sharedHash);
@@ -162,7 +179,7 @@ export function createSettingsPanel(schema, options = {}) {
       toolbar.destroy();
       saved.destroyLooks();
       destroyControls(rows, chromes);
-      doc.removeEventListener('keydown', escape);
+      unbindEscape();
       element.remove();
     },
   };
@@ -186,7 +203,6 @@ function destroyControls(rows, chromes) {
     chrome.presets?.destroy();
   }
   for (const entry of rows.values()) {
-    entry.control.destroy();
-    entry.preview?.destroy?.();
+    entry.destroy();
   }
 }

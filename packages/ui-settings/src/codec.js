@@ -174,6 +174,13 @@ export function fromLegacyJson(schema, json, options = {}) {
   return { ok: true, ...out };
 }
 
+/** Read a settings document or flat legacy JSON using the same migration path. */
+export function readSettingsText(schema, text, options = {}) {
+  return text?.trimStart().startsWith('{')
+    ? fromLegacyJson(schema, text, { version: schema.version, ...options })
+    : fromLino(schema, text, options);
+}
+
 /**
  * The share hash of values:
  * `#settings=<encodeURIComponent(toLino(…, { style: 'inline' }))>`.
@@ -211,7 +218,7 @@ function readShared(schema, param, text) {
   if (text.trimStart().startsWith('{')) {
     return {
       format: 'konard-json',
-      ...fromLegacyJson(schema, text, { ...look, version: schema.version }),
+      ...readSettingsText(schema, text, look),
     };
   }
   return { format: 'lino', ...fromLino(schema, text, look) };

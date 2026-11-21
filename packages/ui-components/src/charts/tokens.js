@@ -113,8 +113,8 @@ export const CHART_CSS = `:root { ${declarations('light')} }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) { ${declarations('dark')} }
 }
-[data-theme='dark'] { ${declarations('dark')} }
-[data-theme='light'] { ${declarations('light')} }
+[data-theme='dark'], [data-ui-chart-theme='dark'] { ${declarations('dark')} }
+[data-theme='light'], [data-ui-chart-theme='light'] { ${declarations('light')} }
 .ui-chart, .ui-stat-tile, .ui-gauge, .ui-sparkline {
   color: var(--color-chart-text); background: var(--color-chart-background);
   font-family: system-ui, sans-serif; position: relative; display: block;
@@ -169,3 +169,14 @@ export const CHART_CSS = `:root { ${declarations('light')} }
 }
 @keyframes ui-chart-fade { from { opacity: 0; } to { opacity: 1; } }
 `;
+
+/** Add the chart style sheet to the document once. */
+export function ensureChartStyles(document) {
+  if (document.querySelector('style[data-ui-chart]') !== null) {
+    return;
+  }
+  const style = document.createElement('style');
+  style.setAttribute('data-ui-chart', '');
+  style.textContent = CHART_CSS;
+  (document.head ?? document.documentElement).append(style);
+}

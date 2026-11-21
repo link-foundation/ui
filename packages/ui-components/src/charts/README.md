@@ -76,3 +76,29 @@ These extensions use SVG even when `renderer: 'echarts'` is requested, preservin
 the same geometry, tooltips and keyboard behavior. The standalone ECharts adapter
 rejects extended specs with an explicit error; original chart specs keep their
 existing optional ECharts renderer.
+
+## Host drawings and shared tooltips
+
+Use `layoutChart(spec)` to draw your own marks and `createChartTable(document,
+spec)` to supply the native data table. Label your drawing or let
+`attachChartInteraction(drawing, spec, { layout })` use the layout label.
+Mark each point's focusable element with `data-chart-row` or supply
+`mark(point)` to map a point to an element. The attachment supplies roving
+focus, chart arrow keys, and tooltip descriptions. Call `refresh()` after
+replacing the marks and `destroy()` when removing the drawing.
+
+Call `configureChartDocument(document, options)` before mounting registered
+charts to share the tooltip with the host drawings. The default overlay root
+is the body. Set `overlayRoot` and `className` for host styles, `label(point,
+spec)` for the spoken description, and `renderTooltip(context)` for the
+visible content. Use `positionTooltip(tooltip, anchor, context)` to manage
+placement and return a cleanup function for any observers. The anchor follows
+the pointer or uses the focused mark. Esc and a tap outside dismiss the
+tooltip. Tapping the same mark again also dismisses it. Keep footnote links
+as siblings of the interactive drawing to retain their native activation.
+An optional `theme(source)` supplies chart token colors, and `refresh()`
+reapplies the host theme after a change.
+
+The [host drawing and navigation example](../../examples/host-visuals.html)
+includes an edge-clipped custom drawing, a localized contribution calendar,
+a fixed-end ongoing range and a stat tile.

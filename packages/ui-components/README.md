@@ -1420,8 +1420,8 @@ history and four light/dark skins. Try [the 10,000-message example](examples/cha
 Import `createSettingsPanel`, `controlFor` and `buildPanelModel` from
 `@link-foundation/ui-components/settings` and load `controls.css` and
 `settings.css` from this package. The panel uses the real `ui-settings`
-schema engine and the basic controls. See
-[`examples/settings.html`](examples/settings.html) (serve with
+schema engine and the basic controls. See the [host settings guide](src/settings/README.md).
+Try [`examples/settings.html`](examples/settings.html) (serve with
 `node scripts/serve-static.mjs`).
 
 ```js
