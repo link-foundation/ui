@@ -1,6 +1,6 @@
 {
   "name": "@link-foundation/ui-core",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Core of the associative UI framework: the UI dialect of Links Notation",
   "type": "module",
   "exports": {
