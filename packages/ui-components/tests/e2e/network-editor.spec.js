@@ -209,6 +209,7 @@ test('Apply uses the default worker and saves a clean 22 11 with the original fi
   const worker = page.waitForEvent('worker');
   await page.getByRole('button', { name: 'Apply', exact: true }).click();
   expect((await worker).url()).toContain('network-collision.worker.mjs');
+  await ready(page);
   await expect(page.getByRole('status')).toHaveText('Collisions 2 → 0');
   await expect
     .poll(() => new globalThis.URL(page.url()).searchParams.has('frame'))
