@@ -43,7 +43,7 @@
     "links-notation": "^0.31.8"
   },
   "devDependencies": {
-    "@link-foundation/ui-components": "^0.2.0",
+    "@link-foundation/ui-components": "^0.3.0",
     "jsdom": "^30.1.3",
     "test-anywhere": "^0.8.48"
   },
