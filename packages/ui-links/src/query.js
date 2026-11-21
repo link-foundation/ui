@@ -81,14 +81,17 @@ function sidePatterns(side) {
  * @returns {[any, any] | null}
  */
 export function querySides(document) {
-  const [first] = document;
-  if (first !== undefined && typeof first !== 'string') {
-    if (first.id === null && first.values.length >= 2) {
-      return [first.values[0], first.values[1]];
-    }
+  const [first, second] = document;
+  if (document.length === 2) {
+    return [first, second];
   }
-  if (document.length >= 2) {
-    return [document[0], document[1]];
+  if (
+    document.length === 1 &&
+    typeof first !== 'string' &&
+    first.id === null &&
+    first.values.length === 2
+  ) {
+    return [first.values[0], first.values[1]];
   }
   return null;
 }
