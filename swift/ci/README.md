@@ -59,7 +59,8 @@ gh workflow run publish-swift.yml --repo link-foundation/ui --ref main
 ```
 
 A successful run creates a bare version tag and a GitHub release in each
-repository. The Swift UI release leaves the npm release's Latest status in
+repository, then builds and runs both consumer programs against the public
+GitHub tags. The Swift UI release leaves the npm release's Latest status in
 place. If publication stops after creating a tag, rerun the same workflow
 run to finish the releases for that revision. The workflow checks existing
 tags before reusing them and fails on conflicting contents.

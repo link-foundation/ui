@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import sys
 import tempfile
 import zipfile
 
@@ -13,7 +14,9 @@ import zipfile
 PARSER_PATH = "native/swift/LinksNotation"
 PARSER_REPOSITORY = "link-foundation/links-notation-swift"
 UI_REPOSITORY = "link-foundation/ui"
-SEMVER = re.compile(r"(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\n")
+UI_URL = f"https://github.com/{UI_REPOSITORY}.git"
+PARSER_URL = f"https://github.com/{PARSER_REPOSITORY}.git"
+SEMVER = re.compile(r"(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)")
 AUTH_GIT = ["git", "-c", "credential.helper=", "-c", "credential.helper=!gh auth git-credential"]
 
 
@@ -26,8 +29,8 @@ def run(*command, **options):
 
 
 def version(path):
-    value = read("git", "show", f"HEAD:{path}")
-    if not SEMVER.fullmatch(value + "\n"):
+    value = subprocess.check_output(["git", "show", f"HEAD:{path}"], text=True).removesuffix("\n")
+    if not SEMVER.fullmatch(value):
         raise ValueError(f"{path} must contain a bare MAJOR.MINOR.PATCH version.")
     return value
 
@@ -58,9 +61,12 @@ def parser_commit(directory, parent=None):
     )
 
 
-def consumer(work, name, url, tag, identity, product, source):
+def consumer(work, name, url, tag, identity, products, source):
     directory = work / name
     directory.mkdir()
+    dependencies = "".join(
+        f'        .product(name: "{product}", package: "{identity}"),\n' for product in products
+    )
     (directory / "Package.swift").write_text(f"""// swift-tools-version:5.9
 import PackageDescription
 
@@ -69,14 +75,40 @@ let package = Package(
     platforms: [.macOS(.v14), .iOS(.v17)],
     dependencies: [.package(url: "{url}", exact: "{tag}")],
     targets: [.executableTarget(name: "{name}", dependencies: [
-        .product(name: "{product}", package: "{identity}"),
-    ])]
+{dependencies}    ])]
 )
 """, encoding="utf-8")
     sources = directory / "Sources" / name
     sources.mkdir(parents=True)
     (sources / "main.swift").write_text(source, encoding="utf-8")
     run("swift", "run", "--package-path", directory, "--jobs", "1", name)
+
+
+def verify_consumers(work, ui_url, ui_version, parser_url, parser_version):
+    ui_products = ["UiSwiftCore"]
+    if sys.platform == "darwin":
+        ui_products.append("UiSwiftUI")
+    consumer(work, "UIConsumer", ui_url, ui_version, "ui", ui_products, """import UiSwiftCore
+
+#if os(macOS)
+import UiSwiftUI
+
+@MainActor
+func makeView() -> UiView {
+    UiView(document: UiDocumentModel(lino: "greeting: text Hello"))
+}
+#endif
+
+let document = project("greeting: text Hello")
+precondition(document.elements.first?.id == "greeting")
+precondition(document.diagnostics.isEmpty)
+""")
+    consumer(work, "ParserConsumer", parser_url, parser_version, "links-notation-swift",
+             ["LinksNotation"], """import LinksNotation
+
+let links = try Parser().parse("greeting: hello")
+precondition(links.first?.id == "greeting")
+""")
 
 
 def verify(ui_version, parser_version):
@@ -94,32 +126,19 @@ def verify(ui_version, parser_version):
         run("swift", "test", "--jobs", "1", "--scratch-path", work / "ui-build")
         run("swift", "test", "--jobs", "1", "--package-path", parser,
             "--scratch-path", work / "parser-build")
-        consumer(work, "UIConsumer", ui.as_uri(), ui_version, "ui", "UiSwiftCore", """import UiSwiftCore
+        verify_consumers(work, ui.as_uri(), ui_version, parser.as_uri(), parser_version)
 
-let document = project("greeting: text Hello")
-precondition(document.diagnostics.isEmpty)
-""")
-        if os.sys.platform == "darwin":
-            consumer(work, "SwiftUIConsumer", ui.as_uri(), ui_version, "ui", "UiSwiftUI", """import UiSwiftUI
 
-@MainActor
-func makeView() -> UiView {
-    UiView(document: UiDocumentModel(lino: "greeting: text Hello"))
-}
-""")
-        consumer(work, "ParserConsumer", parser.as_uri(), parser_version, parser.name,
-                 "LinksNotation", """import LinksNotation
-
-let links = try Parser().parse("greeting: hello")
-precondition(links.first?.id == "greeting")
-""")
+def verify_published(ui_version, parser_version):
+    with tempfile.TemporaryDirectory(prefix="swiftpm-") as temporary:
+        verify_consumers(Path(temporary), UI_URL, ui_version, PARSER_URL, parser_version)
 
 
 def remote_ref(directory, url, ref, env):
     found = read(*AUTH_GIT, "ls-remote", "--refs", url, ref, cwd=directory, env=env)
     if not found:
         return None
-    run(*AUTH_GIT, "fetch", "--quiet", "--no-tags", "--depth=1", url, ref,
+    run(*AUTH_GIT, "fetch", "--quiet", "--no-tags", url, ref,
         cwd=directory, env=env)
     return read("git", "rev-parse", "FETCH_HEAD^{commit}", cwd=directory)
 
@@ -144,19 +163,17 @@ def publish(ui_version, parser_version):
         raise ValueError("Configure PARSER_RELEASE_TOKEN for the LinksNotation Swift repository.")
     parser_env = dict(os.environ, GH_TOKEN=token)
     ui_env = os.environ.copy()
-    ui_url = f"https://github.com/{UI_REPOSITORY}.git"
-    parser_url = f"https://github.com/{PARSER_REPOSITORY}.git"
     ui_tag = f"refs/tags/{ui_version}"
     parser_tag = f"refs/tags/{parser_version}"
     source = read("git", "rev-parse", "HEAD")
-    existing_ui = remote_ref(".", ui_url, ui_tag, ui_env)
+    existing_ui = remote_ref(".", UI_URL, ui_tag, ui_env)
     if existing_ui and existing_ui != source:
         raise ValueError(f"{ui_tag} points to {existing_ui}. Rerun the original release or bump VERSION.")
 
     with tempfile.TemporaryDirectory(prefix="links-notation-swift-") as temporary:
         parser = Path(temporary) / "package"
         export_parser(parser)
-        existing_parser = remote_ref(parser, parser_url, parser_tag, parser_env)
+        existing_parser = remote_ref(parser, PARSER_URL, parser_tag, parser_env)
         if existing_parser:
             tagged_tree = read("git", "rev-parse", f"{existing_parser}^{{tree}}", cwd=parser)
             if tagged_tree != read("git", "write-tree", cwd=parser):
@@ -166,12 +183,12 @@ def publish(ui_version, parser_version):
         release_parser = needs_release(PARSER_REPOSITORY, parser_version, parser_env)
         if not existing_parser:
             branch = "refs/heads/main"
-            parent = remote_ref(parser, parser_url, branch, parser_env)
+            parent = remote_ref(parser, PARSER_URL, branch, parser_env)
             commit = parser_commit(parser, parent)
-            run(*AUTH_GIT, "push", "--atomic", parser_url, f"{commit}:{branch}",
+            run(*AUTH_GIT, "push", "--atomic", PARSER_URL, f"{commit}:{branch}",
                 f"{commit}:{parser_tag}", cwd=parser, env=parser_env)
         if not existing_ui:
-            run(*AUTH_GIT, "push", ui_url, f"{source}:{ui_tag}", env=ui_env)
+            run(*AUTH_GIT, "push", UI_URL, f"{source}:{ui_tag}", env=ui_env)
 
         if release_parser:
             run("gh", "release", "create", parser_version, "--repo", PARSER_REPOSITORY,
@@ -186,12 +203,12 @@ def publish(ui_version, parser_version):
 
 def main():
     cli = argparse.ArgumentParser(description=__doc__)
-    cli.add_argument("operation", choices=["verify", "publish"])
+    operations = {"verify": verify, "publish": publish, "verify-published": verify_published}
+    cli.add_argument("operation", choices=operations)
     args = cli.parse_args()
     try:
         versions = version("VERSION"), version(f"{PARSER_PATH}/VERSION")
-        operation = verify if args.operation == "verify" else publish
-        operation(*versions)
+        operations[args.operation](*versions)
     except (ValueError, subprocess.CalledProcessError) as error:
         cli.exit(1, f"::error::{error}\n")
 
