@@ -6,7 +6,12 @@ import XCTest
 /// (`docs/spec/parser-vectors.json`, written by
 /// `scripts/generate-parser-vectors.mjs` from the JavaScript reference).
 final class SpecVectorsTests: XCTestCase {
-    private let vectors = repositoryRoot.appendingPathComponent("docs/spec/parser-vectors.json")
+    private let vectors: URL = {
+        let path = "docs/spec/parser-vectors.json"
+        let bundled = packageDirectory.appendingPathComponent(path)
+        return FileManager.default.fileExists(atPath: bundled.path)
+            ? bundled : repositoryRoot.appendingPathComponent(path)
+    }()
 
     /// The limits of `docs/spec/limits.md`, which the vectors were made with.
     private let parser = Parser(options: ParserOptions(maxDepth: 64, maxInputSize: 1_048_576))
