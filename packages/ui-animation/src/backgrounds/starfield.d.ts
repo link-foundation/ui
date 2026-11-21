@@ -1,7 +1,39 @@
-import type { CommonOptions, LayerHandle } from './common.js';
+import type { CommonOptions, LayerHandle, RandomSource } from './common.js';
+export interface StarLayoutPoint {
+  /** Position relative to the CSS width and height. */
+  x: number;
+  y: number;
+  depth?: number;
+  phase?: number;
+  size?: number;
+  sprite?: number;
+  /** Optional authored scale, alpha and angle in degrees. */
+  scale?: number;
+  opacity?: number;
+  rotation?: number;
+}
+export interface StarSprite {
+  image: CanvasImageSource;
+  /** Destination size in CSS pixels before applying the star's scale. */
+  size: number;
+}
 export interface StarfieldOptions extends CommonOptions {
   seed?: number | string;
+  random?: RandomSource;
   count?: number;
+  layout?: (input: {
+    count: number;
+    width: number;
+    height: number;
+    dpr: number;
+    random: () => number;
+    options: StarfieldOptions;
+  }) => readonly StarLayoutPoint[];
+  createSprites?: (input: {
+    canvas: HTMLCanvasElement;
+    dpr: number;
+    options: StarfieldOptions;
+  }) => readonly StarSprite[];
   shape?:
     | 'dot'
     | 'soft-dot'

@@ -159,3 +159,28 @@ test('adaptive false keeps resolution and full cadence through slow windows', ()
   );
   layer.dispose();
 });
+
+test('a host clock restores individual start states, then repaints a paused shader', () => {
+  const e = webgl();
+  const randomKeys = [];
+  const layer = mount(e.canvas, {
+    source: 'host shader',
+    animate: false,
+    times: { time: 2, sparkle: 1 },
+    startTime: { time: 12, sparkle: 'random' },
+    random(key) {
+      randomKeys.push(key);
+      return () => 0.125;
+    },
+  });
+  const last = (name) =>
+    e.calls.filter((c) => c[0] === 'uniform1f' && c[1] === name).at(-1)[2];
+  assert.equal(last('time'), 12);
+  assert.equal(last('sparkle'), 125);
+  assert.deepEqual(randomKeys, ['224:sparkle']);
+  layer.update({ clock: { time: 9 } });
+  assert.equal(last('time'), 9);
+  assert.equal(last('sparkle'), 125);
+  assert.equal(e.frames.size, 0);
+  layer.dispose();
+});

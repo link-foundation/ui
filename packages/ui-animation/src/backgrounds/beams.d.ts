@@ -1,7 +1,12 @@
-import type { CommonOptions, LayerHandle } from './common.js';
-export interface BeamOptions extends CommonOptions {
+import type {
+  CommonOptions,
+  LayerHandle,
+  GridCoordinates,
+  RandomSource,
+} from './common.js';
+export interface BeamOptions extends CommonOptions, GridCoordinates {
   seed?: number | string;
-  cellSize?: number;
+  random?: RandomSource;
   style?: 'comet' | 'segment' | 'pulse' | 'scan';
   direction?: 'horizontal' | 'vertical' | 'both';
   bothSenses?: boolean;
@@ -13,7 +18,6 @@ export interface BeamOptions extends CommonOptions {
   glow?: number;
   pause?: number;
   snap?: boolean;
-  drift?: number;
 }
 export function mount(
   canvas: HTMLCanvasElement,

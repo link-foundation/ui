@@ -1,8 +1,15 @@
-import type { CommonOptions, LayerHandle } from './common.js';
-export interface RainOptions extends CommonOptions {
+import type {
+  CommonOptions,
+  LayerHandle,
+  GridCoordinates,
+  RandomSource,
+} from './common.js';
+export interface RainOptions extends CommonOptions, GridCoordinates {
   seed?: number | string;
-  cellSize?: number;
+  random?: RandomSource;
   step?: number;
+  /** Batched calibration only changes after 30 valid gaps, using the upper median. */
+  calibration?: 'rolling' | 'batched';
   columnSteps?: number;
   density?: number;
   restart?: number;
@@ -11,7 +18,6 @@ export interface RainOptions extends CommonOptions {
   padding?: number;
   color?: string;
   visible?: boolean;
-  drift?: number;
   pick?: () => unknown;
   paint?: (
     ctx: CanvasRenderingContext2D,
@@ -26,7 +32,7 @@ export function mount(
   canvas: HTMLCanvasElement,
   options?: RainOptions
 ): LayerHandle<RainOptions>;
-export function createCadence(): {
+export function createCadence(mode?: RainOptions['calibration']): {
   frame(gap: number): void;
   ready(step: number, fps: number): boolean;
   reset(): void;

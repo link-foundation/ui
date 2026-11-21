@@ -1,5 +1,5 @@
 import { seededRandom } from '../random.js';
-import { mountLayer, changed, clamp, bounded } from './common.js';
+import { mountLayer, changed, clamp, bounded, wrapGrid } from './common.js';
 
 const defaults = {
   seed: 224,
@@ -16,6 +16,9 @@ const defaults = {
   pause: 1,
   snap: true,
   drift: 0,
+  originX: 0,
+  originY: 0,
+  random: seededRandom,
 };
 function create(canvas) {
   const ctx = canvas.getContext('2d');
@@ -26,7 +29,7 @@ function create(canvas) {
     area,
     beams = [];
   function seed() {
-    const random = seededRandom(o.seed);
+    const random = o.random(o.seed);
     beams = Array.from({ length: Math.round(clamp(o.count, 1, 40)) }, () => ({
       vertical:
         o.direction === 'vertical' ||
@@ -66,9 +69,12 @@ function create(canvas) {
       b.wait = o.pause;
     }
     const across = b.line * (b.vertical ? area.width : area.height);
+    const origin = b.vertical ? o.originX : o.originY;
     const line =
-      (o.snap ? Math.round(across / o.cellSize) * o.cellSize : across) +
-      (b.vertical ? 0 : o.drift);
+      (o.snap
+        ? Math.round(across / o.cellSize) * o.cellSize +
+          wrapGrid(origin, o.cellSize)
+        : across) + (b.vertical ? 0 : o.drift);
     const head = b.sense > 0 ? b.position * extent : (1 - b.position) * extent;
     ctx.save();
     if (b.vertical) {
@@ -108,6 +114,7 @@ function create(canvas) {
           'direction',
           'bothSenses',
           'seed',
+          'random',
           'snap',
         ])
       ) {

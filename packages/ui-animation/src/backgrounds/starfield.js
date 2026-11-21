@@ -22,12 +22,39 @@ const defaults = {
   speed: 20,
   streak: 0,
   blend: 'normal',
+  random: seededRandom,
+  layout: undefined,
+  createSprites: undefined,
 };
 const looks = ['shape', 'size', 'color', 'hueSpread', 'glow', 'glowColor'];
 
-function create(canvas, win) {
+function placeStars(options, area) {
+  const random = options.random(options.seed);
+  const count = Math.min(
+    6000,
+    Math.round(
+      (clamp(options.count, 0, 3000) * area.width * area.height) / (1920 * 1080)
+    )
+  );
+  if (options.layout) {
+    return options
+      .layout({ ...area, count, random, options })
+      .slice(0, 6000)
+      .map((star) => ({ depth: 1, phase: 0, size: 0, ...star }));
+  }
+  return Array.from({ length: count }, () => ({
+    x: random(),
+    y: random(),
+    depth: 0.2 + random() * 0.8,
+    phase: random() * Math.PI * 2,
+    size: random(),
+    hue: Math.floor(random() * 9),
+  }));
+}
+
+function create(canvas, win, initial) {
   const ctx = canvas.getContext('2d');
-  if (!ctx || !win.Path2D) {
+  if (!ctx || (!win.Path2D && !initial.createSprites)) {
     return null;
   }
   let o,
@@ -37,27 +64,12 @@ function create(canvas, win) {
     dirty = true,
     twinkleClock = 0,
     rotationClock = 0;
-  const seed = () => {
-    const random = seededRandom(o.seed);
-    const count = Math.min(
-      6000,
-      Math.round(
-        (clamp(o.count, 0, 3000) * area.width * area.height) / (1920 * 1080)
-      )
-    );
-    stars = Array.from({ length: count }, () => ({
-      x: random(),
-      y: random(),
-      depth: 0.2 + random() * 0.8,
-      phase: random() * Math.PI * 2,
-      size: random(),
-      hue: Math.floor(random() * 9),
-    }));
-  };
   const rebuild = () => {
-    sprites = Array.from({ length: 9 }, (_, i) =>
-      sprite(canvas, win, o, area.dpr, (i / 4 - 1) * o.hueSpread)
-    );
+    sprites = o.createSprites
+      ? o.createSprites({ canvas, options: o, dpr: area.dpr })
+      : Array.from({ length: 9 }, (_, i) =>
+          sprite(canvas, win, o, area.dpr, (i / 4 - 1) * o.hueSpread)
+        );
     dirty = false;
   };
   function advance(star, dt) {
@@ -102,9 +114,15 @@ function create(canvas, win) {
         speed: [0, 400],
         streak: [0, 20],
       });
-      dirty ||= changed(next, before, looks);
-      if (area && changed(next, before, ['count', 'seed'])) {
-        seed();
+      dirty ||=
+        changed(next, before, looks) ||
+        next.createSprites !== before.createSprites ||
+        (o.createSprites && next.sizeSpread !== before.sizeSpread);
+      if (
+        area &&
+        changed(next, before, ['count', 'seed', 'random', 'layout'])
+      ) {
+        stars = placeStars(o, area);
       }
       return changed(
         next,
@@ -117,7 +135,7 @@ function create(canvas, win) {
     resize(next, old) {
       area = next;
       if (!old || changed(next, old, ['width', 'height'])) {
-        seed();
+        stars = placeStars(o, area);
       }
       dirty ||= !old || next.dpr !== old.dpr;
     },
@@ -136,20 +154,24 @@ function create(canvas, win) {
         if (!still) {
           advance(star, dt);
         }
-        const item = sprites[star.hue];
-        const size = item.size * (1 - o.sizeSpread * star.size);
+        const item = sprites[star.sprite ?? star.hue] ?? sprites[0];
+        if (!item) {
+          continue;
+        }
+        const size = item.size * (star.scale ?? 1 - o.sizeSpread * star.size);
         ctx.globalAlpha = clamp(
-          o.brightness *
-            (1 -
-              o.twinkleDepth *
-                (0.5 +
-                  0.5 * Math.sin(twinkleClock * Math.PI * 2 + star.phase))),
+          star.opacity ??
+            o.brightness *
+              (1 -
+                o.twinkleDepth *
+                  (0.5 +
+                    0.5 * Math.sin(twinkleClock * Math.PI * 2 + star.phase))),
           0,
           1
         );
         ctx.save();
         ctx.translate(star.x * area.width, star.y * area.height);
-        ctx.rotate(radians(o.rotation + rotationClock));
+        ctx.rotate(radians((star.rotation ?? o.rotation) + rotationClock));
         ctx.drawImage(
           item.image,
           -size / 2,
