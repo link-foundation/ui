@@ -222,6 +222,11 @@ export function fromLino(
   text: string,
   options?: MigrateOptions & ReadOptions
 ): ReadResult;
+export function readSettingsText(
+  schema: SettingsSchema,
+  text: string,
+  options?: MigrateOptions & { version?: number }
+): ReadResult;
 export function fromLegacyJson(
   schema: SettingsSchema,
   json: string | object,
@@ -287,6 +292,8 @@ export type SettingsProjection = (values: SettingsValues) => {
 };
 export interface BeforePaintOptions {
   storageKey?: string;
+  /** A server-known JSON or LiNo document used when storage has no values. */
+  initialText?: string;
   /** Serialized into the script: use a standalone function or preloaded globals. */
   readStorage?: (text: string | null) => unknown;
   project?: SettingsProjection;
@@ -319,3 +326,8 @@ export function looksFromLino(
   schema: SettingsSchema,
   text: string
 ): { ok: boolean; looks: Record<string, SettingsValues> } | null;
+
+export function looksFromText(
+  schema: SettingsSchema,
+  text: string
+): ReturnType<typeof looksFromLino>;

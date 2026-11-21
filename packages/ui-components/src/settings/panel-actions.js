@@ -3,8 +3,7 @@ import {
   applyPreset,
   randomize,
   toLino,
-  fromLino,
-  fromLegacyJson,
+  readSettingsText,
   toShareHash,
 } from '@link-foundation/ui-settings';
 
@@ -169,9 +168,7 @@ export function createSharing({
     }
     const parsed = options.codec
       ? options.codec.read(text, { base: getValues() })
-      : text.trimStart().startsWith('{')
-        ? fromLegacyJson(schema, text, { version: schema.version })
-        : fromLino(schema, text);
+      : readSettingsText(schema, text);
     if (
       !parsed.ok ||
       parsed.rejected.length ||

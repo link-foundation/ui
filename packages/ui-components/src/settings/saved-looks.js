@@ -4,7 +4,7 @@ import {
   merge,
   fromShareHash,
   looksToLino,
-  looksFromLino,
+  looksFromText,
 } from '@link-foundation/ui-settings';
 import { miniature } from './miniature.js';
 
@@ -134,7 +134,7 @@ export function createSavedLooks(context) {
   }
   const exportLooks = () => looksToLino(schema, Object.fromEntries(looks));
   function importLooks(text) {
-    const parsed = looksFromLino(schema, text);
+    const parsed = looksFromText(schema, text);
     if (!parsed) {
       return null;
     }
@@ -206,7 +206,7 @@ function loadLooks(schema, storage, key, looks, report) {
   try {
     const text = storage()?.getItem(key);
     if (text) {
-      const parsed = looksFromLino(schema, text);
+      const parsed = looksFromText(schema, text);
       if (parsed?.ok) {
         return new Map([...Object.entries(parsed.looks), ...looks]);
       }

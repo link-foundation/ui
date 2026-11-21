@@ -24,6 +24,8 @@ export interface PanelModel {
   activePreset?: string;
 }
 export interface FieldControl {
+  /** The primary focusable control, if it cannot be inferred from the DOM. */
+  element?: Element;
   update(value: unknown): void;
   destroy(): void;
 }
@@ -94,7 +96,113 @@ export type SettingsMessages = Partial<
     string | ((params: SettingsMessageParams) => string)
   >
 >;
-export interface SettingsPanelOptions extends PanelModelOptions {
+export interface FieldPresentationContext {
+  field: SettingField;
+  id: string;
+  labelId: string;
+  hintId?: string;
+  messages?: {
+    text(key: SettingsMessageKey, params?: SettingsMessageParams): string;
+  };
+}
+
+export interface FieldPresentationState extends FieldPresentationContext {
+  values: SettingsValues;
+  value: unknown;
+  changed: boolean;
+  peeking: boolean;
+  commit(value: unknown): void;
+  resetLabel: string;
+}
+
+export interface FieldPresentationOptions {
+  slots?: Partial<
+    Record<
+      'label' | 'value' | 'reset' | 'hint',
+      (state: FieldPresentationState) => Node | string | undefined
+    >
+  >;
+  layout?: (parts: {
+    row: HTMLElement;
+    label: HTMLLabelElement;
+    control: HTMLElement;
+    value: HTMLOutputElement;
+    reset: HTMLButtonElement;
+    hint: HTMLParagraphElement | null;
+    marker: HTMLElement;
+    preview: HTMLElement | null;
+    field: SettingField;
+    id: string;
+  }) => void;
+  mountControl?: (
+    container: HTMLElement,
+    field: SettingField,
+    value: unknown,
+    onChange: (value: unknown) => void,
+    id: string,
+    context: FieldPresentationContext
+  ) => FieldControl;
+  mountPreview?: (context: {
+    container: HTMLElement;
+    field?: SettingField;
+    section?: SettingsSection;
+    level?: string;
+    values: SettingsValues;
+  }) => {
+    update(
+      values: SettingsValues,
+      definition: SettingField | SettingsSection,
+      level?: string
+    ): void;
+    destroy?(): void;
+  };
+}
+
+export interface SettingsRowState {
+  shown?: SettingsValues;
+  visible?: boolean;
+  peek?: boolean;
+  updateControl?: boolean;
+}
+
+export function mountField(
+  container: HTMLElement,
+  field: SettingField,
+  value: unknown,
+  onChange: (value: unknown) => void,
+  id: string,
+  context?: Pick<FieldPresentationContext, 'messages'>
+): FieldControl;
+export function mountSettingsRow(
+  container: HTMLElement,
+  schema: SettingsSchema,
+  field: SettingField,
+  options?: FieldPresentationOptions & {
+    id?: string;
+    values?: SettingsValues;
+    messages?: SettingsMessages;
+    onChange?: (changes: SettingsValues) => boolean | void;
+  }
+): {
+  element: HTMLElement;
+  update(values: SettingsValues, state?: SettingsRowState): void;
+  setMessages(messages: SettingsMessages): void;
+  destroy(): void;
+};
+export function estimateSection(
+  section: PanelModel['sections'][number],
+  schema: SettingsSchema,
+  values: SettingsValues,
+  options?: PanelModelOptions
+): number;
+export function planSectionColumns(
+  schema: SettingsSchema,
+  values: SettingsValues,
+  options?: PanelModelOptions & Pick<SettingsPanelOptions, 'columns'>
+): PanelModel['sections'][];
+
+export interface SettingsPanelOptions
+  extends PanelModelOptions, FieldPresentationOptions {
   document?: Document;
   values?: SettingsValues;
   target?: SettingsTarget;
@@ -128,27 +236,18 @@ export interface SettingsPanelOptions extends PanelModelOptions {
     values: SettingsValues,
     changes: SettingsValues
   ) => SettingsValues;
-  mountControl?: (
-    container: HTMLElement,
-    field: SettingField,
-    value: unknown,
-    onChange: (value: unknown) => void,
-    id: string
-  ) => FieldControl;
-  mountPreview?: (context: {
-    container: HTMLElement;
-    field?: SettingField;
-    section?: SettingsSection;
-    level?: string;
+  renderSection?: (state: {
+    section: PanelModel['sections'][number];
     values: SettingsValues;
-  }) => {
-    update(
-      values: SettingsValues,
-      definition: SettingField | SettingsSection,
-      level?: string
-    ): void;
-    destroy?(): void;
-  };
+    level?: string;
+  }) => Node | string | undefined;
+  renderTab?: (state: {
+    section: PanelModel['sections'][number];
+    kind: 'tab' | 'level';
+    value: string;
+    selected: boolean;
+    owned: boolean;
+  }) => Node | string | undefined;
   codec?: {
     read(
       text: string,

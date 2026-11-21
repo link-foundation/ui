@@ -17,14 +17,10 @@ export function mountField(
   const numberLabel = () =>
     messages?.text('number', { label: props.label }) ?? `${props.label} number`;
   if (element === 'vector' || element === 'chips') {
-    return mountCollection(
-      container,
-      field,
-      value,
-      onChange,
-      element,
-      messages
-    );
+    return mountCollection(container, field, value, onChange, element, {
+      messages,
+      id,
+    });
   }
   if (element === 'color-field') {
     props.rgb ??= true;
@@ -118,7 +114,14 @@ export function mountField(
   };
 }
 
-function mountCollection(container, field, value, onChange, element, messages) {
+function mountCollection(
+  container,
+  field,
+  value,
+  onChange,
+  element,
+  { messages, id }
+) {
   const doc = container.ownerDocument;
   let current = value;
   let lastMessages = messages?.revision;
@@ -132,6 +135,10 @@ function mountCollection(container, field, value, onChange, element, messages) {
       if (element === 'vector') {
         const input = doc.createElement('input');
         input.type = 'number';
+        input.id = index === 0 ? `${id}-input` : `${id}-input-${index}`;
+        if (index === 0) {
+          input.dataset.part = 'input';
+        }
         input.value = String(item);
         input.setAttribute('aria-label', `${legend.textContent} ${index + 1}`);
         input.addEventListener('change', () =>
@@ -156,6 +163,8 @@ function mountCollection(container, field, value, onChange, element, messages) {
     }
     if (element === 'chips') {
       const input = doc.createElement('input');
+      input.id = `${id}-input`;
+      input.dataset.part = 'input';
       input.setAttribute(
         'aria-label',
         messages?.text('add', { label: legend.textContent }) ??
@@ -179,6 +188,15 @@ function mountCollection(container, field, value, onChange, element, messages) {
   return {
     update(next) {
       const nextMessages = messages?.revision;
+      if (element === 'vector' && current.length === next.length) {
+        container.querySelectorAll('input').forEach((input, index) => {
+          if (input.value !== String(next[index])) {
+            input.value = String(next[index]);
+          }
+        });
+        current = next;
+        return;
+      }
       if (equalValue(field, current, next) && lastMessages === nextMessages) {
         return;
       }

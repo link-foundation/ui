@@ -219,6 +219,17 @@ format), applies the defaults when storage is missing, blocked or corrupted,
 never throws, and contains no `</script>` or line separators. Custom field
 types are applied with their defaults until `applyToRoot` runs.
 
+Use `initialText` to normalize server-known legacy JSON or an existing
+Links Notation values document before generating the script. For an older
+client storage key, `readStorage` can return validated values using a
+synchronous reader available when the script runs. `readSettingsText` reads
+both formats through the package's schema migration. Use `looksFromText`
+for named look collections. Pass the same `project(values)` to
+`beforePaintScript`, `applyToRoot` and the settings panel. It can add
+palette and material CSS variables, clear an inherited value with `null`,
+and project comfort settings into root attributes. Functions serialized
+into the before-paint script must be standalone or use preloaded globals.
+
 ## Testing: every setting is used
 
 ```js

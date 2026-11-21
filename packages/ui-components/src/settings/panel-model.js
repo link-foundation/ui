@@ -5,6 +5,30 @@ import {
   merge,
 } from '@link-foundation/ui-settings';
 
+function matchesQuery(field, section, needle) {
+  return [field.key, field.label, field.description, section.label]
+    .join(' ')
+    .toLocaleLowerCase()
+    .includes(needle);
+}
+
+export function availableTabs(section, values, options) {
+  const needle = options.query?.trim().toLocaleLowerCase() ?? '';
+  return (section.tabs ?? []).filter((tab) =>
+    section.fields.some(
+      (field) =>
+        field.props.tab === tab &&
+        fieldVisible(
+          field,
+          values,
+          { ...options, tabs: { [section.id]: tab } },
+          section
+        ) &&
+        matchesQuery(field, section, needle)
+    )
+  );
+}
+
 /** Pure section/search model. Equality and validation belong to ui-settings.
  * @param {import('@link-foundation/ui-settings').SettingsSchema} schema
  * @param {Record<string, unknown>} values
@@ -22,16 +46,8 @@ export function buildPanelModel(schema, values, options = {}) {
     if (!sections.has(id)) {
       sections.set(id, { id, label: id || 'General', fields: [] });
     }
-    const text = [
-      field.key,
-      field.label,
-      field.description,
-      sections.get(id).label,
-    ]
-      .join(' ')
-      .toLocaleLowerCase();
     if (
-      text.includes(needle) &&
+      matchesQuery(field, sections.get(id), needle) &&
       (includeAll || fieldVisible(field, all, options, sections.get(id)))
     ) {
       sections.get(id).fields.push(field);

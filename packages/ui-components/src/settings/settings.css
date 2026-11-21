@@ -176,3 +176,7 @@ settings-panel [data-preset][aria-pressed='true'] {
 settings-panel [data-owned]::after {
   content: ' •';
 }
+
+settings-panel .settings-label {
+  font-weight: bold;
+}

@@ -11,6 +11,7 @@
  * rules inlined in the script. Corrupted storage gives the defaults.
  */
 
+import { readSettingsText } from './codec.js';
 import { hexToChannels } from './color-channels.js';
 import { cssValue, formatValue } from './coerce.js';
 import { BUILT_IN_TYPES } from './types.js';
@@ -133,16 +134,17 @@ export function paintSnapshot(schema, values, { includeAll = false } = {}) {
  * @param {Array<object>} rules
  * @param {string} key
  */
-function paintFromStorage(rules, key, readStorage, project) {
-  let stored = {};
+function paintFromStorage(rules, key, initial, readStorage, project) {
+  let stored = initial;
   try {
     const raw = globalThis.localStorage.getItem(key);
-    const parsed = readStorage ? readStorage(raw) : JSON.parse(raw || '{}');
+    const parsed =
+      raw === null ? null : readStorage ? readStorage(raw) : JSON.parse(raw);
     if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
       stored = parsed;
     }
   } catch {
-    stored = {};
+    // Fall back to the initial values when storage is unavailable.
   }
   const decimals = (n) => {
     const text = String(n);
@@ -221,14 +223,14 @@ function paintFromStorage(rules, key, readStorage, project) {
   }
   const projected = project?.(all);
   for (const [name, value] of Object.entries(projected?.css ?? {})) {
-    if (value === null) {
+    if (value === null || value === undefined) {
       root.style.removeProperty(name);
     } else {
       root.style.setProperty(name, String(value));
     }
   }
   for (const [name, value] of Object.entries(projected?.attributes ?? {})) {
-    if (value === null) {
+    if (value === null || value === undefined) {
       root.removeAttribute(name);
     } else {
       root.setAttribute(name, String(value));
@@ -295,12 +297,16 @@ const inlineJson = (value) =>
  */
 export function beforePaintScript(
   schema,
-  { storageKey = PAINT_STORAGE_KEY, readStorage, project } = {}
+  { storageKey = PAINT_STORAGE_KEY, initialText, readStorage, project } = {}
 ) {
   const rules = inlineJson(paintRules(schema));
   const key = inlineJson(String(storageKey));
+  const initial =
+    initialText === undefined
+      ? {}
+      : readSettingsText(schema, initialText).values;
   const callable = (fn) => (fn ? `(${fn.toString()})` : 'undefined');
-  const source = `(function(){try{(${paintFromStorage.toString()})(${rules},${key},${callable(readStorage)},${callable(project)});}catch(e){}})();`;
+  const source = `(function(){try{(${paintFromStorage.toString()})(${rules},${key},${inlineJson(initial)},${callable(readStorage)},${callable(project)});}catch(e){}})();`;
   return source.replace(/<\/script/gi, (match) => match.replace('/', '\\/'));
 }
 
