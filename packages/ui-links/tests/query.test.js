@@ -76,6 +76,36 @@ describe('substitution queries', () => {
     ]);
   });
 
+  it('updates both links in a two-pattern restriction with or without a wrapper', () => {
+    const restriction = '((a: 0 0) (b: 0 0))';
+    const substitution = '((a: a a) (b: b b))';
+    for (const query of [
+      `(${restriction} ${substitution})`,
+      `${restriction}\n${substitution}`,
+    ]) {
+      replay([
+        [
+          `() ${restriction}`,
+          ['() ((1: 0 0))', '() ((2: 0 0))'],
+          '(a: 0 0)\n(b: 0 0)',
+        ],
+        [
+          query,
+          ['((1: 0 0)) ((1: 1 1))', '((2: 0 0)) ((2: 2 2))'],
+          '(a: a a)\n(b: b b)',
+        ],
+      ]);
+    }
+  });
+
+  it('rejects extra sides before writing any links', () => {
+    for (const query of ['(() ((1: 0 0)) ())', '()\n((1: 0 0))\n()']) {
+      const links = createMemoryLinks();
+      expect(errorCode(() => runQuery({ links }, query))).toBe('bad-request');
+      expect(linksToLino(links)).toBe('');
+    }
+  });
+
   it('creates nested links and names with autoCreate', () => {
     replay(
       [
