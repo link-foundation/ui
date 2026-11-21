@@ -2,21 +2,22 @@ import java.time.Duration
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 // ui-kotlin: renders ui-dialect/0 documents with Jetpack Compose / Compose
-// Multiplatform Material 3 components (issue #32). Every dependency is
-// Apache-2.0; see README.md, "Dependencies and licences".
+// Multiplatform Material 3 components (issue #32).
 
 plugins {
     kotlin("multiplatform") version "2.4.21"
     id("org.jetbrains.kotlin.plugin.compose") version "2.4.21"
     id("org.jetbrains.compose") version "1.12.2"
     id("com.android.kotlin.multiplatform.library") version "9.5.0" apply false
+    id("com.vanniktech.maven.publish") version "0.37.0"
 }
 
-group = "foundation.link.ui"
+group = "io.github.link-foundation.kotlin"
 version = "0.1.0"
 
 val composeVersion = "1.12.2"
 val material3Version = "1.9.0"
+val androidCompileSdk = 37 // Compose 1.12 AARs require API 37 (checkAarMetadata).
 
 // Android needs an SDK. CI has one; elsewhere the Android target is left out
 // rather than failing the build of the desktop target (the same rule as the
@@ -27,6 +28,13 @@ val androidSdk: String? =
         ?: file("local.properties").takeIf { it.isFile }?.readLines()
             ?.firstOrNull { it.startsWith("sdk.dir=") }?.substringAfter("=")
 val withAndroid = androidSdk != null && file(androidSdk).isDirectory
+
+// The public release must contain the Android variant as well as desktop.
+if (providers.gradleProperty("uiKotlinRequireAndroid").isPresent) {
+    check(withAndroid && file("$androidSdk/platforms/android-$androidCompileSdk/android.jar").isFile) {
+        "Install Android SDK Platform $androidCompileSdk for the full ui-kotlin publication."
+    }
+}
 
 if (withAndroid) {
     apply(plugin = "com.android.kotlin.multiplatform.library")
@@ -67,7 +75,7 @@ kotlin {
     if (withAndroid) {
         extensions.configure<com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget>("android") {
             namespace = "foundation.link.ui"
-            compileSdk = 37 // Compose 1.12 AARs require API 37 (checkAarMetadata)
+            compileSdk = androidCompileSdk
             minSdk = 23
         }
     }
@@ -76,7 +84,8 @@ kotlin {
         commonMain {
             kotlin.srcDir(generateVocabulary)
             dependencies {
-                implementation("io.github.link-foundation:links-notation-kotlin:0.1.0")
+                // Public helpers such as UiValue.toLink() expose the parser's Link type.
+                api("io.github.link-foundation.kotlin:links-notation:0.31.8")
                 api("org.jetbrains.compose.runtime:runtime:$composeVersion")
                 api("org.jetbrains.compose.foundation:foundation:$composeVersion")
                 api("org.jetbrains.compose.ui:ui:$composeVersion")
@@ -95,6 +104,48 @@ kotlin {
                 // Reads the fixtures' .tree.json and .diagnostics.json (test only).
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
             }
+        }
+    }
+}
+
+mavenPublishing {
+    // Upload to the Portal for validation. The maintainer publishes the
+    // validated deployment explicitly in the Portal.
+    publishToMavenCentral(automaticRelease = false)
+    if (providers.gradleProperty("signingInMemoryKey").isPresent) {
+        signAllPublications()
+    }
+    pom {
+        name.set("Link Foundation UI for Kotlin")
+        description.set("A Compose Multiplatform renderer for the Link Foundation UI dialect.")
+        url.set("https://github.com/link-foundation/ui")
+        licenses {
+            license {
+                name.set("Unlicense")
+                url.set("https://unlicense.org/")
+                distribution.set("repo")
+            }
+        }
+        developers {
+            developer {
+                name.set("Link.Foundation")
+                organization.set("Link Foundation")
+                organizationUrl.set("https://github.com/link-foundation")
+            }
+        }
+        scm {
+            url.set("https://github.com/link-foundation/ui")
+            connection.set("scm:git:https://github.com/link-foundation/ui.git")
+            developerConnection.set("scm:git:ssh://git@github.com/link-foundation/ui.git")
+        }
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "Staging"
+            url = uri(layout.buildDirectory.dir("staging-repository"))
         }
     }
 }

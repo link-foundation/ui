@@ -158,13 +158,11 @@ while links-notation#192 is open, and it never covers iOS, JS or Wasm.
 
 The port is offered upstream as `kotlin/` in
 [links-notation#370](https://github.com/link-foundation/links-notation/issues/370),
-with a `kotlin` entry in `parity/language-features.json` and the Maven Central
-coordinates `io.github.link-foundation:links-notation-kotlin` (to be confirmed
-by the maintainer). Until upstream takes it, it is **vendored here** under
-[`native/kotlin/links-notation/`](../native/kotlin/links-notation/), where the
-`ui-kotlin` package of #32 can depend on it as a Gradle included build. When
-upstream publishes it, #32 switches to the published artifact and the vendored
-copy is removed.
+with a `kotlin` entry in `parity/language-features.json`. The renderer resolves
+`io.github.link-foundation.kotlin:links-notation:0.31.8` from Maven Central.
+The original port under
+[`native/kotlin/links-notation/`](../native/kotlin/links-notation/) still
+runs its own parser and parity checks.
 
 ### The port
 

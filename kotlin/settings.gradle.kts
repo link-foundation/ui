@@ -1,7 +1,6 @@
 rootProject.name = "ui-kotlin-checks"
 
-// Keep the standalone builds and their dependency substitution available to
-// consumers. Gradle flattens their nested includes into the same composite.
+// Coordinate the parser and renderer checks. The desktop example runs
+// separately so Gradle resolves the renderer from a Maven repository.
 includeBuild("../native/kotlin/links-notation") { name = "links-notation-kotlin" }
 includeBuild("../packages/ui-kotlin")
-includeBuild("../examples/kotlin") { name = "ui-kotlin-example" }

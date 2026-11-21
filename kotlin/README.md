@@ -1,16 +1,15 @@
 # Kotlin checks
 
 Use the Gradle wrapper here to build and test the Kotlin projects together.
-The [parser](../native/kotlin/links-notation/), [Compose renderer](../packages/ui-kotlin/)
-and [desktop example](../examples/kotlin/) are included Gradle builds. They
-also retain their standalone entry points, source paths and module coordinates.
+The [parser](../native/kotlin/links-notation/) and the
+[Compose renderer](../packages/ui-kotlin/) are included Gradle builds.
 
 From the repository root, using JDK 21:
 
 ```sh
 cd kotlin
 ./gradlew :links-notation-kotlin:jvmTest :links-notation-kotlin:jsTest :links-notation-kotlin:wasmJsTest
-./gradlew :ui-kotlin:check :ui-kotlin-example:build
+./gradlew :ui-kotlin:check
 ```
 
 Set `ANDROID_HOME` to an SDK with platforms 36 and 37 for the Android
@@ -24,6 +23,8 @@ to UI's runners, test suites and terminal status check. Pull requests are tested
 on GitHub's merge checkout. The terminal status also runs when the change has
 no Kotlin inputs and all Gradle jobs skip.
 
-[UI's release workflow](../.github/workflows/release.yml) continues to own
-versioning and publication. The Kotlin quality workflow uses read-only
-permissions, and the coordinator defines no publications.
+The Kotlin quality workflow uses read-only permissions. It stages the
+renderer artifacts and builds the [desktop example](../examples/kotlin/)
+separately against the staged Maven repository.
+See the [renderer README](../packages/ui-kotlin/README.md#maven-central-publication)
+for local staging and the Maven Central workflow.

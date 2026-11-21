@@ -26,6 +26,7 @@ jobs:
         docs/case-studies/issue-1/samples
         .github/workflows/kotlin.yml
         .github/workflows/kotlin-quality.yml
+        .github/workflows/publish-kotlin.yml
         scripts/check-pipeline-status.sh
         scripts/read-job-cancel-in-progress.sh
       fast-tasks: :links-notation-kotlin:compileTestKotlinJvm :links-notation-kotlin:compileTestKotlinJs

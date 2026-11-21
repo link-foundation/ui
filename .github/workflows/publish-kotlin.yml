@@ -1,0 +1,52 @@
+name: Stage ui-kotlin on Maven Central
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  stage:
+    name: Upload a signed deployment to Central Portal
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: maven-central
+    concurrency:
+      group: publish-ui-kotlin-maven-central
+      cancel-in-progress: false
+    defaults:
+      run:
+        working-directory: packages/ui-kotlin
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Validate the Gradle wrapper
+        uses: gradle/actions/wrapper-validation@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+
+      - name: Set up Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Upload for Central Portal validation
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.CENTRAL_TOKEN }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_PRIVATE_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          for property in mavenCentralUsername mavenCentralPassword signingInMemoryKey signingInMemoryKeyPassword; do
+            name="ORG_GRADLE_PROJECT_$property"
+            if [[ -z "${!name}" ]]; then
+              echo "::error::Missing $property. Configure the maven-central environment secrets listed in packages/ui-kotlin/README.md."
+              exit 1
+            fi
+          done
+          ./gradlew --no-daemon --no-configuration-cache --console=plain \
+            -PuiKotlinRequireAndroid=true publishToMavenCentral
