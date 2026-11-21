@@ -1,5 +1,39 @@
 # Brand marks, presentation and static subsets
 
+## Browser-ready brand marks
+
+Import individual marks by slug from the published package. Each module has
+the SVG drawing, title and attribution record for one mark, with no runtime
+dependencies. The included slugs are `discord`, `github`, `habr`,
+`stackoverflow`, `telegram`, `vk`, `x` and `youtube`.
+
+```js
+import {
+  createStaticSource,
+  registerIconSet,
+} from '@link-foundation/ui-components/icons';
+import telegram from '@link-foundation/ui-components/icons/brand/telegram';
+import youtube from '@link-foundation/ui-components/icons/brand/youtube';
+
+registerIconSet(
+  'brand',
+  createStaticSource({
+    set: 'brand',
+    icons: { ...telegram.icons, ...youtube.icons },
+    records: [...telegram.records, ...youtube.records],
+  })
+);
+```
+
+With a browser import map, point the subpaths at the corresponding
+`dist/icons/brand/<slug>.js` files. For approved local artwork, use the
+same [static module shape](src/icons/index.d.ts) and register a separate set,
+for example `registerIconSet('local-brand', createStaticSource(localMarks))`.
+Give each drawing a `viewBox`, SVG `body`, `title` and a matching asset
+record. Use the local set name in `<ui-icon>` or LiNo. Review permissions and
+record attribution for the artwork you provide. The published set excludes
+withdrawn icons such as LinkedIn.
+
 ## Brand marks and presentation variants
 
 Register the optional `simple-icons` peer package as the `brand` set:
