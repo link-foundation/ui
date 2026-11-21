@@ -710,7 +710,12 @@ export interface NetworkPresentationProvider<
   Frame extends NetworkPresentationFrame = NetworkPresentationFrame,
 > {
   geometry(request: NetworkPresentationRequest<Frame>): Frame | Promise<Frame>;
-  solve?(request: NetworkPresentationRequest<Frame>): Frame | Promise<Frame>;
+  solve?(
+    request: NetworkPresentationRequest<Frame>
+  ):
+    | Frame
+    | NetworkPresentationSolution<Frame>
+    | Promise<Frame | NetworkPresentationSolution<Frame>>;
   svg(snapshot: NetworkPresentationSnapshot<Frame>): string;
   raster?(
     request: NetworkPresentationSnapshot<Frame> & {
@@ -720,11 +725,19 @@ export interface NetworkPresentationProvider<
     }
   ): Promise<Blob>;
 }
+export interface NetworkPresentationSolution<
+  Frame extends NetworkPresentationFrame = NetworkPresentationFrame,
+> {
+  frame: Frame;
+  /** Complete LiNo options matching the newly prepared frame. */
+  options: string;
+}
 export interface NetworkPresentation<
   Frame extends NetworkPresentationFrame = NetworkPresentationFrame,
 > {
   update(patch: Partial<NetworkPresentationInput>): Promise<boolean>;
-  solve(): Promise<boolean>;
+  readonly canSolve?: boolean;
+  solve(options?: { signal?: AbortSignal }): Promise<boolean>;
   snapshot(): NetworkPresentationSnapshot<Frame>;
   toSvg(): string;
   toRaster(
@@ -809,7 +822,7 @@ export interface NetworkEditorModel {
   ): Promise<boolean>;
   removeLink(index: number): Promise<boolean>;
   canonicalize(): Promise<boolean> | undefined;
-  solve(callback: NetworkEditorSolver): Promise<NetworkSolverResult | null>;
+  solve(callback?: NetworkEditorSolver): Promise<NetworkSolverResult | null>;
   dispose(): void;
 }
 export function createNetworkEditorModel(
@@ -974,6 +987,24 @@ export interface DoubletMarker {
   rotation: number;
   explicit: string[];
 }
+export interface PaintedCollisionSettings {
+  clearance?: number;
+  solveRange?: number;
+  solveStep?: number;
+  solveGaps?: boolean;
+  solveGapRange?: number;
+  solveMiddleRange?: number;
+  passes?: number;
+  debug?: boolean;
+}
+export interface PaintedCollisionResult extends NetworkSolverResult {
+  delta: [number, number][];
+}
+export interface CollisionWorkerConfiguration {
+  /** Override the bundled worker URL or pass Worker: undefined for a direct call. */
+  workerUrl?: string | URL;
+  Worker?: typeof Worker;
+}
 export type DoubletPalette =
   | 'default'
   | 'custom'
@@ -986,7 +1017,7 @@ export type DoubletPalette =
   | 'warm'
   | 'cold';
 export type DoubletLineJoin = 'miter' | 'round' | 'bevel';
-export interface DoubletOptions {
+export interface DoubletOptions extends Required<PaintedCollisionSettings> {
   layout:
     | 'auto'
     | 'circle'
@@ -1073,6 +1104,12 @@ export interface DoubletMarkerPlacement {
   compensated: boolean;
   extension: number;
   length: number;
+  /** Fitted path vertices for an alternate renderer, in drawing order. */
+  vertices?: LinkPoint[];
+  strokeWidth?: number;
+  linecap?: DoubletOptions['linecap'];
+  linejoin?: DoubletLineJoin;
+  miterLimit?: number;
 }
 export interface DoubletCurve {
   id: number;
@@ -1086,6 +1123,7 @@ export interface FittedDoubletCurve extends DoubletCurve {
   gaps: number[];
   markers: DoubletMarkerPlacement[];
   lengths: number[];
+  cutLengths: number[];
 }
 export interface DoubletFrame extends NetworkPresentationFrame {
   places: Map<number, LinkPoint>;
@@ -1097,6 +1135,7 @@ export interface DoubletFrame extends NetworkPresentationFrame {
   transform: [number, number, number];
   margin: number;
   captionRoom: number;
+  solution?: PaintedCollisionResult;
 }
 export const DOUBLET_MARKERS: readonly DoubletMarkerShape[];
 export function readDoubletOptions(
@@ -1120,7 +1159,7 @@ export function doubletToSvg(
   frame: DoubletFrame,
   options?: DoubletSvgOptions
 ): string;
-export interface DoubletProviderSettings {
+export interface DoubletProviderSettings extends CollisionWorkerConfiguration {
   debug?: (message: string, data: object) => void;
   foreground?: string;
   idPrefix?: string;
@@ -1128,6 +1167,34 @@ export interface DoubletProviderSettings {
 export function createDoubletProvider(
   options?: DoubletProviderSettings
 ): NetworkPresentationProvider<DoubletFrame>;
+export function scorePaintedCollisions(
+  frame: Pick<DoubletFrame, 'options' | 'curves'>,
+  options?: { clearance?: number }
+): { count: number; cost: number };
+/** Prepare raw and fitted painted geometry, honoring a supplied fit. */
+export type CollisionGeometry = (
+  links: DoubletPair[],
+  options: DoubletOptions
+) => Pick<DoubletFrame, 'layoutCurves' | 'curves' | 'transform'> &
+  Partial<Pick<DoubletFrame, 'bounds'>>;
+/** LiNo renderer options or flat, normalized network editor options. */
+export function solveCollisions(
+  links: DoubletInput,
+  options?: string | (Record<string, unknown> & PaintedCollisionSettings),
+  context?: {
+    signal?: AbortSignal;
+    geometry?: CollisionGeometry;
+    /** Decimal places in a host's persisted gaps, from 0 to 12. */
+    gapPrecision?: number;
+  }
+): PaintedCollisionResult;
+export function createCollisionSolver(
+  configuration?: CollisionWorkerConfiguration
+): (
+  links: DoubletInput,
+  options?: string | (Record<string, unknown> & PaintedCollisionSettings),
+  context?: { signal?: AbortSignal }
+) => Promise<PaintedCollisionResult>;
 export function doubletOptionAvailability(
   items: DoubletInput,
   options?: string

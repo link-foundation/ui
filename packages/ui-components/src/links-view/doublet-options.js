@@ -47,6 +47,14 @@ function defaults() {
     links: {},
     order: null,
     frame: null,
+    clearance: 1,
+    solveRange: 180,
+    solveStep: 1,
+    solveGaps: true,
+    solveGapRange: 0.2,
+    solveMiddleRange: 0,
+    passes: 3,
+    debug: false,
     padding: 9,
     start: marker('bar', 2.5, 70, 2.5),
     end: marker('arrow', 3.5),
@@ -106,6 +114,12 @@ const RANGES = Object.freeze({
   sourceAngle: Object.freeze([-180, 180]),
   targetAngle: Object.freeze([-180, 180]),
   tension: Object.freeze([0, 2]),
+  clearance: Object.freeze([0, 10]),
+  solveRange: Object.freeze([0, 180]),
+  solveStep: Object.freeze([1, 30]),
+  solveGapRange: Object.freeze([0, 1]),
+  solveMiddleRange: Object.freeze([0, 15]),
+  passes: Object.freeze([1, 10]),
   padding: Object.freeze([0, 48]),
   strokeWidth: Object.freeze([0.5, 10]),
   opacity: Object.freeze([0.1, 1]),
@@ -320,7 +334,7 @@ function specialOption(config, name, values, count) {
     markerOptions(config[name], values);
   } else if (['background', 'card', 'caption'].includes(name)) {
     styleGroup(config[name], values, name);
-  } else if (['balanceArrows', 'lens'].includes(name)) {
+  } else if (['balanceArrows', 'lens', 'solveGaps', 'debug'].includes(name)) {
     config[name] = choice(scalar(values), 'true false', name) === 'true';
   } else if (['color', 'title'].includes(name)) {
     config[name] = scalar(values);
@@ -358,6 +372,11 @@ export function readDoubletOptions(text = '', count = 0) {
   });
   if (!Number.isInteger(config.columns)) {
     throw new RangeError('Columns must be an integer');
+  }
+  for (const name of ['solveRange', 'solveStep', 'passes']) {
+    if (!Number.isInteger(config[name])) {
+      throw new RangeError(`${name} must be an integer`);
+    }
   }
   return config;
 }

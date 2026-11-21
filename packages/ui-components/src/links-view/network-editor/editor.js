@@ -86,6 +86,7 @@ export function createNetworkEditor(root, settings = {}) {
     syncUrl = true,
     debug,
   } = settings;
+  const canSolve = Boolean(solve || presentation?.canSolve);
   const doc = root.ownerDocument,
     win = doc.defaultView;
   const { roots, notations, links, styles, actions } = panelMounts(
@@ -134,7 +135,7 @@ export function createNetworkEditor(root, settings = {}) {
       }
       panels.share?.setBusy(busy);
       if (panels.apply) {
-        panels.apply.disabled = busy || !solve;
+        panels.apply.disabled = busy || !canSolve;
       }
     },
   });
@@ -155,6 +156,7 @@ export function createNetworkEditor(root, settings = {}) {
     message,
     fail,
     run,
+    canSolve,
     draft: null,
     applyLinks: model.applyLinks,
     changeOptions: model.changeOptions,
@@ -228,7 +230,7 @@ function statusNodes(doc, container) {
 }
 
 function solverControls(actions, model, solve, context) {
-  const { doc, announce, run, message } = context;
+  const { doc, announce, run, message, canSolve } = context;
   const solverPanel = element(doc, 'fieldset', undefined, actions);
   element(doc, 'legend', message('solver'), solverPanel);
   const apply = button(doc, solverPanel, message('apply'), () =>
@@ -240,8 +242,8 @@ function solverControls(actions, model, solve, context) {
       }
     })
   );
-  apply.disabled = !solve;
-  if (!solve) {
+  apply.disabled = !canSolve;
+  if (!canSolve) {
     element(doc, 'p', message('solverUnavailable'), solverPanel);
   }
   return apply;
