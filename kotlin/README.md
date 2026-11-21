@@ -1,20 +1,21 @@
 # Kotlin checks
 
 Use the Gradle wrapper here to build and test the Kotlin projects together.
-The [parser](../native/kotlin/links-notation/), [Compose renderer](../packages/ui-kotlin/)
-and [desktop example](../examples/kotlin/) are included Gradle builds. They
-also retain their standalone entry points, source paths and module coordinates.
+The [parser tests](parser-tests/) run the shared fixtures against the published
+Kotlin Links Notation library. The [Compose renderer](../packages/ui-kotlin/)
+and [desktop example](../examples/kotlin/) are included builds with standalone
+entry points.
 
 From the repository root, using JDK 21:
 
 ```sh
 cd kotlin
-./gradlew :links-notation-kotlin:jvmTest :links-notation-kotlin:jsTest :links-notation-kotlin:wasmJsTest
+./gradlew :parser-tests:jvmTest :parser-tests:jsTest :parser-tests:wasmJsTest
 ./gradlew :ui-kotlin:check :ui-kotlin-example:build
 ```
 
 Set `ANDROID_HOME` to an SDK with platforms 36 and 37 for the Android
-library builds. Run `:links-notation-kotlin:iosSimulatorArm64Test` on an
+library builds. Run `:parser-tests:iosSimulatorArm64Test` on an
 arm64 Mac with Xcode and an iOS simulator.
 
 The [Kotlin caller](../.github/workflows/kotlin.yml) lists the included builds

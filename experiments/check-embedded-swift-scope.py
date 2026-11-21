@@ -13,7 +13,7 @@ def main():
     classify = runpy.run_path(Path(pipeline) / "scope.py")["classify"]
     cases = {
         "packages/ui-core/src/index.js": False,
-        "native/kotlin/links-notation/src/commonMain/kotlin/io/github/linkfoundation/linksnotation/Comments.kt": False,
+        "kotlin/parser-tests/build.gradle.kts": False,
         "packages/ui-kotlin/build.gradle.kts": False,
         "docs/spec/parser-vectors.json": True,
         "docs/spec/fixtures/samples/document.lino": True,

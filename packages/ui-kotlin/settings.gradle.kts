@@ -10,6 +10,11 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
+    versionCatalogs {
+        create("libs") {
+            from(files("../../kotlin/gradle/libs.versions.toml"))
+        }
+    }
     repositories {
         google()
         mavenCentral()
@@ -17,10 +22,3 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "ui-kotlin"
-
-// The Kotlin Multiplatform Links Notation parser of issue #31, vendored in
-// native/kotlin/links-notation until upstream publishes it
-// (link-foundation/links-notation#370). Gradle substitutes its
-// io.github.link-foundation:links-notation-kotlin coordinates with this build.
-includeBuild("../../native/kotlin/links-notation")
-

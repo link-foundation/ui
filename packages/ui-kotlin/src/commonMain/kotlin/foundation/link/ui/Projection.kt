@@ -37,7 +37,7 @@ internal fun project(text: String, vocabulary: Vocabulary): UiDocument {
         val code = when (error) {
             is ParseException.DepthExceeded -> "depth-exceeded"
             is ParseException.InputTooLarge -> "input-too-large"
-            is ParseException.Syntax -> "syntax-error"
+            else -> "syntax-error"
         }
         val at = (error as? ParseException.Syntax)?.takeIf { it.line != 0 }
             ?.let { mapOf("line" to it.line, "column" to it.column) } ?: emptyMap()

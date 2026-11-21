@@ -2,8 +2,8 @@ import java.time.Duration
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 // ui-kotlin: renders ui-dialect/0 documents with Jetpack Compose / Compose
-// Multiplatform Material 3 components (issue #32). Every dependency is
-// Apache-2.0; see README.md, "Dependencies and licences".
+// Multiplatform Material 3 components (issue #32). See README.md,
+// "Dependencies and licences".
 
 plugins {
     kotlin("multiplatform") version "2.4.21"
@@ -19,8 +19,7 @@ val composeVersion = "1.12.2"
 val material3Version = "1.9.0"
 
 // Android needs an SDK. CI has one; elsewhere the Android target is left out
-// rather than failing the build of the desktop target (the same rule as the
-// parser in native/kotlin/links-notation).
+// rather than failing the build of the desktop target.
 val androidSdk: String? =
     System.getenv("ANDROID_HOME")?.takeIf { it.isNotBlank() }
         ?: System.getenv("ANDROID_SDK_ROOT")?.takeIf { it.isNotBlank() }
@@ -76,7 +75,7 @@ kotlin {
         commonMain {
             kotlin.srcDir(generateVocabulary)
             dependencies {
-                implementation("io.github.link-foundation:links-notation-kotlin:0.1.0")
+                implementation(libs.links.notation)
                 api("org.jetbrains.compose.runtime:runtime:$composeVersion")
                 api("org.jetbrains.compose.foundation:foundation:$composeVersion")
                 api("org.jetbrains.compose.ui:ui:$composeVersion")
