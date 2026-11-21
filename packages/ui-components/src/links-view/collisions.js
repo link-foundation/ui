@@ -492,9 +492,14 @@ export function solveCollisions(
       ? options
       : rendererOptions(options, pairs.length);
   const native = doubletGeometry(pairs, source);
-  const frame = geometry
-    ? { ...native, ...geometry(pairs, native.options) }
-    : native;
+  const fitted = geometry ? geometry(pairs, native.options) : native;
+  const frame = {
+    ...native,
+    curves: fitted.curves,
+    layoutCurves: fitted.layoutCurves,
+    transform: fitted.transform,
+    bounds: fitted.bounds ?? native.bounds,
+  };
   const original = pairs.map(
     (_, i) =>
       frame.options.links[i + 1] ?? {

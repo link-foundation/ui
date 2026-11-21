@@ -93,7 +93,7 @@ test('rejects a turn that would paint outside the pinned frame', () => {
 test('a host renderer supplies both the search geometry and the pinned fit', () => {
   const geometry = (links, options) => {
     const entries = Object.values(options.links);
-    return doubletGeometry(
+    const fitted = doubletGeometry(
       links,
       rendererOptions(
         {
@@ -104,6 +104,7 @@ test('a host renderer supplies both the search geometry and the pinned fit', () 
         links.length
       )
     );
+    return { ...fitted, bounds: undefined };
   };
   const fitted = doubletGeometry(reciprocal, 'frame: 45 51 52');
   const result = solveCollisions(reciprocal, {}, { geometry });
@@ -115,6 +116,13 @@ test('a host renderer supplies both the search geometry and the pinned fit', () 
     scorePaintedCollisions(doubletGeometry(reciprocal, committed)).count,
     result.after
   );
+  const disabled = solveCollisions(
+    reciprocal,
+    { solveRange: 0, solveGaps: false },
+    { geometry }
+  );
+  assert.equal(disabled.after, disabled.before);
+  assert.deepEqual(disabled.turns, []);
 });
 
 test('22 22 and 11 11 mirror turns and keep equal gaps at the closed link', async () => {
