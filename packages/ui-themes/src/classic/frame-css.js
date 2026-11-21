@@ -1,5 +1,10 @@
 import { FRAME_EDGES, FRAME_LEVELS, resolveFrame } from './frame-schema.js';
-import { geometryCss, POINTS, IDS, rule } from './frame-css-geometry.js';
+import {
+  geometryDeclarations,
+  POINTS,
+  IDS,
+  rule,
+} from './frame-css-geometry.js';
 import { createCssContext } from './frame-css-controls.js';
 import { frameValues } from './frame-css-values.js';
 import { stateCss } from './frame-css-states.js';
@@ -51,7 +56,7 @@ export function frameLayers() {
   ).join('');
   return `${material}<span data-frame-paint data-frame-strokes aria-hidden="true">${corners}${edges}</span>`;
 }
-function baseCss(prefix) {
+function baseCss(prefix, geometry) {
   return (
     rule('[data-frame-paint]', [
       ['position', 'absolute'],
@@ -75,8 +80,18 @@ function baseCss(prefix) {
       ['position', 'relative'],
       ['z-index', '1'],
     ]) +
-    geometryCss(prefix)
+    rule('[data-frame-paint] > *', Object.entries(geometry.fit)) +
+    rule('[data-frame-material]', Object.entries(geometry.material)) +
+    partCss('corner', geometry.corners) +
+    partCss('edge', geometry.edges)
   );
+}
+function partCss(name, parts) {
+  return Object.entries(parts)
+    .map(([id, values]) =>
+      rule(`[data-frame-${name}='${id}']`, Object.entries(values))
+    )
+    .join('');
 }
 function geometryAliases(ctx, level) {
   const keys = ['opacity', 'layer', 'threshold', 'border'];
@@ -99,9 +114,16 @@ function geometryAliases(ctx, level) {
   }
   for (const side of FRAME_EDGES) {
     keys.push(
-      ...['stroke', 'color', 'visible', 'image', 'mask', 'across'].map(
-        (key) => `${side}-${key}`
-      )
+      ...[
+        'stroke',
+        'color',
+        'visible',
+        'image',
+        'mask',
+        'across',
+        'inset-start',
+        'inset-end',
+      ].map((key) => `${side}-${key}`)
     );
   }
   return keys.map((key) => {
@@ -130,33 +152,47 @@ function geometryAliases(ctx, level) {
     return [name, ctx.variable(level, key)];
   });
 }
-function levelCss(ctx, level, selectors) {
+function levelCss(ctx, level, selectors, aliases) {
   const hosts = selectors.map((s) => `:where(${s})`);
-  const paint = (suffix = '') =>
-    hosts.map((s) => `${s}${suffix} > [data-frame-paint] > *`).join(', ');
-  let css = rule(hosts.join(', '), [
-    ['position', 'relative'],
-    ['isolation', 'isolate'],
-    [`--${ctx.prefix}-stacking`, ctx.variable(level, 'layer')],
-  ]);
-  css += rule(paint(), geometryAliases(ctx, level));
+  const target = (suffix = '') =>
+    hosts
+      .map(
+        (s) => `${s}${suffix}${ctx.paint ? ' > [data-frame-paint] > *' : ''}`
+      )
+      .join(', ');
+  let css = '';
+  if (ctx.paint) {
+    css = rule(hosts.join(', '), [
+      ['position', 'relative'],
+      ['isolation', 'isolate'],
+      [`--${ctx.prefix}-stacking`, ctx.variable(level, 'layer')],
+    ]);
+    css += rule(target(), Object.entries(aliases));
+  }
   css += stateCss(ctx, level, hosts);
   return {
     css,
-    fit: rule(paint(`[data-${ctx.prefix}-fit='outside']`), [
-      [`--${ctx.prefix}-g-threshold`, ctx.variable(level, 'fitScale')],
+    fit: rule(target(`[data-${ctx.prefix}-fit='outside']`), [
+      [
+        ctx.paint
+          ? `--${ctx.prefix}-g-threshold`
+          : ctx.prop(level, 'threshold'),
+        ctx.variable(level, 'fitScale'),
+      ],
     ]),
   };
 }
-function nestedCss(ctx, levels) {
-  if (!levels.panel || !ctx.frames.has('block')) {
+function nestedCss(ctx, levels, blockAliases) {
+  if (!levels.panel || !blockAliases) {
     return { css: '', fit: '' };
   }
   const panel = `:is(${levels.panel.join(', ')})`;
-  const chunk = levelCss(ctx, 'block', [
-    `:scope ${panel} ${panel}`,
-    `:scope${panel} ${panel}`,
-  ]);
+  const chunk = levelCss(
+    ctx,
+    'block',
+    [`:scope ${panel} ${panel}`, `:scope${panel} ${panel}`],
+    blockAliases
+  );
   const boundary = ctx.boundaryAttribute ? `[${ctx.boundaryAttribute}]` : null;
   const wrap = (rules) =>
     !boundary
@@ -172,6 +208,7 @@ export function framesCss(frames, options = {}) {
   const config = {
     prefix: 'frame',
     scope: ':root',
+    paint: true,
     ...options,
     levels:
       options.levels ??
@@ -182,6 +219,7 @@ export function framesCss(frames, options = {}) {
   validateOptions(config);
   const ctx = createCssContext(frames, config);
   const levels = {};
+  const geometry = { ...geometryDeclarations(ctx.prefix), levels: {} };
   let fit = '';
   for (const level of frames.keys()) {
     const frame = resolveFrame(frames, level);
@@ -189,13 +227,19 @@ export function framesCss(frames, options = {}) {
       `:where(${ctx.scope})`,
       frameValues(ctx, level, frame)
     );
+    geometry.levels[level] = Object.fromEntries(geometryAliases(ctx, level));
     if (config.levels[level]) {
-      const chunk = levelCss(ctx, level, config.levels[level]);
+      const chunk = levelCss(
+        ctx,
+        level,
+        config.levels[level],
+        geometry.levels[level]
+      );
       levels[level] += chunk.css;
       fit += chunk.fit;
     }
   }
-  const nested = nestedCss(ctx, config.levels);
+  const nested = nestedCss(ctx, config.levels, geometry.levels.block);
   ctx.renderEnums();
   ctx.register(`--${ctx.prefix}-g-fit`, '<number>', '1', false);
   for (const id of IDS) {
@@ -224,7 +268,11 @@ export function framesCss(frames, options = {}) {
   }
   return {
     properties: ctx.properties(),
-    base: baseCss(ctx.prefix) + ctx.enumCss + nested.css,
+    base:
+      (ctx.paint ? baseCss(ctx.prefix, geometry) : '') +
+      ctx.enumCss +
+      nested.css,
+    geometry,
     levels,
     fit: fit + nested.fit,
     controls: [...ctx.controls.values()],

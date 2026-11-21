@@ -91,6 +91,15 @@ requires no JavaScript. CSS uses container units, typed arithmetic, `hypot()` an
 polygon segments (maximum chord deviation 0.18 px at 128 px); the SVG reference
 retains exact quadratic paths.
 
+For host-controlled painting, set `paint: false` and use `geometry.levels[level]`
+and `geometry.fit` on each host paint target. Merge `geometry.material` for the
+clipped surface, `geometry.corners` for each corner, or `geometry.edges` for each
+stroke. A pseudo-element works as a paint target when its nearest sized
+container covers the frame. The host controls layout and stacking. Load the
+generated `properties`, `base`, `levels` and `fit` CSS to supply scoped skin,
+state and level values. Corner declaration keys are `tl`, `tr`, `br` and
+`bl`. Edge declaration keys are `top`, `right`, `bottom` and `left`.
+
 A panel inside a panel uses `block` automatically when that level is declared.
 `boundaryAttribute` restarts this nesting inside a preview. Explicit block
 selectors work independently. For scaled inheritance:
@@ -135,6 +144,12 @@ Corner color defaults to `currentColor`; supply a bright token for accents.
 Edge or level `style` is `solid`, `dashed`, `dotted` or `double`, independent of
 edge `line`. Dots have length `max(1px, stroke)`. Double splits the total width
 into two equal lines separated by one equally wide gap.
+
+`inset-start` and `inset-end` shorten an individual edge in CSS pixels in
+addition to fitted corner extents. Start is left on horizontal edges and top
+on vertical edges. Cuts inherit by level, keep their authored size as corners
+scale, and are limited to the remaining edge length. Pure border mode
+ignores both cuts.
 
 `mode frame` uses the explicit parent's frame; `own` uses the level's ordinary
 inherited values and explicit overrides; `border` collapses corner extents and

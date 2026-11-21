@@ -79,8 +79,10 @@ export function edgeValues(ctx, level, frame, side, patch) {
   if (changed('color')) {
     declarations.push(ctx.color(level, `${side}-color`, colorCss(edge.color)));
   }
-  if (changed('gap')) {
-    declarations.push(set('gap', `${edge.gap}px`));
+  for (const key of ['gap', 'inset-start', 'inset-end']) {
+    if (changed(key)) {
+      declarations.push(set(key, `${edge[key] ?? 0}px`));
+    }
   }
   declarations.push(...edgePaint(ctx, level, side, edge, patch, raw));
   if (!patch && !colorCss(edge.color).includes('currentColor')) {
