@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Host artwork and frame surfaces</title>
+    <link rel="icon" href="data:," />
+    <script type="importmap">
+      {
+        "imports": {
+          "@link-foundation/ui-animation/backgrounds/": "/packages/ui-animation/src/backgrounds/",
+          "@link-foundation/ui-themes/classic/frames": "/packages/ui-themes/src/classic/frames.js",
+          "@link-foundation/ui-themes/classic/materials": "/packages/ui-themes/src/classic/materials.js",
+          "@link-foundation/ui-core": "/packages/ui-core/src/index.js",
+          "links-notation": "/node_modules/links-notation/dist/index.js"
+        }
+      }
+    </script>
+    <style>
+      :root {
+        color-scheme: dark;
+        font:
+          100% system-ui,
+          sans-serif;
+        color: #f2efff;
+        background: #181731;
+      }
+      body {
+        margin: 0;
+        padding: 1.5rem max(1rem, calc((100% - 54rem) / 2));
+      }
+      h1 {
+        font-size: clamp(1.6rem, 6vw, 2.7rem);
+        margin: 0.25rem 0 1.5rem;
+      }
+      h2 {
+        font-size: 1.2rem;
+        margin: 0.25em 0;
+      }
+      p {
+        margin: 0.65em 0;
+      }
+      button {
+        font: inherit;
+        padding: 0.4rem 0.75rem;
+      }
+      .comparison {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+      figure {
+        margin: 0;
+      }
+      figure canvas {
+        display: block;
+        width: 144px;
+        height: 80px;
+        background: #232048;
+        outline: 1px solid #625893;
+      }
+      figcaption {
+        margin: 0.4rem 0;
+      }
+      .stage {
+        --host-grid-line: #8faeff;
+        --host-grid-alpha: 0.48;
+        position: relative;
+        isolation: isolate;
+        padding: clamp(0.5rem, 4vw, 2rem);
+        background: radial-gradient(ellipse at top right, #754b76, #322a64 70%);
+        max-width: 38rem;
+        margin: 1.5rem 0;
+      }
+      .layer {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .card {
+        --host-glass: #4e4d85;
+        --host-light: #eedbff;
+        --host-frame-panel-top-color: #f9dcaf;
+        --host-frame-block-top-color: #b8cbff;
+        display: grid;
+        grid-template-columns: minmax(0, max-content);
+        position: relative;
+        isolation: isolate;
+        width: fit-content;
+        max-width: 100%;
+        z-index: 5;
+      }
+      .paint {
+        position: absolute;
+        inset: 0;
+        container-type: size;
+        pointer-events: none;
+      }
+      .paint::before,
+      .paint::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+      }
+      .copy {
+        position: relative;
+        padding: clamp(1.15rem, 4vw, 2rem);
+      }
+      .card .card {
+        margin-top: 1rem;
+      }
+      .card .card .copy {
+        padding: 0.6rem 1.25rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Host artwork and frame surfaces</h1>
+      <section
+        class="comparison"
+        aria-label="Deterministic starfield comparison"
+      >
+        <figure>
+          <canvas
+            id="reference"
+            width="144"
+            height="80"
+            aria-hidden="true"
+          ></canvas>
+          <figcaption>Host canvas</figcaption>
+        </figure>
+        <figure>
+          <canvas
+            id="stars"
+            width="144"
+            height="80"
+            aria-hidden="true"
+          ></canvas>
+          <figcaption>Mounted starfield</figcaption>
+        </figure>
+      </section>
+      <div class="stage">
+        <canvas id="sky" class="layer"></canvas>
+        <div id="grid" class="layer"></div>
+        <canvas id="rain" class="layer"></canvas>
+        <canvas id="beams" class="layer"></canvas>
+        <article class="card" data-level="panel" data-skin="violet">
+          <div class="paint" aria-hidden="true"></div>
+          <div class="copy">
+            <h2>Cut glass</h2>
+            <p>The shader, grid and paint layers use the host’s saved scene.</p>
+            <div class="card" data-level="block">
+              <div class="paint" aria-hidden="true"></div>
+              <div class="copy">Nested frame</div>
+            </div>
+          </div>
+        </article>
+      </div>
+      <button id="transparency" type="button" aria-pressed="false">
+        Reduce transparency
+      </button>
+    </main>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
