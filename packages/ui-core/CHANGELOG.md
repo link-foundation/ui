@@ -1,5 +1,11 @@
 # @link-foundation/ui-core
 
+## 0.1.4
+
+### Patch Changes
+
+- 6a56e7d: Update Links Notation to 0.31.8 and the Link CLI client used by the ui-links integration tests to 0.5.0.
+
 ## 0.1.3
 
 ### Patch Changes
