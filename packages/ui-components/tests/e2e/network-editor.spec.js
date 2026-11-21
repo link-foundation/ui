@@ -47,10 +47,8 @@ test('URL writes wait for slider release and preserve or clear pinned frames', a
   await open(page);
   await page.evaluate(() => {
     globalThis.urlWrites = [];
-    const original = globalThis.globalThis.history.replaceState.bind(
-      globalThis.history
-    );
-    globalThis.globalThis.history.replaceState = (...args) => {
+    const original = globalThis.history.replaceState.bind(globalThis.history);
+    globalThis.history.replaceState = (...args) => {
       globalThis.urlWrites.push(args[2]);
       return original(...args);
     };
