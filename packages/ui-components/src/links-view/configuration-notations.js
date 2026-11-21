@@ -1,5 +1,8 @@
-import { Link, Parser } from 'links-notation';
-import { formatLinks as writeLinks } from '@link-foundation/ui-core';
+import { CstKind, Parser } from 'links-notation';
+import {
+  parseNested,
+  formatLinks as writeLinks,
+} from '@link-foundation/ui-core';
 import {
   checked,
   invalid,
@@ -40,6 +43,7 @@ function result(read) {
       error: Object.hasOwn(configurationMessages.en, error.message)
         ? error.message
         : 'configurations.syntax',
+      ...(error.params && { params: error.params }),
     };
   }
 }
@@ -48,18 +52,19 @@ const subscript = (value) =>
   [...String(value)].map((d) => subs[Number(d)]).join('');
 
 function based(text) {
-  const match = /^(.*?)(?:_(\d+)|([₀-₉]+))$/u.exec(text.trim());
+  const source = text.trim();
+  const match = /(?:_(\d+)|([₀-₉]+))$/u.exec(source);
   if (!match) {
-    invalid('base');
+    return { text: source, base: null };
   }
-  const base = match[2] ?? [...match[3]].map((d) => subs.indexOf(d)).join('');
-  return { text: match[1].trim(), base: Number(base) };
+  const base = match[1] ?? [...match[2]].map((d) => subs.indexOf(d)).join('');
+  return { text: source.slice(0, match.index).trim(), base: Number(base) };
 }
-function baseChecked(links, bases) {
-  if (bases.some((base) => base !== links.length + 1)) {
-    invalid('base');
+function checkBase(linkCount, actualBase) {
+  const expectedBase = linkCount + 1;
+  if (actualBase !== null && actualBase !== expectedBase) {
+    invalid('base', { actualBase, expectedBase, linkCount });
   }
-  return checked(links);
 }
 
 export const parseCode = (text) => result(() => decode(text));
@@ -80,19 +85,17 @@ export function parseNumber(source) {
   return result(() => {
     const { text, base } = based(source);
     let digits;
-    if (/^\[\s*\d+(?:\s+\d+)*\s*\]$/u.test(text)) {
-      digits = text.slice(1, -1).trim().split(/\s+/u).map(Number);
-    } else if (/^\d+$/u.test(text)) {
-      digits = [...text].map(Number);
+    if (/^\[\s*\d+(?:(?:\s*,\s*|\s+)\d+)*\s*\]$/u.test(text)) {
+      digits = text.match(/\d+/gu).map(Number);
+    } else if (/^\d+(?:[\s.-]+\d+)*$/u.test(text)) {
+      digits = [...text.replace(/[\s.-]/gu, '')].map(Number);
     } else {
       invalid('syntax');
     }
-    if (!digits.length || digits.length % 2) {
-      invalid('digits');
+    if (digits.length % 2) {
+      invalid('digits', { digitCount: digits.length });
     }
-    if (base !== digits.length / 2 + 1) {
-      invalid('base');
-    }
+    checkBase(digits.length / 2, base);
     return fromDigits(digits);
   });
 }
@@ -106,28 +109,30 @@ export function formatPairs(links) {
     )
     .join(' ');
 }
-export function parsePairs(source) {
-  return result(() => {
-    const parts = source
-      .trim()
-      .match(/\(\s*\d+\s*,\s*\d+\s*\)(?:[₀-₉]+|_\d+)|\d{2}(?:[₀-₉]+|_\d+)/gu);
-    if (
-      !parts ||
-      parts.join('').replace(/\s/gu, '') !== source.replace(/\s/gu, '')
-    ) {
+function readPairs(source, inferBase = false) {
+  const parts = source.match(
+    /\(\s*\d+\s*,\s*\d+\s*\)(?:[₀-₉]+|_\d+)|\d{2}(?:[₀-₉]+|_\d+|(?=\s|$))/gu
+  );
+  if (
+    !parts ||
+    parts.join('').replace(/\s/gu, '') !== source.replace(/\s/gu, '')
+  ) {
+    invalid('syntax');
+  }
+  const links = parts.map((part) => {
+    const { text, base } = based(part);
+    if (base === null && !inferBase) {
       invalid('syntax');
     }
-    const bases = [];
-    const links = parts.map((part) => {
-      const { text, base } = based(part);
-      bases.push(base);
-      return text.startsWith('(')
-        ? text.slice(1, -1).split(',').map(Number)
-        : [...text].map(Number);
-    });
-    return baseChecked(links, bases);
+    checkBase(parts.length, base);
+    return text.startsWith('(')
+      ? text.slice(1, -1).split(',').map(Number)
+      : [...text].map(Number);
   });
+  return checked(links);
 }
+
+export const parsePairs = (source) => result(() => readPairs(source));
 
 function named(pairs, names) {
   if (names.every((name) => name === null)) {
@@ -139,7 +144,7 @@ function named(pairs, names) {
     ) ||
     new Set(names).size !== pairs.length
   ) {
-    invalid('name');
+    invalid('name', { linkCount: pairs.length });
   }
   const ordered = Array(pairs.length);
   pairs.forEach((pair, i) => {
@@ -149,52 +154,101 @@ function named(pairs, names) {
 }
 export function formatTheory(links, { set = 'λ' } = {}) {
   checked(links);
-  if (!['λ', 'L', 'R'].includes(set)) {
+  if (!['λ', 'N²', 'L', 'R'].includes(set)) {
     invalid('syntax');
   }
   return `${set} = {${links.map((pair, i) => `${i + 1} ↦ (${pair.join(', ')})`).join(', ')}}`;
 }
 export function parseTheory(source) {
   return result(() => {
-    const outer = /^(?:N²\s*=\s*)?(?:λ|L|R)\s*=\s*\{(.*)\}$/u.exec(
-      source.trim()
-    );
-    if (!outer) {
-      invalid('syntax');
+    const text = source
+      .trim()
+      .replace(/^(?:N²\s*=\s*(?:[λLR]\s*=\s*)?|[λLR]\s*=\s*)/u, '');
+    const body =
+      text.startsWith('{') && text.endsWith('}')
+        ? text.slice(1, -1).trim()
+        : text;
+    if (!body.includes('(') || /[₀-₉_]/u.test(body)) {
+      return readPairs(body, true);
     }
-    const entries = outer[1].match(
-      /\d+\s*(?:↦|->|→|=>|:)\s*\(\s*\d+\s*,\s*\d+\s*\)/gu
+
+    const entries = body.matchAll(
+      /(?:(\d+)\s*(?:↦|->|→|=>|:)\s*)?\(\s*(\d+)(?:\s*,\s*|\s+)(\d+)\s*\)/gu
     );
-    if (
-      !entries ||
-      entries.join(',').replace(/\s/gu, '') !== outer[1].replace(/\s/gu, '')
-    ) {
-      invalid('syntax');
-    }
     const names = [],
       pairs = [];
+    let end = 0;
     for (const entry of entries) {
-      const numbers = entry.match(/\d+/gu).map(Number);
-      names.push(numbers[0]);
-      pairs.push(numbers.slice(1));
+      const separator = body.slice(end, entry.index).trim();
+      if (separator !== '' && !(pairs.length && separator === ',')) {
+        invalid('syntax');
+      }
+      const [match, name, source, target] = entry;
+      names.push(name === undefined ? null : Number(name));
+      pairs.push([Number(source), Number(target)]);
+      end = entry.index + match.length;
+    }
+    if (!pairs.length || body.slice(end).trim()) {
+      invalid('syntax');
     }
     return named(pairs, names);
   });
 }
 
+const linksLimits = Object.freeze({ maxInputSize: 100000, maxDepth: 32 });
+
+function linkText(node, inRecord = false) {
+  if (inRecord && node.kind === CstKind.GROUP) {
+    invalid('syntax');
+  }
+  if (!node.isToken) {
+    return node.children
+      .map((child) => linkText(child, inRecord || node.kind === CstKind.GROUP))
+      .join('');
+  }
+  // Bare commas were separators in the legacy editor. Leave quoted references,
+  // literals and comments intact so the official parser still interprets them.
+  return node.kind === CstKind.REFERENCE && node.text === node.value
+    ? node.text.replaceAll(',', ' ')
+    : node.text;
+}
+
+function flatLinkSource(source) {
+  const document = new Parser(linksLimits).parseCst(source);
+  return document.children
+    .map(({ children }) => {
+      const records = children.filter((node) => node.kind === CstKind.GROUP);
+      if (!records.length) {
+        return children.map((node) => linkText(node)).join('');
+      }
+      if (
+        children.some(
+          (node) =>
+            node.kind !== CstKind.GROUP &&
+            node.kind !== CstKind.COMMENT &&
+            linkText(node).trim()
+        )
+      ) {
+        invalid('syntax');
+      }
+      const first = children[0];
+      const indent = first.kind === CstKind.WHITESPACE ? first.text : '';
+      // Adjacent parenthesized records are one anonymous value in LiNo.
+      // Give each record its own line without unwrapping a nested group.
+      const separator = `\n${indent}`;
+      return `${indent}${records.map((record) => linkText(record)).join(separator)}\n`;
+    })
+    .join('');
+}
+
 /** Only the official LiNo parser reads Links notation, including indented groups. */
 export function parseLinks(source) {
   return result(() => {
-    const unindent = ({ element, children }) =>
-      new Link(element.id, [...element.values, ...children.map(unindent)]);
-    const groups = new Parser({ maxInputSize: 100000, maxDepth: 32 })
-      .parseGroups(source)
-      .map(unindent);
-    const roots = groups.flatMap((link) =>
-      link.id === null && link.values.some((value) => value.values.length)
-        ? link.values
-        : [link]
-    );
+    const compatible =
+      source.includes(',') || source.includes('(')
+        ? flatLinkSource(source)
+        : source;
+    const roots = parseNested(compatible, linksLimits);
     const names = [],
       pairs = [];
     for (const link of roots) {
@@ -216,15 +270,11 @@ export function parseLinks(source) {
     return named(pairs, names);
   });
 }
-export function formatLinks(links) {
+export function formatLinks(links, { style = 'indented' } = {}) {
   checked(links);
-  return writeLinks(
-    links.map(
-      (pair, i) =>
-        new Link(
-          String(i + 1),
-          pair.map((value) => new Link(String(value), []))
-        )
-    )
+  const text = writeLinks(
+    links.map((pair, i) => ({ id: String(i + 1), values: pair.map(String) })),
+    { style }
   );
+  return style === 'inline' ? text.trimEnd().replaceAll('\n', ' ') : text;
 }
