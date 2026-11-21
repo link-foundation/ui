@@ -1,45 +1,113 @@
 /** All archive content is DOM supplied by the host, never unsanitized HTML text. */
-export function embedView(host) {
+export function embedView(host, externalArchive) {
   const doc = host.ownerDocument;
+  if (externalArchive?.contains(host)) {
+    throw new TypeError('The embed host must be outside its archive');
+  }
   const archive =
+    externalArchive ??
     host.querySelector(':scope > [slot="fallback"]') ??
     doc.createElement('div');
-  if (!archive.parentNode) {
-    archive.append(...host.childNodes);
-  }
-  archive.setAttribute('slot', 'fallback');
+  const originalHidden = archive.getAttribute('hidden');
   const live = doc.createElement('div');
   live.dataset.part = 'embed';
-  const details = doc.createElement('details');
-  const summary = doc.createElement('summary');
+  live.tabIndex = -1;
+  live.setAttribute('role', 'group');
+  const details = externalArchive ? null : doc.createElement('details');
+  const summary = details && doc.createElement('summary');
   const button = doc.createElement('button');
   button.type = 'button';
-  details.append(summary, archive);
-  host.append(live, details, button);
+  if (details) {
+    if (!archive.parentNode) {
+      archive.append(...host.childNodes);
+    }
+    archive.setAttribute('slot', 'fallback');
+    details.append(summary, archive);
+    host.append(live, details, button);
+  } else {
+    host.prepend(live);
+  }
+  const activeElement = () =>
+    host.getRootNode().activeElement ?? doc.activeElement;
+  let addedTabIndex = false;
+  function focusArchive() {
+    if (!archive.hasAttribute('tabindex')) {
+      archive.tabIndex = -1;
+      addedTabIndex = true;
+    }
+    archive.focus({ preventScroll: true });
+  }
+  function showArchive(fallback, label, archiveFocused) {
+    if (!details) {
+      archive.hidden = !fallback;
+      return;
+    }
+    if (fallback && archive.parentNode === details) {
+      details.before(archive);
+    } else if (!fallback && archive.parentNode !== details) {
+      if (archiveFocused) {
+        details.open = true;
+      }
+      details.append(archive);
+    }
+    details.hidden = fallback;
+    summary.textContent = label;
+  }
+  function preserveFocus(active, fallback, toggle, archiveFocused) {
+    if (fallback && (live.contains(active) || active === summary)) {
+      if (toggle) {
+        button.focus({ preventScroll: true });
+      } else {
+        focusArchive();
+      }
+    } else if (!fallback && externalArchive && archiveFocused) {
+      live.focus({ preventScroll: true });
+    } else if (details && archiveFocused && activeElement() !== active) {
+      active.focus({ preventScroll: true });
+    } else if (!toggle && active === button) {
+      if (fallback) {
+        focusArchive();
+      } else {
+        live.focus({ preventScroll: true });
+      }
+    }
+  }
   return {
     live,
-    archive,
     button,
-    show(state, labels, toggle) {
+    activeElement,
+    show(state, labels, toggle, active = activeElement()) {
       const fallback = state === 'fallback' || state === 'off';
-      live.hidden = fallback;
-      if (fallback) {
-        details.before(archive);
-      } else {
-        details.append(archive);
+      const archiveFocused = archive.contains(active);
+      if (toggle && !button.parentNode) {
+        host.append(button);
       }
-      details.hidden = fallback;
-      summary.textContent = labels.archive;
+      showArchive(fallback, labels.archive, archiveFocused);
       button.hidden = !toggle;
       button.textContent = fallback ? labels.showEmbed : labels.showArchive;
       button.setAttribute('aria-pressed', String(!fallback));
+      live.hidden = fallback;
+      live.setAttribute('aria-label', labels.title);
       host.dataset.state = state;
       host.toggleAttribute('data-loaded', state === 'ready');
+      preserveFocus(active, fallback, toggle, archiveFocused);
+      if (externalArchive && !toggle) {
+        button.remove();
+      }
     },
     destroy() {
-      host.append(archive);
+      if (details) {
+        host.append(archive);
+        details.remove();
+      } else if (originalHidden === null) {
+        archive.removeAttribute('hidden');
+      } else {
+        archive.setAttribute('hidden', originalHidden);
+      }
+      if (addedTabIndex && archive.getAttribute('tabindex') === '-1') {
+        archive.removeAttribute('tabindex');
+      }
       live.remove();
-      details.remove();
       button.remove();
       host.removeAttribute('data-loaded');
       host.removeAttribute('data-state');
@@ -88,11 +156,15 @@ export function embedContext(host, options, media) {
 export function watchEmbedFrames(container, title, ready) {
   const win = container.ownerDocument.defaultView;
   const frames = new Set();
-  const resize = win.ResizeObserver ? new win.ResizeObserver(check) : null;
+  const resize =
+    ready && win.ResizeObserver ? new win.ResizeObserver(check) : null;
   function check() {
     for (const frame of container.querySelectorAll('iframe')) {
       if (!frame.getAttribute('title')?.trim()) {
         frame.title = title;
+      }
+      if (!ready) {
+        continue;
       }
       if (!frames.has(frame)) {
         frames.add(frame);

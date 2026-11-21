@@ -16,7 +16,8 @@
 // names a source on the avoid list (Remix Icon, SF Symbols).
 //
 // For each set it writes <out>/<set>.js (`export default {set, icons,
-// records}`) and a <set>.svg sprite (`<symbol id="<set>-<name>">`); then
+// records}`) and a <set>.svg sprite (`<symbol id="<set>-<name>">`); default
+// brand builds also write individual modules in <out>/brand/. Then come
 // NOTICE.lino (every shipped record, in the assets.lino format),
 // ATTRIBUTION.md, and licenses/<set>/ (the licence files and notices of
 // the third-party sets). The own set is also written to
@@ -531,11 +532,28 @@ async function readSets(root, sets, selected) {
  * The files of the built sets: modules, sprites, licences, NOTICE.lino and
  * ATTRIBUTION.md, by path.
  */
-function outputFiles(outDir, built, reads) {
+function outputFiles(outDir, built, reads, selected) {
   const outputs = new Map();
   for (const [set, data] of Object.entries(built)) {
     outputs.set(join(outDir, `${set}.js`), moduleText(data));
     outputs.set(join(outDir, `${set}.svg`), spriteText(set, data.icons));
+    if (set === 'brand' && !selected) {
+      const recordsById = new Map(
+        data.records.map((record) => [record.id, record])
+      );
+      for (const [name, icon] of Object.entries(data.icons)) {
+        const record = recordsById.get(icon.record);
+        outputs.set(
+          join(outDir, set, `${name}.js`),
+          moduleText({
+            set,
+            title: data.title,
+            icons: { [name]: icon },
+            records: [{ ...record, files: [`dist/icons/${set}/${name}.js`] }],
+          })
+        );
+      }
+    }
     for (const [file, text] of Object.entries(reads.get(set).licenses ?? {})) {
       outputs.set(join(outDir, 'licenses', set, file), text);
     }
@@ -606,7 +624,7 @@ export async function buildIcons({
   const outDir = resolve(root, out ?? `${PACKAGE_DIR}/dist/icons`);
   rmSync(join(outDir, 'licenses'), { recursive: true, force: true });
   const written = [];
-  for (const [path, text] of outputFiles(outDir, built, reads)) {
+  for (const [path, text] of outputFiles(outDir, built, reads, selected)) {
     mkdirSync(dirname(path), { recursive: true });
     writeFileSync(path, text);
     written.push(relativePath(root, path));

@@ -32,8 +32,10 @@ function renderGeneration(host, view, options, context, transition) {
       return;
     }
     finished = true;
+    const active = view.activeElement();
+    const focus = view.live.contains(active) ? view.live : active;
     dispose();
-    transition('fallback', reason);
+    transition('fallback', reason, focus);
     host.dispatchEvent(
       new win.CustomEvent('ui-embed-error', {
         bubbles: true,
@@ -74,12 +76,17 @@ function renderGeneration(host, view, options, context, transition) {
     () => fail('timeout'),
     duration(options.timeout, 12000)
   );
-  stopFrames = watchEmbedFrames(container, context.labels.title, ready);
+  stopFrames = watchEmbedFrames(
+    container,
+    context.labels.title,
+    provider.readiness === 'provider' ? undefined : ready
+  );
+  const scriptTimeout = duration(options.scriptTimeout, 10000);
   const request =
     provider.script === null
       ? { promise: Promise.resolve(), release: () => {} }
       : acquireEmbedScript(host.ownerDocument, provider.script, {
-          timeout: duration(options.scriptTimeout, 10000),
+          timeout: scriptTimeout,
         });
   release = request.release;
   request.promise
@@ -92,6 +99,8 @@ function renderGeneration(host, view, options, context, transition) {
         ...context,
         url,
         window: win,
+        scriptTimeout,
+        widgetOptions: options.widgetOptions,
         signal: abort.signal,
         ready,
         unavailable: () => fail('unavailable'),
@@ -125,18 +134,19 @@ function validPost(options) {
 /** Mount on a connected host. destroy() releases all instance-owned resources. */
 export function createEmbed(host, initial = {}) {
   const win = host.ownerDocument.defaultView;
-  const view = embedView(host);
+  const view = embedView(host, initial.archive);
   const media = win.matchMedia?.('(prefers-color-scheme: dark)');
   let options = { ...initial },
     context,
     current,
     state = 'deferred',
     near = false,
-    dead = false;
+    dead = false,
+    revision = 0;
   let intersection;
-  const transition = (next, reason) => {
+  const transition = (next, reason, active) => {
     state = next;
-    view.show(state, context.labels, options.toggle === true);
+    view.show(state, context.labels, options.toggle === true, active);
     if (options.debug) {
       (options.log ?? win.console.debug.bind(win.console))('[ui-embed]', {
         state,
@@ -147,17 +157,34 @@ export function createEmbed(host, initial = {}) {
     }
   };
   const refresh = () => {
+    const nextRevision = ++revision;
     const previous = current;
     current = undefined;
     context = embedContext(host, options, media);
     if (options.enabled === false) {
       transition('off');
     } else if (near || !validPost(options)) {
-      current = renderGeneration(host, view, options, context, transition);
+      const generation = renderGeneration(
+        host,
+        view,
+        options,
+        context,
+        transition
+      );
+      if (!dead && nextRevision === revision) {
+        current = generation;
+      } else {
+        generation();
+      }
     } else {
       transition('deferred');
     }
-    previous?.();
+    if (previous) {
+      if (!view.live.hidden && view.live.contains(view.activeElement())) {
+        view.live.focus({ preventScroll: true });
+      }
+      previous();
+    }
   };
   const onContext = () => {
     const next = embedContext(host, options, media);
