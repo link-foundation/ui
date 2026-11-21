@@ -1,0 +1,2 @@
+[libraries]
+links-notation = { module = "io.github.link-foundation.kotlin:links-notation", version = "0.31.8" }

@@ -45,7 +45,8 @@ describe('Kotlin pilot routing', () => {
 
         for (const [path, expected] of [
           ['packages/ui-kotlin/src/commonMain/kotlin/UiView.kt', true],
-          ['native/kotlin/links-notation/src/jvmMain/Parser.kt', true],
+          ['kotlin/parser-tests/build.gradle.kts', true],
+          ['kotlin/gradle/libs.versions.toml', true],
           ['examples/kotlin/Main.kt', true],
           ['native/parity/text-fixtures.json', true],
           ['docs/spec/parser-vectors.json', true],

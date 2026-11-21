@@ -1,15 +1,11 @@
 import groovy.json.JsonSlurper
 
-// A Kotlin Multiplatform port of the Links Notation parser of
-// link-foundation/links-notation. No runtime dependencies.
+// Runs UI’s parser fixtures against the published Links Notation library.
 
 plugins {
     kotlin("multiplatform") version "2.4.21"
     id("com.android.kotlin.multiplatform.library") version "9.5.0" apply false
 }
-
-group = "io.github.link-foundation"
-version = "0.1.0"
 
 // Android needs an SDK. CI runners have one; elsewhere the Android target is
 // left out rather than failing the build of every other target.
@@ -108,8 +104,8 @@ abstract class GenerateParityCases : DefaultTask() {
 val generateParityCases = tasks.register<GenerateParityCases>("generateParityCases") {
     description = "Generates ParityCases.kt from the parity corpus and the spec parser vectors."
     group = "verification"
-    parityCorpus.set(layout.projectDirectory.file("../../parity/text-fixtures.json"))
-    specVectors.set(layout.projectDirectory.file("../../../docs/spec/parser-vectors.json"))
+    parityCorpus.set(layout.projectDirectory.file("../../native/parity/text-fixtures.json"))
+    specVectors.set(layout.projectDirectory.file("../../docs/spec/parser-vectors.json"))
     outputDir.set(layout.buildDirectory.dir("generated/commonTest"))
 }
 
@@ -132,7 +128,7 @@ kotlin {
 
     if (withAndroid) {
         extensions.configure<com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget>("android") {
-            namespace = "io.github.linkfoundation.linksnotation"
+            namespace = "foundation.link.ui.parsertests"
             compileSdk = 36
             minSdk = 21
             withHostTest {}
@@ -144,6 +140,7 @@ kotlin {
             kotlin.srcDir(generateParityCases)
             dependencies {
                 implementation(kotlin("test"))
+                implementation(libs.links.notation)
             }
         }
     }

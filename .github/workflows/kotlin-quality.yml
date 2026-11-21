@@ -109,8 +109,8 @@ jobs:
 
       - name: Show how many tests each target ran
         if: ${{ !cancelled() }}
-        working-directory: native/kotlin/links-notation
-        run: sh test-summary.sh
+        working-directory: ${{ inputs.project-directory }}/parser-tests
+        run: sh ../scripts/test-summary.sh
 
   android:
     name: Android host tests
@@ -133,18 +133,19 @@ jobs:
         uses: actions/setup-java@v6
         with:
           distribution: temurin
-          java-version: '21'
+          # The published Android parser contains Java 26 class files.
+          java-version: '26'
 
       # The hosted image ships an Android SDK and sets ANDROID_HOME; the
       # build applies the Android target only when it finds one.
-      - name: Build the Android library and run its host tests
+      - name: Run the parser’s Android host tests
         working-directory: ${{ inputs.project-directory }}
-        run: ./gradlew --no-daemon --console=plain :links-notation-kotlin:assemble :links-notation-kotlin:testAndroidHostTest
+        run: ./gradlew --no-daemon --console=plain :parser-tests:testAndroidHostTest
 
       - name: Show how many tests each target ran
         if: ${{ !cancelled() }}
-        working-directory: native/kotlin/links-notation
-        run: sh test-summary.sh
+        working-directory: ${{ inputs.project-directory }}/parser-tests
+        run: sh ../scripts/test-summary.sh
 
   ios:
     name: iOS simulator tests
@@ -172,12 +173,12 @@ jobs:
 
       - name: Run the iOS simulator tests
         working-directory: ${{ inputs.project-directory }}
-        run: ./gradlew --no-daemon --console=plain :links-notation-kotlin:iosSimulatorArm64Test
+        run: ./gradlew --no-daemon --console=plain :parser-tests:iosSimulatorArm64Test
 
       - name: Show how many tests each target ran
         if: ${{ !cancelled() }}
-        working-directory: native/kotlin/links-notation
-        run: sh test-summary.sh
+        working-directory: ${{ inputs.project-directory }}/parser-tests
+        run: sh ../scripts/test-summary.sh
 
   ui-kotlin:
     name: ui-kotlin desktop tests and example
@@ -224,7 +225,7 @@ jobs:
       - name: Show how many tests ran
         if: ${{ !cancelled() }}
         working-directory: packages/ui-kotlin
-        run: sh ../../native/kotlin/links-notation/test-summary.sh
+        run: sh ../../kotlin/scripts/test-summary.sh
 
       # examples/kotlin is its own build (it includes this one); building it
       # compiles Main.kt against the library.

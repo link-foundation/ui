@@ -14,9 +14,10 @@ It is a Gradle Kotlin Multiplatform project:
   `local.properties`), so a machine without one still builds the desktop
   target.
 
-The Links Notation parser is the Kotlin port of issue #31
-(`native/kotlin/links-notation`), an included build. Documents are never
-read with regular expressions.
+The renderer reads documents with the
+[published Kotlin Links Notation parser](https://central.sonatype.com/artifact/io.github.link-foundation.kotlin/links-notation).
+The [Kotlin version catalog](../../kotlin/gradle/libs.versions.toml) pins the
+version shared by the renderer and the parser fixture tests.
 
 ```sh
 cd packages/ui-kotlin
@@ -161,12 +162,11 @@ Multiplatform 1.12.2, Material 3 1.9.0):
 | AndroidX collection, annotation, lifecycle, savedstate, navigationevent, arch core                                         | Apache-2.0   | runtime    |
 | Skiko (`org.jetbrains.skiko`, bundles Skia, BSD-3-Clause)                                                                  | Apache-2.0   | runtime    |
 | JSpecify (`org.jspecify`)                                                                                                  | Apache-2.0   | runtime    |
-| Links Notation Kotlin parser (`native/kotlin/links-notation`)                                                              | Unlicense    | runtime    |
+| Links Notation Kotlin parser (`io.github.link-foundation.kotlin:links-notation`)                                           | Unlicense    | runtime    |
 | Compose UI test (`ui-test`), kotlin-test, kotlinx-serialization-json                                                       | Apache-2.0   | tests only |
 | JUnit 4.13.2                                                                                                               | EPL-1.0      | tests only |
 | Hamcrest core 1.3                                                                                                          | BSD-3-Clause | tests only |
 
-Every one of the 90 artifacts on the desktop runtime classpath is Apache-2.0.
 JUnit 4 (EPL-1.0) and Hamcrest come in only through `kotlin-test-junit` and
 `ui-test-desktop`, which run the tests. They are never part of the library or
 of an application that uses it.
