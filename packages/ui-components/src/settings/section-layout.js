@@ -1,6 +1,6 @@
 import { merge } from '@link-foundation/ui-settings';
 import { fieldVisible } from './conditions.js';
-import { buildPanelModel, availableTabs } from './panel-model.js';
+import { buildPanelModel, availableTabs, selectedTab } from './panel-model.js';
 
 /** Estimate the fields visible with the initial values and selection. */
 export function estimateSection(section, schema, values, options = {}) {
@@ -10,10 +10,9 @@ export function estimateSection(section, schema, values, options = {}) {
 
 function measure(section, values, options) {
   const tabs = availableTabs(section, values, options);
-  const wanted = options.tabs?.[section.id] ?? section.tabs?.[0];
   const scope = {
     ...options,
-    tabs: { [section.id]: tabs.includes(wanted) ? wanted : tabs[0] },
+    tabs: { [section.id]: selectedTab(section, options.tabs, tabs) },
   };
   const fields = section.fields.filter((field) =>
     fieldVisible(field, values, scope, section)

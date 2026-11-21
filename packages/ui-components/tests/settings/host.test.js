@@ -51,6 +51,12 @@ test('host estimates initial tabs and levels and the panel keeps reveal next to 
   );
   assert.deepEqual(
     settings
+      .buildPanelModel(schema, values, { query: 'panel', level: 'panel' })
+      .sections[0].fields.map(({ key }) => key),
+    ['panel']
+  );
+  assert.deepEqual(
+    settings
       .planSectionColumns(schema, values, { ...scope, columns })
       .map((column) => column.map((section) => section.id)),
     [['left', 'reveal'], ['right']]

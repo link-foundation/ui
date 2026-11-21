@@ -1,5 +1,5 @@
 import { matchesCondition } from './conditions.js';
-import { availableTabs } from './panel-model.js';
+import { availableTabs, selectedTab } from './panel-model.js';
 
 /** ARIA tabs with automatic activation and roving keyboard focus. */
 export function tabBar(
@@ -120,10 +120,9 @@ export function refreshSection(chrome, state, context) {
       level: activeLevel,
       query,
     });
-    if (!available.includes(selectedTabs[section.id] ?? section.tabs[0])) {
-      selectedTabs[section.id] = available[0];
-    }
-    tabs.update(selectedTabs[section.id] ?? section.tabs[0], available);
+    const active = selectedTab(section, selectedTabs, available);
+    selectedTabs[section.id] = active;
+    tabs.update(active, available);
     tabs.bar.hidden = available.length === 0;
     tabs.bar.setAttribute(
       'aria-label',
