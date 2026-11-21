@@ -133,7 +133,8 @@ jobs:
         uses: actions/setup-java@v6
         with:
           distribution: temurin
-          java-version: '21'
+          # The published Android parser contains Java 26 class files.
+          java-version: '26'
 
       # The hosted image ships an Android SDK and sets ANDROID_HOME; the
       # build applies the Android target only when it finds one.

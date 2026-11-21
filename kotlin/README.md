@@ -15,8 +15,10 @@ cd kotlin
 ```
 
 Set `ANDROID_HOME` to an SDK with platforms 36 and 37 for the Android
-library builds. Run `:parser-tests:iosSimulatorArm64Test` on an
-arm64 Mac with Xcode and an iOS simulator.
+library builds. Run `:parser-tests:testAndroidHostTest` with JDK 26 or
+later to load the published parser's Android class files. Run
+`:parser-tests:iosSimulatorArm64Test` on an arm64 Mac with Xcode and an
+iOS simulator.
 
 The [Kotlin caller](../.github/workflows/kotlin.yml) lists the included builds
 and shared inputs that select Gradle checks. Its reusable workflow adapts the
