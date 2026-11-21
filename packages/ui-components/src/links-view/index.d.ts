@@ -454,6 +454,11 @@ export interface NetworkLayoutOptions {
   height?: number;
   alphaMin?: number;
   maxTicks?: number;
+  charge?: number;
+  distance?: number;
+  collisionRadius?:
+    | number
+    | ((node: { id: NetworkId; x: number; y: number }) => number);
   pins?: [NetworkId, LinkPoint][];
 }
 export type NetworkLayoutName =
@@ -678,12 +683,16 @@ export interface NetworkPresentationFrame {
   bounds: { x: number; y: number; width: number; height: number };
   [key: string]: unknown;
 }
-export interface NetworkPresentationSnapshot {
+export interface NetworkPresentationSnapshot<
+  Frame extends NetworkPresentationFrame = NetworkPresentationFrame,
+> {
   input: NetworkPresentationInput;
-  frame?: NetworkPresentationFrame;
+  frame?: Frame;
   revision: number;
 }
-export interface NetworkPresentationRequest extends NetworkPresentationSnapshot {
+export interface NetworkPresentationRequest<
+  Frame extends NetworkPresentationFrame = NetworkPresentationFrame,
+> extends NetworkPresentationSnapshot<Frame> {
   signal: AbortSignal;
 }
 export type NetworkRasterType = 'image/png' | 'image/jpeg' | 'image/webp';
@@ -697,26 +706,26 @@ export interface NetworkRasterOptions {
   URL?: typeof URL;
   Image?: typeof Image;
 }
-export interface NetworkPresentationProvider {
-  geometry(
-    request: NetworkPresentationRequest
-  ): NetworkPresentationFrame | Promise<NetworkPresentationFrame>;
-  solve?(
-    request: NetworkPresentationRequest
-  ): NetworkPresentationFrame | Promise<NetworkPresentationFrame>;
-  svg(snapshot: NetworkPresentationSnapshot): string;
+export interface NetworkPresentationProvider<
+  Frame extends NetworkPresentationFrame = NetworkPresentationFrame,
+> {
+  geometry(request: NetworkPresentationRequest<Frame>): Frame | Promise<Frame>;
+  solve?(request: NetworkPresentationRequest<Frame>): Frame | Promise<Frame>;
+  svg(snapshot: NetworkPresentationSnapshot<Frame>): string;
   raster?(
-    request: NetworkPresentationSnapshot & {
+    request: NetworkPresentationSnapshot<Frame> & {
       svg: string;
       type: NetworkRasterType;
       options: NetworkRasterOptions;
     }
   ): Promise<Blob>;
 }
-export interface NetworkPresentation {
+export interface NetworkPresentation<
+  Frame extends NetworkPresentationFrame = NetworkPresentationFrame,
+> {
   update(patch: Partial<NetworkPresentationInput>): Promise<boolean>;
   solve(): Promise<boolean>;
-  snapshot(): NetworkPresentationSnapshot;
+  snapshot(): NetworkPresentationSnapshot<Frame>;
   toSvg(): string;
   toRaster(
     type?: NetworkRasterType,
@@ -724,14 +733,16 @@ export interface NetworkPresentation {
   ): Promise<Blob>;
   toLino(): string;
   subscribe(
-    listener: (snapshot: NetworkPresentationSnapshot) => void
+    listener: (snapshot: NetworkPresentationSnapshot<Frame>) => void
   ): () => void;
   dispose(): void;
 }
-export function createNetworkPresentation(
-  provider: NetworkPresentationProvider,
+export function createNetworkPresentation<
+  Frame extends NetworkPresentationFrame,
+>(
+  provider: NetworkPresentationProvider<Frame>,
   options?: { debug?: (message: string, data: object) => void }
-): NetworkPresentation;
+): NetworkPresentation<Frame>;
 export function networkToRaster(
   svg: string,
   options?: NetworkRasterOptions
@@ -771,17 +782,53 @@ export interface NetworkSolverResult {
   after: number;
   delta?: unknown;
 }
-export interface NetworkEditorSettings {
-  presentation: NetworkPresentation;
+export type NetworkEditorSolver = (
+  links: Configuration,
+  options: NetworkEditorValues,
+  context: { signal: AbortSignal }
+) => Promise<NetworkSolverResult> | NetworkSolverResult;
+
+export interface NetworkEditorModelSettings {
   configurations?: typeof import('./configurations.d.ts');
-  solve?: (
-    links: Configuration,
-    options: NetworkEditorValues,
-    context: { signal: AbortSignal }
-  ) => Promise<NetworkSolverResult>;
-  locale?: 'en' | 'ru';
   serializeOptions?: (options: NetworkEditorValues) => string;
   readOptions?: (text: string) => Partial<NetworkEditorValues>;
+  onChange?: (externalNetwork: boolean) => void;
+  onBusy?: (busy: boolean) => void;
+}
+export interface NetworkEditorModel {
+  snapshot(): NetworkEditorSnapshot;
+  applyLinks(
+    links: Configuration,
+    patch?: Partial<NetworkEditorValues>
+  ): Promise<boolean>;
+  changeOptions(patch: Partial<NetworkEditorValues>): Promise<boolean>;
+  applyStyle(style: Partial<NetworkEditorValues>): Promise<boolean>;
+  restore(
+    links: Configuration,
+    options: Partial<NetworkEditorValues>
+  ): Promise<boolean>;
+  removeLink(index: number): Promise<boolean>;
+  canonicalize(): Promise<boolean> | undefined;
+  solve(callback: NetworkEditorSolver): Promise<NetworkSolverResult | null>;
+  dispose(): void;
+}
+export function createNetworkEditorModel(
+  presentation: NetworkPresentation,
+  settings?: NetworkEditorModelSettings
+): NetworkEditorModel;
+
+export interface NetworkEditorSettings extends Omit<
+  NetworkEditorModelSettings,
+  'onChange' | 'onBusy'
+> {
+  presentation: NetworkPresentation;
+  solve?: NetworkEditorSolver;
+  locale?: 'en' | 'ru';
+  mounts?: Partial<
+    Record<'notations' | 'links' | 'styles' | 'actions', HTMLElement>
+  >;
+  messages?: Readonly<Record<string, string>>;
+  share?: NetworkShareOptions & { title?: string };
   syncUrl?: boolean;
   debug?: (message: string, data?: object) => void;
 }
@@ -797,6 +844,7 @@ export function createNetworkEditor(
   root: HTMLElement,
   settings: NetworkEditorSettings
 ): NetworkEditor;
+export const networkEditorMessages: Readonly<Record<string, string>>;
 export const networkOptionSchema: readonly NetworkOptionDefinition[];
 export const networkOverrideSchema: readonly NetworkOptionDefinition[];
 export function normalizeNetworkOptions(
@@ -806,7 +854,8 @@ export function networkOptionsToParams(
   options: Record<string, unknown>
 ): URLSearchParams;
 export function networkOptionsFromParams(
-  params: string | URLSearchParams
+  params: string | URLSearchParams,
+  options?: { legacy?: boolean }
 ): NetworkEditorValues;
 export function networkOptionsToLino(options: Record<string, unknown>): string;
 export function networkOptionsFromLino(text?: string): NetworkEditorValues;
@@ -820,13 +869,26 @@ export const networkLooks: Readonly<
 >;
 export const networkSizePresets: readonly (readonly [number, number])[];
 export function networkFilename(code: string, extension: string): string;
+export interface NetworkShareDestination {
+  readonly label: string;
+  readonly template: string;
+}
+export const networkShareDestinations: Readonly<
+  Record<string, NetworkShareDestination>
+>;
+export interface NetworkShareOptions {
+  mastodonInstance?: string;
+  emailBody?: string;
+  destinations?: Readonly<Record<string, NetworkShareDestination>>;
+}
 export function networkShareTargets(
   url: string,
-  title?: string
+  title?: string,
+  options?: NetworkShareOptions
 ): Record<string, string>;
 export interface NetworkUrlSyncSettings {
   window?: Window;
-  root?: EventTarget;
+  root?: EventTarget | readonly EventTarget[];
   urlFor(
     snapshot: NetworkPresentationSnapshot,
     currentHref: string
@@ -841,9 +903,9 @@ export function syncNetworkUrl(
   settings: NetworkUrlSyncSettings
 ): { flush(): void; dispose(): void };
 
-export function createNetworkEditorProvider(configuration?: {
-  debug?: (message: string, data?: object) => void;
-}): NetworkPresentationProvider;
+export function createNetworkEditorProvider(
+  configuration?: DoubletProviderSettings
+): NetworkPresentationProvider<DoubletFrame>;
 
 /** Job execution only; this does not provide a collision search algorithm. */
 export type NetworkSolver<Result> = (
@@ -869,19 +931,19 @@ export function installSolverWorker<Result>(
   },
   solve: NetworkSolver<Result>
 ): void;
+export interface LinksGalleryEntry {
+  code: string;
+  links: [number, number][];
+  index: string;
+  size: number;
+  real: boolean;
+  theme: string | null;
+}
 export interface LinksGalleryElement extends HTMLElement {
   size: number;
   readonly count: bigint;
-  urlFor:
-    | ((input: {
-        code: string;
-        links: [number, number][];
-        index: string;
-        size: number;
-        real: boolean;
-        theme: string | null;
-      }) => string | URL)
-    | null;
+  urlFor: ((input: LinksGalleryEntry) => string | URL) | null;
+  frameFor: ((input: LinksGalleryEntry) => DoubletFrame) | null;
 }
 export const LINKS_GALLERY_TAG: 'links-gallery';
 export const GALLERY_PAGE_SIZE: 243;
@@ -912,6 +974,18 @@ export interface DoubletMarker {
   rotation: number;
   explicit: string[];
 }
+export type DoubletPalette =
+  | 'default'
+  | 'custom'
+  | 'mono'
+  | 'inherit'
+  | 'site'
+  | 'print'
+  | 'neon'
+  | 'pastel'
+  | 'warm'
+  | 'cold';
+export type DoubletLineJoin = 'miter' | 'round' | 'bevel';
 export interface DoubletOptions {
   layout:
     | 'auto'
@@ -923,6 +997,9 @@ export interface DoubletOptions {
     | 'cards'
     | 'force'
     | 'layered';
+  forceDistance: number;
+  forceCharge: number;
+  forceCollision: number;
   layoutAspect: number;
   columns: number;
   spread: number;
@@ -930,13 +1007,18 @@ export interface DoubletOptions {
   free: number;
   loop: number;
   bulge: number;
+  bendMode: 'curve' | 'rotate';
+  lens: boolean;
   loopBend: number;
   angles: 'fixed' | 'mirror';
   sourceAngle: number;
   targetAngle: number;
   tension: number;
   gaps: number[];
-  links: Record<number, { turns: number[]; gaps: (number | null)[] }>;
+  links: Record<
+    number,
+    { turns: number[]; gaps: (number | null)[]; color?: string }
+  >;
   order: number[] | null;
   frame: [number, number, number] | null;
   padding: number;
@@ -945,11 +1027,13 @@ export interface DoubletOptions {
   middle: DoubletMarker;
   strokeWidth: number;
   color: string;
+  palette: DoubletPalette;
   dash: 'solid' | 'dashed' | 'dotted' | 'dashdot' | 'long';
   linecap: 'butt' | 'round' | 'square';
+  linejoin: DoubletLineJoin;
   opacity: number;
   glow: number;
-  arrowJoin: 'miter' | 'round' | 'bevel';
+  arrowJoin: DoubletLineJoin | 'inherit';
   balanceArrows: boolean;
   background: {
     type: 'transparent' | 'solid' | 'linear' | 'radial';
@@ -968,11 +1052,14 @@ export interface DoubletOptions {
   };
   caption: {
     mode: 'none' | 'theory' | 'pairs' | 'number' | 'links' | 'custom';
+    position: 'top' | 'bottom';
+    notation: 'default' | 'L' | 'R';
     text: string;
     font: 'mono' | 'sans' | 'serif';
     size: number;
     color: string;
   };
+  title: string;
   width: number;
   height: number;
 }
@@ -994,6 +1081,7 @@ export interface DoubletCurve {
   path: [CubicSegment, CubicSegment];
 }
 export interface FittedDoubletCurve extends DoubletCurve {
+  color: string;
   visible: [CubicSegment | null, CubicSegment | null];
   gaps: number[];
   markers: DoubletMarkerPlacement[];
@@ -1020,9 +1108,26 @@ export function doubletGeometry(
   options?: string,
   index?: string
 ): DoubletFrame;
-export function createDoubletProvider(options?: {
+export interface DoubletSvgOptions {
+  width?: number;
+  height?: number;
+  title?: string;
+  foreground?: string;
+  decorative?: boolean;
+  idPrefix?: string;
+}
+export function doubletToSvg(
+  frame: DoubletFrame,
+  options?: DoubletSvgOptions
+): string;
+export interface DoubletProviderSettings {
   debug?: (message: string, data: object) => void;
-}): NetworkPresentationProvider;
+  foreground?: string;
+  idPrefix?: string;
+}
+export function createDoubletProvider(
+  options?: DoubletProviderSettings
+): NetworkPresentationProvider<DoubletFrame>;
 export function doubletOptionAvailability(
   items: DoubletInput,
   options?: string

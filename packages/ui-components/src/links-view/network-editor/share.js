@@ -1,5 +1,11 @@
 import { formatLinks } from '@link-foundation/ui-core';
 import { element, button, field } from './dom.js';
+import { editorMessage } from './messages.js';
+import {
+  networkShareTargets,
+  networkShareDestinations,
+} from './share-targets.js';
+export { networkShareTargets } from './share-targets.js';
 
 export function networkFilename(code, extension) {
   const suffix = `.${extension}`;
@@ -10,23 +16,6 @@ export function networkFilename(code, extension) {
     ) + suffix
   );
 }
-export function networkShareTargets(url, title = 'Links network') {
-  const u = encodeURIComponent(url),
-    t = encodeURIComponent(title);
-  return {
-    X: `https://twitter.com/intent/tweet?url=${u}&text=${t}`,
-    Telegram: `https://t.me/share/url?url=${u}&text=${t}`,
-    VK: `https://vk.com/share.php?url=${u}&title=${t}`,
-    Facebook: `https://www.facebook.com/sharer/sharer.php?u=${u}`,
-    LinkedIn: `https://www.linkedin.com/sharing/share-offsite/?url=${u}`,
-    Reddit: `https://www.reddit.com/submit?url=${u}&title=${t}`,
-    Bluesky: `https://bsky.app/intent/compose?text=${t}%20${u}`,
-    Mastodon: `https://mastodon.social/share?text=${t}%20${u}`,
-    WhatsApp: `https://wa.me/?text=${t}%20${u}`,
-    'e-mail': `mailto:?subject=${t}&body=${u}`,
-  };
-}
-
 /** All export actions use the presentation's captured SVG/raster backend. */
 export function createNetworkShare(
   parent,
@@ -35,15 +24,22 @@ export function createNetworkShare(
     getState,
     getUrl,
     announce,
+    message = editorMessage(),
+    fail = (error) =>
+      announce(message('error', { detail: error.message }), true),
+    share: shareOptions = {},
     window: win = parent.ownerDocument.defaultView,
   }
 ) {
   const doc = parent.ownerDocument;
   const panel = element(doc, 'fieldset', undefined, parent);
-  element(doc, 'legend', 'Share', panel);
-  const urlInput = field(doc, panel, 'Network URL');
+  element(doc, 'legend', message('share'), panel);
+  const urlInput = field(doc, panel, message('networkUrl'));
   urlInput.readOnly = true;
-  const links = targetLinks(doc, panel);
+  const destinations = shareOptions.destinations ?? networkShareDestinations;
+  const links = targetLinks(doc, panel, message, destinations);
+  const getTitle = () =>
+    shareOptions.title ?? (getState().options.title || message('shareTitle'));
   let busy = false,
     timer,
     prepared,
@@ -55,73 +51,74 @@ export function createNetworkShare(
       try {
         action();
       } catch (error) {
-        announce(error.message, true);
+        fail(error);
       }
     });
   const report = (task) =>
-    Promise.resolve(task).then(
-      () => announce('Done'),
-      (error) => announce(error.message, true)
-    );
+    Promise.resolve(task).then(() => announce(message('done')), fail);
   const raster = (type) => {
     const options = getState().options;
     return presentation.toRaster(type, {
       width: options.width,
       height: options.height,
+      quality: options.quality,
       background: options['background.color'],
     });
   };
   const exportBlob = blobFactory(presentation, getState, win, raster);
   for (const extension of ['svg', 'png', 'jpg', 'webp', 'lino']) {
     exports.push(
-      actionButton(
-        `Download ${extension === 'jpg' ? 'JPEG' : extension.toUpperCase()}`,
-        () => {
-          const code = getState().code;
-          report(
-            exportBlob(extension).then((blob) => {
-              const url = win.URL.createObjectURL(blob);
-              const anchor = element(doc, 'a', undefined, panel);
-              anchor.href = url;
-              anchor.download = networkFilename(code, extension);
-              anchor.click();
-              anchor.remove();
-              win.setTimeout(() => win.URL.revokeObjectURL(url), 0);
-            })
-          );
-        }
-      )
+      actionButton(message(`download.${extension}`), () => {
+        const code = getState().code;
+        report(
+          exportBlob(extension).then((blob) => {
+            const url = win.URL.createObjectURL(blob);
+            const anchor = element(doc, 'a', undefined, panel);
+            anchor.href = url;
+            anchor.download = networkFilename(code, extension);
+            anchor.click();
+            anchor.remove();
+            win.setTimeout(() => win.URL.revokeObjectURL(url), 0);
+          })
+        );
+      })
     );
   }
   exports.push(
-    actionButton('Copy link', () =>
+    actionButton(message('copyLink'), () =>
       report(win.navigator.clipboard.writeText(getUrl()))
     )
   );
   exports.push(
-    actionButton('Copy SVG', () =>
+    actionButton(message('copySvg'), () =>
       report(win.navigator.clipboard.writeText(presentation.toSvg()))
     )
   );
-  const copyImage = actionButton('Copy image', () => {
+  const copyImage = actionButton(message('copyImage'), () => {
     // Construct the ClipboardItem in this click's synchronous activation stack.
     try {
       const item = new win.ClipboardItem({ 'image/png': raster('image/png') });
       report(win.navigator.clipboard.write([item]));
     } catch (error) {
-      announce(error.message, true);
+      fail(error);
     }
   });
   exports.push(copyImage);
-  const share = actionButton('Share', () =>
-    webShare(win, prepared, getUrl(), report, announce)
+  const share = actionButton(message('share'), () =>
+    report(webShare(win, prepared, getUrl(), getTitle(), message))
   );
   exports.push(share);
   function refresh() {
     const url = getUrl();
     urlInput.value = url;
-    for (const [name, href] of Object.entries(networkShareTargets(url))) {
-      links[name].href = href;
+    try {
+      const targets = networkShareTargets(url, getTitle(), shareOptions);
+      for (const [name, href] of Object.entries(targets)) {
+        links[name].href = href;
+      }
+    } catch {
+      Object.values(links).forEach((link) => link.removeAttribute('href'));
+      fail(new Error(message('invalidMastodonInstance')));
     }
     prepared = undefined;
     const job = ++generation;
@@ -142,7 +139,7 @@ export function createNetworkShare(
         })
         .catch((error) => {
           if (job === generation) {
-            announce(error.message, true);
+            fail(error);
           }
         });
     }, 200);
@@ -189,12 +186,17 @@ function blobFactory(presentation, getState, win, raster) {
   };
 }
 
-function targetLinks(doc, panel) {
+function targetLinks(doc, panel, message, destinations) {
   const targets = element(doc, 'nav', undefined, panel);
-  targets.setAttribute('aria-label', 'Share targets');
+  targets.setAttribute('aria-label', message('shareTargets'));
   return Object.fromEntries(
-    Object.keys(networkShareTargets('')).map((name) => {
-      const node = element(doc, 'a', name, targets);
+    Object.entries(destinations).map(([name, { label }]) => {
+      const node = element(
+        doc,
+        'a',
+        message(`target.${name}`, {}, label),
+        targets
+      );
       node.target = '_blank';
       node.rel = 'noopener noreferrer';
       return [name, node];
@@ -202,31 +204,23 @@ function targetLinks(doc, panel) {
   );
 }
 
-function webShare(win, prepared, url, report, announce) {
-  const payload =
-    prepared && win.navigator.canShare?.({ files: [prepared] })
-      ? { files: [prepared], title: 'Links network', url }
-      : { title: 'Links network', url };
+function webShare(win, prepared, url, title, message) {
+  const payload = { title, url };
   if (!win.navigator.share) {
-    report(
+    return (
       win.navigator.clipboard?.writeText(url) ??
-        Promise.reject(new Error('Sharing unavailable'))
+      Promise.reject(new Error(message('sharingUnavailable')))
     );
-    return;
   }
-  try {
-    report(
-      win.navigator.share(payload).catch((error) => {
-        if (payload.files && error.name !== 'AbortError') {
-          return win.navigator.share({
-            title: 'Links network',
-            url,
-          });
-        }
-        throw error;
-      })
-    );
-  } catch (error) {
-    announce(error.message, true);
+  if (!prepared || !win.navigator.canShare?.({ files: [prepared] })) {
+    return win.navigator.share(payload);
   }
+  return win.navigator
+    .share({ ...payload, files: [prepared] })
+    .catch((error) => {
+      if (error.name !== 'AbortError') {
+        return win.navigator.share(payload);
+      }
+      throw error;
+    });
 }

@@ -62,3 +62,58 @@ it('all colour fields retain a pinned frame while geometric caption changes clea
   }
   assert.equal(editOptions(options, { 'caption.size': 8 }).frame, null);
 });
+
+it('reads flat bookmarks with marker options, sparse turns and inherited gaps', () => {
+  const options = fromParams(
+    new globalThis.URLSearchParams({
+      placement: 'square',
+      linejoin: 'bevel',
+      end: 'dot',
+      endSize: '4',
+      colors: '#123456,#fedcba',
+      turns: ',30 -25',
+      gaps: '0.2 ~ 5,',
+      background: 'linear',
+      bgAngle: '270',
+      card: '1',
+      border: '2',
+      caption: 'custom',
+      captionText: 'Hello',
+      width: '1200',
+      height: '630',
+      quality: '0.7',
+      'end.size': '6',
+    })
+  );
+  assert.equal(options.layout, 'grid');
+  assert.equal(options.linejoin, 'bevel');
+  assert.equal(options['end.shape'], 'dot');
+  assert.equal(options['end.size'], 6);
+  assert.deepEqual(options.linkColors, ['#123456', '#fedcba']);
+  assert.deepEqual(options.turns, [
+    [0, 0],
+    [30, -25],
+  ]);
+  assert.deepEqual(options.linkGaps[0], [0.2, null, 5, null]);
+  assert.equal(options['background.angle'], -90);
+  assert.equal(options['card.width'], 2);
+  assert.equal(options['caption.text'], 'Hello');
+  assert.equal(options.quality, 0.7);
+  assert.deepEqual(fromParams(toParams(options)), options);
+});
+
+it('lets hosts select legacy defaults for bookmarks with only shared keys', () => {
+  const params = 'width=1200';
+  const legacy = fromParams(params, { legacy: true });
+  assert.equal(legacy.width, 1200);
+  assert.equal(legacy.height, 2048);
+  assert.equal(legacy['background.color'], '#000000');
+  assert.equal(fromParams(params).height, normalize({}).height);
+  assert.equal(fromParams('rotation=270').rotation, -90);
+  const turns = fromParams('turns=,30+-25');
+  assert.equal(turns.height, 2048);
+  assert.deepEqual(turns.turns, [
+    [0, 0],
+    [30, -25],
+  ]);
+});

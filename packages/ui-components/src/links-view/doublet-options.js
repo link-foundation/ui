@@ -1,3 +1,4 @@
+import { doubletPalettes } from './doublet-colors.js';
 import { parseNested } from '@link-foundation/ui-core';
 
 export const DOUBLET_MARKERS = Object.freeze([
@@ -25,6 +26,9 @@ function defaults() {
   });
   return {
     layout: 'auto',
+    forceDistance: 1,
+    forceCharge: 0.6,
+    forceCollision: 0,
     layoutAspect: 1,
     columns: 0,
     spread: 1,
@@ -32,6 +36,8 @@ function defaults() {
     free: 1,
     loop: 1,
     bulge: 0,
+    bendMode: 'curve',
+    lens: true,
     loopBend: 0,
     angles: 'fixed',
     sourceAngle: 30,
@@ -47,8 +53,10 @@ function defaults() {
     middle: marker('dot', 2),
     strokeWidth: 1,
     color: '#202b3d',
+    palette: 'default',
     dash: 'solid',
     linecap: 'round',
+    linejoin: 'miter',
     opacity: 1,
     glow: 0,
     arrowJoin: 'miter',
@@ -70,17 +78,23 @@ function defaults() {
     },
     caption: {
       mode: 'none',
+      position: 'bottom',
+      notation: 'default',
       text: '',
       font: 'mono',
       size: 5,
       color: '#202b3d',
     },
+    title: '',
     width: 640,
     height: 640,
   };
 }
 
 const RANGES = Object.freeze({
+  forceDistance: Object.freeze([0.2, 3]),
+  forceCharge: Object.freeze([0, 3]),
+  forceCollision: Object.freeze([0, 3]),
   layoutAspect: Object.freeze([0.3, 3]),
   columns: Object.freeze([0, 30]),
   spread: Object.freeze([0, 100]),
@@ -104,7 +118,10 @@ const ENUMS = Object.freeze({
   angles: 'fixed mirror',
   dash: 'solid dashed dotted dashdot long',
   linecap: 'butt round square',
-  arrowJoin: 'miter round bevel',
+  linejoin: 'miter round bevel',
+  arrowJoin: 'miter round bevel inherit',
+  palette: doubletPalettes,
+  bendMode: 'curve rotate',
 });
 function numeric(value, range, name) {
   const n =
@@ -119,7 +136,8 @@ function numeric(value, range, name) {
   return n;
 }
 function choice(value, choices, name) {
-  if (!choices.split(' ').includes(value)) {
+  const allowed = typeof choices === 'string' ? choices.split(' ') : choices;
+  if (!allowed.includes(value)) {
     throw new RangeError(`Unknown ${name}: ${value}`);
   }
   return value;
@@ -191,6 +209,8 @@ function styleGroup(target, values, group) {
       border: 'solid dashed dotted double none',
       mode: 'none theory pairs number links custom',
       font: 'mono sans serif',
+      position: 'top bottom',
+      notation: 'default L R',
     };
     const ranges = {
       opacity: [0, 1],
@@ -229,6 +249,8 @@ function linkOptions(values, config, count) {
       if (!entry.turns.every(Number.isInteger)) {
         throw new RangeError('Turns must be integer degrees');
       }
+    } else if (name === 'color') {
+      entry.color = scalar(list);
     } else if (name === 'gaps') {
       entry.gaps = vector(
         list,
@@ -298,10 +320,10 @@ function specialOption(config, name, values, count) {
     markerOptions(config[name], values);
   } else if (['background', 'card', 'caption'].includes(name)) {
     styleGroup(config[name], values, name);
-  } else if (name === 'balanceArrows') {
+  } else if (['balanceArrows', 'lens'].includes(name)) {
     config[name] = choice(scalar(values), 'true false', name) === 'true';
-  } else if (name === 'color') {
-    config.color = scalar(values);
+  } else if (['color', 'title'].includes(name)) {
+    config[name] = scalar(values);
   } else {
     throw new TypeError(`Unknown doublet option: ${name}`);
   }

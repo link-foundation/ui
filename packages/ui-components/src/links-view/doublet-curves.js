@@ -29,7 +29,8 @@ function direction(pair, id, positions, o) {
   if (incoming || outgoing) {
     return rotate(incoming ?? outgoing, o.bulge);
   }
-  return unit(m, rotate({ x: 1, y: 0 }, o.rotation));
+  const outward = unit(m, rotate({ x: 1, y: 0 }, o.rotation));
+  return o.bendMode === 'rotate' ? rotate(outward, o.bulge) : outward;
 }
 function endDirection(chord, tangent, o, side, same, turn) {
   const a = (Math.atan2(chord.y, chord.x) * 180) / Math.PI;
@@ -37,16 +38,17 @@ function endDirection(chord, tangent, o, side, same, turn) {
   // The mirror end (a lens for two references to one link), in degrees from
   // the chord. Fixed angles turn the chord to the same side as this mirror.
   const offset = a - mid;
-  const mirror = same
-    ? Math.sin((offset * Math.PI) / 180) < 0
-      ? -45
-      : 45
-    : offset;
+  const mirror =
+    same && o.lens
+      ? Math.sin((offset * Math.PI) / 180) < 0
+        ? -45
+        : 45
+      : offset;
   if (o.angles === 'mirror') {
     return rotate(chord, mirror + turn);
   }
   const across = chord.x * tangent.y - chord.y * tangent.x;
-  if (Math.abs(across) < 1e-10) {
+  if (o.bendMode === 'curve' && Math.abs(across) < 1e-10) {
     return rotate(chord, turn);
   }
   const toward = Math.sin((mirror * Math.PI) / 180) < 0 ? -1 : 1;
@@ -59,7 +61,8 @@ function half({ m, dir, ref, id, side, pair, positions, o, turn, n }) {
   const sign = side === 0 ? -1 : 1;
   if (ref === id) {
     const radius = (n === 1 ? 1.25 : 0.8) * o.loop;
-    const width = Math.exp((o.bulge + o.loopBend) / 180);
+    const width =
+      o.bendMode === 'curve' ? Math.exp((o.bulge + o.loopBend) / 180) : 1;
     const along = scale(dir, radius),
       sideways = scale(rotate(dir, 90), radius * width);
     return side === 0

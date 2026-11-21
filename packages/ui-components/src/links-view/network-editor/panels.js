@@ -9,11 +9,12 @@ import { networkLooks, networkSizePresets } from './presets.js';
 import { parseNested, formatLinks } from '@link-foundation/ui-core';
 import { formatLinks as formatConfigurationLinks } from '../configuration-notations.js';
 import { element, button, field, choices } from './dom.js';
+import { doubletColor } from '../doublet-colors.js';
 
 export function notationPanel(parent, context) {
-  const { doc, config, applyLinks, getState, run } = context;
+  const { doc, config, applyLinks, getState, run, message } = context;
   const panel = element(doc, 'fieldset', undefined, parent);
-  element(doc, 'legend', 'Notations', panel);
+  element(doc, 'legend', message('notations'), panel);
   const summary = element(doc, 'p', undefined, panel);
   const inputs = new Map();
   const definitions = [
@@ -32,7 +33,7 @@ export function notationPanel(parent, context) {
     ],
   ];
   for (const [name, parse, format] of definitions) {
-    const input = field(doc, panel, name);
+    const input = field(doc, panel, message(`notation.${name}`));
     input.autocomplete = 'off';
     input.spellcheck = false;
     const error = element(doc, 'span', undefined, input.parentNode);
@@ -44,9 +45,11 @@ export function notationPanel(parent, context) {
       const result = parse(input.value);
       if (result.error) {
         input.setAttribute('aria-invalid', 'true');
-        error.textContent =
-          config.configurationMessages?.[context.locale]?.[result.error] ??
-          result.error;
+        error.textContent = message(
+          `notationError.${result.error}`,
+          {},
+          config.configurationMessages?.[context.locale]?.[result.error]
+        );
       } else {
         input.removeAttribute('aria-invalid');
         error.textContent = '';
@@ -70,15 +73,22 @@ export function notationPanel(parent, context) {
         record.input.removeAttribute('aria-invalid');
         record.error.textContent = '';
       }
-      summary.textContent = `n = ${state.links.length} · base ${state.links.length + 1} · ${2 * state.links.length} digits · one of ${config.count(state.links.length)} networks`;
+      const count = state.links.length;
+      summary.textContent = message('notationSummary', {
+        count,
+        base: count + 1,
+        digits: 2 * count,
+        networks: config.count(count),
+      });
     },
   };
 }
 
 export function linksPanel(parent, context) {
-  const { doc, config, getState, applyLinks, changeOptions, run } = context;
+  const { doc, config, getState, applyLinks, changeOptions, run, message } =
+    context;
   const panel = element(doc, 'fieldset', undefined, parent);
-  element(doc, 'legend', 'Links', panel);
+  element(doc, 'legend', message('links'), panel);
   const canonical = linkActions(panel, context);
   const cards = element(doc, 'div', undefined, panel);
   let count = -1;
@@ -90,12 +100,12 @@ export function linksPanel(parent, context) {
     count = state.links.length;
     for (let i = 0; i < count; i++) {
       const card = element(doc, 'fieldset', undefined, cards);
-      element(doc, 'legend', `Link ${i + 1}`, card);
+      element(doc, 'legend', message('link', { index: i + 1 }), card);
       const reference = ['source', 'target'].map((end, e) => {
         const input = field(
           doc,
           card,
-          `${end} ${i + 1}`,
+          message(`reference.${end}`, { index: i + 1 }),
           count > 50 ? 'number' : 'select'
         );
         if (count <= 50) {
@@ -104,7 +114,11 @@ export function linksPanel(parent, context) {
             input,
             Array.from({ length: count + 1 }, (_, k) => [
               String(k),
-              k === 0 ? '0 — nothing' : k === i + 1 ? `${k} — self` : String(k),
+              k === 0
+                ? message('nothing')
+                : k === i + 1
+                  ? message('self', { index: k })
+                  : String(k),
             ])
           );
         } else {
@@ -126,7 +140,12 @@ export function linksPanel(parent, context) {
         );
         return input;
       });
-      const color = field(doc, card, `colour ${i + 1}`, 'color');
+      const color = field(
+        doc,
+        card,
+        message('linkColor', { index: i + 1 }),
+        'color'
+      );
       color.addEventListener('input', () =>
         run(() => {
           const values = [...getState().options.linkColors];
@@ -134,11 +153,16 @@ export function linksPanel(parent, context) {
             values.push(null);
           }
           values[i] = color.value;
-          return changeOptions({ linkColors: values, palette: 'custom' });
+          return changeOptions({ linkColors: values });
         })
       );
       const turns = ['start', 'end'].map((end, e) => {
-        const input = field(doc, card, `${end} turn ${i + 1}`, 'number');
+        const input = field(
+          doc,
+          card,
+          message(`turn.${end}`, { index: i + 1 }),
+          'number'
+        );
         input.min = '-180';
         input.max = '180';
         input.step = '1';
@@ -152,35 +176,17 @@ export function linksPanel(parent, context) {
         input.addEventListener('input', () =>
           run(() => change(Number(input.value)))
         );
-        button(doc, card, `Reset ${end} turn ${i + 1}`, () =>
+        button(doc, card, message(`resetTurn.${end}`, { index: i + 1 }), () =>
           run(() => change(0))
         );
         return input;
       });
-      const gaps = [
-        'start gap',
-        'end gap',
-        'cut before middle',
-        'cut after middle',
-      ].map((name, g) => {
-        const input = field(doc, card, `${name} ${i + 1}`, 'number');
-        input.min = '0';
-        input.max = g < 2 ? '1' : '30';
-        input.step = '0.01';
-        input.placeholder = 'inherit';
-        input.addEventListener('input', () =>
-          run(() => {
-            const values = getState().links.map((_, k) => [
-              ...(getState().options.linkGaps[k] ?? [null, null, null, null]),
-            ]);
-            values[i][g] = input.value === '' ? null : Number(input.value);
-            return changeOptions({ linkGaps: values });
-          })
-        );
-        return input;
-      });
-      const remove = button(doc, card, `Remove link ${i + 1}`, () =>
-        run(() => context.removeLink(i + 1))
+      const gaps = linkGapFields(card, i, context);
+      const remove = button(
+        doc,
+        card,
+        message('removeLink', { index: i + 1 }),
+        () => run(() => context.removeLink(i + 1))
       );
       remove.disabled = count === 1;
       controls.push({ reference, color, turns, gaps });
@@ -203,7 +209,12 @@ export function linksPanel(parent, context) {
           }
         };
         record.reference.forEach((input, e) => set(input, state.links[i][e]));
-        set(record.color, state.options.linkColors[i] ?? state.options.color);
+        const color = doubletColor(
+          state.options,
+          i + 1,
+          state.options.linkColors[i]
+        );
+        set(record.color, swatch(color));
         record.turns.forEach((input, e) =>
           set(input, state.options.turns[i]?.[e] ?? 0)
         );
@@ -215,17 +226,42 @@ export function linksPanel(parent, context) {
   };
 }
 
+function linkGapFields(card, index, context) {
+  const { doc, getState, changeOptions, run, message } = context;
+  return ['startGap', 'endGap', 'middleBefore', 'middleAfter'].map(
+    (name, g) => {
+      const input = field(
+        doc,
+        card,
+        message(name, { index: index + 1 }),
+        'number'
+      );
+      input.min = '0';
+      input.max = g < 2 ? '1' : '30';
+      input.step = '0.01';
+      input.placeholder = message('inherit');
+      input.addEventListener('input', () =>
+        run(() => {
+          const values = getState().links.map((_, k) => [
+            ...(getState().options.linkGaps[k] ?? [null, null, null, null]),
+          ]);
+          values[index][g] = input.value === '' ? null : Number(input.value);
+          return changeOptions({ linkGaps: values });
+        })
+      );
+      return input;
+    }
+  );
+}
+
 export function stylePanel(parent, context) {
-  const { doc, getState, changeOptions, applyStyle, run } = context;
+  const { doc, getState, changeOptions, applyStyle, run, message } = context;
   const panel = element(doc, 'fieldset', undefined, parent);
-  element(doc, 'legend', 'Style', panel);
-  const looks = field(doc, panel, 'Look', 'select');
+  element(doc, 'legend', message('styles'), panel);
+  const looks = field(doc, panel, message('look'), 'select');
   choices(doc, looks, [
-    ['', 'Choose a look'],
-    ...Object.keys(networkLooks).map((key) => [
-      key,
-      key === 'social' ? 'social 1200×630' : key,
-    ]),
+    ['', message('chooseLook')],
+    ...Object.keys(networkLooks).map((key) => [key, message(`look.${key}`)]),
   ]);
   looks.addEventListener('change', () => {
     if (looks.value) {
@@ -233,10 +269,13 @@ export function stylePanel(parent, context) {
       looks.value = '';
     }
   });
-  const sizes = field(doc, panel, 'Size', 'select');
+  const sizes = field(doc, panel, message('size'), 'select');
   choices(doc, sizes, [
-    ['', 'Choose a size'],
-    ...networkSizePresets.map(([w, h]) => [`${w}x${h}`, `${w}×${h}`]),
+    ['', message('chooseSize')],
+    ...networkSizePresets.map(([w, h]) => [
+      `${w}x${h}`,
+      message('sizePreset', { width: w, height: h }),
+    ]),
   ]);
   sizes.addEventListener('change', () => {
     if (sizes.value) {
@@ -250,8 +289,9 @@ export function stylePanel(parent, context) {
   for (const definition of networkOptionSchema) {
     if (!sections.has(definition.section)) {
       const group = element(doc, 'fieldset', undefined, panel);
-      element(doc, 'legend', definition.section, group);
-      const reset = button(doc, group, `Reset ${definition.section}`, () => {
+      const section = message(`section.${definition.section}`);
+      element(doc, 'legend', section, group);
+      const reset = button(doc, group, message('reset', { section }), () => {
         const defaults = normalize({});
         run(() =>
           changeOptions(
@@ -273,12 +313,15 @@ export function stylePanel(parent, context) {
       color: 'color',
       text: 'text',
     }[definition.type];
-    const input = field(doc, group, definition.key, type);
+    const input = field(doc, group, message(`option.${definition.key}`), type);
     if (definition.choices) {
       choices(
         doc,
         input,
-        definition.choices.map((v) => [v, v])
+        definition.choices.map((v) => [
+          v,
+          message(`choice.${definition.key}.${v}`),
+        ])
       );
     }
     if (type === 'range') {
@@ -315,7 +358,8 @@ export function stylePanel(parent, context) {
         if (f.type === 'boolean') {
           input.checked = options[f.key];
         } else {
-          input.value = options[f.key];
+          input.value =
+            f.type === 'color' ? swatch(options[f.key]) : options[f.key];
         }
         if (output) {
           output.textContent = String(options[f.key]);
@@ -332,10 +376,10 @@ export function stylePanel(parent, context) {
 }
 
 function savedStyles(parent, context) {
-  const { doc, win, run, getState, applyStyle, announce } = context;
-  const name = field(doc, parent, 'Style name');
+  const { doc, win, run, getState, applyStyle, announce, message } = context;
+  const name = field(doc, parent, message('styleName'));
   name.maxLength = 80;
-  const select = field(doc, parent, 'Saved styles', 'select');
+  const select = field(doc, parent, message('savedStyles'), 'select');
   const storageKey = 'links-network-editor-styles';
   function read() {
     const text = win.localStorage.getItem(storageKey) ?? '';
@@ -353,11 +397,11 @@ function savedStyles(parent, context) {
       [...read()].map(([key]) => [key, key])
     );
   }
-  button(doc, parent, 'Save style', () =>
+  button(doc, parent, message('saveStyle'), () =>
     run(() => {
       const key = name.value.trim();
       if (!key) {
-        throw new Error('Enter a style name');
+        throw new Error(message('enterStyleName'));
       }
       const styles = read();
       styles.set(key, toOptions(getState().options));
@@ -366,10 +410,10 @@ function savedStyles(parent, context) {
         formatLinks([...styles].map(([id, text]) => ({ id, values: [text] })))
       );
       refresh();
-      announce('Style saved');
+      announce(message('styleSaved'));
     })
   );
-  button(doc, parent, 'Load style', () =>
+  button(doc, parent, message('loadStyle'), () =>
     run(() => {
       const text = read().get(select.value);
       if (text !== undefined) {
@@ -380,27 +424,27 @@ function savedStyles(parent, context) {
   try {
     refresh();
   } catch (error) {
-    announce(error.message, true);
+    context.fail(error);
   }
   return { dispose() {} };
 }
 
 function linkActions(panel, context) {
-  const { doc, config, getState, applyLinks, run } = context;
+  const { doc, config, getState, applyLinks, run, message } = context;
   const toolbar = element(doc, 'div', undefined, panel);
-  button(doc, toolbar, 'Add link', () =>
+  button(doc, toolbar, message('addLink'), () =>
     run(() => applyLinks(config.addLink(getState().links)))
   );
   for (const [label, direction] of [
-    ['Previous', -1],
-    ['Next', 1],
+    ['previous', -1],
+    ['next', 1],
   ]) {
-    button(doc, toolbar, label, () =>
+    button(doc, toolbar, message(label), () =>
       run(() => applyLinks(config.step(getState().links, direction)))
     );
   }
   for (const real of [false, true]) {
-    button(doc, toolbar, real ? 'Random real links' : 'Random', () =>
+    button(doc, toolbar, message(real ? 'randomReal' : 'random'), () =>
       run(() =>
         applyLinks(
           config.decode(config.randomCode(getState().links.length, { real }))
@@ -408,7 +452,11 @@ function linkActions(panel, context) {
       )
     );
   }
-  return button(doc, toolbar, 'Canonical renaming', () =>
+  return button(doc, toolbar, message('canonicalize'), () =>
     run(() => context.canonicalize())
   );
+}
+
+function swatch(color) {
+  return color === 'currentColor' ? '#000000' : color;
 }

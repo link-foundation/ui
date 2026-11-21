@@ -1,8 +1,13 @@
+import { doubletPalettes } from '../doublet-colors.js';
 import { parseNested } from '@link-foundation/ui-core';
 
 /** Canonical editor schema: key type default min max step section availability. */
+const paletteChoices = Object.freeze(doubletPalettes.join(' '));
 export const networkSchemaLino = `
 layout choice auto 'auto circle grid hex spiral dice cards force layered' layout always
+forceDistance number 1 0.2 3 0.05 layout force
+forceCharge number 0.6 0 3 0.05 layout force
+forceCollision number 0 0 3 0.05 layout force
 layoutAspect number 1 0.3 3 0.1 layout always
 columns number 0 0 30 1 layout grid
 spread number 1 0 100 0.1 layout always
@@ -10,7 +15,9 @@ rotation number 0 -180 180 1 layout always
 free number 1 0 10 0.1 geometry free
 loop number 1 0 10 0.1 geometry loop
 bulge number 0 -180 180 1 geometry always
-loopBend number 0 -180 180 1 geometry loop
+loopBend number 0 -180 180 1 geometry loopCurve
+bendMode choice curve 'curve rotate' geometry always
+lens boolean true geometry lens
 angles choice fixed 'fixed mirror' geometry referenced
 sourceAngle number 30 -180 180 1 geometry fixed
 targetAngle number 30 -180 180 1 geometry fixed
@@ -22,12 +29,13 @@ middleAfter number 0 0 30 0.1 gaps always
 padding number 9 0 48 1 geometry always
 strokeWidth number 1 0.5 10 0.1 line always
 color color '#202b3d' line always
-palette choice default 'default custom' palette always
+palette choice default '${paletteChoices}' palette always
 dash choice solid 'solid dashed dotted dashdot long' line always
 linecap choice round 'butt round square' line always
+linejoin choice miter 'miter round bevel' line always
 opacity number 1 0.1 1 0.01 line always
 glow number 0 0 12 0.1 line always
-arrowJoin choice miter 'miter round bevel' line arrow
+arrowJoin choice miter 'miter round bevel inherit' line arrow
 balanceArrows boolean true line arrow
 background.type choice transparent 'transparent solid linear radial' background always
 background.color color '#ffffff' background background
@@ -41,12 +49,16 @@ card.width number 1 0.1 6 0.1 card border
 card.radius number 0 0 50 1 card card
 card.inset number 0 0 30 1 card card
 caption.mode choice none 'none theory pairs number links custom' caption always
-caption.text text '' caption customCaption
+caption.position choice bottom 'top bottom' caption caption
+caption.notation choice default 'default L R' caption theory
+caption.text text ~ caption customCaption
 caption.font choice mono 'mono sans serif' caption caption
 caption.size number 5 3 14 0.1 caption caption
 caption.color color '#202b3d' caption caption
+title text ~ size always
 width number 640 64 4096 1 size always
 height number 640 64 4096 1 size always
+quality number 0.92 0.5 1 0.01 size always
 clearance number 1 0 10 0.1 solver always
 solveRange number 180 0 180 1 solver always
 solveStep number 1 1 30 1 solver always
@@ -55,6 +67,7 @@ solveGapRange number 0.2 0 1 0.01 solver solveGaps
 solveMiddleRange number 0 0 15 0.1 solver solveGaps
 passes number 3 1 10 1 solver always
 debug boolean false solver always
+solve boolean false solver never
 `;
 
 function readField(link) {
@@ -71,7 +84,9 @@ function readField(link) {
         ? Number(initial)
         : type === 'boolean'
           ? initial === 'true'
-          : initial,
+          : type === 'text' && initial === '~'
+            ? ''
+            : initial,
     ...(type === 'number'
       ? { min: Number(rest[0]), max: Number(rest[1]), step: Number(rest[2]) }
       : {}),
@@ -143,9 +158,18 @@ export function optionAvailable(field, links, options) {
     always: true,
     free: links.some((pair) => pair.includes(0)),
     loop: self,
+    loopCurve: self && options.bendMode === 'curve',
     referenced,
     fixed: referenced && options.angles === 'fixed',
-    grid: ['grid', 'cards'].includes(options.layout),
+    grid:
+      ['grid', 'hex', 'dice'].includes(options.layout) ||
+      (options.layout === 'auto' && links.length > 4),
+    force: options.layout === 'force' && links.length > 1,
+    lens:
+      options.angles === 'mirror' &&
+      links.some(
+        ([source, target], i) => source && source === target && source !== i + 1
+      ),
     circle: options.layout === 'circle',
     background: options['background.type'] !== 'transparent',
     gradient: ['linear', 'radial'].includes(options['background.type']),
@@ -153,6 +177,7 @@ export function optionAvailable(field, links, options) {
     card: options['card.opacity'] > 0 || options['card.border'] !== 'none',
     border: options['card.border'] !== 'none',
     caption: options['caption.mode'] !== 'none',
+    theory: options['caption.mode'] === 'theory',
     customCaption: options['caption.mode'] === 'custom',
     solveGaps: options.solveGaps,
     arrow: ['start', 'end', 'middle'].some((part) =>

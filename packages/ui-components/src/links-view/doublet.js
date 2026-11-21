@@ -8,12 +8,15 @@ import {
   compensatedMarker,
   markerTipExtension,
 } from './doublet-markers.js';
+import { doubletColor } from './doublet-colors.js';
 import { doubletToSvg, doubletCaption } from './doublet-svg.js';
 
-function fit(curves, o, pairs) {
+function fit(curves, o, pairs, index) {
   const width = 100 * Math.max(1, o.width / o.height),
     height = 100 * Math.max(1, o.height / o.width);
-  const caption = doubletCaption(pairs, o, '0') ? o.caption.size * 1.8 + 2 : 0;
+  const caption = doubletCaption(pairs, o, index)
+    ? o.caption.size * 1.8 + 2
+    : 0;
   const margin = Math.min(
     48,
     Math.max(
@@ -47,7 +50,8 @@ function fit(curves, o, pairs) {
   const transform = o.frame ?? [
     k,
     width / 2 - ((box.minX + box.maxX) * k) / 2,
-    (height - caption) / 2 - ((box.minY + box.maxY) * k) / 2,
+    (height + (o.caption.position === 'top' ? caption : -caption)) / 2 -
+      ((box.minY + box.maxY) * k) / 2,
   ];
   return {
     bounds: { x: 0, y: 0, width, height },
@@ -101,6 +105,7 @@ function fittedCurve(curve, transform, o) {
   ];
   return {
     ...curve,
+    color: doubletColor(o, curve.id, o.links[curve.id]?.color),
     middle: point(curve.middle),
     path,
     visible,
@@ -116,7 +121,7 @@ export function doubletGeometry(items, options = '', index = '0') {
     o = readDoubletOptions(options, pairs.length);
   const places = doubletPlaces(pairs, o),
     layoutCurves = doubletCurves(pairs, places, o);
-  const fitted = fit(layoutCurves, o, pairs);
+  const fitted = fit(layoutCurves, o, pairs, index);
   const [k, x, y] = fitted.transform;
   return {
     ...fitted,
@@ -134,7 +139,7 @@ export function doubletGeometry(items, options = '', index = '0') {
 }
 
 /** Built-in provider for createNetworkPresentation and <links-network>. */
-export function createDoubletProvider({ debug } = {}) {
+export function createDoubletProvider({ debug, foreground, idPrefix } = {}) {
   return {
     geometry({ input }) {
       const frame = doubletGeometry(input.items, input.options, input.index);
@@ -149,7 +154,7 @@ export function createDoubletProvider({ debug } = {}) {
       if (!frame?.curves) {
         throw new TypeError('A prepared doublet frame is required');
       }
-      return doubletToSvg(frame);
+      return doubletToSvg(frame, { foreground, idPrefix });
     },
   };
 }
@@ -165,16 +170,24 @@ export function doubletOptionAvailability(items, options = '') {
   );
   const reference = referenceCounts.some((count) => count > 0);
   const singleReference = referenceCounts.includes(1);
+  const fixedAngles = reference && o.angles === 'fixed';
+  const forceMultiple = o.layout === 'force' && pairs.length > 1;
   const result = {
     ...Object.fromEntries(Object.keys(o).map((key) => [key, true])),
     loop,
-    loopBend: loop,
+    loopBend: loop && o.bendMode === 'curve',
+    lens:
+      o.angles === 'mirror' &&
+      pairs.some(([s, t], i) => s && s === t && s !== i + 1),
+    forceCharge: forceMultiple,
+    forceDistance: o.layout === 'force' && reference,
+    forceCollision: forceMultiple,
     free,
     bulge: loop || singleReference,
     tension: reference || free,
     angles: reference,
-    sourceAngle: reference && o.angles === 'fixed',
-    targetAngle: reference && o.angles === 'fixed',
+    sourceAngle: fixedAngles,
+    targetAngle: fixedAngles,
     turns: pairs.length > 0,
     order:
       pairs.length > 1 &&
@@ -207,6 +220,8 @@ export function doubletOptionAvailability(items, options = '') {
     'background.color': o.background.type !== 'transparent',
     'background.color2': ['linear', 'radial'].includes(o.background.type),
     'caption.text': o.caption.mode === 'custom',
+    'caption.position': o.caption.mode !== 'none',
+    'caption.notation': o.caption.mode === 'theory',
     'caption.font': o.caption.mode !== 'none',
     'caption.size': o.caption.mode !== 'none',
     'caption.color': o.caption.mode !== 'none',
@@ -228,3 +243,4 @@ function markerAvailability(key, marker, hasLinks) {
   };
 }
 export { DOUBLET_MARKERS, readDoubletOptions } from './doublet-options.js';
+export { doubletToSvg } from './doublet-svg.js';
