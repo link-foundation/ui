@@ -15,7 +15,7 @@ test('notations edit the presentation, invalid bases preserve preview, and contr
   page,
 }) => {
   await open(page);
-  await page.getByLabel('number', { exact: true }).fill('0120₃');
+  await page.getByLabel('number', { exact: true }).fill('0120');
   await ready(page);
   await expect(page.getByLabel('pairs', { exact: true })).toHaveValue('01 20');
   await expect(page.getByLabel('theory', { exact: true })).toHaveValue(
@@ -33,6 +33,22 @@ test('notations edit the presentation, invalid bases preserve preview, and contr
   );
   await expect(page.locator('#editor-number-error')).toContainText('base');
   expect(await page.locator('#preview').innerHTML()).toBe(before);
+
+  const links = page.getByLabel('links', { exact: true });
+  await links.fill('(1: 1, 1) (2: 2,0)');
+  await ready(page);
+  await expect(page.getByLabel('pairs', { exact: true })).toHaveValue('11 20');
+  const edited = await page.locator('#preview').innerHTML();
+  await links.fill('((1: 0 1))');
+  await ready(page);
+  await expect(links).toHaveAttribute('aria-invalid', 'true');
+  expect(await page.locator('#preview').innerHTML()).toBe(edited);
+
+  await page
+    .getByLabel('theory', { exact: true })
+    .fill('N² = {1 ↦ (0, 1), 2 ↦ (2, 0)}');
+  await ready(page);
+  await expect(links).toHaveValue('(1: 0 1) (2: 2 0)');
   await page.getByLabel('number', { exact: true }).fill('0120₃');
   await ready(page);
   await expectAccessible(page);
