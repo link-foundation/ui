@@ -187,7 +187,7 @@ export function parameterAtDistance(s, length) {
   }
   return t;
 }
-function split(s, t) {
+export function splitCubic(s, t) {
   const a = lerp(s.p0, s.c1, t),
     b = lerp(s.c1, s.c2, t),
     c = lerp(s.c2, s.p3, t);
@@ -209,7 +209,7 @@ export function trimCubic(s, start, end) {
   }
   const t0 = parameterAtDistance(s, start),
     t1 = parameterAtDistance(s, length - end);
-  return split(split(s, t1)[0], t0 / t1)[1];
+  return splitCubic(splitCubic(s, t1)[0], t0 / t1)[1];
 }
 
 /** Sample along the uncut curve; out-of-range offsets extend its end tangent. */

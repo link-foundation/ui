@@ -15,11 +15,14 @@ backend-specific option vocabulary with `formatLinks`; the bridge does not
 invent or discard backend geometry fields.
 
 Geometry and solve requests receive detached input/frame snapshots and an
-AbortSignal. They return a structured-cloneable frame containing `positions`
+`AbortSignal`. They return a structured-cloneable frame containing `positions`
 and `pins` maps plus finite positive `bounds` (`x`, `y`, `width`, `height`).
 Additional cloneable backend data can include curves, painted-marker clearance,
 solver scores, captions, cards and fit margins. Coordinates must be finite.
-Solver policy, including prioritizing turns over gaps, belongs to the provider.
+Solver policy belongs to the provider. A solve can return `{ frame, options }`
+to commit updated LiNo options and the matching frame in the same revision.
+`presentation.solve({ signal })` accepts a caller's cancellation signal.
+`presentation.canSolve` indicates whether the provider offers solving.
 
 Only the latest job commits. New jobs abort previous ones, and late successes
 or errors are discarded even if a backend ignores cancellation. Failed input
@@ -90,13 +93,11 @@ cancellation cooperatively through its signal; it cannot free the calling
 thread to deliver an abort event while running. Supply the worker entry for
 interactive, CPU-intensive solves.
 
-The default `solveCollisions` algorithm, its module worker entry and the default
-provider wiring are not implemented by this execution layer. The renderer from
-#227 is now available. [#249](https://github.com/link-foundation/ui/issues/249)
-reconciled the input that #228 describes as clean as a shared fixture, which
-that renderer paints without collisions (see [doublet provider](doublet-provider.md)).
-This execution layer does not claim the renderer-dependent acceptance criteria
-of #228.
+Both `createDoubletProvider` and `createNetworkEditorProvider` supply a
+`solve` implementation backed by the packaged painted-clearance worker.
+The standalone `createCollisionSolver()` uses the same worker and synchronous
+fallback. See the [doublet provider](doublet-provider.md#painted-clearance-solving)
+for the scorer, solver options and return value.
 The built-in [`createDoubletProvider`](doublet-provider.md) supplies the
 continuous two-cubic doublet renderer, nine parametric markers, placements,
 backgrounds, cards and captions without a consumer geometry backend.

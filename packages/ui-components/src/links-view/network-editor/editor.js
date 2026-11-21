@@ -25,6 +25,15 @@ function stateUrl(state, href, win) {
   return url.href;
 }
 
+function committedState(state, config, readOptions) {
+  const links = presentationPairs(state);
+  return {
+    links,
+    code: config.encode(links),
+    options: normalize(readOptions(state.input.options)),
+  };
+}
+
 /** DOM adapter panels for a prepared, host-owned network presentation. */
 export function createNetworkEditor(root, settings = {}) {
   const {
@@ -37,6 +46,7 @@ export function createNetworkEditor(root, settings = {}) {
     syncUrl = true,
     debug,
   } = settings;
+  const canSolve = Boolean(solve || presentation?.canSolve);
   const doc = root.ownerDocument,
     win = doc.defaultView;
   const container = element(doc, 'div', undefined, root);
@@ -79,20 +89,13 @@ export function createNetworkEditor(root, settings = {}) {
       container.setAttribute('aria-busy', String(busy));
       panels.share?.setBusy(busy);
       if (panels.apply) {
-        panels.apply.disabled = busy || !solve;
+        panels.apply.disabled = busy || !canSolve;
       }
     },
   });
   const getState = model.snapshot;
-  const getCommittedState = () => {
-    const state = presentation.snapshot();
-    const links = presentationPairs(state);
-    return {
-      links,
-      code: config.encode(links),
-      options: normalize(readOptions(state.input.options)),
-    };
-  };
+  const getCommittedState = () =>
+    committedState(presentation.snapshot(), config, readOptions);
   const getUrl = () => stateUrl(getCommittedState(), win.location.href, win);
   const context = {
     doc,
@@ -115,7 +118,13 @@ export function createNetworkEditor(root, settings = {}) {
   panels.notations = notationPanel(container, context);
   panels.cards = linksPanel(container, context);
   panels.styles = stylePanel(container, context);
-  panels.apply = solverControls(container, model, solve, announce, run);
+  panels.apply = solverControls(container, {
+    model,
+    solve,
+    canSolve,
+    announce,
+    run,
+  });
   panels.share = createNetworkShare(container, {
     presentation,
     getState: getCommittedState,
@@ -181,7 +190,7 @@ function statusNodes(doc, container) {
   return { live, error };
 }
 
-function solverControls(container, model, solve, announce, run) {
+function solverControls(container, { model, solve, canSolve, announce, run }) {
   const doc = container.ownerDocument;
   const solverPanel = element(doc, 'fieldset', undefined, container);
   element(doc, 'legend', 'Solver', solverPanel);
@@ -194,8 +203,8 @@ function solverControls(container, model, solve, announce, run) {
       }
     })
   );
-  apply.disabled = !solve;
-  if (!solve) {
+  apply.disabled = !canSolve;
+  if (!canSolve) {
     element(doc, 'p', 'Solver unavailable.', solverPanel);
   }
   return apply;

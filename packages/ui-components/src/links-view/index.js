@@ -138,3 +138,7 @@ export {
 } from './doublet.js';
 
 export { createNetworkEditorProvider } from './network-editor/provider.js';
+
+export { scorePaintedCollisions } from './painted-collisions.js';
+export { solveCollisions } from './collisions.js';
+export { createCollisionSolver } from './collision-job.js';

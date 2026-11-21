@@ -703,7 +703,10 @@ export interface NetworkPresentationProvider {
   ): NetworkPresentationFrame | Promise<NetworkPresentationFrame>;
   solve?(
     request: NetworkPresentationRequest
-  ): NetworkPresentationFrame | Promise<NetworkPresentationFrame>;
+  ):
+    | NetworkPresentationFrame
+    | NetworkPresentationSolution
+    | Promise<NetworkPresentationFrame | NetworkPresentationSolution>;
   svg(snapshot: NetworkPresentationSnapshot): string;
   raster?(
     request: NetworkPresentationSnapshot & {
@@ -713,9 +716,15 @@ export interface NetworkPresentationProvider {
     }
   ): Promise<Blob>;
 }
+export interface NetworkPresentationSolution {
+  frame: NetworkPresentationFrame;
+  /** Complete LiNo options matching the newly prepared frame. */
+  options: string;
+}
 export interface NetworkPresentation {
   update(patch: Partial<NetworkPresentationInput>): Promise<boolean>;
-  solve(): Promise<boolean>;
+  readonly canSolve?: boolean;
+  solve(options?: { signal?: AbortSignal }): Promise<boolean>;
   snapshot(): NetworkPresentationSnapshot;
   toSvg(): string;
   toRaster(
@@ -841,9 +850,9 @@ export function syncNetworkUrl(
   settings: NetworkUrlSyncSettings
 ): { flush(): void; dispose(): void };
 
-export function createNetworkEditorProvider(configuration?: {
-  debug?: (message: string, data?: object) => void;
-}): NetworkPresentationProvider;
+export function createNetworkEditorProvider(
+  configuration?: DoubletProviderConfiguration
+): NetworkPresentationProvider;
 
 /** Job execution only; this does not provide a collision search algorithm. */
 export type NetworkSolver<Result> = (
@@ -912,7 +921,28 @@ export interface DoubletMarker {
   rotation: number;
   explicit: string[];
 }
-export interface DoubletOptions {
+export interface PaintedCollisionSettings {
+  clearance?: number;
+  solveRange?: number;
+  solveStep?: number;
+  solveGaps?: boolean;
+  solveGapRange?: number;
+  solveMiddleRange?: number;
+  passes?: number;
+  debug?: boolean;
+}
+export interface PaintedCollisionResult extends NetworkSolverResult {
+  delta: [number, number][];
+}
+export interface CollisionWorkerConfiguration {
+  /** Override the bundled worker URL or pass Worker: undefined for a direct call. */
+  workerUrl?: string | URL;
+  Worker?: typeof Worker;
+}
+export interface DoubletProviderConfiguration extends CollisionWorkerConfiguration {
+  debug?: (message: string, data: object) => void;
+}
+export interface DoubletOptions extends Required<PaintedCollisionSettings> {
   layout:
     | 'auto'
     | 'circle'
@@ -998,6 +1028,7 @@ export interface FittedDoubletCurve extends DoubletCurve {
   gaps: number[];
   markers: DoubletMarkerPlacement[];
   lengths: number[];
+  cutLengths: number[];
 }
 export interface DoubletFrame extends NetworkPresentationFrame {
   places: Map<number, LinkPoint>;
@@ -1009,6 +1040,7 @@ export interface DoubletFrame extends NetworkPresentationFrame {
   transform: [number, number, number];
   margin: number;
   captionRoom: number;
+  solution?: PaintedCollisionResult;
 }
 export const DOUBLET_MARKERS: readonly DoubletMarkerShape[];
 export function readDoubletOptions(
@@ -1020,9 +1052,26 @@ export function doubletGeometry(
   options?: string,
   index?: string
 ): DoubletFrame;
-export function createDoubletProvider(options?: {
-  debug?: (message: string, data: object) => void;
-}): NetworkPresentationProvider;
+export function createDoubletProvider(
+  configuration?: DoubletProviderConfiguration
+): NetworkPresentationProvider;
+export function scorePaintedCollisions(
+  frame: DoubletFrame,
+  options?: { clearance?: number }
+): { count: number; cost: number };
+/** LiNo renderer options or flat, normalized network editor options. */
+export function solveCollisions(
+  links: DoubletInput,
+  options?: string | (Record<string, unknown> & PaintedCollisionSettings),
+  context?: { signal?: AbortSignal }
+): PaintedCollisionResult;
+export function createCollisionSolver(
+  configuration?: CollisionWorkerConfiguration
+): (
+  links: DoubletInput,
+  options?: string | (Record<string, unknown> & PaintedCollisionSettings),
+  context?: { signal?: AbortSignal }
+) => Promise<PaintedCollisionResult>;
 export function doubletOptionAvailability(
   items: DoubletInput,
   options?: string

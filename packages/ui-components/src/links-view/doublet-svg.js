@@ -125,6 +125,18 @@ function curveData(visible) {
   return data.trim();
 }
 
+const DASHES = Object.freeze({
+  solid: Object.freeze([]),
+  dashed: Object.freeze([4, 2]),
+  dotted: Object.freeze([0, 2]),
+  dashdot: Object.freeze([4, 2, 0, 2]),
+  long: Object.freeze([8, 3]),
+});
+
+export function doubletDashLengths(options) {
+  return DASHES[options.dash].map((v) => v * options.strokeWidth);
+}
+
 /** Deterministic preview/export markup, all measurements in the 100-unit box. */
 export function doubletToSvg(frame) {
   const o = frame.options,
@@ -132,17 +144,7 @@ export function doubletToSvg(frame) {
     id = identifier(frame),
     bg = background(o, b, id);
   const label = `Links network${frame.pairs.length ? ` ${doubletNotation(frame.pairs)}` : ''}`;
-  const dash = {
-    solid: '',
-    dashed: '4 2',
-    dotted: '0 2',
-    dashdot: '4 2 0 2',
-    long: '8 3',
-  }[o.dash]
-    .split(' ')
-    .filter(Boolean)
-    .map((v) => Number(v) * o.strokeWidth)
-    .join(' ');
+  const dash = doubletDashLengths(o).join(' ');
   const glow = o.glow
     ? `<filter id="${id}-glow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="${o.glow / 3}"></feGaussianBlur><feMerge><feMergeNode></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter>`
     : '';

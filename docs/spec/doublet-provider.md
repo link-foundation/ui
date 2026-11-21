@@ -187,3 +187,49 @@ transactional updates, SVG preview/export equality, and PNG/JPEG/WebP encoding.
 
 See the [original browser gallery](../../packages/ui-components/examples/doublet-network.html)
 and [verification inventory](../case-studies/issue-227/README.md).
+
+## Painted clearance solving
+
+`scorePaintedCollisions(frame, { clearance })` returns `{ count, cost }` from a
+fitted doublet frame. Clearance defaults to the frame's setting. The scorer
+uses the visible cubics, dash and cap geometry, marker strokes including
+miter joins, and filled marker interiors. Cuts remove the corresponding
+sections from the score. The two halves of a link count against one another
+outside a radius of `strokeWidth + clearance + middleSize / 2` around their
+shared joint. Count measures interacting pairs of painted parts. Weighted
+cost gives crossings priority over close passes and increases as the painted
+edges approach, with extra weight inside one stroke width. The curves are
+subdivided in fitted box units for distance measurements.
+
+`solveCollisions(links, options, { signal })` is the synchronous solver.
+Options can be renderer LiNo or a flat network editor option object. Use
+`await createCollisionSolver()(links, options, { signal })` for a cancellable
+job in a browser. Its default module worker is included in the npm package.
+Both built-in providers expose the solver via `presentation.solve()`.
+
+| Option             | Default | Range or meaning                       |
+| ------------------ | ------- | -------------------------------------- |
+| `clearance`        | `1`     | 0–10 box units                         |
+| `solveRange`       | `180`   | 0–180 degrees from the input turn      |
+| `solveStep`        | `1`     | 1–30 degrees                           |
+| `solveGaps`        | `true`  | Enables gap fallback                   |
+| `solveGapRange`    | `0.2`   | 0–1 layout units for outer gap changes |
+| `solveMiddleRange` | `0`     | 0–15 box units for new middle cuts     |
+| `passes`           | `3`     | 1–10 searches per stage                |
+| `debug`            | `false` | Reports stage counts and cost          |
+
+The solver tries mirrored spacing at self-closed targets, then turns within
+30 degrees and within the configured range. It tries gaps, turns and gaps
+again only when turns alone leave collisions. It prefers fewer collisions,
+less gap movement and earlier stages. It preserves manual cuts and excludes
+free and self-reference ends from edits. New cuts are capped at 30% of the
+fitted half and 30 box units. Larger networks use a bounded coarse grid
+followed by local refinement and reuse unaffected pair scores.
+
+The result contains `{ turns, linkGaps, frame, delta, before, after }`.
+`turns` and `linkGaps` are absolute per-link overrides, `delta` contains
+turn offsets from the input, and `before` and `after` are collision counts.
+A changed solution pins the original fitted transform as `frame` so the score
+can be reproduced when rendering. A clean input retains its options,
+including an unpinned fit. Both providers commit only turns, gaps and frame
+to the saved options.
