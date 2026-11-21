@@ -1069,7 +1069,8 @@ export function scorePaintedCollisions(
 export type CollisionGeometry = (
   links: DoubletPair[],
   options: DoubletOptions
-) => Pick<DoubletFrame, 'layoutCurves' | 'curves' | 'transform'>;
+) => Pick<DoubletFrame, 'layoutCurves' | 'curves' | 'transform'> &
+  Partial<Pick<DoubletFrame, 'bounds'>>;
 /** LiNo renderer options or flat, normalized network editor options. */
 export function solveCollisions(
   links: DoubletInput,

@@ -128,6 +128,26 @@ function adaptedCandidate(pairs, options, geometry, bound, baseline) {
   return measuredAgain ? geometry(pairs, options) : candidate;
 }
 
+function paintLimit(bounds, initial) {
+  return {
+    minX: Math.min(bounds.x, initial?.minX ?? Infinity),
+    minY: Math.min(bounds.y, initial?.minY ?? Infinity),
+    maxX: Math.max(bounds.x + bounds.width, initial?.maxX ?? -Infinity),
+    maxY: Math.max(bounds.y + bounds.height, initial?.maxY ?? -Infinity),
+  };
+}
+
+function containsPaint(limit, box) {
+  const epsilon = 1e-8;
+  return (
+    !box ||
+    (box.minX >= limit.minX - epsilon &&
+      box.minY >= limit.minY - epsilon &&
+      box.maxX <= limit.maxX + epsilon &&
+      box.maxY <= limit.maxY + epsilon)
+  );
+}
+
 export function searchState(frame, baseline, geometry, gapScale) {
   const { options, pairs, transform } = frame;
   const symmetric = pairs.map((_, i) => symmetricReferences(pairs, i));
@@ -144,6 +164,11 @@ export function searchState(frame, baseline, geometry, gapScale) {
     count: 0,
     cost: 0,
   };
+  // Each link may already touch or overflow a user-pinned frame. Solver
+  // edits must not move its paint farther beyond any edge.
+  const limits = current.painted.map(({ bounds }) =>
+    paintLimit(frame.bounds, bounds)
+  );
   const scores = pairs.map((_, i) =>
     Array.from({ length: i + 1 }, (_, j) => {
       const score = diagonal(current.painted, i, j);
@@ -182,11 +207,14 @@ export function searchState(frame, baseline, geometry, gapScale) {
       : nativeCandidate(frame, optionsForCandidate, bound, dirtyCurve);
     const dirty = raw.map(dirtyCurve);
     const painted = current.painted.slice();
-    dirty.forEach((updated, i) => {
+    for (const [i, updated] of dirty.entries()) {
       if (updated) {
         painted[i] = paintDoublet(curves[i], options, clearance);
+        if (!containsPaint(limits[i], painted[i].bounds)) {
+          return null;
+        }
       }
-    });
+    }
     const updates = [];
     let { count, cost } = current;
     dirty.forEach((updated, i) => {

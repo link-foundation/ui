@@ -80,6 +80,9 @@ function rank(
     const next = entries.slice();
     next[i] = variant;
     const candidate = state.evaluate(next, [i]);
+    if (!candidate) {
+      continue;
+    }
     const values = metrics(candidate);
     const changed = values.findIndex(
       (value, j) => absolute(value, scores[j]) > epsilon
@@ -273,7 +276,7 @@ function searchMirrors(context, state, range) {
       const next = original.slice();
       next[i] = { ...original[i], turns: variant.turns };
       const candidate = state.evaluate(next, [i]);
-      if (!candidate.count) {
+      if (candidate && !candidate.count) {
         state.commit(candidate);
         return true;
       }

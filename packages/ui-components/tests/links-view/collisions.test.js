@@ -13,6 +13,7 @@ import {
   solveCollisions,
 } from '@link-foundation/ui-components/links-view';
 import { rendererOptions } from '../../src/links-view/network-editor/renderer-options.js';
+import { paintDoublet } from '../../src/links-view/painted-collisions.js';
 
 const reciprocal = [
   [2, 2],
@@ -70,6 +71,23 @@ test('returns the shared clean 22 11 fixture unchanged', () => {
     [0, 0],
     [0, 0],
   ]);
+});
+
+test('rejects a turn that would paint outside the pinned frame', () => {
+  const [scale, x, y] = doubletGeometry(reciprocal).transform;
+  const frame = [scale, x, y + 18];
+  const bottom = (options) => {
+    const text = rendererOptions(options, reciprocal.length);
+    const { curves, options: fitted } = doubletGeometry(reciprocal, text);
+    return Math.max(
+      ...curves.map((curve) => paintDoublet(curve, fitted, 1).bounds.maxY)
+    );
+  };
+  assert.ok(bottom({ frame }) < 100);
+  const result = solveCollisions(reciprocal, { frame });
+  assert.ok(result.after < result.before);
+  assert.deepEqual(result.frame, frame);
+  assert.ok(bottom(result) <= 100);
 });
 
 test('a host renderer supplies both the search geometry and the pinned fit', () => {

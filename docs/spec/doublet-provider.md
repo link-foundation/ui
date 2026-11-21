@@ -239,7 +239,9 @@ Hosts with their own doublet renderer can supply a `CollisionGeometry`
 function as `solveCollisions(links, options, { signal, geometry })`. It receives
 positional links and normalized doublet options, including the per-link edits.
 Return the layout curves, fitted curves and transform. Honor `options.frame`
-when present. The fitted curves describe the visible halves, fitted lengths
+when present. Supply `bounds` if the host uses a different view box. The solver
+rejects edits that extend paint beyond the view box or worsen existing overflow.
+The fitted curves describe the visible halves, fitted lengths
 before and after the outer cuts, and positioned markers. Marker placements may
 provide their actual fitted path vertices, stroke width, cap, join and miter
 limit. The search uses the same scoring and cut limits for these curves. In a
