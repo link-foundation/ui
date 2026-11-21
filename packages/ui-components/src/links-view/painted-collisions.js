@@ -5,6 +5,7 @@ import {
   component,
   paintedDistance,
   paintedMarker,
+  strokeDashDot,
   strokeParts,
   strokeCrossing,
   visiblePoints,
@@ -27,8 +28,11 @@ function dashHalf(points, pattern, state, cap, joint, radius) {
     for (let length = 0; length < span; ) {
       const p = length === 0 ? a : lerp(a, b, length / span);
       if (state.remaining === 0) {
-        if (state.index % 2 === 0 && cap === 'round' && !run.length) {
-          parts.push(...strokeParts([p, p], radius, cap, joint));
+        if (state.index % 2 === 0 && !run.length) {
+          const dot = strokeDashDot(p, a, b, radius, cap, joint);
+          if (dot) {
+            parts.push(dot);
+          }
         }
         flush();
         state.index = (state.index + 1) % pattern.length;

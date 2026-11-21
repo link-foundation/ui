@@ -137,8 +137,14 @@ function outsideJoint(a, b, joint) {
   return outside;
 }
 
-function strokeStrip(a, b, radius, extendStart = 0, extendEnd = 0) {
-  const v = sub(b, a);
+function strokeStrip(
+  a,
+  b,
+  radius,
+  extendStart = 0,
+  extendEnd = 0,
+  v = sub(b, a)
+) {
   const n = Math.hypot(v.x, v.y);
   if (n < EPSILON) {
     return null;
@@ -152,6 +158,15 @@ function strokeStrip(a, b, radius, extendStart = 0, extendEnd = 0) {
     sub(end, normal),
     sub(start, normal),
   ]);
+}
+
+export function strokeDashDot(point, from, to, radius, cap, joint) {
+  if (cap === 'butt' || !outsideJoint(point, point, joint).length) {
+    return null;
+  }
+  return cap === 'round'
+    ? segment(point, point, radius)
+    : strokeStrip(point, point, radius, radius, radius, sub(to, from));
 }
 
 /** Stroke strips and round joins approximate the visible cubic within FLATNESS. */

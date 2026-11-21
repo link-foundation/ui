@@ -80,6 +80,28 @@ test('clips the own-half joint and respects real breaks and dash gaps', () => {
   assert.equal(score(dashes).count, 0);
 });
 
+test('scores zero-length dashes with their painted cap shape', () => {
+  const dotted = curve(line(0, 0, 10, 0));
+  const corner = curve(null, null, point(50, 50), [
+    {
+      marker: { shape: 'dot', size: 0.05, angle: 45 },
+      point: point(4.45, 0.45),
+      angle: 0,
+    },
+  ]);
+  for (const [cap, count] of [
+    ['square', 1],
+    ['round', 0],
+    ['butt', 0],
+  ]) {
+    assert.equal(
+      score(scene([dotted, corner], `dash dotted\nlinecap ${cap}\nclearance 0`))
+        .count,
+      count
+    );
+  }
+});
+
 test('scores an endpoint marker against other paint on the same link', () => {
   const left = line(-12, 0, 0, 0);
   const right = line(0, 0, 12, 0);
