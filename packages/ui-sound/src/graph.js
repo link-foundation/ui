@@ -31,8 +31,18 @@ function noiseBuffer(audio, seconds, channels, random, decay = false) {
   return buffer;
 }
 
-/** Shelf → dry/reverb → compressor → master volume (including wet tails). */
-export function createSoundBus(audio, settings, random = Math.random) {
+/** Route volume before the effects or after compression (including wet tails). */
+export function createSoundBus(
+  audio,
+  settings,
+  random = Math.random,
+  { gainPlacement = 'output', destination = audio.destination } = {}
+) {
+  if (!['input', 'output'].includes(gainPlacement)) {
+    throw new RangeError('Invalid sound bus gain placement');
+  }
+  const output =
+    typeof destination === 'function' ? destination(audio) : destination;
   const input = audio.createGain();
   const shelf = audio.createBiquadFilter();
   shelf.type = 'highshelf';
@@ -44,13 +54,15 @@ export function createSoundBus(audio, settings, random = Math.random) {
   compressor.knee.value = 12;
   compressor.attack.value = 0.003;
   compressor.release.value = 0.15;
-  const master = audio.createGain();
-  const nodes = [input, shelf, compressor, master];
-  input
-    .connect(shelf)
-    .connect(compressor)
-    .connect(master)
-    .connect(audio.destination);
+  const master = gainPlacement === 'input' ? input : audio.createGain();
+  const nodes = [input, shelf, compressor];
+  input.connect(shelf).connect(compressor);
+  if (master === input) {
+    compressor.connect(output);
+  } else {
+    compressor.connect(master).connect(output);
+    nodes.push(master);
+  }
   const convolver = audio.createConvolver();
   const wet = audio.createGain();
   wet.gain.value = settings.reverb ?? 0.2;

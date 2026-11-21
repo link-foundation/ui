@@ -77,6 +77,7 @@ export function createSoundPlayer({
   now = () => globalThis.performance.now(),
   random = Math.random,
   createContext = () => new globalThis.AudioContext(),
+  bus: busOptions,
   gestureTarget = globalThis.window,
   document = gestureTarget?.document ?? globalThis.document,
   hasBeenActive = () =>
@@ -102,6 +103,7 @@ export function createSoundPlayer({
     theme,
     state,
     createContext,
+    busOptions,
     random,
     onDiagnostic,
     document,

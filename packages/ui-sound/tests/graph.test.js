@@ -53,3 +53,42 @@ describe('Web Audio graph', () => {
     ).toBe(true);
   });
 });
+
+describe('Host audio routing', () => {
+  it('plays quiet and stacked instances of the same patch through either volume placement', () => {
+    const theme = loadTheme();
+    for (const gainPlacement of ['input', 'output']) {
+      const audio = fakeAudio();
+      const destination = audio.createGain();
+      const bus = createSoundBus(audio, theme.bus, seeded(), {
+        gainPlacement,
+        destination: () => destination,
+      });
+      const compressor = audio.nodes.find((node) => node.kind === 'compressor');
+      expect(bus.input.connections).toEqual([bus.shelf]);
+      expect(bus.shelf.connections).toEqual([compressor, bus.convolver]);
+      expect(bus.wet.connections).toEqual([compressor]);
+      expect(compressor.connections).toEqual([
+        gainPlacement === 'input' ? destination : bus.master,
+      ]);
+      const volume = gainPlacement === 'input' ? bus.input : bus.master;
+      expect(bus.master).toBe(volume);
+      bus.configure({ volume: 0.6, room: 0.5 });
+      expect(volume.gain.calls).toEqual([['target', 0.6, 0, 0.02]]);
+      for (const voices of [1, 3]) {
+        const start = audio.nodes.length;
+        for (let voice = 0; voice < voices; voice++) {
+          playVoice(audio, theme.voices.tick, bus.input, { gain: 0.1 });
+        }
+        const peaks = audio.nodes
+          .slice(start)
+          .filter((node) => node.kind === 'gain');
+        expect(peaks.map((node) => node.gain.calls[2][1])).toEqual(
+          Array(voices).fill(theme.voices.tick.parts[0].gain * 0.1)
+        );
+      }
+      bus.disconnect();
+      expect(destination.disconnected).toBe(undefined);
+    }
+  });
+});
