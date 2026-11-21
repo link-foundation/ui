@@ -259,8 +259,10 @@ export function paintedMarker(placement, options) {
   if (shape === 'none') {
     return null;
   }
+  const strokeWidth =
+    placement.strokeWidth ?? (shape === 'dot' ? 0 : options.strokeWidth);
   if (shape === 'dot') {
-    return component([segment(point, point, size / 2)]);
+    return component([segment(point, point, (size + strokeWidth) / 2)]);
   }
   const closed = closedShapes.includes(shape);
   const local =
@@ -273,7 +275,7 @@ export function paintedMarker(placement, options) {
   const points =
     placement.vertices ??
     local.map(([x, y]) => add(point, rotate({ x, y }, angle)));
-  const parts = markerStroke(points, options.strokeWidth / 2, {
+  const parts = markerStroke(points, strokeWidth / 2, {
     closed,
     cap: placement.linecap ?? 'butt',
     join: placement.linejoin ?? options.arrowJoin,

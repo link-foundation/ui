@@ -193,10 +193,11 @@ and [verification inventory](../case-studies/issue-227/README.md).
 `scorePaintedCollisions(frame, { clearance })` returns `{ count, cost }` from a
 fitted doublet frame. Clearance defaults to the frame's setting. The scorer
 uses the visible cubics, dash and cap geometry, marker strokes including
-miter joins, and filled marker interiors. Cuts remove the corresponding
-sections from the score. The two halves of a link count against one another
-outside a radius of `strokeWidth + clearance + middleSize / 2` around their
-shared joint. Count measures interacting pairs of painted parts. Weighted
+miter joins, and filled marker interiors. Endpoint markers enter the score
+against the opposite half and other markers of the same link. Cuts remove the
+corresponding sections from the score. The two halves of a link count against
+one another outside a radius of `strokeWidth + clearance + middleSize / 2`
+around their shared joint. Count measures interacting pairs of painted parts. Weighted
 cost gives crossings priority over close passes and increases as the painted
 edges approach, with extra weight inside one stroke width. The curves are
 subdivided in fitted box units for distance measurements.
@@ -240,8 +241,8 @@ positional links and normalized doublet options, including the per-link edits.
 Return the layout curves, fitted curves and transform. Honor `options.frame`
 when present. The fitted curves describe the visible halves, fitted lengths
 before and after the outer cuts, and positioned markers. Marker placements may
-provide their actual fitted path vertices, stroke cap, join and miter limit.
-The search uses the same scoring and cut limits for these curves. In a
+provide their actual fitted path vertices, stroke width, cap, join and miter
+limit. The search uses the same scoring and cut limits for these curves. In a
 custom module worker, import the geometry function and pass it to the solver
 registered with `installSolverWorker`. Use the same solver and geometry
 function as the fallback passed to `createSolverJob`.

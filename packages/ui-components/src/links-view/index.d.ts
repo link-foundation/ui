@@ -1018,6 +1018,7 @@ export interface DoubletMarkerPlacement {
   length: number;
   /** Fitted path vertices for an alternate renderer, in drawing order. */
   vertices?: LinkPoint[];
+  strokeWidth?: number;
   linecap?: DoubletOptions['linecap'];
   linejoin?: DoubletOptions['arrowJoin'];
   miterLimit?: number;

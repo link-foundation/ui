@@ -75,15 +75,33 @@ export function paintDoublet(curve, options, clearance) {
       return shape;
     });
   };
-  const pieces = [
-    ...paint(null),
-    ...curve.markers.map((marker) => paintedMarker(marker, options)),
-  ].filter(Boolean);
+  const shafts = paint(null);
+  const markers = curve.markers.map((placement) =>
+    paintedMarker(placement, options)
+  );
+  const pieces = [...shafts, ...markers].filter(Boolean);
   const halves = paint(joint);
+  let cost = measure(halves[0], halves[1], clearance, options.strokeWidth);
+  let count = Number(cost > 0);
+  const add = (first, second) => {
+    const collision = measure(first, second, clearance, options.strokeWidth);
+    cost += collision;
+    count += Number(collision > 0);
+  };
+  for (const [i, placement] of curve.markers.entries()) {
+    // A marker touches the shaft it belongs to. The opposite shaft and
+    // the other markers can still obstruct it when a link folds back.
+    if (placement.end === 'start' || placement.end === 'end') {
+      add(markers[i], shafts[placement.end === 'start' ? 1 : 0]);
+    }
+    for (let j = 0; j < i; j++) {
+      add(markers[i], markers[j]);
+    }
+  }
   return {
     pieces,
     bounds: component(pieces)?.bounds,
-    own: measure(halves[0], halves[1], clearance, options.strokeWidth),
+    own: { count, cost },
   };
 }
 
@@ -143,7 +161,7 @@ export function paintedPair(a, b, clearance, strokeWidth) {
   return { count, cost };
 }
 
-export const ownScore = ({ own }) => ({ count: Number(own > 0), cost: own });
+export const ownScore = ({ own }) => own;
 
 /** Count and weight collisions in the fitted geometry returned by the renderer. */
 export function scorePaintedCollisions(

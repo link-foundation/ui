@@ -46,6 +46,17 @@ test('scores a filled marker interior, a hollow marker rim and an acute miter ti
   assert.equal(score(scene([marker('square', 10), inside])).count, 1);
   assert.equal(score(scene([marker('diamond', 10), inside])).count, 1);
   assert.equal(score(scene([marker('circle', 10), inside])).count, 0);
+  const dot = marker('dot', 10);
+  const outside = curve(line(5.3, -0.1, 5.3, 0.1));
+  assert.equal(
+    score(scene([dot, outside], 'clearance 0\nstrokeWidth 0.5')).count,
+    0
+  );
+  dot.markers[0].strokeWidth = 1;
+  assert.equal(
+    score(scene([dot, outside], 'clearance 0\nstrokeWidth 0.5')).count,
+    1
+  );
   assert.equal(
     score(scene([marker('circle', 10), curve(line(5, 0, 5, 0.5))])).count,
     1
@@ -67,4 +78,20 @@ test('clips the own-half joint and respects real breaks and dash gaps', () => {
     'dash dashed\nlinecap butt\nclearance 0'
   );
   assert.equal(score(dashes).count, 0);
+});
+
+test('scores an endpoint marker against other paint on the same link', () => {
+  const left = line(-12, 0, 0, 0);
+  const right = line(0, 0, 12, 0);
+  const marker = (end, x) => ({
+    end,
+    marker: { shape: 'dot', size: 2, angle: 45 },
+    point: point(x, 0),
+    angle: 0,
+  });
+  const measure = (markers) =>
+    score(scene([curve(left, right, point(0, 0), markers)])).count;
+  assert.equal(measure([marker('start', -8)]), 0);
+  assert.equal(measure([marker('start', 8)]), 1);
+  assert.equal(measure([marker('start', 8), marker('end', 8)]), 2);
 });
