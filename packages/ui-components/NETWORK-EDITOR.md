@@ -85,31 +85,8 @@ survives option edits; a network change elsewhere replaces it. The single-line
 links field uses the official formatter's inline mode. Downloads use nested
 LiNo with one link per line.
 
-The codecs also accept the historic editor inputs.
-
-| Codec         | Examples for `01 20`                                                                       |
-| ------------- | ------------------------------------------------------------------------------------------ |
-| `parseLinks`  | `(1: 0, 1) (2: 2, 0)` or named records with one indented reference per line                |
-| `parseNumber` | `0120`, `01-20₃`, `01.20_3` or `[0, 1, 2, 0]_3`                                            |
-| `parseTheory` | `N² = {1 ↦ (0, 1), 2 ↦ (2, 0)}`, `1 -> (0 1), 2 -> (2 0)`, `{(0, 1), (2, 0)}` or `01₃ 20₃` |
-
-Links records are flat doublets and may be all named or all unnamed. A number
-with an omitted base uses the link count plus one. Any explicit base must match
-that value.
-
-`formatLinks(links, { style: 'inline' })` writes `(1: 0 1) (2: 2 0)` on
-one line. Its default writes one record per line with no parentheses.
-`formatTheory(links, { set: 'N²' })` selects the reference notation label.
-The default label is `λ`.
-
-The parse functions return `{ links }` for valid input or an `error` message
-key with optional `params`. For example, `parseNumber('0120₄')` returns
-`configurations.base` with `{ actualBase: 4, expectedBase: 3, linkCount: 2 }`.
-A numeric reference outside the network supplies `reference` and `linkCount`.
-Name errors carry `linkCount`, odd number digit counts carry `digitCount` and
-decimal index errors carry `linkCount` and the exact `maxIndex` as a string.
-Hosts can use these values in localized field errors and look up the generic
-message keys in `configurationMessages`.
+The [configurations API guide](CONFIGURATIONS.md) lists the historic editor
+inputs and validation parameters for hosts building localized field errors.
 
 Reference menus switch to bounded integer inputs above 50 links. Removal uses
 the configurations index map for turns, gaps and colours. Canonical renaming

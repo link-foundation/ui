@@ -38,10 +38,29 @@ with an injectable `[0,1)` random source, avoiding a floating point index.
 `parseTheory`/`formatTheory`, `parsePairs`/`formatPairs`,
 `parseNumber`/`formatNumber`, `parseDecimal(text, n, options)`/`formatDecimal`
 and `parseLinks`/`formatLinks` use that contract for their readers.
-`configurationMessages.en` and `.ru` map error keys to explanations.
-Theory formatters accept `{set: 'λ' | 'L' | 'R'}`; readers also accept an
-optional leading `N²=`. Number and pair bases always equal `n + 1`, including
-real-only networks; decimal indexing accepts `{real}`.
+
+| Codec         | Inputs for `01 20`                                                                         |
+| ------------- | ------------------------------------------------------------------------------------------ |
+| `parseLinks`  | `(1: 0, 1) (2: 2, 0)` or named records with one indented reference per line                |
+| `parseNumber` | `0120`, `01-20₃`, `01.20_3` or `[0, 1, 2, 0]_3`                                            |
+| `parseTheory` | `N² = {1 ↦ (0, 1), 2 ↦ (2, 0)}`, `1 -> (0 1), 2 -> (2 0)`, `{(0, 1), (2, 0)}` or `01₃ 20₃` |
+
+Links records are flat doublets and may be all named or all unnamed. Number
+and pair bases equal the link count plus one, including real-only networks.
+The number reader infers an omitted base and checks any explicit base. Decimal
+indexing accepts `{real}`.
+
+`formatLinks(links, { style: 'inline' })` writes `(1: 0 1) (2: 2 0)` on
+one line. Its default writes one record per line with no parentheses.
+`formatTheory` accepts `{set: 'λ' | 'L' | 'R' | 'N²'}` and defaults to `λ`.
+
+Failures may include `params` alongside the existing error key. For example,
+`parseNumber('0120₄')` returns `configurations.base` with
+`{ actualBase: 4, expectedBase: 3, linkCount: 2 }`. Out-of-range references
+supply `reference` and `linkCount`. Name errors carry `linkCount`, odd number
+digit counts carry `digitCount` and decimal index errors carry `linkCount`
+and the exact `maxIndex` as a string. `configurationMessages.en` and `.ru`
+map error keys to explanations.
 
 Editing helpers return fresh arrays: `addLink`, `setReference(links, k, end, value)`
 (`end` is `source`, `target`, `0` or `1`), and `step(links, ±1)` across sizes.
