@@ -38,7 +38,10 @@ export function createPositioner(
           offset(options.offset ?? 8),
           flip(),
           // Keep sized menus inside the viewport even when scrolling hides the anchor.
-          shift({ padding: 8, crossAxis: Boolean(options.size) }),
+          shift({
+            padding: 8,
+            crossAxis: options.crossAxis ?? Boolean(options.size),
+          }),
           ...(options.size
             ? [
                 size({

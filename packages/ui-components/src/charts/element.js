@@ -13,7 +13,15 @@ import { chartFromLinks, chartToLino, parseChart } from './chart-model.js';
 import { atomNode, formatNode, parseLino, prop } from './lino.js';
 import { renderSmallChartSvg } from './small-svg.js';
 import { chartTable } from './summary.js';
-import { CHART_CSS } from './tokens.js';
+import { ensureChartStyles } from './tokens.js';
+import { attachChartInteraction } from './chart-interaction.js';
+import {
+  applyChartTheme,
+  chartDocument,
+  observeChartPresentation,
+} from './document.js';
+
+export { ensureChartStyles } from './tokens.js';
 
 /** The `<script>` type of an inline spec: `<script type="text/lino">`. */
 export const LINO_SCRIPT_TYPE = 'text/lino';
@@ -27,17 +35,6 @@ export function uniqueId(document, prefix = 'ui-chart') {
   return `${prefix}-${next}`;
 }
 
-/** Add the chart style sheet to the document once. */
-export function ensureChartStyles(document) {
-  if (document.querySelector('style[data-ui-chart]') !== null) {
-    return;
-  }
-  const style = document.createElement('style');
-  style.setAttribute('data-ui-chart', '');
-  style.textContent = CHART_CSS;
-  (document.head ?? document.documentElement).append(style);
-}
-
 /**
  * The data table twin of a chart: a caption, column headers, and one row
  * per data row. Built with DOM methods, so every value is text.
@@ -45,7 +42,7 @@ export function ensureChartStyles(document) {
  * @param {object} spec
  * @param {string} id
  */
-export function createTable(document, spec, id) {
+export function createTable(document, spec, id = uniqueId(document)) {
   const { caption, columns, numeric, rows } = chartTable(spec);
   const table = document.createElement('table');
   table.id = id;
@@ -101,6 +98,7 @@ export function createChartElementClass(win) {
     #spec = null;
     #rendered = null;
     #output = [];
+    #smallInteraction;
 
     /** The LiNo text of the chart; setting it renders the element again. */
     get lino() {
@@ -128,6 +126,42 @@ export function createChartElementClass(win) {
     connectedCallback() {
       if (this.#rendered === null) {
         this.update();
+      } else {
+        this.bindPresentation();
+      }
+    }
+
+    disconnectedCallback() {
+      this.#smallInteraction?.destroy();
+      this.#smallInteraction = undefined;
+      chartDocument(this.ownerDocument).hide(this);
+      observeChartPresentation(this);
+    }
+
+    bindPresentation() {
+      applyChartTheme(this);
+      observeChartPresentation(this, () => this.updatePresentation());
+      this.updatePresentation();
+    }
+
+    updatePresentation() {
+      if (!chartDocument(this.ownerDocument).configured) {
+        this.#smallInteraction?.destroy();
+        this.#smallInteraction = undefined;
+        return;
+      }
+      if (this.#smallInteraction) {
+        return;
+      }
+      const drawing = this.#output[0]?.querySelector('[data-ui-chart-drawing]');
+      if (this.#rendered && this.#rendered.kind !== 'chart' && drawing) {
+        this.#smallInteraction = attachChartInteraction(
+          drawing,
+          this.#rendered,
+          {
+            mark: () => drawing,
+          }
+        );
       }
     }
 
@@ -177,6 +211,9 @@ export function createChartElementClass(win) {
     update() {
       const document = this.ownerDocument;
       ensureChartStyles(document);
+      this.#smallInteraction?.destroy();
+      this.#smallInteraction = undefined;
+      chartDocument(document).hide(this);
       this.#output.forEach((node) => node.remove());
       let spec;
       try {
@@ -191,6 +228,9 @@ export function createChartElementClass(win) {
       }
       this.#rendered = spec;
       this.show(spec === null ? [] : this.draw(spec));
+      if (this.isConnected) {
+        this.bindPresentation();
+      }
     }
 
     /** Append the rendered nodes, remembering them for the next update. */
@@ -287,6 +327,7 @@ export function drawSmallChart(
   } else {
     box.innerHTML = renderSmallChartSvg(spec);
   }
+  box.firstElementChild?.setAttribute('data-ui-chart-drawing', '');
   if (spec.footnote) {
     const link = document.createElement('a');
     link.textContent = spec.footnote.label;
