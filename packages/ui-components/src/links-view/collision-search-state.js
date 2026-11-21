@@ -10,7 +10,25 @@ const samePath = (a, b) =>
     )
   );
 
-function boundedGaps(preview, entry, baseline, scale, options, symmetric) {
+function cutAtMost(gap, cap, gapScale) {
+  const value = Math.min(gap, cap);
+  if (!gapScale) {
+    return value;
+  }
+  // Comparing the nearest grid value avoids rounding an already-snapped gap
+  // down another step when multiplication falls just below an integer.
+  const nearest = Math.round(value * gapScale);
+  return (nearest / gapScale <= value ? nearest : nearest - 1) / gapScale;
+}
+
+function boundedGaps(
+  preview,
+  entry,
+  baseline,
+  scale,
+  options,
+  { symmetric, gapScale }
+) {
   const gaps = [...entry.gaps];
   const original = baseline.gaps.map((gap, i) => gap ?? options.gaps[i]);
   const outer = preview.lengths.map(
@@ -18,7 +36,8 @@ function boundedGaps(preview, entry, baseline, scale, options, symmetric) {
   );
   const clamp = (i, cap) => {
     if (gaps[i] !== null && gaps[i] > original[i]) {
-      gaps[i] = cap <= original[i] ? baseline.gaps[i] : Math.min(cap, gaps[i]);
+      const next = cutAtMost(gaps[i], cap, gapScale);
+      gaps[i] = next <= original[i] ? baseline.gaps[i] : next;
     }
   };
   if (
@@ -27,12 +46,11 @@ function boundedGaps(preview, entry, baseline, scale, options, symmetric) {
     gaps[0] === gaps[1] &&
     gaps[0] > Math.min(original[0], original[1])
   ) {
-    const cap = Math.min(...outer);
-    if (cap < Math.max(original[0], original[1])) {
+    const next = cutAtMost(gaps[0], Math.min(...outer), gapScale);
+    if (next < Math.max(original[0], original[1])) {
       [gaps[0], gaps[1]] = baseline.gaps;
     } else {
-      clamp(0, cap);
-      clamp(1, cap);
+      gaps[0] = gaps[1] = next;
     }
   } else {
     clamp(0, outer[0]);
@@ -55,20 +73,16 @@ export function symmetricReferences(pairs, i) {
   );
 }
 
-export function cutsWithinBounds(frame, entries, baseline) {
+export function cutsWithinBounds(frame, entries, baseline, gapScale) {
   const { curves, options, pairs, transform } = frame;
   return curves.every((curve, i) => {
     const entry = entries[i];
     return (
       entry ===
-      boundedGaps(
-        curve,
-        entry,
-        baseline[i],
-        transform[0],
-        options,
-        symmetricReferences(pairs, i)
-      )
+      boundedGaps(curve, entry, baseline[i], transform[0], options, {
+        symmetric: symmetricReferences(pairs, i),
+        gapScale,
+      })
     );
   });
 }
@@ -114,7 +128,7 @@ function adaptedCandidate(pairs, options, geometry, bound, baseline) {
   return measuredAgain ? geometry(pairs, options) : candidate;
 }
 
-export function searchState(frame, baseline, geometry) {
+export function searchState(frame, baseline, geometry, gapScale) {
   const { options, pairs, transform } = frame;
   const symmetric = pairs.map((_, i) => symmetricReferences(pairs, i));
   const { strokeWidth, clearance } = options;
@@ -158,7 +172,7 @@ export function searchState(frame, baseline, geometry) {
         baseline[i],
         transform[0],
         options,
-        symmetric[i]
+        { symmetric: symmetric[i], gapScale }
       );
       optionsForCandidate.links[i + 1] = next;
       return entry !== next;

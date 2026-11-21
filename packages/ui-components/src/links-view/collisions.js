@@ -386,7 +386,7 @@ function inputLengths(options, entries) {
   return [last('turns', 0), last('gaps', null)];
 }
 
-function exactScore({ frame, geometry, original }, entries) {
+function exactScore({ frame, geometry, original, gapScale }, entries) {
   const options = linkedOptions(
     { ...frame.options, frame: frame.transform },
     entries
@@ -398,16 +398,16 @@ function exactScore({ frame, geometry, original }, entries) {
       );
   const fitted = { ...frame, options, curves };
   return (
-    cutsWithinBounds(fitted, entries, original) &&
+    cutsWithinBounds(fitted, entries, original, gapScale) &&
     scorePaintedCollisions(fitted)
   );
 }
 
 function chooseWinner(context) {
-  const { frame, original, before, geometry } = context;
+  const { frame, original, before, geometry, gapScale } = context;
   const { options } = frame;
   const near = Math.min(30, options.solveRange);
-  const turns = searchState(frame, original, geometry);
+  const turns = searchState(frame, original, geometry, gapScale);
   const stages = [];
   const remember = (state, stage) => {
     stages.push(state.current);
@@ -429,7 +429,7 @@ function chooseWinner(context) {
   }
   remember(turns, 'full turns');
   if (turns.current.count && options.solveGaps) {
-    const gaps = searchState(frame, original, geometry);
+    const gaps = searchState(frame, original, geometry, gapScale);
     searchGaps(context, gaps);
     remember(gaps, 'gaps');
     searchTurns(context, gaps, near);
@@ -445,7 +445,7 @@ function chooseWinner(context) {
       options.solveGapRange &&
       frame.pairs.some((_, i) => symmetricReferences(frame.pairs, i))
     ) {
-      const mirrors = searchState(frame, original, geometry);
+      const mirrors = searchState(frame, original, geometry, gapScale);
       searchSymmetricGaps(context, mirrors, near);
       remember(mirrors, 'gaps with mirrored turns');
     }
@@ -476,9 +476,13 @@ function chooseWinner(context) {
 export function solveCollisions(
   links,
   options = {},
-  { signal, geometry } = {}
+  { signal, geometry, gapPrecision } = {}
 ) {
   abort(signal);
+  const gapScale =
+    Number.isInteger(gapPrecision) && gapPrecision >= 0 && gapPrecision <= 12
+      ? 10 ** gapPrecision
+      : 0;
   const pairs = doubletPairs(links);
   const source =
     typeof options === 'string'
@@ -497,7 +501,7 @@ export function solveCollisions(
   );
   const before = scorePaintedCollisions(frame);
   const winner = before.count
-    ? chooseWinner({ frame, original, before, signal, geometry })
+    ? chooseWinner({ frame, original, before, signal, geometry, gapScale })
     : undefined;
   const entries = winner?.entries ?? original;
   const [lastTurn, lastGap] = inputLengths(options, original);

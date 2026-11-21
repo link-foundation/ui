@@ -246,3 +246,7 @@ limit. The search uses the same scoring and cut limits for these curves. In a
 custom module worker, import the geometry function and pass it to the solver
 registered with `installSolverWorker`. Use the same solver and geometry
 function as the fallback passed to `createSolverJob`.
+
+Hosts whose saved gaps have a fixed decimal precision can pass `gapPrecision`
+(0–12 decimal places) in the solver context. The search measures new gaps on
+that grid, within the fitted caps, and preserves manual gaps.

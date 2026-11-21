@@ -1074,7 +1074,12 @@ export type CollisionGeometry = (
 export function solveCollisions(
   links: DoubletInput,
   options?: string | (Record<string, unknown> & PaintedCollisionSettings),
-  context?: { signal?: AbortSignal; geometry?: CollisionGeometry }
+  context?: {
+    signal?: AbortSignal;
+    geometry?: CollisionGeometry;
+    /** Decimal places in a host's persisted gaps, from 0 to 12. */
+    gapPrecision?: number;
+  }
 ): PaintedCollisionResult;
 export function createCollisionSolver(
   configuration?: CollisionWorkerConfiguration

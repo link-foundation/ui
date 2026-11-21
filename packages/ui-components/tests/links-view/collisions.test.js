@@ -139,6 +139,20 @@ test('tries gap fallback in a narrow range, and solves with gaps disabled in the
   assert.deepEqual(turnsOnly.linkGaps, []);
 });
 
+test('scores new gaps at the precision the host can save', async () => {
+  const options = { solveRange: 30, solveGapRange: 0.19543 };
+  const result = solveCollisions(reciprocal, options, { gapPrecision: 3 });
+  const gaps = result.linkGaps.flat().filter((gap) => gap !== null);
+  assert.ok(gaps.length > 0);
+  assert.ok(result.after < result.before);
+  assert.deepEqual(
+    gaps,
+    gaps.map((gap) => Number(gap.toFixed(3)))
+  );
+  assert.ok(gaps.every((gap) => gap <= 0.08 + options.solveGapRange));
+  await verifyScore(reciprocal, options, result);
+});
+
 test('the editor provider commits only solved fields to its input and scores the committed frame', async () => {
   const p = createNetworkPresentation(
     createNetworkEditorProvider({ Worker: undefined })
