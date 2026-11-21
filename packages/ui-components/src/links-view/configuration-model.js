@@ -1,6 +1,9 @@
 /** Exact numeric model. Public parsers translate these exceptions to message keys. */
-export function invalid(reason) {
-  throw new RangeError(`configurations.${reason}`);
+export function invalid(reason, params = undefined) {
+  throw Object.assign(
+    new RangeError(`configurations.${reason}`),
+    params && { params }
+  );
 }
 
 export function size(n) {
@@ -21,14 +24,14 @@ export function checked(links, { real = false } = {}) {
     }
     for (const digit of pair) {
       if (!Number.isSafeInteger(digit) || digit < (real ? 1 : 0) || digit > n) {
-        invalid('reference');
+        invalid('reference', { reference: digit, linkCount: n });
       }
     }
   }
   return links;
 }
 
-export function integer(value) {
+function integer(value) {
   if (typeof value === 'bigint') {
     return value;
   }
@@ -38,7 +41,7 @@ export function integer(value) {
   if (typeof value === 'string' && /^\d+$/u.test(value)) {
     return BigInt(value);
   }
-  return invalid('index');
+  return null;
 }
 
 export function count(n, { real = false } = {}) {
@@ -102,8 +105,8 @@ export function indexOf(links, { real = false } = {}) {
 export function linksAt(n, index, { real = false } = {}) {
   const total = count(n, { real });
   let value = integer(index);
-  if (value < 0n || value >= total) {
-    invalid('index');
+  if (value === null || value < 0n || value >= total) {
+    invalid('index', { linkCount: n, maxIndex: String(total - 1n) });
   }
   const base = BigInt(real ? n : n + 1);
   const digits = Array(2 * n);

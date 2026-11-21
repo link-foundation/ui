@@ -97,6 +97,94 @@ it('parses and formats every notation, including all theory arrows', () => {
   assert.deepEqual(parseLinks('(0 1) (2 0)'), { links: sample });
   assert.deepEqual(parseDecimal(formatDecimal(sample), 2), { links: sample });
 });
+it('reads historic flat Links Notation with commas, indentation and quoted references', () => {
+  for (const text of [
+    '(1: 0, 1) (2: 2, 0)',
+    '(2: 2,0), (1: 0 , 1)',
+    '1:\n  0\n  1\n2:\n  2\n  0\n',
+    "'1': '0', '1' # keep commas and parentheses in comments: , ((\n2: 2 0",
+    '(0,1) (2,0)',
+  ]) {
+    assert.deepEqual(parseLinks(text), { links: sample }, text);
+  }
+  for (const text of [
+    '((1: 0 1))',
+    '((1: 0 1) (2: 2 0))',
+    '(1: 0 1) ((2: 2 0))',
+    '1:\n  0\n    1\n  1',
+    "(1: '0,1' 1)",
+    '(1: 0 1) trailing',
+  ]) {
+    assert.ok(parseLinks(text).error, text);
+  }
+  assert.equal(formatLinks(sample), '1: 0 1\n2: 2 0\n');
+  const inline = formatLinks(sample, { style: 'inline' });
+  assert.equal(inline, '(1: 0 1) (2: 2 0)');
+  assert.deepEqual(parseLinks(inline), { links: sample });
+});
+it('infers an omitted number base and accepts the established digit separators', () => {
+  for (const text of [
+    '0120',
+    '01 20',
+    '01-20₃',
+    '01.20_3',
+    '[0, 1, 2, 0]_3',
+    '[0,1 2,0]',
+  ]) {
+    assert.deepEqual(parseNumber(text), { links: sample }, text);
+  }
+  assert.deepEqual(parseNumber('[0, 1, 2, 0]₄'), {
+    error: 'configurations.base',
+    params: { actualBase: 4, expectedBase: 3, linkCount: 2 },
+  });
+  assert.equal(parseNumber('0120_').error, 'configurations.syntax');
+  assert.equal(parseNumber('012').error, 'configurations.digits');
+});
+it('reads both theory labels, bare mappings, unnamed pairs and based pairs', () => {
+  for (const text of [
+    'N² = {1 ↦ (0, 1), 2 ↦ (2, 0)}',
+    '1 -> (0 1), 2 -> (2 0)',
+    '{(0, 1), (2, 0)}',
+    'λ = {\n2 : (2 0)\n1 → (0 1)\n}',
+    '01₃ 20₃',
+    '01 20',
+    '(0,1)₃ (2,0)_3',
+  ]) {
+    assert.deepEqual(parseTheory(text), { links: sample }, text);
+  }
+  assert.equal(formatTheory(sample), 'λ = {1 ↦ (0, 1), 2 ↦ (2, 0)}');
+  const references = formatTheory(sample, { set: 'N²' });
+  assert.equal(references, 'N² = {1 ↦ (0, 1), 2 ↦ (2, 0)}');
+  assert.deepEqual(parseTheory(references), { links: sample });
+  for (const text of [
+    '013 203',
+    '01oops 20',
+    'λ = {1 ↦ (0, 1), 2 ↦ (2)}',
+    '{(0, 1), (2, 0)} trailing',
+    '{(0, 1),, (2, 0)}',
+    '{1 -> (0 1), (2, 0)}',
+  ]) {
+    assert.ok(parseTheory(text).error, text);
+  }
+  assert.deepEqual(parseTheory('01₃ 20₄'), {
+    error: 'configurations.base',
+    params: { actualBase: 4, expectedBase: 3, linkCount: 2 },
+  });
+});
+it('exposes validation parameters alongside the existing message keys', () => {
+  assert.deepEqual(parseLinks('(1: 0, 1) (2: 3, 0)'), {
+    error: 'configurations.reference',
+    params: { reference: 3, linkCount: 2 },
+  });
+  assert.deepEqual(parseTheory('{1 ↦ (0, 1), 1 ↦ (2, 0)}'), {
+    error: 'configurations.name',
+    params: { linkCount: 2 },
+  });
+  assert.deepEqual(parseDecimal('81', 2), {
+    error: 'configurations.index',
+    params: { linkCount: 2, maxIndex: '80' },
+  });
+});
 it('returns localisable, specific errors', () => {
   const cases = [
     [parseNumber('0120₄'), 'base'],
@@ -194,7 +282,10 @@ it('exports a DOM-free package subpath and nonthrowing code parser', async () =>
     await import('@link-foundation/ui-components/links-view/configurations');
   assert.equal(api.codeAt(2, 80n), '22 22');
   assert.deepEqual(parseCode('01 20'), { links: sample });
-  assert.deepEqual(parseCode('01 30'), { error: 'configurations.reference' });
+  assert.deepEqual(parseCode('01 30'), {
+    error: 'configurations.reference',
+    params: { reference: 3, linkCount: 2 },
+  });
   assert.deepEqual(parseCode('012'), { error: 'configurations.digits' });
   assert.deepEqual(parseCode('hello'), { error: 'configurations.syntax' });
   const ten = Array.from({ length: 10 }, () => [10, 0]);

@@ -1,7 +1,16 @@
 export type Configuration = [number, number][];
+export interface ConfigurationErrorParams {
+  actualBase?: number;
+  expectedBase?: number;
+  linkCount?: number;
+  reference?: number;
+  digitCount?: number;
+  /** Decimal string to preserve the exact bound for large networks. */
+  maxIndex?: string;
+}
 export type ParseConfiguration =
-  | { links: Configuration; error?: never }
-  | { error: string; links?: never };
+  | { links: Configuration; error?: never; params?: never }
+  | { error: string; params?: ConfigurationErrorParams; links?: never };
 export interface ConfigurationOptions {
   real?: boolean;
 }
@@ -28,7 +37,7 @@ export function parseCode(code: string): ParseConfiguration;
 export function parseTheory(text: string): ParseConfiguration;
 export function formatTheory(
   links: Configuration,
-  options?: { set?: 'λ' | 'L' | 'R' }
+  options?: { set?: 'λ' | 'N²' | 'L' | 'R' }
 ): string;
 export function parsePairs(text: string): ParseConfiguration;
 export function formatPairs(links: Configuration): string;
@@ -44,7 +53,11 @@ export function formatDecimal(
   options?: ConfigurationOptions
 ): string;
 export function parseLinks(text: string): ParseConfiguration;
-export function formatLinks(links: Configuration): string;
+/** The inline style writes all parenthesized records on one line. */
+export function formatLinks(
+  links: Configuration,
+  options?: { style?: 'indented' | 'inline' }
+): string;
 export const configurationMessages: Record<'en' | 'ru', Record<string, string>>;
 export function addLink(links: Configuration): Configuration;
 export function removeLink(

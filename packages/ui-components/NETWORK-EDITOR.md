@@ -28,12 +28,9 @@ const editor = createNetworkEditor(document.getElementById('editor'), {
 });
 ```
 
-The adapter uses the pure configurations implementation merged into main in
-[PR #244](https://github.com/link-foundation/ui/pull/244). Its model, notations,
-canonical renaming and regression tests are reused unchanged. They are also available at
+The adapter uses the pure model, notations and canonical renaming available at
 `@link-foundation/ui-components/links-view/configurations`. A host may supply
 another `configurations` object implementing that module's contract.
-No consumer-site source is copied.
 
 ## Host panels and messages
 
@@ -128,6 +125,9 @@ localized English/Russian error and leave the presentation unchanged. Draft text
 survives option edits; a network change elsewhere replaces it. The single-line
 links field uses the official formatter's inline mode. Downloads use nested
 LiNo with one link per line.
+
+The [configurations API guide](CONFIGURATIONS.md) lists the historic editor
+inputs and validation parameters for hosts building localized field errors.
 
 Reference menus switch to bounded integer inputs above 50 links. Removal uses
 the configurations index map for turns, gaps and colours. Canonical renaming

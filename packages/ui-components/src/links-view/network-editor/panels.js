@@ -7,6 +7,7 @@ import {
 } from './options.js';
 import { networkLooks, networkSizePresets } from './presets.js';
 import { parseNested, formatLinks } from '@link-foundation/ui-core';
+import { formatLinks as formatConfigurationLinks } from '../configuration-notations.js';
 import { element, button, field, choices } from './dom.js';
 import { doubletColor } from '../doublet-colors.js';
 
@@ -28,17 +29,7 @@ export function notationPanel(parent, context) {
     [
       'links',
       config.parseLinks,
-      (links) =>
-        formatLinks(
-          links.map(([s, t], i) => ({
-            id: String(i + 1),
-            values: [String(s), String(t)],
-          })),
-          { style: 'inline' }
-        )
-          .trim()
-          .split('\n')
-          .join(' '),
+      (links) => formatConfigurationLinks(links, { style: 'inline' }),
     ],
   ];
   for (const [name, parse, format] of definitions) {
